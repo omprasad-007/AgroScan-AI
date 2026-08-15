@@ -1,0 +1,486 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>AgroScan AI - Farmer Analytics</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-container": "#ffeede",
+                        "on-primary-fixed": "#002204",
+                        "surface": "#f9f9f7",
+                        "secondary-fixed-dim": "#78dc77",
+                        "surface-dim": "#dadad8",
+                        "on-tertiary": "#ffffff",
+                        "surface-container": "#eeeeec",
+                        "surface-container-lowest": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "on-secondary-container": "#00731e",
+                        "on-surface-variant": "#40493d",
+                        "secondary-fixed": "#94f990",
+                        "surface-container-highest": "#e2e3e1",
+                        "inverse-primary": "#88d982",
+                        "error": "#ba1a1a",
+                        "inverse-on-surface": "#f1f1ef",
+                        "on-secondary-fixed-variant": "#005313",
+                        "primary-fixed-dim": "#88d982",
+                        "surface-tint": "#1b6d24",
+                        "on-primary-fixed-variant": "#005312",
+                        "on-secondary": "#ffffff",
+                        "outline-variant": "#bfcaba",
+                        "surface-container-high": "#e8e8e6",
+                        "tertiary-fixed": "#ffddb5",
+                        "on-background": "#1a1c1b",
+                        "tertiary-container": "#986200",
+                        "on-error-container": "#93000a",
+                        "surface-variant": "#e2e3e1",
+                        "surface-bright": "#f9f9f7",
+                        "on-tertiary-fixed": "#2a1800",
+                        "background": "#f9f9f7",
+                        "primary-container": "#2e7d32",
+                        "secondary-container": "#91f78e",
+                        "inverse-surface": "#2f3130",
+                        "on-secondary-fixed": "#002204",
+                        "on-surface": "#1a1c1b",
+                        "primary-fixed": "#a3f69c",
+                        "on-tertiary-fixed-variant": "#643f00",
+                        "surface-container-low": "#f4f4f2",
+                        "primary": "#0d631b",
+                        "tertiary-fixed-dim": "#ffb957",
+                        "tertiary": "#774c00",
+                        "on-error": "#ffffff",
+                        "outline": "#707a6c",
+                        "secondary": "#006e1c",
+                        "on-primary-container": "#cbffc2",
+                        "on-primary": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "unit": "8px",
+                        "container-margin": "24px",
+                        "touch-target-min": "48px",
+                        "card-padding": "20px",
+                        "gutter": "16px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "body-md": ["Inter"],
+                        "label-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "title-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "title-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: theme('colors.background'); color: theme('colors.on-background'); }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .material-symbols-outlined.fill { font-variation-settings: 'FILL' 1; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Simple chart placeholder styles */
+        .donut-segment-1 { stroke-dasharray: 60 40; stroke-dashoffset: 25; }
+        .donut-segment-2 { stroke-dasharray: 25 75; stroke-dashoffset: -35; }
+        .donut-segment-3 { stroke-dasharray: 15 85; stroke-dashoffset: -60; }
+        
+        .line-chart-path-1 { stroke-dasharray: 1000; stroke-dashoffset: 1000; animation: dash 2s linear forwards; }
+        .line-chart-path-2 { stroke-dasharray: 1000; stroke-dashoffset: 1000; animation: dash 2s linear forwards 0.5s; }
+        
+        @keyframes dash {
+            to { stroke-dashoffset: 0; }
+        }
+    </style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background pb-32">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 border-b border-outline-variant shadow-sm flex justify-between items-center px-gutter h-14 w-full bg-surface"><button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-high transition-colors active:scale-95 text-on-surface-variant mr-2" onclick="window.location.href='{{DATA:SCREEN:SCREEN_20}}'"><span class="material-symbols-outlined">arrow_back</span></button>
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full overflow-hidden bg-surface-container-highest">
+<img alt="User profile shortcut" class="w-full h-full object-cover" data-alt="A close up, high resolution portrait of a farmer in a modern agricultural setting, soft natural lighting, light green background, professional UI avatar style, bright and clean." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB8E1RR4q25EhocLaO7-gcGdPLnQMXKugRuf_kwQKjTlwjfah_AQRyZbuiC2iKg5R6Ono8DBQFU1yXvxZOXAGWrHsoO70386rTNk1qQVDel965uoSe3DUbgsybsZaf-58NYpvlGZ2wshRB_iSbIgGe82Y_x5FYTkOhv0dkVTHVeXMDZMRSd1_-Cvn66jd5bXUxTbOSTVNYB2K49S-D_cn5-DWyiWSVjBQEr62vGh_WFFj0qSGe1dgkfsw">
+</div>
+<h1 class="font-display-lg-mobile text-display-lg-mobile text-primary tracking-tight">AgroScan AI</h1>
+</div>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-high transition-colors active:scale-95 text-primary">
+<span class="material-symbols-outlined" data-icon="location_on">location_on</span>
+</button>
+</header>
+<main class="pt-20 px-4 md:px-6 max-w-7xl mx-auto space-y-6">
+<div class="flex justify-between items-end">
+<div>
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-on-surface">Analytics Dashboard</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Farm performance and crop health insights</p>
+</div>
+</div>
+<!-- Filters (Horizontal scrolling chips) -->
+<div class="flex gap-2 overflow-x-auto hide-scrollbar py-2 -mx-4 px-4 md:mx-0 md:px-0">
+<button class="flex-shrink-0 px-4 h-10 rounded-full flex items-center gap-2 bg-primary-container text-on-primary-container font-label-md text-label-md transition-all active:scale-95">
+<span class="material-symbols-outlined text-[18px]">calendar_month</span>
+                Last 30 Days
+            </button>
+<button class="flex-shrink-0 px-4 h-10 rounded-full flex items-center gap-2 bg-surface-container-highest text-on-surface font-label-md text-label-md hover:bg-surface-variant transition-all active:scale-95">
+<span class="material-symbols-outlined text-[18px]">grass</span>
+                Crop: All
+            </button>
+<button class="flex-shrink-0 px-4 h-10 rounded-full flex items-center gap-2 bg-surface-container-highest text-on-surface font-label-md text-label-md hover:bg-surface-variant transition-all active:scale-95">
+<span class="material-symbols-outlined text-[18px]">landscape</span>
+                Farm: North Field
+            </button>
+<button class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-surface-container-lowest border border-outline-variant text-on-surface hover:bg-surface-container transition-all active:scale-95">
+<span class="material-symbols-outlined text-[20px]">filter_list</span>
+</button>
+</div>
+<!-- Key Stats Grid -->
+<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4">
+<!-- Stat 1 -->
+<div class="bg-surface-container-lowest p-4 rounded-xl border border-outline-variant shadow-[0_2px_4px_-1px_rgba(27,94,32,0.04)]">
+<div class="flex items-center gap-2 text-on-surface-variant mb-2">
+<span class="material-symbols-outlined text-[18px]">center_focus_strong</span>
+<span class="font-label-sm text-label-sm uppercase tracking-wider">Total Scans</span>
+</div>
+<div class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">1,240</div>
+<div class="mt-1 font-label-sm text-label-sm text-primary flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">trending_up</span> +12%
+                </div>
+</div>
+<!-- Stat 2 -->
+<div class="bg-surface-container-lowest p-4 rounded-xl border-l-4 border-l-primary shadow-[0_2px_4px_-1px_rgba(27,94,32,0.04)]">
+<div class="flex items-center gap-2 text-on-surface-variant mb-2">
+<span class="material-symbols-outlined text-[18px] text-primary">psychiatry</span>
+<span class="font-label-sm text-label-sm uppercase tracking-wider">Healthy Plants</span>
+</div>
+<div class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">892</div>
+<div class="mt-1 font-label-sm text-label-sm text-primary flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">trending_up</span> 72% overall
+                </div>
+</div>
+<!-- Stat 3 -->
+<div class="bg-surface-container-lowest p-4 rounded-xl border-l-4 border-l-tertiary shadow-[0_2px_4px_-1px_rgba(27,94,32,0.04)]">
+<div class="flex items-center gap-2 text-on-surface-variant mb-2">
+<span class="material-symbols-outlined text-[18px] text-tertiary">coronavirus</span>
+<span class="font-label-sm text-label-sm uppercase tracking-wider">Diseased Plants</span>
+</div>
+<div class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">348</div>
+<div class="mt-1 font-label-sm text-label-sm text-tertiary flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">trending_down</span> -5%
+                </div>
+</div>
+<!-- Stat 4 -->
+<div class="bg-surface-container-lowest p-4 rounded-xl border-l-4 border-l-error shadow-[0_2px_4px_-1px_rgba(27,94,32,0.04)]">
+<div class="flex items-center gap-2 text-on-surface-variant mb-2">
+<span class="material-symbols-outlined text-[18px] text-error">warning</span>
+<span class="font-label-sm text-label-sm uppercase tracking-wider">High-Risk Cases</span>
+</div>
+<div class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">12</div>
+<div class="mt-1 font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1">
+                    Needs immediate action
+                </div>
+</div>
+<!-- Stat 5 -->
+<div class="bg-surface-container-lowest p-4 rounded-xl border border-outline-variant shadow-[0_2px_4px_-1px_rgba(27,94,32,0.04)]">
+<div class="flex items-center gap-2 text-on-surface-variant mb-2">
+<span class="material-symbols-outlined text-[18px]">verified</span>
+<span class="font-label-sm text-label-sm uppercase tracking-wider">Avg. Confidence</span>
+</div>
+<div class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">94%</div>
+<div class="mt-1 w-full bg-surface-container-highest rounded-full h-1.5">
+<div class="bg-primary h-1.5 rounded-full" style="width: 94%"></div>
+</div>
+</div>
+<!-- Stat 6 -->
+<div class="bg-surface-container-lowest p-4 rounded-xl border border-outline-variant shadow-[0_2px_4px_-1px_rgba(27,94,32,0.04)]">
+<div class="flex items-center gap-2 text-on-surface-variant mb-2">
+<span class="material-symbols-outlined text-[18px]">thermostat</span>
+<span class="font-label-sm text-label-sm uppercase tracking-wider">Avg. Severity</span>
+</div>
+<div class="font-headline-lg-mobile text-headline-lg-mobile text-tertiary">Moderate</div>
+<div class="mt-1 font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1">
+                    Based on 348 cases
+                </div>
+</div>
+</div>
+<!-- Charts Section (Bento Grid) -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<!-- Crop Health Trend (Large span) -->
+<div class="lg:col-span-2 bg-surface-container-lowest p-6 rounded-xl border border-outline-variant shadow-[0_4px_12px_-4px_rgba(27,94,32,0.08)] flex flex-col">
+<div class="flex justify-between items-start mb-6">
+<div>
+<h3 class="font-title-md text-title-md text-on-surface">Crop Health Trend</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Healthy vs Diseased over 30 days</p>
+</div>
+<div class="flex items-center gap-4 font-label-sm text-label-sm">
+<div class="flex items-center gap-1.5">
+<div class="w-3 h-3 rounded-full bg-primary"></div>
+<span class="text-on-surface">Healthy</span>
+</div>
+<div class="flex items-center gap-1.5">
+<div class="w-3 h-3 rounded-full bg-tertiary"></div>
+<span class="text-on-surface">Diseased</span>
+</div>
+</div>
+</div>
+<div class="relative flex-grow min-h-[250px] w-full">
+<canvas id="healthTrendChart" width="308" height="250" style="display: block; box-sizing: border-box; height: 250px; width: 308px;"></canvas>
+</div>
+</div>
+<!-- Disease Distribution -->
+<div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant shadow-[0_4px_12px_-4px_rgba(27,94,32,0.08)] flex flex-col">
+<div class="mb-4">
+<h3 class="font-title-md text-title-md text-on-surface">Disease Distribution</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Types found in current scan</p>
+</div>
+<div class="relative flex-grow min-h-[200px] flex items-center justify-center">
+<canvas id="diseaseDonutChart" width="308" height="300" style="display: block; box-sizing: border-box; height: 300px; width: 308px;"></canvas>
+</div>
+</div>
+<!-- Weather Risk Trend -->
+<div class="lg:col-span-2 bg-surface-container-lowest p-6 rounded-xl border border-outline-variant shadow-[0_4px_12px_-4px_rgba(27,94,32,0.08)] flex flex-col">
+<div class="mb-6">
+<h3 class="font-title-md text-title-md text-on-surface">Weather Risk Correlation</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Humidity/Temp vs Disease Spikes</p>
+</div>
+<div class="relative flex-grow min-h-[200px] w-full">
+<canvas id="weatherRiskChart" width="308" height="200" style="display: block; box-sizing: border-box; height: 200px; width: 308px;"></canvas>
+</div>
+</div>
+<!-- Severity Distribution -->
+<div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant shadow-[0_4px_12px_-4px_rgba(27,94,32,0.08)] flex flex-col">
+<div class="mb-6">
+<h3 class="font-title-md text-title-md text-on-surface">Severity Distribution</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Breakdown of affected plants</p>
+</div>
+<div class="relative flex-grow min-h-[200px] w-full">
+<canvas id="severityBarChart" width="308" height="200" style="display: block; box-sizing: border-box; height: 200px; width: 308px;"></canvas>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="md:hidden fixed bottom-0 w-full rounded-t-xl z-50 border-t border-outline-variant shadow-[0_-4px_6px_-1px_rgba(27,94,32,0.08)] flex justify-around items-center h-20 px-2 pb-safe w-full bg-surface-container">
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors active:scale-90 transition-all duration-200 ease-out px-4 py-1 rounded-full" onclick="window.location.href='{{DATA:SCREEN:SCREEN_20}}'">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-sm text-label-sm mt-1">Home</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors active:scale-90 transition-all duration-200 ease-out px-4 py-1 rounded-full">
+<span class="material-symbols-outlined" data-icon="center_focus_strong">center_focus_strong</span>
+<span class="font-label-sm text-label-sm mt-1">Scan</span>
+</button>
+<!-- Active state for History/Analytics -->
+<button class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 active:scale-90 transition-all duration-200 ease-out" onclick="window.location.href='{{DATA:SCREEN:SCREEN_4}}'">
+<span class="material-symbols-outlined fill" data-icon="history">history</span>
+<span class="font-label-sm text-label-sm mt-1">History</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors active:scale-90 transition-all duration-200 ease-out px-4 py-1 rounded-full">
+<span class="material-symbols-outlined" data-icon="cloud">cloud</span>
+<span class="font-label-sm text-label-sm mt-1">Weather</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors active:scale-90 transition-all duration-200 ease-out px-4 py-1 rounded-full">
+<span class="material-symbols-outlined" data-icon="smart_toy">smart_toy</span>
+<span class="font-label-sm text-label-sm mt-1">AI</span>
+</button>
+</nav>
+<!-- SideNav for Desktop (Hidden on mobile) -->
+<nav class="hidden md:flex fixed left-0 top-14 h-full w-20 flex-col items-center py-6 gap-6 bg-surface border-r border-outline-variant z-40">
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high p-2 rounded-xl transition-colors" onclick="window.location.href='{{DATA:SCREEN:SCREEN_20}}'">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-sm text-[10px] mt-1">Home</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high p-2 rounded-xl transition-colors">
+<span class="material-symbols-outlined">center_focus_strong</span>
+<span class="font-label-sm text-[10px] mt-1">Scan</span>
+</button>
+<button class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container p-2 rounded-xl transition-colors w-16">
+<span class="material-symbols-outlined fill">history</span>
+<span class="font-label-sm text-[10px] mt-1">History</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high p-2 rounded-xl transition-colors">
+<span class="material-symbols-outlined">cloud</span>
+<span class="font-label-sm text-[10px] mt-1">Weather</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high p-2 rounded-xl transition-colors">
+<span class="material-symbols-outlined">smart_toy</span>
+<span class="font-label-sm text-[10px] mt-1">AI</span>
+</button>
+</nav>
+<script>
+        // Chart.js Configuration
+        document.addEventListener('DOMContentLoaded', function() {
+            // Colors from Tailwind config
+            const colors = {
+                primary: '#0d631b',
+                primaryContainer: '#2e7d32',
+                tertiary: '#774c00',
+                error: '#ba1a1a',
+                surfaceVariant: '#e2e3e1',
+                onSurfaceVariant: '#40493d',
+                gridColor: '#e8e8e6'
+            };
+
+            Chart.defaults.font.family = 'Inter';
+            Chart.defaults.color = colors.onSurfaceVariant;
+            
+            // 1. Health Trend Line Chart
+            const ctxHealth = document.getElementById('healthTrendChart').getContext('2d');
+            new Chart(ctxHealth, {
+                type: 'line',
+                data: {
+                    labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+                    datasets: [
+                        {
+                            label: 'Healthy',
+                            data: [750, 780, 820, 892],
+                            borderColor: colors.primary,
+                            backgroundColor: colors.primary + '20',
+                            borderWidth: 3,
+                            tension: 0.4,
+                            fill: true,
+                            pointBackgroundColor: '#ffffff',
+                            pointBorderColor: colors.primary,
+                            pointBorderWidth: 2,
+                            pointRadius: 4
+                        },
+                        {
+                            label: 'Diseased',
+                            data: [420, 390, 360, 348],
+                            borderColor: colors.tertiary,
+                            borderWidth: 2,
+                            tension: 0.4,
+                            borderDash: [5, 5],
+                            pointBackgroundColor: '#ffffff',
+                            pointBorderColor: colors.tertiary,
+                            pointBorderWidth: 2,
+                            pointRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: colors.gridColor, drawBorder: false } },
+                        x: { grid: { display: false, drawBorder: false } }
+                    },
+                    interaction: { mode: 'index', intersect: false }
+                }
+            });
+
+            // 2. Disease Donut Chart
+            const ctxDisease = document.getElementById('diseaseDonutChart').getContext('2d');
+            new Chart(ctxDisease, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Leaf Rust', 'Blight', 'Powdery Mildew', 'Other'],
+                    datasets: [{
+                        data: [45, 25, 20, 10],
+                        backgroundColor: [
+                            colors.tertiary,
+                            '#ffb957', // tertiary-fixed-dim
+                            '#ffddb5', // tertiary-fixed
+                            colors.surfaceVariant
+                        ],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    plugins: {
+                        legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20, font: { size: 12 } } }
+                    }
+                }
+            });
+
+            // 3. Weather Risk Area Chart
+            const ctxWeather = document.getElementById('weatherRiskChart').getContext('2d');
+            new Chart(ctxWeather, {
+                type: 'line',
+                data: {
+                    labels: ['1st', '5th', '10th', '15th', '20th', '25th', '30th'],
+                    datasets: [{
+                        label: 'Risk Index',
+                        data: [20, 45, 60, 85, 50, 30, 15],
+                        borderColor: colors.error,
+                        backgroundColor: colors.error + '15',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { display: false, beginAtZero: true, max: 100 },
+                        x: { grid: { display: false, drawBorder: false } }
+                    }
+                }
+            });
+
+            // 4. Severity Bar Chart
+            const ctxSeverity = document.getElementById('severityBarChart').getContext('2d');
+            new Chart(ctxSeverity, {
+                type: 'bar',
+                data: {
+                    labels: ['Low', 'Moderate', 'High', 'Critical'],
+                    datasets: [{
+                        data: [150, 120, 66, 12],
+                        backgroundColor: [
+                            '#a3f69c', // primary-fixed
+                            '#ffddb5', // tertiary-fixed
+                            colors.tertiary,
+                            colors.error
+                        ],
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { display: false },
+                        x: { grid: { display: false, drawBorder: false } }
+                    }
+                }
+            });
+        });
+    </script>
+
+
+</body></html>

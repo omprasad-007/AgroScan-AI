@@ -1,0 +1,187 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>AgroScan AI - Registration</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-fixed-variant": "#005312",
+                        "inverse-primary": "#88d982",
+                        "outline": "#707a6c",
+                        "surface-container-lowest": "#ffffff",
+                        "primary": "#0d631b",
+                        "surface-container-low": "#f4f4f2",
+                        "tertiary-fixed": "#ffddb5",
+                        "on-surface-variant": "#40493d",
+                        "tertiary-container": "#986200",
+                        "error": "#ba1a1a",
+                        "surface-container": "#eeeeec",
+                        "tertiary-fixed-dim": "#ffb957",
+                        "secondary-fixed-dim": "#78dc77",
+                        "surface": "#f9f9f7",
+                        "on-error-container": "#93000a",
+                        "on-surface": "#1a1c1b",
+                        "outline-variant": "#bfcaba",
+                        "primary-fixed": "#a3f69c",
+                        "secondary": "#006e1c",
+                        "surface-bright": "#f9f9f7",
+                        "background": "#f9f9f7",
+                        "on-tertiary-fixed": "#2a1800",
+                        "primary-container": "#2e7d32",
+                        "on-primary-container": "#cbffc2",
+                        "error-container": "#ffdad6",
+                        "surface-container-highest": "#e2e3e1",
+                        "surface-dim": "#dadad8",
+                        "surface-variant": "#e2e3e1",
+                        "on-error": "#ffffff",
+                        "on-secondary-fixed": "#002204",
+                        "on-primary-fixed": "#002204",
+                        "on-secondary-fixed-variant": "#005313",
+                        "inverse-surface": "#2f3130",
+                        "surface-container-high": "#e8e8e6",
+                        "on-tertiary-container": "#ffeede",
+                        "tertiary": "#774c00",
+                        "on-background": "#1a1c1b",
+                        "on-primary": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "primary-fixed-dim": "#88d982",
+                        "surface-tint": "#1b6d24",
+                        "on-secondary-container": "#00731e",
+                        "inverse-on-surface": "#f1f1ef",
+                        "secondary-fixed": "#94f990",
+                        "on-secondary": "#ffffff",
+                        "secondary-container": "#91f78e",
+                        "on-tertiary-fixed-variant": "#643f00"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "16px",
+                        "card-padding": "20px",
+                        "touch-target-min": "48px",
+                        "container-margin": "24px",
+                        "unit": "8px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Inter"],
+                        "title-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "label-md": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "title-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen flex flex-col font-body-md antialiased pb-safe">
+<!-- Header (Suppressed navigation, simple branding for registration) -->
+<header class="flex justify-between items-center px-gutter h-14 w-full bg-surface shadow-sm border-b border-outline-variant fixed top-0 w-full z-50">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[28px]" data-icon="eco">eco</span>
+<h1 class="font-display-lg-mobile text-display-lg-mobile text-primary tracking-tight">AgroScan AI</h1>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-1 flex flex-col pt-[80px] px-gutter max-w-md mx-auto w-full">
+<div class="mb-8 mt-4 text-center">
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-2">Create Farmer Account</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Join AgroScan to monitor your crops and receive instant AI insights.</p>
+</div>
+<form class="space-y-4">
+<!-- Full Name -->
+<div class="flex flex-col bg-surface-container-lowest border border-outline-variant rounded-lg p-3 shadow-[0_2px_4px_-1px_rgba(27,94,32,0.04)] focus-within:border-primary transition-colors">
+<label class="font-label-sm text-label-sm text-on-surface-variant mb-1" for="fullName">Full Name</label>
+<input class="border-0 p-0 bg-transparent font-body-md text-body-md text-on-surface focus:ring-0" id="fullName" placeholder="John Doe" required="" type="text">
+</div>
+<!-- Mobile Number -->
+<div class="flex flex-col bg-surface-container-lowest border border-outline-variant rounded-lg p-3 shadow-[0_2px_4px_-1px_rgba(27,94,32,0.04)] focus-within:border-primary transition-colors">
+<label class="font-label-sm text-label-sm text-on-surface-variant mb-1" for="mobile">Mobile Number</label>
+<input class="border-0 p-0 bg-transparent font-body-md text-body-md text-on-surface focus:ring-0" id="mobile" placeholder="+1 (555) 000-0000" required="" type="tel">
+</div>
+<!-- Preferred Language -->
+<div class="flex flex-col bg-surface-container-lowest border border-outline-variant rounded-lg p-3 shadow-[0_2px_4px_-1px_rgba(27,94,32,0.04)] focus-within:border-primary transition-colors relative">
+<label class="font-label-sm text-label-sm text-on-surface-variant mb-1" for="language">Preferred Language</label>
+<select class="border-0 p-0 bg-transparent font-body-md text-body-md text-on-surface focus:ring-0 appearance-none w-full" id="language">
+<option value="en">English</option>
+<option value="es">Español</option>
+<option value="fr">Français</option>
+<option value="hi">हिंदी</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" data-icon="expand_more">expand_more</span>
+</div>
+<!-- Farm Location -->
+<div class="flex flex-col bg-surface-container-lowest border border-outline-variant rounded-lg p-3 shadow-[0_2px_4px_-1px_rgba(27,94,32,0.04)] focus-within:border-primary transition-colors">
+<label class="font-label-sm text-label-sm text-on-surface-variant mb-1" for="location">Farm Location</label>
+<div class="flex items-center gap-2">
+<input class="border-0 p-0 bg-transparent font-body-md text-body-md text-on-surface focus:ring-0 flex-1" id="location" placeholder="Enter region or detect GPS" type="text">
+<button aria-label="Detect GPS Location" class="flex items-center justify-center min-w-[48px] h-[48px] bg-secondary-container text-on-secondary-container rounded-md hover:bg-secondary-fixed transition-colors active:scale-95" type="button">
+<span class="material-symbols-outlined" data-icon="my_location">my_location</span>
+</button>
+</div>
+</div>
+<!-- Main Crop -->
+<div class="flex flex-col bg-surface-container-lowest border border-outline-variant rounded-lg p-3 shadow-[0_2px_4px_-1px_rgba(27,94,32,0.04)] focus-within:border-primary transition-colors relative">
+<label class="font-label-sm text-label-sm text-on-surface-variant mb-1" for="crop">Main Crop</label>
+<select class="border-0 p-0 bg-transparent font-body-md text-body-md text-on-surface focus:ring-0 appearance-none w-full" id="crop">
+<option disabled="" selected="" value="">Select primary crop</option>
+<option value="wheat">Wheat</option>
+<option value="corn">Corn (Maize)</option>
+<option value="soybeans">Soybeans</option>
+<option value="rice">Rice</option>
+<option value="cotton">Cotton</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" data-icon="expand_more">expand_more</span>
+</div>
+<!-- Spacer -->
+<div class="h-6"></div>
+<!-- Primary CTA -->
+<button class="w-full bg-primary-container text-on-primary-container font-title-md text-title-md rounded-xl h-[56px] flex items-center justify-center shadow-md active:scale-[0.98] active:shadow-sm transition-all" type="submit" onclick="window.location.href='{{DATA:SCREEN:SCREEN_20}}'">
+                Create Farmer Account
+            </button>
+<div class="text-center mt-4">
+<button class="font-label-md text-label-md text-primary hover:text-secondary transition-colors h-[48px] px-4" type="button" onclick="window.location.href='{{DATA:SCREEN:SCREEN_20}}'">
+                    Already have an account? Sign In
+                </button>
+</div>
+</form>
+<!-- Bottom spacing for touch safety -->
+<div class="h-12"></div>
+</main>
+
+
+</body></html>

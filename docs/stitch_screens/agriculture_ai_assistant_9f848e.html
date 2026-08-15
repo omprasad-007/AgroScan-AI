@@ -1,0 +1,267 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+<title>AgroScan AI - Assistant</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-tertiary-fixed-variant": "#643f00",
+                    "inverse-surface": "#2f3130",
+                    "primary": "#0d631b",
+                    "inverse-on-surface": "#f1f1ef",
+                    "background": "#f9f9f7",
+                    "surface-container-highest": "#e2e3e1",
+                    "on-secondary-fixed-variant": "#005313",
+                    "tertiary-fixed": "#ffddb5",
+                    "on-primary": "#ffffff",
+                    "tertiary": "#774c00",
+                    "on-secondary-container": "#00731e",
+                    "surface-container-lowest": "#ffffff",
+                    "on-secondary": "#ffffff",
+                    "inverse-primary": "#88d982",
+                    "surface-dim": "#dadad8",
+                    "on-surface-variant": "#40493d",
+                    "surface-container-low": "#f4f4f2",
+                    "surface": "#f9f9f7",
+                    "on-primary-fixed-variant": "#005312",
+                    "on-primary-fixed": "#002204",
+                    "primary-container": "#2e7d32",
+                    "primary-fixed-dim": "#88d982",
+                    "surface-tint": "#1b6d24",
+                    "outline": "#707a6c",
+                    "secondary": "#006e1c",
+                    "on-primary-container": "#cbffc2",
+                    "surface-container": "#eeeeec",
+                    "tertiary-container": "#986200",
+                    "on-tertiary": "#ffffff",
+                    "on-tertiary-container": "#ffeede",
+                    "on-tertiary-fixed": "#2a1800",
+                    "tertiary-fixed-dim": "#ffb957",
+                    "on-background": "#1a1c1b",
+                    "on-surface": "#1a1c1b",
+                    "secondary-fixed": "#94f990",
+                    "error": "#ba1a1a",
+                    "error-container": "#ffdad6",
+                    "secondary-fixed-dim": "#78dc77",
+                    "secondary-container": "#91f78e",
+                    "on-error": "#ffffff",
+                    "primary-fixed": "#a3f69c",
+                    "outline-variant": "#bfcaba",
+                    "on-secondary-fixed": "#002204",
+                    "surface-bright": "#f9f9f7",
+                    "surface-container-high": "#e8e8e6",
+                    "surface-variant": "#e2e3e1",
+                    "on-error-container": "#93000a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "gutter": "16px",
+                    "container-margin": "24px",
+                    "touch-target-min": "48px",
+                    "card-padding": "20px",
+                    "unit": "8px"
+            },
+            "fontFamily": {
+                    "title-md": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "label-md": ["Inter"],
+                    "body-md": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "headline-lg-mobile": ["Inter"]
+            },
+            "fontSize": {
+                    "title-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom, 20px); }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-md h-screen flex flex-col overflow-hidden">
+<!-- TopAppBar (from JSON) -->
+<header class="fixed top-0 w-full z-50 bg-surface border-b border-outline-variant shadow-sm flex justify-between items-center px-gutter h-14">
+<div class="flex items-center gap-2"><button class="h-touch-target-min w-touch-target-min flex items-center justify-center text-on-surface hover:bg-surface-container-high rounded-full active:scale-95 transition-transform" onclick="window.history.back()">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<button class="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center overflow-hidden hover:bg-surface-container-highest transition-colors active:scale-95">
+<img class="w-full h-full object-cover" data-alt="A close-up portrait of a farmer wearing a sun hat and looking confident, set against a bright, modern agricultural background with lush green fields. The lighting is sunny and optimistic, reflecting a modern, tech-enabled farming lifestyle in high resolution." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCL944hR6YAIcZfDBoJcBJKwKSnxTpyQj0cROISJ1nyxnMSrD4Uv6_eND3YM5GT1mehtYXKGueOHYweLPviGt32mxINKFYFFOw1yTDl_EGfz9wdPgMBgVKt6qpMIgtTBU1UjLGHwmIoz8N7qGP-Zkk_pH1gf--89OeegFyZItRnEINv6Cvo8Y3oUsUiFxbhjcr8R3qb4qtw-HDKhPdhxKDQ_FFuJTfLfFKDINCz-537MsCXYsXY68h4jA">
+</button>
+<h1 class="font-display-lg-mobile text-display-lg-mobile text-primary tracking-tight">AgroScan AI</h1>
+</div>
+<button class="w-10 h-10 flex items-center justify-center text-primary hover:bg-surface-container-high transition-colors rounded-full active:scale-95">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">location_on</span>
+</button>
+</header>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col mt-14 mb-20 overflow-hidden relative">
+<!-- Context Header -->
+<div class="bg-surface-container-low border-b border-outline-variant p-4 shrink-0 shadow-sm z-10 relative">
+<div class="flex items-center justify-between mb-2">
+<h2 class="font-title-md text-title-md text-on-surface">Scan Context</h2>
+<div class="flex bg-surface rounded-lg p-1 border border-outline-variant">
+<button class="px-3 py-1 text-label-md font-label-md bg-primary-container text-on-primary-container rounded-md">EN</button>
+<button class="px-3 py-1 text-label-md font-label-md text-on-surface-variant hover:bg-surface-container">MR</button>
+<button class="px-3 py-1 text-label-md font-label-md text-on-surface-variant hover:bg-surface-container">HI</button>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-2 text-label-sm font-label-sm">
+<div class="bg-surface p-2 rounded border border-outline-variant flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-sm">yard</span>
+<span class="text-on-surface-variant">Crop: <strong class="text-on-surface">Tomato</strong></span>
+</div>
+<div class="bg-error-container p-2 rounded border border-error-container flex items-center gap-2">
+<span class="material-symbols-outlined text-error text-sm">coronavirus</span>
+<span class="text-on-error-container">Disease: <strong>Early Blight</strong></span>
+</div>
+<div class="bg-tertiary-container p-2 rounded border border-tertiary-container flex items-center gap-2">
+<span class="material-symbols-outlined text-on-tertiary-container text-sm">warning</span>
+<span class="text-on-tertiary-container">Severity: <strong>Moderate</strong></span>
+</div>
+<div class="bg-error-container p-2 rounded border border-error-container flex items-center gap-2">
+<span class="material-symbols-outlined text-error text-sm">thunderstorm</span>
+<span class="text-on-error-container">Risk: <strong>High</strong></span>
+</div>
+</div>
+</div>
+<!-- Chat Area -->
+<div class="flex-1 overflow-y-auto p-4 space-y-6 pb-32" id="chat-container">
+<!-- AI Message -->
+<div class="flex gap-3 max-w-[90%]">
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center shrink-0 shadow-sm border border-primary">
+<span class="material-symbols-outlined text-on-primary-container" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+</div>
+<div class="flex flex-col gap-1">
+<span class="text-label-sm font-label-sm text-on-surface-variant">AgroScan AI Assistant</span>
+<div class="bg-surface border border-outline-variant p-4 rounded-xl rounded-tl-none shadow-sm text-body-lg font-body-lg text-on-surface">
+<p class="">I see you've scanned a Tomato plant showing signs of Early Blight. The weather forecast indicates high humidity over the next 48 hours, which will accelerate the spread.</p>
+<p class="mt-2 font-medium">I recommend taking immediate action. What would you like to know first?</p>
+</div>
+</div>
+</div>
+<!-- User Message -->
+<div class="flex gap-3 max-w-[90%] ml-auto justify-end">
+<div class="flex flex-col gap-1 items-end">
+<span class="text-label-sm font-label-sm text-on-surface-variant">You</span>
+<div class="bg-primary text-on-primary p-4 rounded-xl rounded-tr-none shadow-sm text-body-lg font-body-lg">
+                        What should I do now?
+                    </div>
+</div>
+</div>
+<!-- AI Message (Detailed Response) -->
+<div class="flex gap-3 max-w-[95%]">
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center shrink-0 shadow-sm border border-primary">
+<span class="material-symbols-outlined text-on-primary-container" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+</div>
+<div class="flex flex-col gap-1 w-full">
+<span class="text-label-sm font-label-sm text-on-surface-variant">AgroScan AI Assistant</span>
+<div class="bg-surface border border-outline-variant p-4 rounded-xl rounded-tl-none shadow-sm text-body-lg font-body-lg text-on-surface">
+<p class="font-medium mb-2">Immediate Steps for Early Blight:</p>
+<ul class="list-disc pl-5 space-y-2 mb-4">
+<li class="">Remove and destroy infected lower leaves immediately to slow the spread.</li>
+<li class="">Apply a copper-based fungicide or chlorothalonil spray before the rain begins tomorrow.</li>
+<li class="">Ensure good air circulation around the plants by avoiding overcrowding.</li>
+</ul>
+<!-- Actionable Button inside chat -->
+<button class="w-full h-12 bg-primary text-on-primary rounded-lg font-label-md text-label-md flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-md">
+<span class="material-symbols-outlined">local_pharmacy</span>
+                            Find Treatment Guides
+                        </button>
+</div>
+</div>
+</div>
+</div>
+<!-- Input Area (Fixed at bottom above nav) -->
+<div class="absolute bottom-0 w-full bg-surface-container border-t border-outline-variant p-2 pb-4 shadow-[0_-4px_6px_-1px_rgba(27,94,32,0.08)]">
+<!-- Suggested Questions (Quick Replies) -->
+<div class="flex overflow-x-auto gap-2 pb-3 pt-1 px-2 hide-scrollbar">
+<button class="whitespace-nowrap px-4 py-2 bg-surface border border-outline-variant rounded-full text-label-md font-label-md text-on-surface hover:bg-surface-container-high transition-colors active:scale-95 flex-shrink-0">
+                    How can I prevent this disease?
+                </button>
+<button class="whitespace-nowrap px-4 py-2 bg-surface border border-outline-variant rounded-full text-label-md font-label-md text-on-surface hover:bg-surface-container-high transition-colors active:scale-95 flex-shrink-0">
+                    Explain this in Marathi
+                </button>
+<button class="whitespace-nowrap px-4 py-2 bg-surface border border-outline-variant rounded-full text-label-md font-label-md text-on-surface hover:bg-surface-container-high transition-colors active:scale-95 flex-shrink-0">
+                    Why is my disease risk high?
+                </button>
+<button class="whitespace-nowrap px-4 py-2 bg-surface border border-outline-variant rounded-full text-label-md font-label-md text-on-surface hover:bg-surface-container-high transition-colors active:scale-95 flex-shrink-0">
+                    Should I monitor again?
+                </button>
+</div>
+<div class="flex items-center gap-2 px-2">
+<div class="flex-1 relative">
+<input class="w-full h-14 pl-4 pr-12 rounded-xl bg-surface border border-outline text-body-lg font-body-lg text-on-surface focus:ring-2 focus:ring-primary focus:border-primary placeholder:text-on-surface-variant" placeholder="Ask AI Assistant..." type="text">
+<button class="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center text-primary active:scale-90 transition-transform">
+<span class="material-symbols-outlined">mic</span>
+</button>
+</div>
+<button class="w-14 h-14 rounded-xl bg-primary text-on-primary flex items-center justify-center shadow-md active:scale-95 transition-transform shrink-0">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">send</span>
+</button>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (from JSON - AI Tab Active) -->
+<nav class="fixed bottom-0 w-full rounded-t-xl z-50 border-t border-outline-variant shadow-[0_-4px_6px_-1px_rgba(27,94,32,0.08)] flex justify-around items-center h-20 px-2 pb-safe bg-surface-container md:hidden">
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors active:scale-90 duration-200 ease-out w-16 h-full">
+<span class="material-symbols-outlined mb-1">dashboard</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors active:scale-90 duration-200 ease-out w-16 h-full">
+<span class="material-symbols-outlined mb-1">center_focus_strong</span>
+<span class="font-label-sm text-label-sm">Scan</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors active:scale-90 duration-200 ease-out w-16 h-full">
+<span class="material-symbols-outlined mb-1">history</span>
+<span class="font-label-sm text-label-sm">History</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors active:scale-90 duration-200 ease-out w-16 h-full">
+<span class="material-symbols-outlined mb-1">cloud</span>
+<span class="font-label-sm text-label-sm">Weather</span>
+</button>
+<!-- Active Tab -->
+<button class="flex flex-col items-center justify-center w-16 h-full active:scale-90 transition-all duration-200 ease-out">
+<div class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+</div>
+<span class="font-label-sm text-label-sm mt-1 text-primary">AI</span>
+</button>
+</nav>
+<script>
+        // Scroll to bottom of chat on load
+        const chatContainer = document.getElementById('chat-container');
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    </script>
+
+
+</body></html>

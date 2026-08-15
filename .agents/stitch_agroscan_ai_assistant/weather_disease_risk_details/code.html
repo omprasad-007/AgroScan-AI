@@ -1,0 +1,425 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+<title>Weather Risk - AgroScan AI</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-container": "#cbffc2",
+                        "on-error-container": "#93000a",
+                        "tertiary-fixed-dim": "#ffb957",
+                        "primary-fixed-dim": "#88d982",
+                        "surface-container-high": "#e8e8e6",
+                        "tertiary": "#774c00",
+                        "inverse-primary": "#88d982",
+                        "on-secondary-fixed-variant": "#005313",
+                        "surface-container-low": "#f4f4f2",
+                        "on-error": "#ffffff",
+                        "surface-container": "#eeeeec",
+                        "surface-variant": "#e2e3e1",
+                        "primary-fixed": "#a3f69c",
+                        "surface": "#f9f9f7",
+                        "error-container": "#ffdad6",
+                        "tertiary-fixed": "#ffddb5",
+                        "secondary-fixed": "#94f990",
+                        "surface-tint": "#1b6d24",
+                        "on-tertiary-fixed": "#2a1800",
+                        "secondary-container": "#91f78e",
+                        "tertiary-container": "#986200",
+                        "on-tertiary": "#ffffff",
+                        "on-primary-fixed-variant": "#005312",
+                        "on-secondary": "#ffffff",
+                        "inverse-on-surface": "#f1f1ef",
+                        "on-primary": "#ffffff",
+                        "inverse-surface": "#2f3130",
+                        "on-tertiary-container": "#ffeede",
+                        "background": "#f9f9f7",
+                        "on-tertiary-fixed-variant": "#643f00",
+                        "surface-dim": "#dadad8",
+                        "secondary": "#006e1c",
+                        "error": "#ba1a1a",
+                        "on-secondary-fixed": "#002204",
+                        "primary-container": "#2e7d32",
+                        "on-surface": "#1a1c1b",
+                        "secondary-fixed-dim": "#78dc77",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed": "#002204",
+                        "on-background": "#1a1c1b",
+                        "primary": "#0d631b",
+                        "outline": "#707a6c",
+                        "on-secondary-container": "#00731e",
+                        "surface-container-highest": "#e2e3e1",
+                        "outline-variant": "#bfcaba",
+                        "surface-bright": "#f9f9f7",
+                        "on-surface-variant": "#40493d"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "card-padding": "20px",
+                        "unit": "8px",
+                        "touch-target-min": "48px",
+                        "container-margin": "24px",
+                        "gutter": "16px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "body-md": ["Inter"],
+                        "label-md": ["Inter"],
+                        "title-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "display-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "title-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1;
+        }
+        /* Hide scrollbar for clean horizontal scrolling */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 120px;
+            width: 100%;
+        }
+        .chart-line {
+            fill: none;
+            stroke: #ba1a1a;
+            stroke-width: 3;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+        .chart-area {
+            fill: url(#gradientRed);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-md antialiased pb-[90px] pt-[70px]">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 border-b border-outline-variant shadow-sm flex justify-between items-center px-gutter h-14 bg-surface md:hidden"><button class="h-10 w-10 flex items-center justify-center text-on-surface hover:bg-surface-container-high rounded-full active:scale-95 transition-transform" onclick="window.history.back()"><span class="material-symbols-outlined">arrow_back</span></button>
+<button aria-label="User profile shortcut" class="w-10 h-10 flex items-center justify-center rounded-full active:scale-95 transition-transform bg-surface-container hover:bg-surface-container-high text-on-surface">
+<span class="material-symbols-outlined">person</span>
+</button>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary tracking-tight">Weather Risk</h1>
+<button aria-label="Location" class="w-10 h-10 flex items-center justify-center rounded-full active:scale-95 transition-transform hover:bg-surface-container-high text-on-surface-variant">
+<span class="material-symbols-outlined">location_on</span>
+</button>
+</header>
+<!-- Desktop Header (Hidden on Mobile) -->
+<header class="hidden md:flex fixed top-0 w-full z-50 border-b border-outline-variant shadow-sm justify-between items-center px-gutter h-16 bg-surface">
+<div class="flex items-center gap-4"><button class="h-10 w-10 flex items-center justify-center text-on-surface hover:bg-surface-container-high rounded-full active:scale-95 transition-transform mr-2" onclick="window.history.back()"><span class="material-symbols-outlined">arrow_back</span></button>
+<button aria-label="User profile shortcut" class="w-10 h-10 flex items-center justify-center rounded-full active:scale-95 transition-transform bg-surface-container hover:bg-surface-container-high text-on-surface">
+<span class="material-symbols-outlined">person</span>
+</button>
+<h1 class="font-headline-lg text-headline-lg text-primary tracking-tight">AgroScan AI</h1>
+</div>
+<nav class="flex gap-6">
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">Home</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">Scan</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">History</a>
+<a class="font-label-md text-label-md text-primary border-b-2 border-primary pb-1" href="#">Weather</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">AI</a>
+</nav>
+<button aria-label="Location" class="w-10 h-10 flex items-center justify-center rounded-full active:scale-95 transition-transform hover:bg-surface-container-high text-on-surface-variant">
+<span class="material-symbols-outlined">location_on</span>
+</button>
+</header>
+<main class="max-w-3xl mx-auto px-4 md:px-6 md:pt-6 space-y-6">
+<!-- Selection Filters -->
+<section class="flex gap-2 overflow-x-auto no-scrollbar pb-2 pt-2 -mx-4 px-4 md:mx-0 md:px-0">
+<div class="flex-shrink-0 relative">
+<select class="appearance-none bg-surface-container-low border border-outline-variant rounded-lg pl-3 pr-8 py-2 font-label-md text-label-md text-on-surface focus:ring-2 focus:ring-primary focus:outline-none min-h-[48px]">
+<option>North Field</option>
+<option>South Sector</option>
+<option>East Greenhouse</option>
+</select>
+<span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none text-[20px]">expand_more</span>
+</div>
+<div class="flex-shrink-0 relative">
+<select class="appearance-none bg-surface-container-low border border-outline-variant rounded-lg pl-3 pr-8 py-2 font-label-md text-label-md text-on-surface focus:ring-2 focus:ring-primary focus:outline-none min-h-[48px]">
+<option>Tomatoes</option>
+<option>Potatoes</option>
+<option>Wheat</option>
+</select>
+<span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none text-[20px]">expand_more</span>
+</div>
+<div class="flex-shrink-0 relative">
+<select class="appearance-none bg-surface-container-low border border-outline-variant rounded-lg pl-3 pr-8 py-2 font-label-md text-label-md text-on-surface focus:ring-2 focus:ring-primary focus:outline-none min-h-[48px]">
+<option>Late Blight</option>
+<option>Powdery Mildew</option>
+<option>Leaf Spot</option>
+</select>
+<span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none text-[20px]">expand_more</span>
+</div>
+</section>
+<!-- AI-Generated Risk Predictions Label -->
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-primary text-[18px]">smart_toy</span>
+<span class="font-label-sm text-label-sm text-primary uppercase tracking-wider">AI-Generated Risk Predictions</span>
+</div>
+<!-- Risk Score & Meter -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-card-padding shadow-[0_4px_12px_rgba(27,94,32,0.04)] relative overflow-hidden">
+<!-- Decorative background element for high risk -->
+<div class="absolute top-0 left-0 w-2 h-full bg-error"></div>
+<div class="flex flex-col md:flex-row items-center gap-6 justify-between">
+<div class="flex-1 flex flex-col items-center md:items-start text-center md:text-left">
+<h2 class="font-title-md text-title-md text-on-surface mb-1">Disease Risk Score</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mb-4">Late Blight susceptibility for Tomatoes</p>
+<div class="flex items-end gap-3 mb-2">
+<span class="font-display-lg text-display-lg text-error leading-none">78%</span>
+<span class="bg-error-container text-on-error-container font-label-md text-label-md px-3 py-1 rounded-full mb-1">HIGH RISK</span>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1 mt-2">
+<span class="material-symbols-outlined text-[14px]">update</span> Updated 10 mins ago
+                    </p>
+</div>
+<!-- Semi-circular Risk Meter -->
+<div class="relative w-[200px] h-[100px] flex-shrink-0">
+<svg class="w-full h-full overflow-visible" viewBox="0 0 200 100">
+<!-- Background track -->
+<path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="#e2e3e1" stroke-linecap="round" stroke-width="24"></path>
+<!-- Colored segments (simulated with gradient for simplicity here, though discrete paths are better) -->
+<path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="url(#riskGradient)" stroke-dasharray="251.2" stroke-dashoffset="55" stroke-linecap="round" stroke-width="24"></path>
+<defs>
+<linearGradient id="riskGradient" x1="0%" x2="100%" y1="0%" y2="0%">
+<stop offset="0%" stop-color="#2e7d32"></stop> <!-- Safe / Green -->
+<stop offset="50%" stop-color="#ffb957"></stop> <!-- Warn / Yellow-Orange -->
+<stop offset="100%" stop-color="#ba1a1a"></stop> <!-- Danger / Red -->
+</linearGradient>
+</defs>
+<!-- Needle indicator -->
+<g transform="translate(100, 100) rotate(50)"> <!-- 50deg rotation for ~78% -->
+<polygon fill="#1a1c1b" points="-4,-10 4,-10 0,-70"></polygon>
+<circle cx="0" cy="-10" fill="#1a1c1b" r="8"></circle>
+<circle cx="0" cy="-10" fill="#ffffff" r="3"></circle>
+</g>
+</svg>
+</div>
+</div>
+</section>
+<!-- Contributing Factors -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-card-padding shadow-[0_2px_8px_rgba(27,94,32,0.03)]">
+<h3 class="font-title-md text-title-md text-on-surface mb-4">Contributing Factors</h3>
+<div class="space-y-4">
+<!-- Factor 1 -->
+<div class="flex items-start gap-3">
+<div class="w-10 h-10 rounded-full bg-error-container flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-on-error-container">water_drop</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-center mb-1">
+<span class="font-label-md text-label-md text-on-surface">High Humidity</span>
+<span class="font-label-sm text-label-sm text-error font-bold">Critical</span>
+</div>
+<div class="w-full bg-surface-variant rounded-full h-2 mb-1 overflow-hidden">
+<div class="bg-error h-2 rounded-full" style="width: 85%"></div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm">85% average over 48h creates optimal spore germination environment.</p>
+</div>
+</div>
+<!-- Factor 2 -->
+<div class="flex items-start gap-3">
+<div class="w-10 h-10 rounded-full bg-[#ffeede] flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-[#986200]">rainy</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-center mb-1">
+<span class="font-label-md text-label-md text-on-surface">Recent Rainfall</span>
+<span class="font-label-sm text-label-sm text-[#986200] font-bold">Elevated</span>
+</div>
+<div class="w-full bg-surface-variant rounded-full h-2 mb-1 overflow-hidden">
+<div class="bg-[#ffb957] h-2 rounded-full" style="width: 60%"></div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm">12mm rain yesterday increased leaf wetness duration.</p>
+</div>
+</div>
+<!-- Factor 3 -->
+<div class="flex items-start gap-3">
+<div class="w-10 h-10 rounded-full bg-error-container flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-on-error-container">thermostat</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-center mb-1">
+<span class="font-label-md text-label-md text-on-surface">Ideal Temp for Spore Growth</span>
+<span class="font-label-sm text-label-sm text-error font-bold">Critical</span>
+</div>
+<div class="w-full bg-surface-variant rounded-full h-2 mb-1 overflow-hidden">
+<div class="bg-error h-2 rounded-full" style="width: 75%"></div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm">Current 28°C falls squarely in the 25-30°C danger zone.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Weather Observations Label -->
+<div class="flex items-center gap-2 mb-2 mt-6">
+<span class="material-symbols-outlined text-primary text-[18px]">satellite_alt</span>
+<span class="font-label-sm text-label-sm text-primary uppercase tracking-wider">Weather Observations</span>
+</div>
+<!-- Current Conditions Summary -->
+<section class="grid grid-cols-2 md:grid-cols-4 gap-3">
+<div class="bg-surface-container border border-outline-variant rounded-lg p-3 flex flex-col items-center justify-center text-center h-24 shadow-sm">
+<span class="material-symbols-outlined text-on-surface-variant mb-1">thermostat</span>
+<span class="font-title-md text-title-md text-on-surface">28°C</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Temp</span>
+</div>
+<div class="bg-surface-container border border-outline-variant rounded-lg p-3 flex flex-col items-center justify-center text-center h-24 shadow-sm">
+<span class="material-symbols-outlined text-on-surface-variant mb-1">humidity_percentage</span>
+<span class="font-title-md text-title-md text-on-surface">85%</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Humidity</span>
+</div>
+<div class="bg-surface-container border border-outline-variant rounded-lg p-3 flex flex-col items-center justify-center text-center h-24 shadow-sm">
+<span class="material-symbols-outlined text-on-surface-variant mb-1">rainy</span>
+<span class="font-title-md text-title-md text-on-surface">12mm</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Rainfall</span>
+</div>
+<div class="bg-surface-container border border-outline-variant rounded-lg p-3 flex flex-col items-center justify-center text-center h-24 shadow-sm">
+<span class="material-symbols-outlined text-on-surface-variant mb-1">air</span>
+<span class="font-title-md text-title-md text-on-surface">10 km/h</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Wind</span>
+</div>
+</section>
+<!-- Forecast & Trends -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-card-padding shadow-sm">
+<h3 class="font-title-md text-title-md text-on-surface mb-4">7-Day Risk Trend</h3>
+<!-- Comparison Pill -->
+<div class="flex items-center gap-4 mb-6 bg-surface-container-low rounded-lg p-3 border border-outline-variant">
+<div class="flex-1 text-center border-r border-outline-variant pr-4">
+<span class="block font-label-sm text-label-sm text-on-surface-variant uppercase">Today</span>
+<span class="font-title-md text-title-md text-error">78%</span>
+</div>
+<div class="flex-1 text-center flex items-center justify-center gap-2">
+<div>
+<span class="block font-label-sm text-label-sm text-on-surface-variant uppercase">Tomorrow</span>
+<span class="font-title-md text-title-md text-error">82%</span>
+</div>
+<span class="material-symbols-outlined text-error fill">trending_up</span>
+</div>
+</div>
+<!-- Chart Area (Mockup using SVG) -->
+<div class="chart-container">
+<svg class="w-full h-full" preserveAspectRatio="none" viewBox="0 0 400 120">
+<defs>
+<linearGradient id="gradientRed" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#ffdad6" stop-opacity="0.8"></stop>
+<stop offset="100%" stop-color="#ffdad6" stop-opacity="0"></stop>
+</linearGradient>
+</defs>
+<!-- Grid Lines -->
+<line stroke="#e2e3e1" stroke-dasharray="4,4" stroke-width="1" x1="0" x2="400" y1="30" y2="30"></line>
+<line stroke="#e2e3e1" stroke-dasharray="4,4" stroke-width="1" x1="0" x2="400" y1="60" y2="60"></line>
+<line stroke="#e2e3e1" stroke-dasharray="4,4" stroke-width="1" x1="0" x2="400" y1="90" y2="90"></line>
+<!-- Area -->
+<path class="chart-area" d="M 0 80 L 50 60 L 100 70 L 150 40 L 200 30 L 250 20 L 300 40 L 350 20 L 400 10 L 400 120 L 0 120 Z"></path>
+<!-- Line -->
+<path class="chart-line" d="M 0 80 L 50 60 L 100 70 L 150 40 L 200 30 L 250 20 L 300 40 L 350 20 L 400 10"></path>
+<!-- Data Points -->
+<circle cx="200" cy="30" fill="#ba1a1a" r="4" stroke="#ffffff" stroke-width="2"></circle> <!-- Today -->
+<circle cx="250" cy="20" fill="#ba1a1a" r="4" stroke="#ffffff" stroke-width="2"></circle> <!-- Tomorrow -->
+</svg>
+<!-- X-Axis Labels -->
+<div class="flex justify-between mt-2 font-label-sm text-label-sm text-on-surface-variant">
+<span class="">Mon</span>
+<span class="">Tue</span>
+<span class="">Wed</span>
+<span class="font-bold text-on-surface">Thu (Today)</span>
+<span class="">Fri</span>
+<span class="">Sat</span>
+<span class="">Sun</span>
+</div>
+</div>
+</section>
+<!-- Preventive Actions -->
+<section class="bg-primary-container/10 border border-primary-container/20 rounded-xl p-card-padding shadow-sm mb-6">
+<div class="flex items-center gap-2 mb-3">
+<span class="material-symbols-outlined text-primary text-[24px]">shield</span>
+<h3 class="font-title-md text-title-md text-primary">What should I do?</h3>
+</div>
+<ul class="space-y-3">
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary mt-0.5 text-[20px]">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface">Apply preventative fungicide immediately before tomorrow's expected humidity spike.</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary mt-0.5 text-[20px]">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface">Improve field drainage in the North Sector where water tends to pool.</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary mt-0.5 text-[20px]">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface">Monitor lower leaves closely for initial dark, water-soaked spots.</span>
+</li>
+</ul>
+<button class="w-full mt-5 bg-primary hover:bg-surface-tint text-on-primary font-label-md text-label-md py-3 px-4 rounded-lg flex items-center justify-center gap-2 min-h-[48px] transition-colors active:scale-95" onclick="alert('Task added successfully!'); window.location.href='#'">
+<span class="material-symbols-outlined">add_task</span>
+                Add to Task List
+            </button>
+</section>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="fixed bottom-0 w-full rounded-t-xl z-50 border-t border-outline-variant shadow-[0_-4px_6px_-1px_rgba(27,94,32,0.08)] bg-surface-container flex justify-around items-center h-20 px-2 pb-safe md:hidden">
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors active:scale-90 duration-200 ease-out p-2 rounded-lg w-16" href="#">
+<span class="material-symbols-outlined mb-1 text-[24px]">dashboard</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors active:scale-90 duration-200 ease-out p-2 rounded-lg w-16" href="#">
+<span class="material-symbols-outlined mb-1 text-[24px]">center_focus_strong</span>
+<span class="font-label-sm text-label-sm">Scan</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors active:scale-90 duration-200 ease-out p-2 rounded-lg w-16" href="#">
+<span class="material-symbols-outlined mb-1 text-[24px]">history</span>
+<span class="font-label-sm text-label-sm">History</span>
+</a>
+<!-- Active Tab -->
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 active:scale-90 transition-all duration-200 ease-out w-20" href="#">
+<span class="material-symbols-outlined fill mb-1 text-[24px]">cloud</span>
+<span class="font-label-sm text-label-sm">Weather</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors active:scale-90 duration-200 ease-out p-2 rounded-lg w-16" href="#">
+<span class="material-symbols-outlined mb-1 text-[24px]">smart_toy</span>
+<span class="font-label-sm text-label-sm">AI</span>
+</a>
+</nav>
+
+
+</body></html>

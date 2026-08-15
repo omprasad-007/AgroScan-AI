@@ -1,0 +1,325 @@
+<!DOCTYPE html><html class="h-full" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>AgroScan AI - Scan Leaf</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary-fixed": "#94f990",
+                    "outline": "#707a6c",
+                    "on-secondary-fixed": "#002204",
+                    "tertiary": "#774c00",
+                    "surface": "#f9f9f7",
+                    "on-tertiary": "#ffffff",
+                    "on-surface-variant": "#40493d",
+                    "on-secondary-container": "#00731e",
+                    "on-tertiary-fixed-variant": "#643f00",
+                    "surface-variant": "#e2e3e1",
+                    "on-error-container": "#93000a",
+                    "on-background": "#1a1c1b",
+                    "primary": "#0d631b",
+                    "primary-fixed-dim": "#88d982",
+                    "on-primary-fixed-variant": "#005312",
+                    "surface-container-lowest": "#ffffff",
+                    "on-tertiary-fixed": "#2a1800",
+                    "surface-container-high": "#e8e8e6",
+                    "background": "#f9f9f7",
+                    "on-secondary": "#ffffff",
+                    "secondary-fixed-dim": "#78dc77",
+                    "surface-bright": "#f9f9f7",
+                    "on-primary-fixed": "#002204",
+                    "on-surface": "#1a1c1b",
+                    "on-primary": "#ffffff",
+                    "on-secondary-fixed-variant": "#005313",
+                    "on-error": "#ffffff",
+                    "secondary": "#006e1c",
+                    "on-primary-container": "#cbffc2",
+                    "outline-variant": "#bfcaba",
+                    "surface-container-low": "#f4f4f2",
+                    "surface-container": "#eeeeec",
+                    "surface-container-highest": "#e2e3e1",
+                    "surface-dim": "#dadad8",
+                    "surface-tint": "#1b6d24",
+                    "secondary-container": "#91f78e",
+                    "inverse-surface": "#2f3130",
+                    "inverse-on-surface": "#f1f1ef",
+                    "tertiary-fixed-dim": "#ffb957",
+                    "tertiary-container": "#986200",
+                    "error": "#ba1a1a",
+                    "primary-container": "#2e7d32",
+                    "error-container": "#ffdad6",
+                    "primary-fixed": "#a3f69c",
+                    "on-tertiary-container": "#ffeede",
+                    "inverse-primary": "#88d982",
+                    "tertiary-fixed": "#ffddb5"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "touch-target-min": "48px",
+                    "container-margin": "24px",
+                    "unit": "8px",
+                    "card-padding": "20px",
+                    "gutter": "16px"
+            },
+            "fontFamily": {
+                    "body-lg": [
+                            "Inter"
+                    ],
+                    "display-lg": [
+                            "Inter"
+                    ],
+                    "label-md": [
+                            "Inter"
+                    ],
+                    "headline-lg-mobile": [
+                            "Inter"
+                    ],
+                    "label-sm": [
+                            "Inter"
+                    ],
+                    "headline-lg": [
+                            "Inter"
+                    ],
+                    "body-md": [
+                            "Inter"
+                    ],
+                    "title-md": [
+                            "Inter"
+                    ]
+            },
+            "fontSize": {
+                    "body-lg": [
+                            "18px",
+                            {
+                                    "lineHeight": "28px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "display-lg": [
+                            "48px",
+                            {
+                                    "lineHeight": "56px",
+                                    "letterSpacing": "-0.02em",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "label-md": [
+                            "14px",
+                            {
+                                    "lineHeight": "20px",
+                                    "letterSpacing": "0.01em",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "headline-lg-mobile": [
+                            "24px",
+                            {
+                                    "lineHeight": "32px",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "label-sm": [
+                            "12px",
+                            {
+                                    "lineHeight": "16px",
+                                    "fontWeight": "500"
+                            }
+                    ],
+                    "headline-lg": [
+                            "32px",
+                            {
+                                    "lineHeight": "40px",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "body-md": [
+                            "16px",
+                            {
+                                    "lineHeight": "24px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "title-md": [
+                            "20px",
+                            {
+                                    "lineHeight": "28px",
+                                    "fontWeight": "600"
+                            }
+                    ]
+            }
+    },
+        },
+      }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface h-full font-body-lg text-body-md flex flex-col md:hidden">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 border-b border-outline-variant shadow-sm flex justify-between items-center px-gutter h-14 bg-surface">
+<a href="{{DATA:SCREEN:SCREEN_20}}" class="w-10 h-10 rounded-full flex items-center justify-center hover:bg-surface-container-high transition-colors active:scale-95 text-primary">
+<span class="material-symbols-outlined">arrow_back</span>
+<span class="sr-only">Back to Dashboard</span>
+</a>
+<h1 class="font-display-lg-mobile text-display-lg-mobile text-primary tracking-tight">AgroScan AI</h1>
+<button class="w-10 h-10 rounded-full flex items-center justify-center hover:bg-surface-container-high transition-colors active:scale-95 text-primary">
+<span class="material-symbols-outlined">location_on</span>
+</button>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow pt-[calc(56px+24px)] pb-[calc(80px+24px)] px-gutter overflow-y-auto">
+<div class="max-w-md mx-auto space-y-6">
+<!-- Instruction -->
+<section class="bg-surface-container-lowest p-card-padding rounded-xl border border-surface-variant shadow-sm">
+<p class="font-body-md text-body-md text-on-surface-variant">
+                    Upload a clear image of the affected leaf. Avoid very dark, blurry or distant images.
+                </p>
+</section>
+<!-- Large Central Upload Area -->
+<section class="border-2 border-dashed border-outline-variant rounded-xl p-6 flex flex-col items-center justify-center min-h-[240px] bg-surface-container-lowest relative overflow-hidden group hover:border-primary transition-colors cursor-pointer active:bg-surface-container-low">
+<div class="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<div class="flex gap-4 mb-6 relative z-10 w-full px-4">
+<button class="flex-1 flex flex-col items-center justify-center gap-2 py-4 bg-surface rounded-lg border border-surface-variant hover:bg-surface-container-high active:scale-95 transition-all shadow-sm">
+<span class="material-symbols-outlined text-primary text-3xl">photo_camera</span>
+<span class="font-label-md text-label-md text-primary">Camera</span>
+</button>
+<button class="flex-1 flex flex-col items-center justify-center gap-2 py-4 bg-surface rounded-lg border border-surface-variant hover:bg-surface-container-high active:scale-95 transition-all shadow-sm">
+<span class="material-symbols-outlined text-primary text-3xl">image</span>
+<span class="font-label-md text-label-md text-primary">Gallery</span>
+</button>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant text-center relative z-10">
+                     Supported: JPG, PNG. Max 10MB.
+                 </p>
+</section>
+<!-- Crop Selection -->
+<section class="space-y-2">
+<label class="font-label-md text-label-md text-on-surface block" for="crop-type">Crop Type</label>
+<div class="relative">
+<select class="w-full bg-surface-container-lowest border border-surface-variant rounded-xl h-[56px] px-4 appearance-none font-body-md text-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm bg-white" id="crop-type">
+<option disabled="" selected="" value="">Select Crop...</option>
+<option value="wheat">Wheat</option>
+<option value="corn">Corn</option>
+<option value="soybean">Soybean</option>
+<option value="rice">Rice</option>
+<option value="tomato">Tomato</option>
+<option value="potato">Potato</option>
+<option value="other">Other</option>
+</select>
+<span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">expand_more</span>
+</div>
+</section>
+<!-- Quality Check Tips -->
+<section class="bg-surface-container-lowest p-card-padding rounded-xl border border-surface-variant shadow-sm">
+<h3 class="font-label-md text-label-md text-on-surface mb-3 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[20px]">check_circle</span>
+                    Quality Tips
+                </h3>
+<ul class="space-y-2">
+<li class="flex items-start gap-2 font-body-md text-body-md text-on-surface-variant">
+<span class="material-symbols-outlined text-outline text-[16px] mt-[4px]">brightness_high</span>
+<span class="">Ensure bright lighting</span>
+</li>
+<li class="flex items-start gap-2 font-body-md text-body-md text-on-surface-variant">
+<span class="material-symbols-outlined text-outline text-[16px] mt-[4px]">filter_center_focus</span>
+<span class="">Center the leaf in frame</span>
+</li>
+<li class="flex items-start gap-2 font-body-md text-body-md text-on-surface-variant">
+<span class="material-symbols-outlined text-outline text-[16px] mt-[4px]">back_hand</span>
+<span class="">Keep camera steady</span>
+</li>
+</ul>
+</section>
+<!-- Primary Action -->
+<div class="pt-4">
+<a href="{{DATA:SCREEN:SCREEN_8}}" class="w-full h-[56px] bg-primary-container text-on-primary-container font-label-md text-label-md rounded-xl shadow-sm transition-all active:scale-95 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">search</span>
+                    Analyze Leaf
+                </a>
+</div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full rounded-t-xl z-50 border-t border-outline-variant shadow-[0_-4px_6px_-1px_rgba(27,94,32,0.08)] bg-surface-container flex justify-around items-center h-20 px-2 pb-safe">
+<a class="flex flex-col items-center justify-center text-on-surface-variant min-w-[64px] h-[56px] hover:bg-surface-container-high transition-colors active:scale-90 duration-200 ease-out rounded-lg group" href="{{DATA:SCREEN:SCREEN_20}}">
+<span class="material-symbols-outlined text-2xl group-active:scale-90 transition-transform">dashboard</span>
+<span class="font-label-sm text-label-sm mt-1">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 min-w-[64px] h-[56px] hover:bg-surface-container-high transition-colors active:scale-90 duration-200 ease-out" href="#">
+<span class="material-symbols-outlined text-2xl" data-weight="fill" style="font-variation-settings: 'FILL' 1;">center_focus_strong</span>
+<span class="font-label-sm text-label-sm mt-1 font-bold">Scan</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant min-w-[64px] h-[56px] hover:bg-surface-container-high transition-colors active:scale-90 duration-200 ease-out rounded-lg group" href="#">
+<span class="material-symbols-outlined text-2xl group-active:scale-90 transition-transform">history</span>
+<span class="font-label-sm text-label-sm mt-1">History</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant min-w-[64px] h-[56px] hover:bg-surface-container-high transition-colors active:scale-90 duration-200 ease-out rounded-lg group" href="#">
+<span class="material-symbols-outlined text-2xl group-active:scale-90 transition-transform">cloud</span>
+<span class="font-label-sm text-label-sm mt-1">Weather</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant min-w-[64px] h-[56px] hover:bg-surface-container-high transition-colors active:scale-90 duration-200 ease-out rounded-lg group" href="#">
+<span class="material-symbols-outlined text-2xl group-active:scale-90 transition-transform">smart_toy</span>
+<span class="font-label-sm text-label-sm mt-1">AI</span>
+</a>
+</nav>
+<script>
+        // Simple interaction script to demonstrate state change (simulate file select)
+        const uploadArea = document.querySelector('section.border-dashed');
+        const analyzeBtn = document.querySelector('button.bg-primary-container');
+        const selectBox = document.getElementById('crop-type');
+        
+        let hasImage = false;
+        let hasCrop = false;
+        
+        function checkState() {
+            if(hasImage && hasCrop) {
+                analyzeBtn.removeAttribute('disabled');
+                analyzeBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                analyzeBtn.classList.add('hover:opacity-90');
+            } else {
+                analyzeBtn.setAttribute('disabled', 'true');
+                analyzeBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                analyzeBtn.classList.remove('hover:opacity-90');
+            }
+        }
+
+        // Simulate image selection
+        uploadArea.addEventListener('click', () => {
+            hasImage = !hasImage;
+            
+            if(hasImage) {
+                uploadArea.classList.remove('border-outline-variant');
+                uploadArea.classList.add('border-primary', 'bg-primary/5');
+                uploadArea.querySelector('p').textContent = 'leaf_sample_04.jpg (3.2MB) - Tap to change';
+            } else {
+                uploadArea.classList.add('border-outline-variant');
+                uploadArea.classList.remove('border-primary', 'bg-primary/5');
+                uploadArea.querySelector('p').textContent = 'Supported: JPG, PNG. Max 10MB.';
+            }
+            
+            checkState();
+        });
+        
+        selectBox.addEventListener('change', (e) => {
+            hasCrop = e.target.value !== '';
+            checkState();
+        });
+    </script>
+
+
+</body></html>

@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AgroScan AI - Admin Analytics</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-container": "#ffeede",
+                        "on-primary-fixed": "#002204",
+                        "surface": "#f9f9f7",
+                        "secondary-fixed-dim": "#78dc77",
+                        "surface-dim": "#dadad8",
+                        "on-tertiary": "#ffffff",
+                        "surface-container": "#eeeeec",
+                        "surface-container-lowest": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "on-secondary-container": "#00731e",
+                        "on-surface-variant": "#40493d",
+                        "secondary-fixed": "#94f990",
+                        "surface-container-highest": "#e2e3e1",
+                        "inverse-primary": "#88d982",
+                        "error": "#ba1a1a",
+                        "inverse-on-surface": "#f1f1ef",
+                        "on-secondary-fixed-variant": "#005313",
+                        "primary-fixed-dim": "#88d982",
+                        "surface-tint": "#1b6d24",
+                        "on-primary-fixed-variant": "#005312",
+                        "on-secondary": "#ffffff",
+                        "outline-variant": "#bfcaba",
+                        "surface-container-high": "#e8e8e6",
+                        "tertiary-fixed": "#ffddb5",
+                        "on-background": "#1a1c1b",
+                        "tertiary-container": "#986200",
+                        "on-error-container": "#93000a",
+                        "surface-variant": "#e2e3e1",
+                        "surface-bright": "#f9f9f7",
+                        "on-tertiary-fixed": "#2a1800",
+                        "background": "#f9f9f7",
+                        "primary-container": "#2e7d32",
+                        "secondary-container": "#91f78e",
+                        "inverse-surface": "#2f3130",
+                        "on-secondary-fixed": "#002204",
+                        "on-surface": "#1a1c1b",
+                        "primary-fixed": "#a3f69c",
+                        "on-tertiary-fixed-variant": "#643f00",
+                        "surface-container-low": "#f4f4f2",
+                        "primary": "#0d631b",
+                        "tertiary-fixed-dim": "#ffb957",
+                        "tertiary": "#774c00",
+                        "on-error": "#ffffff",
+                        "outline": "#707a6c",
+                        "secondary": "#006e1c",
+                        "on-primary-container": "#cbffc2",
+                        "on-primary": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "unit": "8px",
+                        "container-margin": "24px",
+                        "touch-target-min": "48px",
+                        "card-padding": "20px",
+                        "gutter": "16px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "body-md": ["Inter"],
+                        "label-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "title-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "title-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface flex flex-col min-h-screen pt-14 pb-20 md:pb-0 md:pl-[240px]">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 shadow-sm border-b border-outline-variant bg-surface flex justify-between items-center px-gutter h-14 md:pl-[256px]">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary text-2xl md:hidden">menu</span>
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container font-label-md">
+                    AS
+                </div>
+<h1 class="font-title-md text-title-md text-primary tracking-tight">AgroScan AI</h1>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-high transition-colors p-2 rounded-full cursor-pointer" data-icon="cloud_done">cloud_done</span>
+<span class="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-high transition-colors p-2 rounded-full cursor-pointer">location_on</span>
+</div>
+</header>
+<!-- SideNav (Desktop) / Simulated -->
+<nav class="hidden md:flex flex-col w-[240px] h-screen fixed left-0 top-0 bg-surface-container border-r border-outline-variant pt-20 px-4">
+<div class="flex flex-col gap-2">
+<a class="flex items-center gap-3 p-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 p-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined">center_focus_strong</span>
+<span class="font-label-md text-label-md">Scan</span>
+</a>
+<a class="flex items-center gap-3 p-3 rounded-lg bg-primary-container text-on-primary-container" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-label-md text-label-md">Analytics</span>
+</a>
+<a class="flex items-center gap-3 p-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined">history</span>
+<span class="font-label-md text-label-md">History</span>
+</a>
+</div>
+</nav>
+<main class="flex-grow p-gutter md:p-container-margin w-full max-w-7xl mx-auto space-y-6">
+<!-- Header & Filters -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+<div>
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface">Regional Analytics Overview</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Aggregated health data across all active monitoring zones.</p>
+</div>
+<div class="flex flex-wrap gap-3">
+<select class="bg-surface-container-lowest border border-outline-variant rounded-lg px-4 py-2 font-label-md text-label-md text-on-surface focus:ring-primary focus:border-primary">
+<option>Region: All West</option>
+<option>Region: North Valley</option>
+</select>
+<select class="bg-surface-container-lowest border border-outline-variant rounded-lg px-4 py-2 font-label-md text-label-md text-on-surface focus:ring-primary focus:border-primary">
+<option>Crop: All</option>
+<option>Tomatoes</option>
+<option>Potatoes</option>
+</select>
+<select class="bg-surface-container-lowest border border-outline-variant rounded-lg px-4 py-2 font-label-md text-label-md text-on-surface focus:ring-primary focus:border-primary">
+<option>Last 30 Days</option>
+<option>Last 90 Days</option>
+</select>
+</div>
+</div>
+<!-- KPIs Bento Grid -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-gutter">
+<!-- Total Users -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-card-padding shadow-[0_4px_12px_rgba(27,94,32,0.03)] flex flex-col justify-between">
+<div class="flex justify-between items-start mb-4">
+<span class="material-symbols-outlined text-primary bg-primary-container/20 p-2 rounded-lg">group</span>
+</div>
+<div>
+<div class="font-display-lg text-display-lg text-on-surface">450</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mt-1">Total Active Users</div>
+</div>
+</div>
+<!-- Regional Scans -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-card-padding shadow-[0_4px_12px_rgba(27,94,32,0.03)] flex flex-col justify-between">
+<div class="flex justify-between items-start mb-4">
+<span class="material-symbols-outlined text-secondary bg-secondary-container/20 p-2 rounded-lg">center_focus_strong</span>
+<span class="font-label-sm text-label-sm text-secondary bg-secondary-container px-2 py-0.5 rounded-full">+12%</span>
+</div>
+<div>
+<div class="font-display-lg text-display-lg text-on-surface">45k</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mt-1">Regional Scans</div>
+</div>
+</div>
+<!-- Most Common Disease -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-card-padding shadow-[0_4px_12px_rgba(27,94,32,0.03)] flex flex-col justify-between md:col-span-1 col-span-2">
+<div class="flex justify-between items-start mb-4">
+<span class="material-symbols-outlined text-error bg-error-container/20 p-2 rounded-lg">coronavirus</span>
+</div>
+<div>
+<div class="font-title-md text-title-md text-on-surface truncate">Late Blight</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mt-1">Most Common Disease</div>
+</div>
+</div>
+<!-- Risk Level -->
+<div class="bg-error-container border border-error/20 rounded-xl p-card-padding shadow-[0_4px_12px_rgba(27,94,32,0.03)] flex flex-col justify-between md:col-span-1 col-span-2">
+<div class="flex justify-between items-start mb-4">
+<span class="material-symbols-outlined text-on-error-container bg-error/10 p-2 rounded-lg">warning</span>
+</div>
+<div>
+<div class="font-title-md text-title-md text-on-error-container">Elevated</div>
+<div class="font-label-sm text-label-sm text-on-error-container/80 uppercase tracking-wider mt-1">Regional Risk Level</div>
+</div>
+</div>
+</div>
+<!-- Charts Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<!-- Disease Trend -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-card-padding shadow-[0_4px_12px_rgba(27,94,32,0.03)] col-span-1 md:col-span-2">
+<h3 class="font-title-md text-title-md text-on-surface mb-4">Disease Trend Over Time (Top 3)</h3>
+<div class="h-[300px] w-full">
+<canvas id="trendChart"></canvas>
+</div>
+</div>
+<!-- Crop-wise Disease Frequency -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-card-padding shadow-[0_4px_12px_rgba(27,94,32,0.03)]">
+<h3 class="font-title-md text-title-md text-on-surface mb-4">Crop-wise Disease Frequency</h3>
+<div class="h-[250px] w-full">
+<canvas id="barChart"></canvas>
+</div>
+</div>
+<!-- AI Confidence -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-card-padding shadow-[0_4px_12px_rgba(27,94,32,0.03)] flex flex-col">
+<h3 class="font-title-md text-title-md text-on-surface mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">smart_toy</span>
+                    System Performance (AI Confidence)
+                </h3>
+<div class="flex-grow flex items-center justify-center">
+<div class="w-48 h-48 relative">
+<canvas id="doughnutChart"></canvas>
+<div class="absolute inset-0 flex items-center justify-center flex-col">
+<span class="font-title-md text-title-md text-on-surface">92%</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Avg Score</span>
+</div>
+</div>
+</div>
+<div class="mt-4 flex justify-center gap-4 font-label-sm text-label-sm">
+<div class="flex items-center gap-1"><div class="w-3 h-3 rounded-full bg-primary"></div> &gt; 90%</div>
+<div class="flex items-center gap-1"><div class="w-3 h-3 rounded-full bg-tertiary-fixed-dim"></div> 75-90%</div>
+<div class="flex items-center gap-1"><div class="w-3 h-3 rounded-full bg-error"></div> &lt; 75%</div>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden flex justify-around items-center h-20 px-2 pb-safe w-full fixed bottom-0 rounded-t-xl z-50 shadow-[0_-4px_6px_-1px_rgba(27,94,32,0.08)] bg-surface-container border-t border-outline-variant">
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors w-16 py-2 rounded-lg" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-sm text-label-sm mt-1">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors w-16 py-2 rounded-lg" href="#">
+<span class="material-symbols-outlined">center_focus_strong</span>
+<span class="font-label-sm text-label-sm mt-1">Scan</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 active:scale-90 transition-all duration-200 ease-out" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-label-sm text-label-sm mt-1">Analytics</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors w-16 py-2 rounded-lg" href="#">
+<span class="material-symbols-outlined">history</span>
+<span class="font-label-sm text-label-sm mt-1">History</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors w-16 py-2 rounded-lg" href="#">
+<span class="material-symbols-outlined">smart_toy</span>
+<span class="font-label-sm text-label-sm mt-1">AI</span>
+</a>
+</nav>
+<script>
+        // Common chart styling
+        Chart.defaults.font.family = 'Inter';
+        Chart.defaults.color = '#40493d'; // on-surface-variant
+        const gridColor = '#e2e3e1'; // surface-variant
+
+        // Trend Chart (Line)
+        const trendCtx = document.getElementById('trendChart').getContext('2d');
+        new Chart(trendCtx, {
+            type: 'line',
+            data: {
+                labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'],
+                datasets: [
+                    {
+                        label: 'Late Blight',
+                        data: [65, 59, 80, 81, 56, 95],
+                        borderColor: '#ba1a1a', // error
+                        tension: 0.4,
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'Powdery Mildew',
+                        data: [28, 48, 40, 19, 86, 27],
+                        borderColor: '#986200', // tertiary-container
+                        tension: 0.4,
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'Rust',
+                        data: [18, 28, 30, 49, 36, 17],
+                        borderColor: '#0d631b', // primary
+                        tension: 0.4,
+                        borderWidth: 2
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'top' } },
+                scales: {
+                    y: { grid: { color: gridColor } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+
+        // Crop-wise Chart (Horizontal Bar)
+        const barCtx = document.getElementById('barChart').getContext('2d');
+        new Chart(barCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Tomatoes', 'Potatoes', 'Corn', 'Wheat'],
+                datasets: [{
+                    label: 'Reported Incidents',
+                    data: [450, 320, 150, 80],
+                    backgroundColor: '#2e7d32', // primary-container
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { grid: { color: gridColor } },
+                    y: { grid: { display: false } }
+                }
+            }
+        });
+
+        // Confidence Chart (Doughnut)
+        const doughnutCtx = document.getElementById('doughnutChart').getContext('2d');
+        new Chart(doughnutCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['> 90%', '75-90%', '< 75%'],
+                datasets: [{
+                    data: [75, 20, 5],
+                    backgroundColor: [
+                        '#0d631b', // primary
+                        '#ffb957', // tertiary-fixed-dim
+                        '#ba1a1a'  // error
+                    ],
+                    borderWidth: 0,
+                    cutout: '75%'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } }
+            }
+        });
+    </script>
+</body></html>

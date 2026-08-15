@@ -1,0 +1,48 @@
+{
+  "app_title": "AgroScan AI",
+  "subtitle": "Smart Plant Disease Detection & Crop Health Monitoring System",
+  "nav": {
+    "dashboard": "Dashboard",
+    "scan": "Scan Leaf",
+    "history": "Scan History",
+    "analytics": "Crop Analytics",
+    "weather": "Weather Risk",
+    "assistant": "AI Agronomist",
+    "admin": "Admin Console",
+    "profile": "Profile",
+    "logout": "Logout",
+    "login": "Login",
+    "register": "Register"
+  },
+  "demo_banner": "DEMO AI MODE ACTIVE — Running baseline mock inference pipeline. Model training in progress.",
+  "dashboard": {
+    "welcome": "Welcome back,",
+    "summary_title": "Crop Health Summary",
+    "total_scans": "Total Scans",
+    "healthy_scans": "Healthy Crops",
+    "diseased_scans": "Diseased Crops",
+    "avg_confidence": "Avg Confidence",
+    "quick_scan": "Quick Leaf Scan",
+    "recent_scans": "Recent Scans",
+    "view_all": "View All History"
+  },
+  "scan": {
+    "title": "Smart Plant Leaf Analysis",
+    "drag_drop": "Drag & drop leaf photo here, or click to upload",
+    "supported_formats": "Supports JPEG, PNG, WEBP up to 10MB",
+    "sample_picker": "Or choose a sample leaf for instant Demo Mode analysis:",
+    "analyzing": "Running OpenCV preprocessing & AI disease detection...",
+    "btn_analyze": "Analyze Leaf Image"
+  },
+  "result": {
+    "title": "Diagnostic Report",
+    "detected_disease": "Detected Condition",
+    "confidence": "Confidence Score",
+    "severity": "Lesion Severity",
+    "weather_risk": "Weather Outbreak Risk",
+    "organic_remedy": "Recommended Organic Remedy",
+    "chemical_remedy": "Chemical Treatment",
+    "prevention": "Preventive Guidelines",
+    "disclaimer": "Decision-support guidance only. Follow locally approved product labels and agricultural extension guidelines."
+  }
+}

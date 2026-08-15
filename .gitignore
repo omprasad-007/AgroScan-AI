@@ -1,0 +1,37 @@
+# Dependencies
+node_modules/
+.venv/
+venv/
+env/
+__pycache__/
+*.pyc
+*.pyo
+
+# Build & Output
+dist/
+build/
+*.egg-info/
+
+# Environment & Config
+.env
+.env.local
+.env.production
+!.env.example
+!backend/.env.example
+!frontend/.env.example
+
+# Databases & User Uploads
+*.db
+*.sqlite3
+uploads/*
+!uploads/.gitkeep
+
+# IDE & OS Files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Scratch & Logs
+*.log
+scratch/

@@ -1,0 +1,263 @@
+<!DOCTYPE html><html class="scroll-smooth" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>AgroScan AI - Crop Protection</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-fixed-variant": "#005312",
+                        "inverse-primary": "#88d982",
+                        "outline": "#707a6c",
+                        "surface-container-lowest": "#ffffff",
+                        "primary": "#0d631b",
+                        "surface-container-low": "#f4f4f2",
+                        "tertiary-fixed": "#ffddb5",
+                        "on-surface-variant": "#40493d",
+                        "tertiary-container": "#986200",
+                        "error": "#ba1a1a",
+                        "surface-container": "#eeeeec",
+                        "tertiary-fixed-dim": "#ffb957",
+                        "secondary-fixed-dim": "#78dc77",
+                        "surface": "#f9f9f7",
+                        "on-error-container": "#93000a",
+                        "on-surface": "#1a1c1b",
+                        "outline-variant": "#bfcaba",
+                        "primary-fixed": "#a3f69c",
+                        "secondary": "#006e1c",
+                        "surface-bright": "#f9f9f7",
+                        "background": "#f9f9f7",
+                        "on-tertiary-fixed": "#2a1800",
+                        "primary-container": "#2e7d32",
+                        "on-primary-container": "#cbffc2",
+                        "error-container": "#ffdad6",
+                        "surface-container-highest": "#e2e3e1",
+                        "surface-dim": "#dadad8",
+                        "surface-variant": "#e2e3e1",
+                        "on-error": "#ffffff",
+                        "on-secondary-fixed": "#002204",
+                        "on-primary-fixed": "#002204",
+                        "on-secondary-fixed-variant": "#005313",
+                        "inverse-surface": "#2f3130",
+                        "surface-container-high": "#e8e8e6",
+                        "on-tertiary-container": "#ffeede",
+                        "tertiary": "#774c00",
+                        "on-background": "#1a1c1b",
+                        "on-primary": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "primary-fixed-dim": "#88d982",
+                        "surface-tint": "#1b6d24",
+                        "on-secondary-container": "#00731e",
+                        "inverse-on-surface": "#f1f1ef",
+                        "secondary-fixed": "#94f990",
+                        "on-secondary": "#ffffff",
+                        "secondary-container": "#91f78e",
+                        "on-tertiary-fixed-variant": "#643f00"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "16px",
+                        "card-padding": "20px",
+                        "touch-target-min": "48px",
+                        "container-margin": "24px",
+                        "unit": "8px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Inter"],
+                        "title-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "label-md": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "title-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: theme('colors.background');
+            color: theme('colors.on-background');
+        }
+        .pb-safe {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="antialiased min-h-screen flex flex-col pt-14 md:pt-16 pb-24 md:pb-0">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 shadow-sm border-b border-outline-variant bg-surface flex justify-between items-center px-gutter h-14 transition-all duration-300 md:h-16 md:px-8">
+<div class="flex items-center gap-4">
+<a href="{{DATA:SCREEN:SCREEN_14}}" aria-label="User profile shortcut" class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center overflow-hidden hover:bg-surface-container-highest transition-colors active:scale-95 md:hidden">
+<span class="material-symbols-outlined text-on-surface-variant">person</span>
+</a>
+<div class="font-display-lg-mobile text-display-lg-mobile md:font-display-lg md:text-display-lg text-primary tracking-tight">AgroScan AI</div>
+</div>
+<!-- Desktop Nav -->
+<nav class="hidden md:flex items-center gap-8">
+<a class="font-label-md text-label-md text-primary hover:bg-surface-container-high px-4 py-2 rounded-full transition-colors" href="#">Home</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high px-4 py-2 rounded-full transition-colors" href="#">Dashboard</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high px-4 py-2 rounded-full transition-colors" href="#">History</a>
+</nav>
+<button aria-label="Location" class="w-10 h-10 rounded-full flex items-center justify-center text-primary hover:bg-surface-container-high transition-colors active:scale-95">
+<span class="material-symbols-outlined">location_on</span>
+</button>
+</header>
+<!-- Main Content -->
+<main class="flex-grow flex flex-col w-full max-w-[1440px] mx-auto">
+<!-- Hero Section -->
+<section class="relative w-full px-gutter md:px-8 py-12 md:py-24 flex flex-col md:flex-row items-center gap-8 md:gap-16">
+<div class="w-full md:w-1/2 flex flex-col items-start gap-6 z-10">
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm border border-outline-variant">
+<span class="material-symbols-outlined text-[16px] text-primary">eco</span>
+<span class="">AI-Powered Agriculture</span>
+</div>
+<h1 class="font-display-lg-mobile text-display-lg-mobile md:font-display-lg md:text-display-lg text-on-background max-w-2xl text-balance">
+                    Protect Your Crops with AI
+                </h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-xl text-balance">
+                    Detect plant diseases early, understand severity, and get actionable guidance tailored to your specific field conditions.
+                </p>
+<div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto mt-4">
+<a href="{{DATA:SCREEN:SCREEN_7}}" class="bg-primary-container text-on-primary-container font-label-md text-label-md px-6 py-4 rounded-xl min-h-[56px] min-w-[48px] shadow-[0_4px_6px_-1px_rgba(27,94,32,0.08)] hover:bg-primary transition-colors active:scale-95 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">center_focus_strong</span>
+                        Scan a Leaf
+                    </a>
+<a href="{{DATA:SCREEN:SCREEN_20}}" class="bg-surface text-primary border-2 border-primary font-label-md text-label-md px-6 py-4 rounded-xl min-h-[56px] min-w-[48px] hover:bg-surface-container-high transition-colors active:scale-95 flex items-center justify-center">
+                        Explore Dashboard
+                    </a>
+</div>
+</div>
+<div class="w-full md:w-1/2 relative h-[400px] md:h-[600px] rounded-[24px] overflow-hidden shadow-[0_8px_24px_-4px_rgba(27,94,32,0.12)] border border-outline-variant bg-surface-container-lowest">
+<div class="bg-cover bg-center w-full h-full absolute inset-0" data-alt="A high-quality, professional photograph of a lush, healthy agricultural field stretching to the horizon under a clear, bright sky. The perspective is slightly elevated, showing neat rows of green crops. In the foreground, a modern digital tablet interface is subtly superimposed or held by a partially visible hand in a sturdy work glove, displaying a clean, light-mode dashboard with subtle green accents, analyzing the health of a specific leaf. The lighting is natural, crisp, and conveys a sense of morning vitality and technological reliability." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuA5K63vBKDNirsKUZvKsJD56Yt8T30RVnBY9uVI51xSV9f1DYq6pXQDT1nIOM75LGUmZ9qgTzAOOC1zXWWXuaWLf5pvq2Ueh5MiFN9C3G8GwefHHKx9QeKXXUPbyqB54KE-e_5_IGjWkPardjpcCgMK-dcS1GsXUms1ZcJe_dG9PDJ-ZLSSw86wLdD1fP9OavkLn8bY6B2LYt2aaC2O_0cxMyY7EN_3lUyy2n912LNmKUJY2E3NY_9UmA')"></div>
+<!-- Floating glass card -->
+<div class="absolute bottom-6 left-6 right-6 md:left-auto md:right-8 md:w-80 bg-surface/90 backdrop-blur-md p-card-padding rounded-xl border border-outline-variant shadow-lg flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<div>
+<div class="font-title-md text-title-md text-on-surface">Crop Health: Optimal</div>
+<div class="font-body-md text-body-md text-on-surface-variant">Last scan: 2 mins ago</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Features Bento Grid -->
+<section class="w-full px-gutter md:px-8 py-16 bg-surface-container-low rounded-t-[32px] md:rounded-[32px] mt-8 flex flex-col gap-8">
+<div class="text-center max-w-2xl mx-auto flex flex-col gap-4">
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-on-background">Comprehensive Field Intelligence</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Professional tools designed for immediate, actionable insights.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[minmax(250px,auto)]">
+<!-- Feature 1: Disease Detection -->
+<div class="bg-surface-container-lowest p-card-padding rounded-2xl border border-outline-variant shadow-[0_2px_8px_-2px_rgba(27,94,32,0.05)] flex flex-col gap-4 md:col-span-2 relative overflow-hidden group">
+<div class="absolute right-0 top-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -mr-20 -mt-20 transition-transform group-hover:scale-110"></div>
+<div class="w-12 h-12 rounded-xl bg-primary-container text-on-primary-container flex items-center justify-center shrink-0 relative z-10">
+<span class="material-symbols-outlined">center_focus_strong</span>
+</div>
+<div class="relative z-10">
+<h3 class="font-title-md text-title-md text-on-background mb-2">Instant Disease Detection</h3>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-md">Utilize advanced computer vision to identify pathogens, pests, and nutrient deficiencies with a single photo.</p>
+</div>
+<div class="mt-auto pt-4 relative z-10">
+<img class="w-full h-48 object-cover rounded-xl border border-outline-variant" data-alt="A close-up, high-resolution image of a healthy green plant leaf held in a hand wearing a durable, professional work glove. An overlay of a sleek, minimalist digital scanning reticle or interface in a light green tint highlights a specific area of the leaf. The background is a slightly blurred, bright agricultural field. The aesthetic is clean, professional, and emphasizes high-tech precision in a natural environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCySDZrfhFBVJl-A9tLi2ZVLrNZQI2ZozpysJD-tSszYF7BgFJgNZa1t5Ry8kJiHwgZLmMisB-J27bH8P_VfCII6jrxZwXPwv6lp4rn0b8ZqF-l1X35B_SzmziCqvcwnjw1GUywNKCIRNbwtb6FYuTuZdLCAuPWv6Yzs52FUH6MbOggWfWigOSLxVEGcN6DpQDR2g55Qxp0ok5aGUV-hnnsAD9OxHM8MS4tqWRdScH5TUrfYwpRr-TL-g">
+</div>
+</div>
+<!-- Feature 2: Weather Risk -->
+<div class="bg-surface-container-lowest p-card-padding rounded-2xl border border-outline-variant shadow-[0_2px_8px_-2px_rgba(27,94,32,0.05)] flex flex-col gap-4">
+<div class="w-12 h-12 rounded-xl bg-tertiary-container text-on-tertiary-container flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined">cloud</span>
+</div>
+<div>
+<h3 class="font-title-md text-title-md text-on-background mb-2">Micro-climate Weather Risk</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Anticipate conditions that foster disease spread based on hyper-local weather data.</p>
+</div>
+<div class="mt-auto bg-surface-container rounded-xl p-4 flex flex-col gap-3">
+<div class="flex justify-between items-center">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Rain Prob.</span>
+<span class="font-label-md text-label-md text-on-surface">85%</span>
+</div>
+<div class="w-full bg-outline-variant h-2 rounded-full overflow-hidden">
+<div class="bg-tertiary w-[85%] h-full rounded-full"></div>
+</div>
+<div class="flex justify-between items-center mt-2">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Humidity</span>
+<span class="font-label-md text-label-md text-on-surface">72%</span>
+</div>
+</div>
+</div>
+<!-- Feature 3: Smart Treatment -->
+<div class="bg-surface-container-lowest p-card-padding rounded-2xl border border-outline-variant shadow-[0_2px_8px_-2px_rgba(27,94,32,0.05)] flex flex-col gap-4 md:col-span-3 lg:col-span-1 lg:row-start-2 lg:col-start-3">
+<div class="w-12 h-12 rounded-xl bg-secondary-container text-on-secondary-container flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined">smart_toy</span>
+</div>
+<div>
+<h3 class="font-title-md text-title-md text-on-background mb-2">Guided AI Treatment</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Receive step-by-step, actionable mitigation strategies generated by specialized agricultural AI.</p>
+</div>
+<div class="mt-auto bg-[#4CAF50]/10 border border-[#4CAF50]/20 rounded-xl p-4">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary text-[20px] mt-0.5">psychology</span>
+<p class="font-label-sm text-label-sm text-on-surface">Apply copper-based fungicide before anticipated rainfall tomorrow to prevent further spreading.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 w-full rounded-t-xl z-50 border-t border-outline-variant shadow-[0_-4px_6px_-1px_rgba(27,94,32,0.08)] bg-surface-container flex justify-around items-center h-20 px-2 pb-safe">
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 active:scale-90 transition-all duration-200 ease-out min-w-[48px] min-h-[48px]" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="font-label-sm text-label-sm mt-1">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors active:scale-90 duration-200 ease-out min-w-[48px] min-h-[48px] rounded-lg px-2" href="#">
+<span class="material-symbols-outlined">center_focus_strong</span>
+<span class="font-label-sm text-label-sm mt-1">Scan</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors active:scale-90 duration-200 ease-out min-w-[48px] min-h-[48px] rounded-lg px-2" href="#">
+<span class="material-symbols-outlined">history</span>
+<span class="font-label-sm text-label-sm mt-1">History</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors active:scale-90 duration-200 ease-out min-w-[48px] min-h-[48px] rounded-lg px-2" href="#">
+<span class="material-symbols-outlined">cloud</span>
+<span class="font-label-sm text-label-sm mt-1">Weather</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors active:scale-90 duration-200 ease-out min-w-[48px] min-h-[48px] rounded-lg px-2" href="#">
+<span class="material-symbols-outlined">smart_toy</span>
+<span class="font-label-sm text-label-sm mt-1">AI</span>
+</a>
+</nav>
+
+
+</body></html>

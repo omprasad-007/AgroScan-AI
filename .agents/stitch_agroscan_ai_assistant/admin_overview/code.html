@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+
+<html class="h-full" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AgroScan AI - Admin Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-fixed-variant": "#005312",
+                        "inverse-primary": "#88d982",
+                        "outline": "#707a6c",
+                        "surface-container-lowest": "#ffffff",
+                        "primary": "#0d631b",
+                        "surface-container-low": "#f4f4f2",
+                        "tertiary-fixed": "#ffddb5",
+                        "on-surface-variant": "#40493d",
+                        "tertiary-container": "#986200",
+                        "error": "#ba1a1a",
+                        "surface-container": "#eeeeec",
+                        "tertiary-fixed-dim": "#ffb957",
+                        "secondary-fixed-dim": "#78dc77",
+                        "surface": "#f9f9f7",
+                        "on-error-container": "#93000a",
+                        "on-surface": "#1a1c1b",
+                        "outline-variant": "#bfcaba",
+                        "primary-fixed": "#a3f69c",
+                        "secondary": "#006e1c",
+                        "surface-bright": "#f9f9f7",
+                        "background": "#f9f9f7",
+                        "on-tertiary-fixed": "#2a1800",
+                        "primary-container": "#2e7d32",
+                        "on-primary-container": "#cbffc2",
+                        "error-container": "#ffdad6",
+                        "surface-container-highest": "#e2e3e1",
+                        "surface-dim": "#dadad8",
+                        "surface-variant": "#e2e3e1",
+                        "on-error": "#ffffff",
+                        "on-secondary-fixed": "#002204",
+                        "on-primary-fixed": "#002204",
+                        "on-secondary-fixed-variant": "#005313",
+                        "inverse-surface": "#2f3130",
+                        "surface-container-high": "#e8e8e6",
+                        "on-tertiary-container": "#ffeede",
+                        "tertiary": "#774c00",
+                        "on-background": "#1a1c1b",
+                        "on-primary": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "primary-fixed-dim": "#88d982",
+                        "surface-tint": "#1b6d24",
+                        "on-secondary-container": "#00731e",
+                        "inverse-on-surface": "#f1f1ef",
+                        "secondary-fixed": "#94f990",
+                        "on-secondary": "#ffffff",
+                        "secondary-container": "#91f78e",
+                        "on-tertiary-fixed-variant": "#643f00"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "16px",
+                        "card-padding": "20px",
+                        "touch-target-min": "48px",
+                        "container-margin": "24px",
+                        "unit": "8px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Inter"],
+                        "title-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "label-md": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "title-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom, 20px); }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-md h-full flex flex-col pt-14 md:flex-row md:pt-0">
+<!-- TopAppBar (Mobile) -->
+<header class="fixed top-0 w-full z-50 border-b border-outline-variant shadow-sm flex justify-between items-center px-gutter h-14 bg-surface md:hidden">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-title-md">
+                A
+            </div>
+<h1 class="font-display-lg-mobile text-display-lg-mobile text-primary tracking-tight">AgroScan AI</h1>
+</div>
+<button class="w-10 h-10 flex items-center justify-center text-primary rounded-full hover:bg-surface-container-high transition-colors active:scale-95 transition-transform" data-icon="location_on">
+<span class="material-symbols-outlined">location_on</span>
+</button>
+</header>
+<!-- SideNav (Desktop) / Implicit from BottomNavBar logic for desktop context -->
+<aside class="hidden md:flex flex-col w-64 h-screen fixed left-0 top-0 border-r border-outline-variant bg-surface z-40">
+<div class="flex items-center gap-3 h-20 px-6 border-b border-outline-variant">
+<div class="w-10 h-10 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-title-md">
+                A
+            </div>
+<h1 class="font-title-md text-title-md text-primary tracking-tight">AgroScan Admin</h1>
+</div>
+<nav class="flex-1 py-6 px-4 space-y-2">
+<!-- Active: Dashboard/Home context -->
+<a class="flex items-center gap-4 px-4 py-3 rounded-full bg-primary-container text-on-primary-container font-label-md transition-colors" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-full text-on-surface-variant hover:bg-surface-container-high transition-colors font-label-md" href="#">
+<span class="material-symbols-outlined">center_focus_strong</span>
+                Scans
+            </a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-full text-on-surface-variant hover:bg-surface-container-high transition-colors font-label-md" href="#">
+<span class="material-symbols-outlined">group</span>
+                Users
+            </a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-full text-on-surface-variant hover:bg-surface-container-high transition-colors font-label-md" href="#">
+<span class="material-symbols-outlined">menu_book</span>
+                Knowledge Base
+            </a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-full text-on-surface-variant hover:bg-surface-container-high transition-colors font-label-md" href="#">
+<span class="material-symbols-outlined">settings</span>
+                Settings
+            </a>
+</nav>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 overflow-y-auto px-4 py-6 md:ml-64 md:px-8 md:py-8 pb-24 md:pb-8">
+<div class="max-w-7xl mx-auto space-y-8">
+<!-- Page Header -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+<div>
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface">System Overview</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Real-time agricultural intelligence and user metrics.</p>
+</div>
+<div class="flex gap-3 w-full md:w-auto">
+<button class="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 h-12 rounded-lg border-2 border-primary text-primary font-label-md hover:bg-surface-container-high transition-colors active:scale-95">
+<span class="material-symbols-outlined">menu_book</span>
+                        Manage KB
+                    </button>
+<button class="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 h-12 rounded-lg bg-primary text-on-primary font-label-md shadow-sm hover:bg-surface-tint transition-colors active:scale-95">
+<span class="material-symbols-outlined">person_search</span>
+                        User Directory
+                    </button>
+</div>
+</div>
+<!-- Summary Stats Bento Grid -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+<!-- Stat Card 1 -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-card-padding shadow-[0_4px_12px_rgba(27,94,32,0.04)] relative overflow-hidden group">
+<div class="absolute -right-4 -top-4 opacity-10 text-primary transition-transform group-hover:scale-110">
+<span class="material-symbols-outlined" style="font-size: 120px;">group</span>
+</div>
+<div class="relative z-10">
+<p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Total Farmers</p>
+<div class="flex items-end gap-3 mt-2">
+<span class="font-display-lg text-display-lg text-primary">12,458</span>
+<span class="flex items-center text-secondary font-label-md mb-2">
+<span class="material-symbols-outlined text-[16px]">trending_up</span> +5.2%
+                            </span>
+</div>
+</div>
+</div>
+<!-- Stat Card 2 -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-card-padding shadow-[0_4px_12px_rgba(27,94,32,0.04)] relative overflow-hidden group">
+<div class="absolute -right-4 -top-4 opacity-10 text-secondary transition-transform group-hover:scale-110">
+<span class="material-symbols-outlined" style="font-size: 120px;">center_focus_strong</span>
+</div>
+<div class="relative z-10">
+<p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Total Scans Processed</p>
+<div class="flex items-end gap-3 mt-2">
+<span class="font-display-lg text-display-lg text-secondary">842.1K</span>
+<span class="flex items-center text-secondary font-label-md mb-2">
+<span class="material-symbols-outlined text-[16px]">trending_up</span> +12.4%
+                            </span>
+</div>
+</div>
+</div>
+<!-- Stat Card 3: High Risk (Red Badge) -->
+<div class="bg-error-container border border-error/20 rounded-xl p-card-padding shadow-[0_4px_12px_rgba(186,26,26,0.08)] relative overflow-hidden group">
+<div class="absolute left-0 top-0 w-1.5 h-full bg-error"></div>
+<div class="absolute -right-4 -top-4 opacity-10 text-error transition-transform group-hover:scale-110">
+<span class="material-symbols-outlined" style="font-size: 120px;">warning</span>
+</div>
+<div class="relative z-10 pl-2">
+<div class="flex justify-between items-center">
+<p class="font-label-md text-label-md text-on-error-container uppercase tracking-wider">High Risk Farms</p>
+<span class="bg-error text-on-error px-2 py-0.5 rounded-full font-label-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">priority_high</span> Alert
+                            </span>
+</div>
+<div class="flex items-end gap-3 mt-2">
+<span class="font-display-lg text-display-lg text-on-error-container">342</span>
+<span class="flex items-center text-error font-label-md mb-2">
+<span class="material-symbols-outlined text-[16px]">trending_up</span> +1.8%
+                            </span>
+</div>
+</div>
+</div>
+</div>
+<!-- Charts & Maps Section -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<!-- Map Visualization -->
+<div class="lg:col-span-2 bg-surface-container-lowest border border-outline-variant rounded-xl shadow-[0_4px_12px_rgba(27,94,32,0.04)] overflow-hidden flex flex-col h-[500px]">
+<div class="p-4 border-b border-outline-variant flex justify-between items-center bg-surface-container-lowest z-10">
+<h3 class="font-title-md text-title-md text-on-surface">Regional Disease Distribution</h3>
+<button class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container-high text-on-surface-variant transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<div class="flex-1 relative bg-surface-container-low">
+<!-- Placeholder for Map Image -->
+<div class="absolute inset-0 bg-cover bg-center" data-alt="A highly detailed, professional satellite map visualization of an agricultural region showing heat map overlays indicating crop disease prevalence. The map uses a sophisticated color palette of deep greens, muted earth tones, and vibrant red and yellow hotspots to indicate disease concentration. The lighting is neutral and clear, suggesting a high-tech data dashboard interface. The overall mood is analytical and precise, fitting for an advanced agricultural AI tool." data-location="California Central Valley" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuD8cSVtWhwlxucNjhpCrVb_NkggKJX1GovthGTbBMKJ_bHhwfHBHM2tzjVG07R3VfbpbwZdMz7X8JuNmhV0d6FDdbH4cw1kUbaEYbh1duKaPR4vOjn0YKQ_imP9AoEHQUWG1I4ER7AANgZJACVaq67chchuL7t3qZi5XONBan9il1LAoPLQbqmrcWfHXAi_rRp2M87F1gzxRF3SCSOpbaJYrVlJ2dnl5-fcpf0v4s5n9V-CsPW5diZ7YA')"></div>
+<!-- Overlay Legend -->
+<div class="absolute bottom-4 left-4 glass-panel p-3 rounded-lg shadow-sm">
+<p class="font-label-sm text-label-sm text-on-surface mb-2 font-bold">Risk Level</p>
+<div class="flex flex-col gap-1.5">
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-error"></div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Severe (&gt;30%)</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-tertiary-fixed-dim"></div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Moderate (10-30%)</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-secondary"></div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Low (&lt;10%)</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Trends List -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-[0_4px_12px_rgba(27,94,32,0.04)] flex flex-col h-[500px]">
+<div class="p-4 border-b border-outline-variant flex justify-between items-center">
+<h3 class="font-title-md text-title-md text-on-surface">Trending Anomalies</h3>
+</div>
+<div class="flex-1 overflow-y-auto p-2">
+<ul class="space-y-1">
+<li class="p-3 rounded-lg hover:bg-surface-container-high transition-colors cursor-pointer flex gap-4 items-center">
+<div class="w-10 h-10 rounded-full bg-error-container text-on-error-container flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined">coronavirus</span>
+</div>
+<div class="flex-1 min-w-0">
+<p class="font-label-md text-label-md text-on-surface truncate">Wheat Rust Surge</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant truncate">North Region • 142 new reports</p>
+</div>
+<span class="material-symbols-outlined text-outline">chevron_right</span>
+</li>
+<li class="p-3 rounded-lg hover:bg-surface-container-high transition-colors cursor-pointer flex gap-4 items-center">
+<div class="w-10 h-10 rounded-full bg-tertiary-fixed text-on-tertiary-fixed flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined">water_drop</span>
+</div>
+<div class="flex-1 min-w-0">
+<p class="font-label-md text-label-md text-on-surface truncate">Drought Stress</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant truncate">Central Valley • 89 new reports</p>
+</div>
+<span class="material-symbols-outlined text-outline">chevron_right</span>
+</li>
+<li class="p-3 rounded-lg hover:bg-surface-container-high transition-colors cursor-pointer flex gap-4 items-center">
+<div class="w-10 h-10 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined">bug_report</span>
+</div>
+<div class="flex-1 min-w-0">
+<p class="font-label-md text-label-md text-on-surface truncate">Aphid Infestation</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant truncate">East Sector • 45 new reports</p>
+</div>
+<span class="material-symbols-outlined text-outline">chevron_right</span>
+</li>
+<li class="p-3 rounded-lg hover:bg-surface-container-high transition-colors cursor-pointer flex gap-4 items-center">
+<div class="w-10 h-10 rounded-full bg-error-container text-on-error-container flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined">pest_control</span>
+</div>
+<div class="flex-1 min-w-0">
+<p class="font-label-md text-label-md text-on-surface truncate">Locust Warning</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant truncate">South Border • High probability</p>
+</div>
+<span class="material-symbols-outlined text-outline">chevron_right</span>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="fixed bottom-0 w-full rounded-t-xl z-50 border-t border-outline-variant shadow-[0_-4px_6px_-1px_rgba(27,94,32,0.08)] flex justify-around items-center h-20 px-2 pb-safe bg-surface-container md:hidden">
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1" href="#">
+<span class="material-symbols-outlined mb-1">dashboard</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors px-4 py-1 rounded-full" href="#">
+<span class="material-symbols-outlined mb-1">center_focus_strong</span>
+<span class="font-label-sm text-label-sm">Scan</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors px-4 py-1 rounded-full" href="#">
+<span class="material-symbols-outlined mb-1">history</span>
+<span class="font-label-sm text-label-sm">History</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors px-4 py-1 rounded-full" href="#">
+<span class="material-symbols-outlined mb-1">cloud</span>
+<span class="font-label-sm text-label-sm">Weather</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors px-4 py-1 rounded-full" href="#">
+<span class="material-symbols-outlined mb-1">smart_toy</span>
+<span class="font-label-sm text-label-sm">AI</span>
+</a>
+</nav>
+</body></html>

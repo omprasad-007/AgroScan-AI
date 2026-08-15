@@ -1,0 +1,317 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Analyzing Crop - AgroScan AI</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-fixed": "#94f990",
+                        "outline": "#707a6c",
+                        "on-secondary-fixed": "#002204",
+                        "tertiary": "#774c00",
+                        "surface": "#f9f9f7",
+                        "on-tertiary": "#ffffff",
+                        "on-surface-variant": "#40493d",
+                        "on-secondary-container": "#00731e",
+                        "on-tertiary-fixed-variant": "#643f00",
+                        "surface-variant": "#e2e3e1",
+                        "on-error-container": "#93000a",
+                        "on-background": "#1a1c1b",
+                        "primary": "#0d631b",
+                        "primary-fixed-dim": "#88d982",
+                        "on-primary-fixed-variant": "#005312",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-fixed": "#2a1800",
+                        "surface-container-high": "#e8e8e6",
+                        "background": "#f9f9f7",
+                        "on-secondary": "#ffffff",
+                        "secondary-fixed-dim": "#78dc77",
+                        "surface-bright": "#f9f9f7",
+                        "on-primary-fixed": "#002204",
+                        "on-surface": "#1a1c1b",
+                        "on-primary": "#ffffff",
+                        "on-secondary-fixed-variant": "#005313",
+                        "on-error": "#ffffff",
+                        "secondary": "#006e1c",
+                        "on-primary-container": "#cbffc2",
+                        "outline-variant": "#bfcaba",
+                        "surface-container-low": "#f4f4f2",
+                        "surface-container": "#eeeeec",
+                        "surface-container-highest": "#e2e3e1",
+                        "surface-dim": "#dadad8",
+                        "surface-tint": "#1b6d24",
+                        "secondary-container": "#91f78e",
+                        "inverse-surface": "#2f3130",
+                        "inverse-on-surface": "#f1f1ef",
+                        "tertiary-fixed-dim": "#ffb957",
+                        "tertiary-container": "#986200",
+                        "error": "#ba1a1a",
+                        "primary-container": "#2e7d32",
+                        "error-container": "#ffdad6",
+                        "primary-fixed": "#a3f69c",
+                        "on-tertiary-container": "#ffeede",
+                        "inverse-primary": "#88d982",
+                        "tertiary-fixed": "#ffddb5"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "touch-target-min": "48px",
+                        "container-margin": "24px",
+                        "unit": "8px",
+                        "card-padding": "20px",
+                        "gutter": "16px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "title-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "title-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .pulse-overlay {
+            animation: scanLine 2s linear infinite;
+        }
+        @keyframes scanLine {
+            0% { transform: translateY(-100%); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(100%); opacity: 0; }
+        }
+        .step-spinner {
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body-lg min-h-screen flex flex-col pt-14 pb-20 selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 shadow-sm border-b border-outline-variant bg-surface h-14 px-gutter flex justify-between items-center transition-colors">
+<button class="flex items-center justify-center w-touch-target-min h-touch-target-min rounded-full hover:bg-surface-container-high active:scale-95 transition-all text-on-surface-variant focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">arrow_back</span>
+</button>
+<h1 class="font-title-md text-title-md text-primary tracking-tight">Analyzing Crop...</h1>
+<button class="flex items-center justify-center w-touch-target-min h-touch-target-min rounded-full hover:bg-surface-container-high active:scale-95 transition-all text-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">location_on</span>
+</button>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow flex flex-col p-container-margin gap-6 max-w-2xl mx-auto w-full mt-4">
+<!-- Hero: Scan Preview -->
+<section class="relative w-full aspect-[4/3] rounded-xl overflow-hidden shadow-[0_4px_12px_-2px_rgba(27,94,32,0.12)] border border-outline-variant bg-surface-container-lowest">
+<!-- Blur overlay for soft focus -->
+<div class="absolute inset-0 bg-black/10 backdrop-blur-sm z-10 pointer-events-none"></div>
+<!-- Image placeholder -->
+<img alt="Scanning leaf" class="absolute inset-0 w-full h-full object-cover z-0" data-alt="A close-up, softly focused top-down view of a diseased tomato leaf resting on dry soil in a sunny field. The image is bright and professional, shot with shallow depth of field to isolate the leaf. The lighting is natural sunlight, creating a high-contrast but organic scene. The color palette leans towards natural earthy greens, browns, and bright daylight." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDPwA71QCm9AgYPuQCLocVYq1_fcrQdiDfuiT__lsmdXxF1oToGRjWk1WXqjhhBviWU7-deuzZrFI0znwmYD175lnvaR2wySURgvUFi5emNlA2IE4JXd38Rc4umHNfeaujwJcS2GXY_Jc21R2TqvbGdqwiqz0Ma8V6YukTpr2NJPe0rUEMmevbYsPxTBwWywP7bajgs7Mf1NMkcpCc5SEYuU97w_Db-4UU3DOvzBEdXG65KHJfdGLMIVg">
+<!-- Scanning Animation Overlay -->
+<div class="absolute inset-0 z-20 flex flex-col justify-center items-center pointer-events-none overflow-hidden">
+<!-- Corner markers -->
+<div class="absolute inset-4 border-2 border-primary/40 rounded-lg">
+<div class="absolute -top-1 -left-1 w-6 h-6 border-t-4 border-l-4 border-primary rounded-tl-lg"></div>
+<div class="absolute -top-1 -right-1 w-6 h-6 border-t-4 border-r-4 border-primary rounded-tr-lg"></div>
+<div class="absolute -bottom-1 -left-1 w-6 h-6 border-b-4 border-l-4 border-primary rounded-bl-lg"></div>
+<div class="absolute -bottom-1 -right-1 w-6 h-6 border-b-4 border-r-4 border-primary rounded-br-lg"></div>
+</div>
+<!-- Moving scan line -->
+<div class="w-full h-1 bg-primary pulse-overlay shadow-[0_0_8px_2px_rgba(13,99,27,0.8)] relative">
+<div class="absolute -top-4 left-0 w-full h-8 bg-gradient-to-b from-transparent to-primary/30"></div>
+</div>
+</div>
+<!-- Status Text Overlay -->
+<div class="absolute bottom-4 left-0 w-full text-center z-30 px-4">
+<div class="inline-flex flex-col items-center bg-surface/90 backdrop-blur-md px-6 py-3 rounded-full border border-outline-variant shadow-sm">
+<span class="font-label-md text-label-md text-primary">AI Examining Crop</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant mt-1">Please keep device steady...</span>
+</div>
+</div>
+</section>
+<!-- Progress Sequence Card -->
+<section class="bg-surface-container-lowest rounded-xl p-card-padding border border-outline-variant shadow-[0_2px_8px_-2px_rgba(27,94,32,0.08)]">
+<h2 class="sr-only">Analysis Progress</h2>
+<!-- Overall Progress Bar -->
+<div class="w-full bg-surface-container-high rounded-full h-2 mb-8 overflow-hidden">
+<div class="bg-primary h-2 rounded-full transition-all duration-1000 ease-in-out" style="width: 45%;"></div>
+</div>
+<!-- Steps List -->
+<div class="flex flex-col gap-0 relative">
+<!-- Vertical connecting line -->
+<div class="absolute left-[19px] top-4 bottom-6 w-[2px] bg-surface-container-high -z-10"></div>
+<!-- Step 1: Success -->
+<div class="flex items-start gap-4 pb-6">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center border-2 border-surface shadow-sm z-10">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<div class="pt-2 flex-grow">
+<h3 class="font-label-md text-label-md text-on-surface">Image Quality Check</h3>
+</div>
+</div>
+<!-- Step 2: Success -->
+<div class="flex items-start gap-4 pb-6">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center border-2 border-surface shadow-sm z-10">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<div class="pt-2 flex-grow">
+<h3 class="font-label-md text-label-md text-on-surface">Image Preprocessing</h3>
+</div>
+</div>
+<!-- Step 3: Active -->
+<div class="flex items-start gap-4 pb-6">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-surface border-2 border-primary text-primary flex items-center justify-center shadow-sm z-10 relative">
+<span class="material-symbols-outlined step-spinner text-[20px]">autorenew</span>
+<!-- Pulsing glow behind active step -->
+<div class="absolute inset-0 rounded-full bg-primary/20 animate-ping -z-10"></div>
+</div>
+<div class="pt-2 flex-grow">
+<h3 class="font-label-md text-label-md text-primary font-bold">Plant Identification</h3>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-1">Analyzing structural features...</p>
+</div>
+</div>
+<!-- Step 4: Pending -->
+<div class="flex items-start gap-4 pb-6">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-surface-container text-outline-variant flex items-center justify-center border-2 border-surface shadow-sm z-10">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 0;">coronavirus</span>
+</div>
+<div class="pt-2 flex-grow opacity-60">
+<h3 class="font-label-md text-label-md text-on-surface-variant">Disease Detection</h3>
+</div>
+</div>
+<!-- Step 5: Pending -->
+<div class="flex items-start gap-4 pb-6">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-surface-container text-outline-variant flex items-center justify-center border-2 border-surface shadow-sm z-10">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 0;">percent</span>
+</div>
+<div class="pt-2 flex-grow opacity-60">
+<h3 class="font-label-md text-label-md text-on-surface-variant">Confidence Calculation</h3>
+</div>
+</div>
+<!-- Step 6: Pending -->
+<div class="flex items-start gap-4 pb-6">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-surface-container text-outline-variant flex items-center justify-center border-2 border-surface shadow-sm z-10">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 0;">warning</span>
+</div>
+<div class="pt-2 flex-grow opacity-60">
+<h3 class="font-label-md text-label-md text-on-surface-variant">Severity Analysis</h3>
+</div>
+</div>
+<!-- Step 7: Pending (Last item, no pb-6) -->
+<div class="flex items-start gap-4">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-surface-container text-outline-variant flex items-center justify-center border-2 border-surface shadow-sm z-10">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 0;">medical_services</span>
+</div>
+<div class="pt-2 flex-grow opacity-60">
+<h3 class="font-label-md text-label-md text-on-surface-variant">Recommendation Generation</h3>
+</div>
+</div>
+</div>
+</section>
+<!-- Cancel Action (Tertiary) -->
+<div class="flex justify-center mt-4 mb-8">
+<button class="font-label-md text-label-md text-primary hover:bg-primary-container/10 px-6 py-3 rounded-full transition-colors active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary" onclick="console.log('Navigating back to Scan: {{DATA:SCREEN:SCREEN_7}}'); if (window.parent &amp;&amp; window.parent.postMessage) { window.parent.postMessage({ type: 'NAVIGATE', screenId: 'SCREEN_7' }, '*'); }">
+                Cancel Analysis
+            </button>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="md:hidden fixed bottom-0 w-full rounded-t-xl z-50 border-t border-outline-variant shadow-[0_-4px_6px_-1px_rgba(27,94,32,0.08)] bg-surface-container flex justify-around items-center h-20 px-2 pb-safe">
+<!-- Home -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors active:scale-90 w-16 h-16 rounded-xl gap-1" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">dashboard</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</a>
+<!-- Scan (Active) -->
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 transition-colors active:scale-90 gap-1 h-14 min-w-[64px]" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">center_focus_strong</span>
+<span class="font-label-sm text-label-sm">Scan</span>
+</a>
+<!-- History -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors active:scale-90 w-16 h-16 rounded-xl gap-1" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">history</span>
+<span class="font-label-sm text-label-sm">History</span>
+</a>
+<!-- Weather -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors active:scale-90 w-16 h-16 rounded-xl gap-1" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">cloud</span>
+<span class="font-label-sm text-label-sm">Weather</span>
+</a>
+<!-- AI -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors active:scale-90 w-16 h-16 rounded-xl gap-1" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">smart_toy</span>
+<span class="font-label-sm text-label-sm">AI</span>
+</a>
+</nav>
+<!-- Desktop Navigation (Hidden on mobile) - Conceptual mapping of BottomNav to SideNav for web -->
+<nav class="hidden md:flex flex-col fixed left-0 top-14 bottom-0 w-20 bg-surface-container border-r border-outline-variant z-40 items-center py-6 gap-8 shadow-[4px_0_12px_-2px_rgba(27,94,32,0.08)]">
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors active:scale-90 w-14 h-14 rounded-xl gap-1" href="#" title="Home">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">dashboard</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-2 py-2 transition-colors active:scale-90 w-14 h-14 gap-1 shadow-sm" href="#" title="Scan">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">center_focus_strong</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors active:scale-90 w-14 h-14 rounded-xl gap-1" href="#" title="History">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">history</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors active:scale-90 w-14 h-14 rounded-xl gap-1" href="#" title="Weather">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">cloud</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors active:scale-90 w-14 h-14 rounded-xl gap-1" href="#" title="AI">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">smart_toy</span>
+</a>
+</nav>
+<!-- Add padding to main content on desktop to account for side nav -->
+<style>
+        @media (min-width: 768px) {
+            main {
+                padding-left: calc(5rem + 24px); /* 5rem for sidebar + container-margin */
+            }
+        }
+    </style>
+
+
+<script>
+  // Simulate AI processing delay
+  setTimeout(() => {
+    // In a real app, this would be window.location.href = '...';
+    // For this simulation, we'll assume the system handles the transition to SCREEN_17
+    console.log('Redirecting to Diagnosis Result: {{DATA:SCREEN:SCREEN_17}}');
+    // Mocking the transition for the prototype environment
+    if (window.parent && window.parent.postMessage) {
+      window.parent.postMessage({ type: 'NAVIGATE', screenId: 'SCREEN_17' }, '*');
+    }
+  }, 3000);
+</script></body></html>

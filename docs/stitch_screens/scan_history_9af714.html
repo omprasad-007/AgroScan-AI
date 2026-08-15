@@ -1,0 +1,282 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>AgroScan AI - Disease History</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-fixed-variant": "#005312",
+                        "inverse-primary": "#88d982",
+                        "outline": "#707a6c",
+                        "surface-container-lowest": "#ffffff",
+                        "primary": "#0d631b",
+                        "surface-container-low": "#f4f4f2",
+                        "tertiary-fixed": "#ffddb5",
+                        "on-surface-variant": "#40493d",
+                        "tertiary-container": "#986200",
+                        "error": "#ba1a1a",
+                        "surface-container": "#eeeeec",
+                        "tertiary-fixed-dim": "#ffb957",
+                        "secondary-fixed-dim": "#78dc77",
+                        "surface": "#f9f9f7",
+                        "on-error-container": "#93000a",
+                        "on-surface": "#1a1c1b",
+                        "outline-variant": "#bfcaba",
+                        "primary-fixed": "#a3f69c",
+                        "secondary": "#006e1c",
+                        "surface-bright": "#f9f9f7",
+                        "background": "#f9f9f7",
+                        "on-tertiary-fixed": "#2a1800",
+                        "primary-container": "#2e7d32",
+                        "on-primary-container": "#cbffc2",
+                        "error-container": "#ffdad6",
+                        "surface-container-highest": "#e2e3e1",
+                        "surface-dim": "#dadad8",
+                        "surface-variant": "#e2e3e1",
+                        "on-error": "#ffffff",
+                        "on-secondary-fixed": "#002204",
+                        "on-primary-fixed": "#002204",
+                        "on-secondary-fixed-variant": "#005313",
+                        "inverse-surface": "#2f3130",
+                        "surface-container-high": "#e8e8e6",
+                        "on-tertiary-container": "#ffeede",
+                        "tertiary": "#774c00",
+                        "on-background": "#1a1c1b",
+                        "on-primary": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "primary-fixed-dim": "#88d982",
+                        "surface-tint": "#1b6d24",
+                        "on-secondary-container": "#00731e",
+                        "inverse-on-surface": "#f1f1ef",
+                        "secondary-fixed": "#94f990",
+                        "on-secondary": "#ffffff",
+                        "secondary-container": "#91f78e",
+                        "on-tertiary-fixed-variant": "#643f00"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "16px",
+                        "card-padding": "20px",
+                        "touch-target-min": "48px",
+                        "container-margin": "24px",
+                        "unit": "8px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Inter"],
+                        "title-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "label-md": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "title-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom, 20px); }
+        .thumb-zone-scroll { scroll-padding-bottom: 120px; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface antialiased flex flex-col min-h-screen relative overflow-x-hidden">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 shadow-sm border-b border-outline-variant bg-surface flex justify-between items-center px-gutter h-14 transition-colors">
+<div class="flex items-center gap-4">
+<button aria-label="User profile shortcut" class="w-10 h-10 rounded-full overflow-hidden focus:outline-none hover:bg-surface-container-high transition-colors active:scale-95" onclick="window.location.href='{{DATA:SCREEN:SCREEN_20}}'">
+<img class="w-full h-full object-cover" data-alt="A close-up portrait of an agricultural professional in a bright, modern field environment. The subject is wearing a neutral tone cap and looking determined. The image features a corporate modern aesthetic with soft natural lighting and a clean, high-contrast light mode feel. The background is slightly blurred greenery." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA5NoI6g6hdiri3LaKVRFRO16MZ9OPaGsQbBEj01t3WjtfGSkXdkU2-kjWDxWTImuuKFg2uGsCQDSoEIGEtv3aHMRMI25lECTq3KTDBpeuF_yamlPEH1Fxjtf961vEsbm1NrURrnALYGMW8JovseviHwBGdQ0lfLKBt9h0dTlVw9gJcKfv0dRXOnhuDd3pYdNnWBbXqY4nKvSXjxviO1rFw-bLQNvdiM5pnzFkxNRGgUvS5lTy55ihwLw">
+</button>
+<h1 class="font-display-lg-mobile text-display-lg-mobile text-primary tracking-tight">AgroScan AI</h1>
+</div>
+<button aria-label="location_on" class="w-10 h-10 flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high rounded-full transition-colors active:scale-95">
+<span class="material-symbols-outlined">location_on</span>
+</button>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 mt-14 pb-[100px] px-gutter pt-container-margin thumb-zone-scroll">
+<!-- Header & Filters -->
+<div class="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div>
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-1">Disease History</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Review recent scans and field health records.</p>
+</div>
+<!-- Filter Pills (Scrollable on mobile) -->
+<div class="flex overflow-x-auto pb-2 -mx-gutter px-gutter md:mx-0 md:px-0 gap-2 hide-scrollbar items-center">
+<span class="material-symbols-outlined text-outline mr-1">filter_list</span>
+<button class="whitespace-nowrap flex items-center gap-1.5 px-4 py-2 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container-high transition-colors font-label-md text-label-md min-h-[48px]">
+                    Crop Type
+                    <span class="material-symbols-outlined text-[18px]">arrow_drop_down</span>
+</button>
+<button class="whitespace-nowrap flex items-center gap-1.5 px-4 py-2 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container-high transition-colors font-label-md text-label-md min-h-[48px]">
+                    Severity Level
+                    <span class="material-symbols-outlined text-[18px]">arrow_drop_down</span>
+</button>
+<button class="whitespace-nowrap flex items-center gap-1.5 px-4 py-2 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container-high transition-colors font-label-md text-label-md min-h-[48px]">
+                    Date Range
+                    <span class="material-symbols-outlined text-[18px]">arrow_drop_down</span>
+</button>
+</div>
+</div>
+<!-- Bento Grid Layout for Scan History -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+<!-- Card 1: High Severity -->
+<article class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-[0_4px_12px_rgba(27,94,32,0.04)] overflow-hidden relative group hover:shadow-[0_8px_16px_rgba(27,94,32,0.08)] transition-all duration-300">
+<!-- Status Strip -->
+<div class="absolute left-0 top-0 bottom-0 w-1.5 bg-[#d97706]"></div>
+<div class="p-card-padding pl-6 flex flex-col h-full">
+<div class="flex justify-between items-start mb-4">
+<div>
+<div class="font-label-sm text-label-sm text-on-surface-variant mb-1 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">calendar_today</span> Oct 12
+                            </div>
+<h3 class="font-title-md text-title-md text-on-surface">Tomato</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Early Blight</p>
+</div>
+<div class="bg-surface-container px-2 py-1 rounded font-label-sm text-label-sm text-on-surface-variant font-medium flex flex-col items-end">
+<span class="">94%</span>
+<span class="text-[10px] text-outline">Confidence</span>
+</div>
+</div>
+<div class="mt-auto pt-4 border-t border-outline-variant/30 flex justify-between items-center">
+<div class="flex items-center gap-1.5 text-[#d97706] bg-[#fef3c7] px-2 py-1 rounded">
+<span class="material-symbols-outlined text-[16px] fill-current">warning</span>
+<span class="font-label-md text-label-md">Moderate</span>
+</div>
+<button class="text-primary font-label-md text-label-md flex items-center gap-1 hover:text-primary-container transition-colors min-h-[48px]" onclick="window.location.href='{{DATA:SCREEN:SCREEN_17}}'">
+                            View Details <span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</button>
+</div>
+</div>
+</article>
+<!-- Card 2: Low Severity / Healthy -->
+<article class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-[0_4px_12px_rgba(27,94,32,0.04)] overflow-hidden relative group hover:shadow-[0_8px_16px_rgba(27,94,32,0.08)] transition-all duration-300">
+<div class="absolute left-0 top-0 bottom-0 w-1.5 bg-primary"></div>
+<div class="p-card-padding pl-6 flex flex-col h-full">
+<div class="flex justify-between items-start mb-4">
+<div>
+<div class="font-label-sm text-label-sm text-on-surface-variant mb-1 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">calendar_today</span> Oct 11
+                            </div>
+<h3 class="font-title-md text-title-md text-on-surface">Corn</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Healthy</p>
+</div>
+<div class="bg-surface-container px-2 py-1 rounded font-label-sm text-label-sm text-on-surface-variant font-medium flex flex-col items-end">
+<span class="">98%</span>
+<span class="text-[10px] text-outline">Confidence</span>
+</div>
+</div>
+<div class="mt-auto pt-4 border-t border-outline-variant/30 flex justify-between items-center">
+<div class="flex items-center gap-1.5 text-primary bg-primary-container/10 px-2 py-1 rounded">
+<span class="material-symbols-outlined text-[16px] fill-current" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-label-md text-label-md">Normal</span>
+</div>
+<button class="text-primary font-label-md text-label-md flex items-center gap-1 hover:text-primary-container transition-colors min-h-[48px]" onclick="window.location.href='{{DATA:SCREEN:SCREEN_17}}'">
+                            View Details <span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</button>
+</div>
+</div>
+</article>
+<!-- Card 3: High Severity -->
+<article class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-[0_4px_12px_rgba(27,94,32,0.04)] overflow-hidden relative group hover:shadow-[0_8px_16px_rgba(27,94,32,0.08)] transition-all duration-300">
+<div class="absolute left-0 top-0 bottom-0 w-1.5 bg-error"></div>
+<div class="p-card-padding pl-6 flex flex-col h-full">
+<div class="flex justify-between items-start mb-4">
+<div>
+<div class="font-label-sm text-label-sm text-on-surface-variant mb-1 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">calendar_today</span> Oct 09
+                            </div>
+<h3 class="font-title-md text-title-md text-on-surface">Wheat</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Leaf Rust</p>
+</div>
+<div class="bg-surface-container px-2 py-1 rounded font-label-sm text-label-sm text-on-surface-variant font-medium flex flex-col items-end">
+<span class="">88%</span>
+<span class="text-[10px] text-outline">Confidence</span>
+</div>
+</div>
+<div class="mt-auto pt-4 border-t border-outline-variant/30 flex justify-between items-center">
+<div class="flex items-center gap-1.5 text-error bg-error-container/50 px-2 py-1 rounded">
+<span class="material-symbols-outlined text-[16px] fill-current" style="font-variation-settings: 'FILL' 1;">error</span>
+<span class="font-label-md text-label-md">Severe</span>
+</div>
+<button class="text-primary font-label-md text-label-md flex items-center gap-1 hover:text-primary-container transition-colors min-h-[48px]" onclick="window.location.href='{{DATA:SCREEN:SCREEN_17}}'">
+                            View Details <span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</button>
+</div>
+</div>
+</article>
+<!-- Empty State (Hidden by default, structure provided) -->
+<div class="hidden col-span-full py-16 flex flex-col items-center justify-center text-center">
+<div class="w-20 h-20 bg-surface-container rounded-full flex items-center justify-center mb-4 text-outline">
+<span class="material-symbols-outlined text-[40px]">history_off</span>
+</div>
+<h3 class="font-title-md text-title-md text-on-surface mb-2">No scans found</h3>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-sm mb-6">Start by scanning a leaf in the field to build your crop health history.</p>
+<button class="bg-primary text-on-primary font-label-md text-label-md px-6 min-h-[48px] rounded-xl flex items-center justify-center gap-2 hover:bg-primary-container transition-colors shadow-md active:scale-95">
+<span class="material-symbols-outlined">center_focus_strong</span>
+                    Scan New Leaf
+                </button>
+</div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full rounded-t-xl z-50 shadow-[0_-4px_6px_-1px_rgba(27,94,32,0.08)] border-t border-outline-variant bg-surface-container flex justify-around items-center h-20 px-2 pb-safe md:hidden">
+<button aria-label="Home" class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors active:scale-90 duration-200 ease-out min-w-[64px] min-h-[48px]" onclick="window.location.href='{{DATA:SCREEN:SCREEN_20}}'">
+<span class="material-symbols-outlined mb-1">dashboard</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</button>
+<button aria-label="Scan" class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors active:scale-90 duration-200 ease-out min-w-[64px] min-h-[48px]">
+<span class="material-symbols-outlined mb-1">center_focus_strong</span>
+<span class="font-label-sm text-label-sm">Scan</span>
+</button>
+<button aria-label="History" class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 active:scale-90 transition-all duration-200 ease-out min-w-[64px] min-h-[48px]">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">history</span>
+<span class="font-label-sm text-label-sm">History</span>
+</button>
+<button aria-label="Weather" class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors active:scale-90 duration-200 ease-out min-w-[64px] min-h-[48px]">
+<span class="material-symbols-outlined mb-1">cloud</span>
+<span class="font-label-sm text-label-sm">Weather</span>
+</button>
+<button aria-label="AI" class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors active:scale-90 duration-200 ease-out min-w-[64px] min-h-[48px]">
+<span class="material-symbols-outlined mb-1">smart_toy</span>
+<span class="font-label-sm text-label-sm">AI</span>
+</button>
+</nav>
+<!-- Desktop Navigation (Visible only on md+) - Floating Side Action -->
+<div class="hidden md:flex fixed right-6 bottom-6 flex-col gap-4 z-50">
+<button class="bg-primary text-on-primary w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:bg-primary-container transition-colors hover:scale-105 active:scale-95" title="New Scan">
+<span class="material-symbols-outlined text-[28px]">center_focus_strong</span>
+</button>
+</div>
+
+
+</body></html>
