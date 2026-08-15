@@ -56,3 +56,15 @@ def test_authenticated_dashboard_analytics():
     assert "total_predictions" in data
     assert "disease_distribution" in data
     assert "severity_distribution" in data
+
+def test_firebase_login_endpoint():
+    response = client.post("/api/v1/auth/firebase-login", json={
+        "email": "newfarmer@agroscan.ai",
+        "full_name": "New Farmer User",
+        "city": "Nashik"
+    })
+    assert response.status_code == 200
+    data = response.json()
+    assert "access_token" in data
+    assert data["user"]["email"] == "newfarmer@agroscan.ai"
+

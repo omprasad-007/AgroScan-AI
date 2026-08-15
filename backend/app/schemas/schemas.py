@@ -15,6 +15,14 @@ class UserLogin(BaseModel):
     email: EmailStr
     password: str
 
+class FirebaseLoginRequest(BaseModel):
+    email: EmailStr
+    full_name: Optional[str] = "Farmer User"
+    firebase_uid: Optional[str] = None
+    role: Optional[str] = "farmer"
+    city: Optional[str] = "Pune"
+    state: Optional[str] = "Maharashtra"
+
 class UserResponse(BaseModel):
     id: str
     email: str
