@@ -141,6 +141,20 @@ def test_plant_search_catalog():
     assert data[0]["name"] == "Mango"
     assert data[0]["scientific_name"] == "Mangifera indica"
 
+def test_geocoding_search_and_reverse():
+    # Test geocoding open search
+    search_res = client.get("/api/v1/geocoding/search?q=kagal")
+    assert search_res.status_code == 200
+    search_data = search_res.json()
+    assert len(search_data) >= 1
+
+    # Test reverse geocoding
+    rev_res = client.get("/api/v1/geocoding/reverse?lat=16.5889&lon=74.3150")
+    assert rev_res.status_code == 200
+    rev_data = rev_res.json()
+    assert "village" in rev_data
+    assert rev_data["source"] == "GPS"
+
 def test_farm_location_crud_and_isolation():
     # Login as demo farmer
     login_res = client.post(

@@ -81,6 +81,10 @@ class FarmCreate(BaseModel):
     district: Optional[str] = "Kolhapur"
     state: Optional[str] = "Maharashtra"
     pincode: Optional[str] = "416216"
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+    location_source: Optional[str] = "MANUAL"
+    gps_accuracy: Optional[float] = None
     crop_types: Optional[str] = "Tomato, Potato, Sugarcane"
     area_acres: Optional[float] = 2.5
     irrigation_type: Optional[str] = "Drip Irrigation"
@@ -92,6 +96,10 @@ class FarmUpdate(BaseModel):
     district: Optional[str] = None
     state: Optional[str] = None
     pincode: Optional[str] = None
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+    location_source: Optional[str] = None
+    gps_accuracy: Optional[float] = None
     crop_types: Optional[str] = None
     area_acres: Optional[float] = None
     irrigation_type: Optional[str] = None
@@ -105,10 +113,15 @@ class FarmResponse(BaseModel):
     district: Optional[str]
     state: Optional[str]
     pincode: Optional[str]
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+    location_source: Optional[str] = "MANUAL"
+    gps_accuracy: Optional[float] = None
     crop_types: Optional[str]
     area_acres: float
     irrigation_type: Optional[str] = "Drip Irrigation"
     created_at: datetime
+    updated_at: Optional[datetime] = None
 
     class Config:
         from_attributes = True

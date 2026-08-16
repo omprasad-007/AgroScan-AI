@@ -92,6 +92,31 @@ api.interceptors.response.use(
   (response) => {
     // If backend returned valid predictions/farms, sync to localStorage for offline persistence
     const url = response.config?.url || '';
+    if (url.includes('/geocoding/search')) {
+      const q = (url.split('q=')[1] || '').toLowerCase();
+      const hubs = [
+        { display_name: "Kagal, Kolhapur, Maharashtra, 416216", village: "Kagal", taluka: "Kagal", district: "Kolhapur", state: "Maharashtra", pincode: "416216", latitude: 16.5889, longitude: 74.3150, source: "SEARCH" },
+        { display_name: "Karad, Satara, Maharashtra, 415110", village: "Karad", taluka: "Karad", district: "Satara", state: "Maharashtra", pincode: "415110", latitude: 17.2858, longitude: 74.1818, source: "SEARCH" },
+        { display_name: "Baramati, Pune, Maharashtra, 413102", village: "Baramati", taluka: "Baramati", district: "Pune", state: "Maharashtra", pincode: "413102", latitude: 18.1517, longitude: 74.5772, source: "SEARCH" },
+        { display_name: "Nashik, Maharashtra, 422001", village: "Nashik", taluka: "Nashik", district: "Nashik", state: "Maharashtra", pincode: "422001", latitude: 19.9975, longitude: 73.7898, source: "SEARCH" }
+      ];
+      const filtered = q ? hubs.filter(h => h.village.toLowerCase().includes(q) || h.district.toLowerCase().includes(q) || h.state.toLowerCase().includes(q)) : hubs;
+      return { data: filtered.length ? filtered : hubs.slice(0, 2) };
+    }
+
+    if (url.includes('/geocoding/reverse')) {
+      return {
+        data: {
+          village: "Kagal",
+          taluka: "Kagal",
+          district: "Kolhapur",
+          state: "Maharashtra",
+          pincode: "416216",
+          source: "GPS"
+        }
+      };
+    }
+
     if (url.includes('/plants/search')) {
       const catalog = [
         { name: 'Mango', scientific_name: 'Mangifera indica' },

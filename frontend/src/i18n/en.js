@@ -44,6 +44,18 @@ export const en = {
   "scan.err_no_photo": "Please select or capture a leaf photo first.",
   "scan.camera_denied": "Camera permission was denied. Please allow camera access or upload an image instead.",
 
+  // Location System & GPS
+  "location.use_gps": "📍 Use My Current Location",
+  "location.search_loc": "🔎 Search Location",
+  "location.enter_manual": "✏️ Enter Location Manually",
+  "location.detected_title": "Location Detected",
+  "location.use_this": "Use This Location",
+  "location.gps_denied": "Location permission was denied. You can search for your location or enter it manually.",
+  "location.gps_unavailable": "Your device location is currently unavailable. Try location search or enter your location manually.",
+  "location.gps_timeout": "Location detection timed out. Please try again or choose another location method.",
+  "location.gps_unsupported": "Location access is not supported by this browser.",
+  "location.gps_unknown": "Unable to detect your location. Please search or enter it manually.",
+
   // AI Assistant Page
   "assistant.title": "AgroScan AI Agronomist",
   "assistant.subtitle": "Ask general agricultural questions, consult about your scans, or select a plant manually.",

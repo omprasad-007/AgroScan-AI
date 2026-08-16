@@ -49,11 +49,14 @@ class Farm(Base):
     location = Column(String, nullable=True)
     latitude = Column(Float, nullable=True)
     longitude = Column(Float, nullable=True)
+    location_source = Column(String, default="MANUAL") # "GPS", "SEARCH", "MANUAL"
+    gps_accuracy = Column(Float, nullable=True)
 
     crop_types = Column(String, nullable=True)
     area_acres = Column(Float, default=1.0)
     irrigation_type = Column(String, default="Drip Irrigation")
     created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     owner = relationship("User", back_populates="farms")
     predictions = relationship("ScanPrediction", back_populates="farm")

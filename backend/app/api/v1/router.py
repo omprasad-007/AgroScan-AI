@@ -10,7 +10,8 @@ from app.api.v1.endpoints import (
     admin,
     health,
     crop_guides,
-    plants
+    plants,
+    geocoding
 )
 
 api_router = APIRouter()
@@ -19,6 +20,7 @@ api_router.include_router(health.router, tags=["Health"])
 api_router.include_router(auth.router, prefix="/auth", tags=["Auth"])
 api_router.include_router(auth.router, prefix="/user", tags=["User Profile"])
 api_router.include_router(farm.router, prefix="/farms", tags=["Farms"])
+api_router.include_router(geocoding.router, prefix="/geocoding", tags=["Geocoding & GPS"])
 api_router.include_router(plants.router, prefix="/plants", tags=["Plants"])
 api_router.include_router(scan.router, prefix="/predictions", tags=["Predictions & Scans"])
 api_router.include_router(weather.router, prefix="/weather", tags=["Weather"])
