@@ -4,7 +4,6 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { LanguageProvider } from './context/LanguageContext';
 
 import { ErrorBoundary } from './components/common/ErrorBoundary';
-import { DemoBanner } from './components/common/DemoBanner';
 import { Navbar } from './components/common/Navbar';
 import { Sidebar } from './components/common/Sidebar';
 import { ProtectedRoute } from './components/ProtectedRoute';
@@ -31,7 +30,6 @@ const AppLayout = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-950 text-slate-100 font-sans">
-      <DemoBanner />
       <Navbar />
 
       <div className="flex-1 flex w-full">
