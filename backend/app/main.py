@@ -121,20 +121,21 @@ async def security_and_limit_middleware(request: Request, call_next):
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
     return response
 
-# Configure CORS with strict allowed origins
+# Configure CORS with explicit production & development allowed origins
 origins = settings.ALLOWED_ORIGINS.copy()
-if settings.FRONTEND_URL:
+if settings.FRONTEND_URL and settings.FRONTEND_URL not in origins:
     origins.append(settings.FRONTEND_URL)
 
-if settings.DEBUG:
-    origins = list(set(origins + ["http://localhost:5173", "http://localhost:3000", "*"]))
+if "https://agro-scan-ai-nine.vercel.app" not in origins:
+    origins.append("https://agro-scan-ai-nine.vercel.app")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins if not settings.DEBUG else ["*"],
+    allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allow_headers=["*"],
+    expose_headers=["*"]
 )
 
 # Serve uploaded leaf images statically
