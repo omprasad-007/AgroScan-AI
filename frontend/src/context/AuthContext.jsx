@@ -87,30 +87,26 @@ export const AuthProvider = ({ children }) => {
       try {
         fbUser = await registerUser(email, password, fullName);
       } catch (fbErr) {
-        console.warn("Firebase Auth Register warning:", fbErr.message);
+        console.warn("Firebase Auth Register note:", fbErr.message);
       }
 
-      // Sync with backend API
-      let backendUser = null;
-      try {
-        const res = await api.post('/auth/register', {
-          email,
-          password,
-          full_name: fullName || email.split('@')[0],
-          role: email.includes('admin') ? 'admin' : 'farmer',
-          city: 'Pune',
-          state: 'Maharashtra'
-        });
-        if (res.data?.access_token) {
-          localStorage.setItem('agroscan_token', res.data.access_token);
-          backendUser = res.data.user;
-        }
-      } catch (apiErr) {
-        console.warn("Backend Register fallback:", apiErr);
+      // Authenticate & register with API service
+      const res = await api.post('/auth/register', {
+        email,
+        password,
+        full_name: fullName || email.split('@')[0],
+        role: email.includes('admin') ? 'admin' : 'farmer',
+        city: 'Pune',
+        state: 'Maharashtra'
+      });
+
+      const backendUser = res.data?.user;
+      if (res.data?.access_token) {
+        localStorage.setItem('agroscan_token', res.data.access_token);
       }
 
-      const role = email.includes('admin') ? 'admin' : 'farmer';
-      const cleanName = fullName.trim() || (email ? email.split('@')[0] : 'Farmer User');
+      const role = backendUser?.role || (email.includes('admin') ? 'admin' : 'farmer');
+      const cleanName = backendUser?.full_name || fullName.trim() || (email ? email.split('@')[0] : 'Farmer');
       const userObj = {
         uid: fbUser?.uid || backendUser?.id || `user_${Date.now()}`,
         id: fbUser?.uid || backendUser?.id || `user_${Date.now()}`,
@@ -123,6 +119,9 @@ export const AuthProvider = ({ children }) => {
       setUser(userObj);
       localStorage.setItem('agroscan_user', JSON.stringify(userObj));
       return userObj;
+    } catch (err) {
+      const msg = err.response?.data?.detail || err.message || 'Registration failed.';
+      throw new Error(msg);
     } finally {
       setLoading(false);
     }
@@ -135,12 +134,16 @@ export const AuthProvider = ({ children }) => {
       try {
         fbUser = await loginUser(email, password);
       } catch (fbErr) {
-        console.warn("Firebase Auth Login warning:", fbErr.message);
+        console.warn("Firebase Auth Login note:", fbErr.message);
       }
 
-      // Sync with Backend API (which authenticates credentials via localStorage/database)
-      const backendUser = await syncBackendUser(email, password, email.split('@')[0]);
-      
+      // Sync & authenticate with Backend API
+      const res = await api.post('/auth/login', { email, password });
+      if (res.data?.access_token) {
+        localStorage.setItem('agroscan_token', res.data.access_token);
+      }
+      const backendUser = res.data?.user;
+
       const role = backendUser?.role || (email.includes('admin') ? 'admin' : 'farmer');
       const userDisplayName = backendUser?.full_name || fbUser?.displayName || (email ? email.split('@')[0] : 'Farmer');
       const userEmail = backendUser?.email || email;
@@ -157,6 +160,9 @@ export const AuthProvider = ({ children }) => {
       setUser(userObj);
       localStorage.setItem('agroscan_user', JSON.stringify(userObj));
       return userObj;
+    } catch (err) {
+      const msg = err.response?.data?.detail || err.message || 'Authentication failed.';
+      throw new Error(msg);
     } finally {
       setLoading(false);
     }

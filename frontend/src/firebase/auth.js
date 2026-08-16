@@ -16,11 +16,12 @@ export const getAuthErrorMessage = (errorCode) => {
     case 'auth/invalid-email':
       return 'The email address format is invalid. Please check and try again.';
     case 'auth/user-not-found':
+      return 'User account not found. Please create an account to get started.';
     case 'auth/wrong-password':
     case 'auth/invalid-credential':
-      return 'Incorrect email or password. Please verify your credentials.';
+      return 'Incorrect password. Please verify your credentials and try again.';
     case 'auth/email-already-in-use':
-      return 'An account with this email address already exists. Please login instead.';
+      return 'An account with this email address already exists. Please sign in instead.';
     case 'auth/weak-password':
       return 'Password is too weak. Please use at least 6 characters.';
     case 'auth/too-many-requests':
@@ -28,7 +29,7 @@ export const getAuthErrorMessage = (errorCode) => {
     case 'auth/network-request-failed':
       return 'Network connection error. Please check your internet connection.';
     default:
-      return 'Authentication failed. Please try again.';
+      return 'Authentication failed. Please check your email and password.';
   }
 };
 

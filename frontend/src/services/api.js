@@ -29,34 +29,12 @@ api.interceptors.request.use(
 );
 
 // User Account Storage & Credential Authentication Engine
-const SEEDED_ACCOUNTS = [
-  {
-    id: "usr_101",
-    email: "farmer@agroscan.ai",
-    password: "password123",
-    full_name: "Kisan Ramesh Patil",
-    role: "farmer",
-    city: "Pune",
-    state: "Maharashtra"
-  },
-  {
-    id: "usr_admin_01",
-    email: "admin@agroscan.ai",
-    password: "admin123",
-    full_name: "Dr. Agro Admin",
-    role: "admin",
-    city: "Pune",
-    state: "Maharashtra"
-  }
-];
-
 const getRegisteredAccounts = () => {
   try {
     const saved = localStorage.getItem('agroscan_accounts');
     if (saved) return JSON.parse(saved);
   } catch (e) {}
-  localStorage.setItem('agroscan_accounts', JSON.stringify(SEEDED_ACCOUNTS));
-  return SEEDED_ACCOUNTS;
+  return [];
 };
 
 const saveRegisteredAccounts = (accounts) => {
@@ -85,8 +63,7 @@ const getStoredPredictions = () => {
   if (saved) {
     try { return JSON.parse(saved); } catch (e) {}
   }
-  // Return pre-populated mock data ONLY for the seeded demo account
-  return u.email === 'farmer@agroscan.ai' ? MOCK_PREDICTIONS : [];
+  return [];
 };
 
 const saveStoredPredictions = (preds) => {
@@ -102,7 +79,7 @@ const getStoredFarms = () => {
   if (saved) {
     try { return JSON.parse(saved); } catch (e) {}
   }
-  return u.email === 'farmer@agroscan.ai' ? MOCK_FARMS : [];
+  return [];
 };
 
 const saveStoredFarms = (farms) => {
