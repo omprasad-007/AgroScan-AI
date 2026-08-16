@@ -96,24 +96,47 @@ async def global_exception_handler(request: Request, exc: Exception):
         }
     )
 
-# Security Middleware: Payload Size & Security Headers
+# Security & Bulletproof CORS Middleware: Preflight, Payload Size & Headers
 @app.middleware("http")
 async def security_and_limit_middleware(request: Request, call_next):
+    origin = request.headers.get("origin", "")
+
+    # Clean preflight OPTIONS handling to prevent CORS block on browser preflight
+    if request.method == "OPTIONS":
+        res = Response(status_code=204)
+        if origin:
+            res.headers["Access-Control-Allow-Origin"] = origin
+            res.headers["Access-Control-Allow-Credentials"] = "true"
+            res.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH"
+            res.headers["Access-Control-Allow-Headers"] = "*"
+        return res
+
     # Check max content length to protect against OOM / DoS
     content_length = request.headers.get("content-length")
     max_bytes = settings.MAX_UPLOAD_SIZE_MB * 1024 * 1024
     if content_length:
         try:
             if int(content_length) > max_bytes:
-                return JSONResponse(
+                res = JSONResponse(
                     status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
                     content={"detail": f"Payload size exceeds the maximum limit of {settings.MAX_UPLOAD_SIZE_MB}MB."}
                 )
+                if origin:
+                    res.headers["Access-Control-Allow-Origin"] = origin
+                    res.headers["Access-Control-Allow-Credentials"] = "true"
+                return res
         except ValueError:
             pass
 
     response = await call_next(request)
     
+    # Guarantee CORS Headers on all responses (including 4xx/5xx errors)
+    if origin:
+        response.headers["Access-Control-Allow-Origin"] = origin
+        response.headers["Access-Control-Allow-Credentials"] = "true"
+        response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH"
+        response.headers["Access-Control-Allow-Headers"] = "*"
+
     # Inject Security HTTP Headers
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "DENY"
@@ -121,7 +144,7 @@ async def security_and_limit_middleware(request: Request, call_next):
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
     return response
 
-# Configure CORS with explicit production & development allowed origins
+# Configure Starlette CORSMiddleware as fallback
 origins = settings.ALLOWED_ORIGINS.copy()
 if settings.FRONTEND_URL and settings.FRONTEND_URL not in origins:
     origins.append(settings.FRONTEND_URL)
