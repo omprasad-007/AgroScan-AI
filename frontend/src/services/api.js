@@ -8,7 +8,7 @@ import {
   MOCK_DASHBOARD_ANALYTICS 
 } from './mockData';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://agroscan-ai-backend.onrender.com/api/v1';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api/v1';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
