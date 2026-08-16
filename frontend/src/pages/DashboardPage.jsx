@@ -173,7 +173,7 @@ export const DashboardPage = () => {
             </Link>
           </div>
 
-          {recentScans.length === 0 ? (
+          {(!Array.isArray(recentScans) || recentScans.length === 0) ? (
             <div className="text-center py-10 text-slate-500 text-xs">
               No leaf scans recorded yet. Click "Quick Leaf Scan" to start your first analysis.
             </div>

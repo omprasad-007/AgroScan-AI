@@ -77,9 +77,9 @@ export const AdminDashboardPage = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/60">
-                {users.map((u) => (
-                  <tr key={u.id} className="hover:bg-slate-800/30 transition">
-                    <td className="py-3 px-3 font-semibold text-white">{u.full_name}</td>
+                {(Array.isArray(users) ? users : []).map((u) => (
+                  <tr key={u.id || u.email} className="hover:bg-slate-800/30 transition">
+                    <td className="py-3 px-3 font-semibold text-white">{u.full_name || u.displayName}</td>
                     <td className="py-3 px-3 text-slate-300">{u.email}</td>
                     <td className="py-3 px-3">
                       <span className="px-2 py-0.5 rounded bg-agri-500/10 text-agri-400 text-[10px] font-bold uppercase">
@@ -88,7 +88,7 @@ export const AdminDashboardPage = () => {
                     </td>
                     <td className="py-3 px-3 text-slate-400">{u.city || 'N/A'}</td>
                     <td className="py-3 px-3 text-slate-400 font-mono text-[11px]">
-                      {new Date(u.created_at).toLocaleDateString()}
+                      {new Date(u.created_at || Date.now()).toLocaleDateString()}
                     </td>
                   </tr>
                 ))}

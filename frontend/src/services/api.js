@@ -8,7 +8,7 @@ import {
   MOCK_DASHBOARD_ANALYTICS 
 } from './mockData';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api/v1';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://agroscan-ai-backend.onrender.com/api/v1';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -187,6 +187,26 @@ api.interceptors.response.use(
         displayName: newAccount.full_name,
         role: newAccount.role,
         city: newAccount.city
+      };
+
+      localStorage.setItem('agroscan_user', JSON.stringify(userObj));
+      localStorage.setItem('agroscan_token', `jwt_token_${Date.now()}`);
+      return { data: { access_token: `jwt_token_${Date.now()}`, token_type: 'bearer', user: userObj } };
+    }
+
+    if (url.includes('/auth/firebase-login')) {
+      const body = JSON.parse(error.config.data || '{}');
+      const inputEmail = (body.email || '').trim().toLowerCase();
+      const inputName = (body.full_name || inputEmail.split('@')[0] || 'Farmer').trim();
+
+      const userObj = {
+        id: `usr_${Date.now()}`,
+        uid: `usr_${Date.now()}`,
+        email: inputEmail,
+        full_name: inputName,
+        displayName: inputName,
+        role: inputEmail.includes('admin') ? 'admin' : 'farmer',
+        city: body.city || 'Pune'
       };
 
       localStorage.setItem('agroscan_user', JSON.stringify(userObj));

@@ -125,7 +125,7 @@ export const ProfilePage = () => {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {farms.map((f) => (
+          {(Array.isArray(farms) ? farms : []).map((f) => (
             <div key={f.id} className="p-4 rounded-xl bg-slate-900/60 border border-slate-800 space-y-2">
               <h3 className="text-sm font-bold text-white">{f.name}</h3>
               <p className="text-xs text-slate-400">Crops: <strong className="text-slate-200">{f.crop_types}</strong></p>

@@ -24,10 +24,13 @@ export const HistoryPage = () => {
     fetchHistory();
   }, []);
 
-  const filteredHistory = history.filter((item) => {
-    const matchesSearch = item.disease_name.toLowerCase().includes(search.toLowerCase()) ||
-                          item.crop_detected.toLowerCase().includes(search.toLowerCase());
-    const matchesCrop = cropFilter === 'All' || item.crop_detected === cropFilter;
+  const safeHistory = Array.isArray(history) ? history : [];
+  const filteredHistory = safeHistory.filter((item) => {
+    const diseaseName = item.disease_name || item.disease || '';
+    const cropName = item.crop_detected || item.plant || '';
+    const matchesSearch = diseaseName.toLowerCase().includes(search.toLowerCase()) ||
+                          cropName.toLowerCase().includes(search.toLowerCase());
+    const matchesCrop = cropFilter === 'All' || cropName === cropFilter;
     return matchesSearch && matchesCrop;
   });
 
