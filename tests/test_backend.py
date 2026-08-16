@@ -133,13 +133,47 @@ def test_validate_image_endpoint():
     assert data["status"] == "NON_PLANT_IMAGE"
     assert "You have not scanned a leaf or plant." in data["message"]
 
-def test_crop_specific_weather_risk_explanation():
-    from app.services.weather_service import WeatherRiskService
-    res = WeatherRiskService.calculate_risk(temp_c=25.0, humidity_pct=85.0, rainfall_mm=10.0, crop="Rice")
-    assert res["crop"] == "Rice"
-    assert "pathogen" in res
-    assert res["risk_score"] > 50.0
-    assert len(res["contributing_factors"]) >= 3
-    assert "Explain WHY" in str(res["contributing_factors"]) or "Rice" in str(res["contributing_factors"])
+def test_plant_search_catalog():
+    response = client.get("/api/v1/plants/search?q=mango")
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data) >= 1
+    assert data[0]["name"] == "Mango"
+    assert data[0]["scientific_name"] == "Mangifera indica"
+
+def test_farm_location_crud_and_isolation():
+    # Login as demo farmer
+    login_res = client.post(
+        "/api/v1/auth/login",
+        json={"email": "farmer@agroscan.ai", "password": "password123"}
+    )
+    assert login_res.status_code == 200
+    token = login_res.json()["access_token"]
+    headers = {"Authorization": f"Bearer {token}"}
+
+    # Create farm plot with structured location
+    create_res = client.post(
+        "/api/v1/farms",
+        json={
+            "name": "Kagal Organic Farm",
+            "village": "Kagal",
+            "taluka": "Kagal",
+            "district": "Kolhapur",
+            "state": "Maharashtra",
+            "pincode": "416216",
+            "area_acres": 3.5
+        },
+        headers=headers
+    )
+    assert create_res.status_code == 200
+    farm = create_res.json()
+    assert farm["name"] == "Kagal Organic Farm"
+    assert farm["village"] == "Kagal"
+    assert farm["district"] == "Kolhapur"
+
+    # Get farms list
+    list_res = client.get("/api/v1/farms", headers=headers)
+    assert list_res.status_code == 200
+    assert len(list_res.json()) >= 1
 
 

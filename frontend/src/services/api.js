@@ -92,6 +92,24 @@ api.interceptors.response.use(
   (response) => {
     // If backend returned valid predictions/farms, sync to localStorage for offline persistence
     const url = response.config?.url || '';
+    if (url.includes('/plants/search')) {
+      const catalog = [
+        { name: 'Mango', scientific_name: 'Mangifera indica' },
+        { name: 'Neem', scientific_name: 'Azadirachta indica' },
+        { name: 'Sugarcane', scientific_name: 'Saccharum officinarum' },
+        { name: 'Rice', scientific_name: 'Oryza sativa' },
+        { name: 'Wheat', scientific_name: 'Triticum aestivum' },
+        { name: 'Tomato', scientific_name: 'Solanum lycopersicum' },
+        { name: 'Potato', scientific_name: 'Solanum tuberosum' },
+        { name: 'Corn (Maize)', scientific_name: 'Zea mays' },
+        { name: 'Cotton', scientific_name: 'Gossypium hirsutum' },
+        { name: 'Chilli', scientific_name: 'Capsicum annuum' },
+        { name: 'Onion', scientific_name: 'Allium cepa' }
+      ];
+      const q = (url.split('q=')[1] || '').toLowerCase();
+      const filtered = q ? catalog.filter(p => p.name.toLowerCase().includes(q) || p.scientific_name.toLowerCase().includes(q)) : catalog;
+      return { data: filtered };
+    }
     if (url.includes('/predictions/history') && Array.isArray(response.data)) {
       saveStoredPredictions(response.data);
     }

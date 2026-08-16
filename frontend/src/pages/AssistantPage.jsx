@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
-import { Bot, User, Send, Search, Sparkles, Sprout, AlertCircle, RefreshCw } from 'lucide-react';
+import { Bot, User, Send, Search, Sparkles, Sprout, AlertCircle, RefreshCw, X } from 'lucide-react';
 import api from '../services/api';
 
 export const AssistantPage = () => {
@@ -10,26 +10,29 @@ export const AssistantPage = () => {
   const { lang, setLang, t } = useLanguage();
   const predictionId = searchParams.get('predictionId');
 
-  // Context States: 'none' | 'manual' | 'scan' | 'no_plant'
+  // Context Modes: 'none' | 'manual' | 'scan' | 'no_plant'
   const [contextMode, setContextMode] = useState('none');
   const [scanData, setScanData] = useState(null);
   const [selectedPlant, setSelectedPlant] = useState('');
   const [plantSearch, setPlantSearch] = useState('');
-
-  const availablePlants = [
-    'Mango', 'Sugarcane', 'Tomato', 'Neem', 'Rice', 'Wheat',
-    'Cotton', 'Potato', 'Chilli', 'Onion', 'Guava', 'Papaya',
-    'Banana', 'Soybean', 'Maize', 'Turmeric', 'Ginger', 'Grape'
-  ];
-
-  const filteredPlants = availablePlants.filter(p =>
-    p.toLowerCase().includes(plantSearch.toLowerCase())
-  );
+  const [searchResults, setSearchResults] = useState([]);
+  const [showSearchModal, setShowSearchModal] = useState(false);
 
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const chatEndRef = useRef(null);
+
+  // Search Plant Catalog API
+  useEffect(() => {
+    if (plantSearch.trim().length > 0) {
+      api.get(`/plants/search?q=${encodeURIComponent(plantSearch)}`)
+        .then(res => setSearchResults(Array.isArray(res.data) ? res.data : []))
+        .catch(() => setSearchResults([]));
+    } else {
+      setSearchResults([]);
+    }
+  }, [plantSearch]);
 
   // Initialize Assistant Messages based on Context State
   useEffect(() => {
@@ -41,20 +44,28 @@ export const AssistantPage = () => {
             setContextMode('no_plant');
             setMessages([{
               sender: 'assistant',
-              content: t('assistant.state_d_noplant')
+              content: t('assistant.state_d_noplant') || "The latest image does not appear to contain a leaf or plant. Please scan a clear plant image to begin analysis."
             }]);
           } else {
             setContextMode('scan');
             setScanData(data);
-            setMessages([{
-              sender: 'assistant',
-              content: t('assistant.state_c_scan', {
-                crop: data.crop_detected || 'Crop',
-                disease: data.disease_name || 'Healthy',
-                severity: data.severity_level || 'Normal',
-                confidence: Math.round((data.confidence_score || 0.95) * 100)
-              })
-            }]);
+            const isHealthy = (data.disease_name || '').toLowerCase().includes('healthy');
+            if (isHealthy) {
+              setMessages([{
+                sender: 'assistant',
+                content: t('assistant.state_c_healthy', { crop: data.crop_detected || 'Plant' }) || `Your latest scan identified ${data.crop_detected || 'Plant'}. No disease was detected in this scan.`
+              }]);
+            } else {
+              setMessages([{
+                sender: 'assistant',
+                content: t('assistant.state_c_scan', {
+                  crop: data.crop_detected || 'Crop',
+                  disease: data.disease_name || 'Healthy',
+                  severity: data.severity_level || 'Normal',
+                  confidence: Math.round((data.confidence_score || 0.95) * 100)
+                })
+              }]);
+            }
           }
         })
         .catch(() => {
@@ -71,29 +82,40 @@ export const AssistantPage = () => {
   const handleSelectManualPlant = (plantName) => {
     setSelectedPlant(plantName);
     setPlantSearch('');
+    setShowSearchModal(false);
     setContextMode('manual');
     setMessages([{
       sender: 'assistant',
-      content: t('assistant.state_b_manual', { plant: plantName })
+      content: t('assistant.state_b_manual', { plant: plantName }) || `You selected ${plantName}. Ask me anything about soil, climate, irrigation, pests, or harvesting.`
     }]);
   };
 
   // Dynamic Suggested Questions based on Active Context
   const getDynamicQuickReplies = () => {
     if (contextMode === 'scan' && scanData) {
+      const isHealthy = (scanData.disease_name || '').toLowerCase().includes('healthy');
+      if (isHealthy) {
+        return [
+          `How to keep ${scanData.crop_detected} healthy?`,
+          `Best organic fertilizers for ${scanData.crop_detected}`,
+          `Irrigation schedule for ${scanData.crop_detected}`,
+          `Common seasonal pests for ${scanData.crop_detected}`
+        ];
+      }
       return [
-        `How to treat ${scanData.disease_name}?`,
-        `Preventive measures for ${scanData.crop_detected}`,
-        `What fertilizer works best for ${scanData.crop_detected}?`,
-        `Explain treatment in Marathi`
+        `What are the symptoms of ${scanData.disease_name}?`,
+        `How can I control ${scanData.disease_name}?`,
+        `What treatment is recommended for ${scanData.disease_name}?`,
+        `How can I prevent ${scanData.disease_name}?`
       ];
     }
     if (contextMode === 'manual' && selectedPlant) {
       return [
-        `What disease affects ${selectedPlant} leaves?`,
-        `How much water does ${selectedPlant} need?`,
-        `Best soil and climate for ${selectedPlant}`,
-        `Pest management for ${selectedPlant}`
+        `What soil is best for ${selectedPlant}?`,
+        `When should ${selectedPlant} be planted?`,
+        `How much irrigation is required for ${selectedPlant}?`,
+        `What are common ${selectedPlant} diseases?`,
+        `How long does ${selectedPlant} take to harvest?`
       ];
     }
     return [
@@ -157,6 +179,15 @@ export const AssistantPage = () => {
           </div>
 
           <div className="flex items-center space-x-2">
+            <button
+              type="button"
+              onClick={() => setShowSearchModal(true)}
+              className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 border border-slate-700 flex items-center space-x-1.5 transition"
+            >
+              <Sprout className="w-3.5 h-3.5 text-agri-400" />
+              <span>{t('assistant.change_plant') || 'Change Plant'}</span>
+            </button>
+
             {/* Language Switch */}
             <div className="flex bg-slate-950 rounded-xl p-1 border border-slate-800 text-xs font-bold">
               <button
@@ -181,40 +212,26 @@ export const AssistantPage = () => {
           </div>
         </div>
 
-        {/* Manual Plant Selection Dropdown */}
-        <div className="relative">
-          <div className="flex items-center space-x-2 bg-slate-950 px-3 py-2 rounded-xl border border-slate-800 text-xs">
-            <Search className="w-4 h-4 text-slate-500 shrink-0" />
-            <input
-              type="text"
-              value={plantSearch}
-              onChange={(e) => setPlantSearch(e.target.value)}
-              placeholder={t('assistant.search_placeholder')}
-              className="bg-transparent text-slate-200 w-full focus:outline-none placeholder:text-slate-600"
-            />
-            {selectedPlant && (
-              <span className="px-2 py-0.5 rounded bg-agri-500/20 text-agri-400 font-bold shrink-0">
-                Selected: {selectedPlant}
-              </span>
-            )}
-          </div>
-
-          {plantSearch.trim().length > 0 && (
-            <div className="absolute top-full left-0 right-0 mt-1 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl z-50 max-h-48 overflow-y-auto">
-              {filteredPlants.map((plant) => (
-                <button
-                  key={plant}
-                  type="button"
-                  onClick={() => handleSelectManualPlant(plant)}
-                  className="w-full text-left px-4 py-2.5 text-xs text-slate-200 hover:bg-slate-800 flex items-center space-x-2 border-b border-slate-800/50"
-                >
-                  <Sprout className="w-3.5 h-3.5 text-agri-400" />
-                  <span>{plant}</span>
-                </button>
-              ))}
+        {/* Scan / Manual Context Bar */}
+        {contextMode === 'scan' && scanData && (
+          <div className="bg-slate-950 p-2.5 rounded-xl border border-slate-800 flex items-center justify-between text-xs">
+            <div className="flex items-center space-x-3">
+              <span className="text-white font-bold">🌱 Current Scan: {scanData.crop_detected}</span>
+              <span className="text-slate-400">|</span>
+              <span className="text-amber-400 font-semibold">🦠 Disease: {scanData.disease_name}</span>
             </div>
-          )}
-        </div>
+            <span className="text-agri-400 font-mono font-bold">
+              Confidence: {Math.round((scanData.confidence_score || 0.95) * 100)}%
+            </span>
+          </div>
+        )}
+
+        {contextMode === 'manual' && selectedPlant && (
+          <div className="bg-slate-950 p-2.5 rounded-xl border border-slate-800 flex items-center justify-between text-xs">
+            <span className="text-white font-bold">🌱 Selected Plant: {selectedPlant}</span>
+            <span className="text-slate-400 text-[11px] italic">Manual plant knowledge context</span>
+          </div>
+        )}
       </div>
 
       {/* Chat Messages Area */}
@@ -291,6 +308,63 @@ export const AssistantPage = () => {
           </button>
         </form>
       </div>
+
+      {/* Plant Search & Change Modal */}
+      {showSearchModal && (
+        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="glass-panel p-6 rounded-2xl max-w-md w-full space-y-4 border border-slate-700">
+            <div className="flex justify-between items-center">
+              <h3 className="text-base font-bold text-white">{t('assistant.type_select_plant') || 'Type or select a plant'}</h3>
+              <button onClick={() => setShowSearchModal(false)} className="text-slate-400 hover:text-white">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="relative">
+              <div className="flex items-center space-x-2 bg-slate-950 px-3.5 py-2.5 rounded-xl border border-slate-800 text-xs">
+                <Search className="w-4 h-4 text-slate-500 shrink-0" />
+                <input
+                  type="text"
+                  value={plantSearch}
+                  onChange={(e) => setPlantSearch(e.target.value)}
+                  placeholder="Search plant (e.g. Mango, Sugarcane, Neem, Rice...)"
+                  className="bg-transparent text-slate-200 w-full focus:outline-none placeholder:text-slate-600"
+                  autoFocus
+                />
+              </div>
+            </div>
+
+            <div className="max-h-60 overflow-y-auto space-y-1">
+              {(searchResults.length > 0 ? searchResults : [
+                { name: 'Mango', scientific_name: 'Mangifera indica' },
+                { name: 'Neem', scientific_name: 'Azadirachta indica' },
+                { name: 'Sugarcane', scientific_name: 'Saccharum officinarum' },
+                { name: 'Rice', scientific_name: 'Oryza sativa' },
+                { name: 'Wheat', scientific_name: 'Triticum aestivum' },
+                { name: 'Tomato', scientific_name: 'Solanum lycopersicum' },
+                { name: 'Potato', scientific_name: 'Solanum tuberosum' },
+                { name: 'Corn (Maize)', scientific_name: 'Zea mays' },
+                { name: 'Cotton', scientific_name: 'Gossypium hirsutum' },
+                { name: 'Chilli', scientific_name: 'Capsicum annuum' },
+                { name: 'Onion', scientific_name: 'Allium cepa' }
+              ]).map((p) => (
+                <button
+                  key={p.name}
+                  type="button"
+                  onClick={() => handleSelectManualPlant(p.name)}
+                  className="w-full text-left px-3.5 py-2.5 rounded-xl hover:bg-slate-800 flex items-center justify-between text-xs text-slate-200 transition border border-transparent hover:border-slate-700"
+                >
+                  <div className="flex items-center space-x-2">
+                    <Sprout className="w-4 h-4 text-agri-400 shrink-0" />
+                    <span className="font-semibold">{p.name}</span>
+                  </div>
+                  <span className="text-[11px] text-slate-500 italic">{p.scientific_name}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );

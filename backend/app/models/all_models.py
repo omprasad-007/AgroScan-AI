@@ -15,8 +15,17 @@ class User(Base):
     full_name = Column(String, nullable=False)
     hashed_password = Column(String, nullable=False)
     role = Column(String, default="farmer") # "farmer", "agronomist", "admin"
+    
+    # Structured Indian Agricultural Location Fields
+    village = Column(String, nullable=True)
+    taluka = Column(String, nullable=True)
+    district = Column(String, nullable=True)
+    state = Column(String, nullable=True, default="Maharashtra")
+    pincode = Column(String, nullable=True)
     city = Column(String, nullable=True)
-    state = Column(String, nullable=True)
+    latitude = Column(Float, nullable=True)
+    longitude = Column(Float, nullable=True)
+
     created_at = Column(DateTime, default=datetime.utcnow)
 
     farms = relationship("Farm", back_populates="owner", cascade="all, delete-orphan")
@@ -30,9 +39,20 @@ class Farm(Base):
     id = Column(String, primary_key=True, default=generate_uuid)
     user_id = Column(String, ForeignKey("users.id"), nullable=False)
     name = Column(String, nullable=False)
+    
+    # Structured Farm Location Fields
+    village = Column(String, nullable=True)
+    taluka = Column(String, nullable=True)
+    district = Column(String, nullable=True)
+    state = Column(String, nullable=True, default="Maharashtra")
+    pincode = Column(String, nullable=True)
     location = Column(String, nullable=True)
-    crop_types = Column(String, nullable=True) # comma separated or JSON string
+    latitude = Column(Float, nullable=True)
+    longitude = Column(Float, nullable=True)
+
+    crop_types = Column(String, nullable=True)
     area_acres = Column(Float, default=1.0)
+    irrigation_type = Column(String, default="Drip Irrigation")
     created_at = Column(DateTime, default=datetime.utcnow)
 
     owner = relationship("User", back_populates="farms")
@@ -43,7 +63,7 @@ class DiseaseInfo(Base):
     __tablename__ = "diseases"
 
     id = Column(String, primary_key=True, default=generate_uuid)
-    disease_code = Column(String, unique=True, index=True, nullable=False) # e.g. "tomato_late_blight"
+    disease_code = Column(String, unique=True, index=True, nullable=False)
     crop = Column(String, nullable=False)
     disease_name = Column(String, nullable=False)
     scientific_name = Column(String, nullable=True)
@@ -71,14 +91,14 @@ class ScanPrediction(Base):
     confidence_score = Column(Float, nullable=False)
     
     severity_percentage = Column(Float, default=0.0)
-    severity_level = Column(String, default="Mild") # Healthy, Mild, Moderate, Severe
+    severity_level = Column(String, default="Mild")
     affected_area_cm2 = Column(Float, default=0.0)
     
     ambient_temp_c = Column(Float, nullable=True)
     humidity_pct = Column(Float, nullable=True)
     rainfall_mm = Column(Float, nullable=True)
     weather_risk_score = Column(Float, default=0.0)
-    weather_risk_level = Column(String, default="Low") # Low, Medium, High, Critical
+    weather_risk_level = Column(String, default="Low")
     
     is_demo = Column(Boolean, default=True)
     created_at = Column(DateTime, default=datetime.utcnow)
@@ -133,7 +153,7 @@ class ChatMessage(Base):
 
     id = Column(String, primary_key=True, default=generate_uuid)
     session_id = Column(String, ForeignKey("chat_sessions.id"), nullable=False)
-    sender = Column(String, nullable=False) # "user" or "assistant"
+    sender = Column(String, nullable=False)
     content = Column(Text, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
 

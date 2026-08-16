@@ -1,8 +1,9 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Upload, Sparkles, AlertCircle, CheckCircle2, Camera, RefreshCw } from 'lucide-react';
+import { Upload, Sparkles, AlertCircle, CheckCircle2, Camera, RefreshCw, Home, MapPin } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { CameraScanner } from '../components/camera/CameraScanner';
+import api from '../services/api';
 
 export const ScanPage = () => {
   const { t } = useLanguage();
@@ -14,6 +15,21 @@ export const ScanPage = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState('camera'); // 'camera' or 'upload'
+
+  const [farms, setFarms] = useState([]);
+  const [selectedFarmId, setSelectedFarmId] = useState('');
+
+  useEffect(() => {
+    api.get('/farms')
+      .then(res => {
+        const list = Array.isArray(res.data) ? res.data : [];
+        setFarms(list);
+        if (list.length > 0) setSelectedFarmId(list[0].id);
+      })
+      .catch(() => setFarms([]));
+  }, []);
+
+  const selectedFarm = farms.find(f => f.id === selectedFarmId);
 
   const handleFileChange = (file) => {
     if (!file) return;
@@ -57,7 +73,7 @@ export const ScanPage = () => {
     }
     setIsAnalyzing(true);
     // Navigate to animated Analysis Loading page
-    navigate('/analysis', { state: { imageFile: targetFile } });
+    navigate('/analysis', { state: { imageFile: targetFile, farmId: selectedFarmId } });
   };
 
   return (
@@ -75,6 +91,33 @@ export const ScanPage = () => {
           {t('scan.subtitle') || 'Open your device camera or upload a plant photo for instant identification and disease analysis.'}
         </p>
       </div>
+
+      {/* Target Farm & Location Selector */}
+      {farms.length > 0 && (
+        <div className="glass-panel p-4 rounded-2xl space-y-2 border border-slate-800">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <label className="text-xs font-bold text-slate-200 flex items-center space-x-2">
+              <Home className="w-4 h-4 text-agri-400" />
+              <span>{t('scan.select_farm') || 'Select Target Farm / Location'}</span>
+            </label>
+            <select
+              value={selectedFarmId}
+              onChange={(e) => setSelectedFarmId(e.target.value)}
+              className="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-xs font-semibold text-white focus:outline-none focus:border-agri-500"
+            >
+              {farms.map((f) => (
+                <option key={f.id} value={f.id}>{f.name} ({f.village || 'Kagal'}, {f.district || 'Kolhapur'})</option>
+              ))}
+            </select>
+          </div>
+          {selectedFarm && (
+            <div className="flex items-center space-x-2 text-[11px] text-slate-400 pt-1 border-t border-slate-800/60">
+              <MapPin className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+              <span>Location: <strong>{selectedFarm.village || 'Kagal'}, {selectedFarm.taluka || 'Kagal'}, {selectedFarm.district || 'Kolhapur'}, {selectedFarm.state || 'Maharashtra'} (PIN: {selectedFarm.pincode || '416216'})</strong></span>
+            </div>
+          )}
+        </div>
+      )}
 
       {error && (
         <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs flex items-center space-x-2">
