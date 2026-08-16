@@ -83,6 +83,7 @@ export const AuthProvider = ({ children }) => {
   const register = async (email, password, fullName = '') => {
     setLoading(true);
     try {
+      // 1. Firebase Authentication Primary
       let fbUser = null;
       try {
         fbUser = await registerUser(email, password, fullName);
@@ -90,23 +91,27 @@ export const AuthProvider = ({ children }) => {
         console.warn("Firebase Auth Register note:", fbErr.message);
       }
 
-      // Authenticate & register with API service
-      const res = await api.post('/auth/register', {
-        email,
-        password,
-        full_name: fullName || email.split('@')[0],
-        role: email.includes('admin') ? 'admin' : 'farmer',
-        city: 'Pune',
-        state: 'Maharashtra'
-      });
-
-      const backendUser = res.data?.user;
-      if (res.data?.access_token) {
-        localStorage.setItem('agroscan_token', res.data.access_token);
+      // 2. Sync with Backend API
+      let backendUser = null;
+      try {
+        const res = await api.post('/auth/register', {
+          email,
+          password,
+          full_name: fullName || email.split('@')[0],
+          role: email.includes('admin') ? 'admin' : 'farmer',
+          city: 'Pune',
+          state: 'Maharashtra'
+        });
+        if (res.data?.access_token) {
+          localStorage.setItem('agroscan_token', res.data.access_token);
+        }
+        backendUser = res.data?.user;
+      } catch (apiErr) {
+        console.warn("Backend API sync note:", apiErr);
       }
 
       const role = backendUser?.role || (email.includes('admin') ? 'admin' : 'farmer');
-      const cleanName = backendUser?.full_name || fullName.trim() || (email ? email.split('@')[0] : 'Farmer');
+      const cleanName = fbUser?.displayName || backendUser?.full_name || fullName.trim() || (email ? email.split('@')[0] : 'Farmer');
       const userObj = {
         uid: fbUser?.uid || backendUser?.id || `user_${Date.now()}`,
         id: fbUser?.uid || backendUser?.id || `user_${Date.now()}`,
@@ -130,23 +135,37 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     setLoading(true);
     try {
+      // 1. Primary Firebase Authentication
       let fbUser = null;
+      let fbError = null;
       try {
         fbUser = await loginUser(email, password);
-      } catch (fbErr) {
-        console.warn("Firebase Auth Login note:", fbErr.message);
+      } catch (err) {
+        fbError = err;
       }
 
-      // Sync & authenticate with Backend API
-      const res = await api.post('/auth/login', { email, password });
-      if (res.data?.access_token) {
-        localStorage.setItem('agroscan_token', res.data.access_token);
+      // 2. Backend API Credential Verification
+      let backendUser = null;
+      let backendError = null;
+      try {
+        const res = await api.post('/auth/login', { email, password });
+        if (res.data?.access_token) {
+          localStorage.setItem('agroscan_token', res.data.access_token);
+        }
+        backendUser = res.data?.user;
+      } catch (err) {
+        backendError = err;
       }
-      const backendUser = res.data?.user;
+
+      // If both Firebase and Backend failed, throw the relevant authentication error
+      if (!fbUser && !backendUser) {
+        const msg = backendError?.response?.data?.detail || fbError?.message || 'Authentication failed. Please verify credentials.';
+        throw new Error(msg);
+      }
 
       const role = backendUser?.role || (email.includes('admin') ? 'admin' : 'farmer');
-      const userDisplayName = backendUser?.full_name || fbUser?.displayName || (email ? email.split('@')[0] : 'Farmer');
-      const userEmail = backendUser?.email || email;
+      const userDisplayName = fbUser?.displayName || backendUser?.full_name || (email ? email.split('@')[0] : 'Farmer');
+      const userEmail = fbUser?.email || backendUser?.email || email;
 
       const userObj = {
         uid: fbUser?.uid || backendUser?.id || `user_${Date.now()}`,
@@ -160,9 +179,6 @@ export const AuthProvider = ({ children }) => {
       setUser(userObj);
       localStorage.setItem('agroscan_user', JSON.stringify(userObj));
       return userObj;
-    } catch (err) {
-      const msg = err.response?.data?.detail || err.message || 'Authentication failed.';
-      throw new Error(msg);
     } finally {
       setLoading(false);
     }
