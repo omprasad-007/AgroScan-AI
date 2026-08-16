@@ -120,4 +120,13 @@ def test_plant_verification_detector():
     assert is_plant is False
     assert "Invalid image" in reason or "doesn't appear" in reason
 
+def test_crop_specific_weather_risk_explanation():
+    from app.services.weather_service import WeatherRiskService
+    res = WeatherRiskService.calculate_risk(temp_c=25.0, humidity_pct=85.0, rainfall_mm=10.0, crop="Rice")
+    assert res["crop"] == "Rice"
+    assert "pathogen" in res
+    assert res["risk_score"] > 50.0
+    assert len(res["contributing_factors"]) >= 3
+    assert "Explain WHY" in str(res["contributing_factors"]) or "Rice" in str(res["contributing_factors"])
+
 

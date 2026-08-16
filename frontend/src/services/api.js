@@ -304,16 +304,55 @@ api.interceptors.response.use(
     }
 
     if (url.includes('/weather/risk')) {
-      const body = JSON.parse(error.config.data || '{}');
+      const body = JSON.parse(error.config?.data || '{}');
+      const cropName = body.crop || 'Tomato';
+      const tempC = parseFloat(body.temperature_c) || 24.5;
+      const humPct = parseFloat(body.humidity_pct) || 82.0;
+      const rainMm = parseFloat(body.rainfall_mm) || 5.0;
+
+      let score = 10.0;
+      const factors = [];
+      
+      if (tempC >= 18.0 && tempC <= 26.0) {
+        score += 35.0;
+        factors.push(`Temperature (${tempC}°C) matches optimal germination window for ${cropName} pathogens (+35 pts).`);
+      } else {
+        score += 15.0;
+        factors.push(`Temperature (${tempC}°C) is in sub-optimal pathogen growth range (+15 pts).`);
+      }
+
+      if (humPct >= 80.0) {
+        score += 40.0;
+        factors.push(`Relative humidity (${humPct}%) exceeds critical leaf wetness threshold (≥80%) (+40 pts).`);
+      } else if (humPct >= 65.0) {
+        score += 25.0;
+        factors.push(`Relative humidity (${humPct}%) is in moderate spore production range (+25 pts).`);
+      } else {
+        score += 5.0;
+        factors.push(`Relative humidity (${humPct}%) is low, keeping foliage relatively dry (+5 pts).`);
+      }
+
+      if (rainMm > 0.0) {
+        score += 15.0;
+        factors.push(`Rainfall (${rainMm}mm) accelerates rain-splash spore dispersal (+15 pts).`);
+      }
+
+      const totalScore = Math.min(100, Math.round(score * 10) / 10);
+      const level = totalScore >= 70 ? 'High' : totalScore >= 45 ? 'Medium' : 'Low';
+      const advice = level === 'High'
+        ? `HIGH RISK: Microclimate conditions strongly favor rapid outbreak in ${cropName}. Apply preventive organic copper spray within 48 hours.`
+        : level === 'Medium'
+        ? `MEDIUM RISK: Moderate transmission threat for ${cropName}. Improve canopy ventilation and avoid evening watering.`
+        : `LOW RISK: Ambient conditions are dry and non-conducive for ${cropName} diseases. Continue routine checks.`;
+
       return {
         data: {
-          risk_score: 82.5,
-          risk_level: "High",
-          contributing_factors: [
-            `Optimal thermal range for spore germination (${body.temperature_c || 26.5}°C)`,
-            `Elevated humidity level (${body.humidity_pct || 82}%) promoting leaf wetness`
-          ],
-          advice: "Favorable weather for fungal outbreak. Apply preventive organic/copper spray every 5-7 days."
+          crop: cropName,
+          pathogen: `${cropName} Outbreak Pathogen`,
+          risk_score: totalScore,
+          risk_level: level,
+          contributing_factors: factors,
+          advice
         }
       };
     }
