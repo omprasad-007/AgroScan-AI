@@ -23,6 +23,41 @@ ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/webp", "image/jpg"]
 ALLOWED_EXTENSIONS = {"jpg", "jpeg", "png", "webp"}
 MAX_FILE_SIZE_BYTES = settings.MAX_UPLOAD_SIZE_MB * 1024 * 1024  # 10 MB
 
+@router.post("/validate-image")
+async def validate_plant_image(file: UploadFile = File(...)):
+    """
+    Stage 1 Image Validation Endpoint.
+    Verifies if uploaded image contains a recognizable plant/leaf before identification or disease analysis.
+    """
+    contents = await file.read()
+    if not contents or len(contents) > MAX_FILE_SIZE_BYTES:
+        return {
+            "is_plant": False,
+            "status": "NON_PLANT_IMAGE",
+            "message": "You have not scanned a leaf or plant. Please scan a clear photo of a leaf or plant."
+        }
+
+    from app.services.plant_detector import PlantDetector
+    is_plant, status_code, message = PlantDetector.verify_plant_image(contents)
+
+    if is_plant is False:
+        return {
+            "is_plant": False,
+            "status": status_code,
+            "message": "You have not scanned a leaf or plant. Please scan a clear photo of a leaf or plant."
+        }
+    elif is_plant is None:
+        return {
+            "is_plant": None,
+            "status": "VALIDATION_UNAVAILABLE",
+            "message": "We couldn't verify the image. Please try again."
+        }
+
+    return {
+        "is_plant": True,
+        "status": "PLANT_IMAGE"
+    }
+
 def format_prediction_response(p: ScanPrediction, rec_data: dict = None) -> PredictionResponse:
     kb_data = get_disease_by_code(p.disease_code)
     

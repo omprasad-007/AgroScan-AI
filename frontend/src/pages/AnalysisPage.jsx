@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
-import { Sparkles, CheckCircle2, Loader2, AlertCircle, ArrowLeft, RefreshCw } from 'lucide-react';
+import { Sparkles, CheckCircle2, Loader2, AlertCircle, RefreshCw, Upload } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import api from '../services/api';
 
@@ -14,7 +14,7 @@ export const AnalysisPage = () => {
   const [analyzedPred, setAnalyzedPred] = useState(null);
 
   const steps = [
-    { label: "Validating image & verifying plant vegetation content...", duration: 600 },
+    { label: "Executing Stage 1 Image Validation...", duration: 500 },
     { label: "Normalizing image & applying OpenCV HSV color space mask...", duration: 700 },
     { label: "Executing MobileNetV2 Deep Learning inference model...", duration: 800 },
     { label: "Evaluating weather-based disease risk matrix...", duration: 600 }
@@ -29,7 +29,6 @@ export const AnalysisPage = () => {
     const runAnalysisPipeline = async () => {
       try {
         if (!imageFile) {
-          // If no image passed, default fallback prediction
           setTimeout(() => {
             if (isMounted) navigate('/results/pred_001');
           }, 2000);
@@ -39,6 +38,26 @@ export const AnalysisPage = () => {
         const formData = new FormData();
         formData.append('file', imageFile);
 
+        // Stage 1: Mandatory Image Validation
+        const valRes = await api.post('/predictions/validate-image', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+
+        if (valRes.data?.is_plant === false) {
+          if (isMounted) {
+            setError(valRes.data.message || "You have not scanned a leaf or plant. Please scan a clear photo of a leaf or plant.");
+          }
+          return;
+        }
+
+        if (valRes.data?.is_plant === null) {
+          if (isMounted) {
+            setError(valRes.data.message || "We couldn't verify the image. Please try again.");
+          }
+          return;
+        }
+
+        // Stage 2: Disease Detection & Inference (Only when is_plant == true)
         const res = await api.post('/predictions/analyze', formData, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
@@ -48,7 +67,7 @@ export const AnalysisPage = () => {
         }
       } catch (err) {
         if (isMounted) {
-          const detail = err.response?.data?.detail || err.message || "Failed to analyze leaf image.";
+          const detail = err.response?.data?.detail || err.message || "You have not scanned a leaf or plant. Please scan a clear photo of a leaf or plant.";
           setError(detail);
         }
       }
@@ -76,19 +95,19 @@ export const AnalysisPage = () => {
   if (error) {
     return (
       <div className="max-w-xl mx-auto py-12 px-4 space-y-6 text-center">
-        <div className="glass-panel p-8 rounded-3xl border border-amber-500/30 space-y-4 shadow-2xl">
-          <div className="w-16 h-16 rounded-2xl bg-amber-500/10 text-amber-400 border border-amber-500/30 flex items-center justify-center mx-auto">
+        <div className="glass-panel p-8 rounded-3xl border border-red-500/40 space-y-5 shadow-2xl">
+          <div className="w-16 h-16 rounded-2xl bg-red-500/10 text-red-400 border border-red-500/30 flex items-center justify-center mx-auto shadow-inner">
             <AlertCircle className="w-8 h-8" />
           </div>
 
-          <h2 className="text-xl font-extrabold text-white">No Plant Detected</h2>
+          <h2 className="text-xl font-extrabold text-white">Validation Error</h2>
           
-          <p className="text-xs sm:text-sm text-amber-200/90 leading-relaxed bg-amber-500/10 p-4 rounded-xl border border-amber-500/20">
+          <p className="text-xs sm:text-sm text-red-200/90 leading-relaxed bg-red-500/10 p-4 rounded-xl border border-red-500/20 font-medium">
             {error}
           </p>
 
           <p className="text-xs text-slate-400">
-            Please capture or select a clear, focused photo of a leaf, stem, fruit, or flower for scientific disease detection.
+            Ensure your photo clearly shows a leaf, stem, fruit, or plant part with good lighting.
           </p>
 
           <div className="pt-4 flex flex-col sm:flex-row gap-3 justify-center">
@@ -97,14 +116,14 @@ export const AnalysisPage = () => {
               className="px-6 py-3 rounded-xl bg-agri-500 hover:bg-agri-400 text-slate-950 font-bold text-xs transition shadow-lg shadow-agri-500/20 inline-flex items-center justify-center space-x-2"
             >
               <RefreshCw className="w-4 h-4" />
-              <span>Scan Another Image</span>
+              <span>Scan Again</span>
             </Link>
             <Link
-              to="/dashboard"
+              to="/scan"
               className="px-6 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs border border-slate-700 inline-flex items-center justify-center space-x-2"
             >
-              <ArrowLeft className="w-4 h-4" />
-              <span>Return to Dashboard</span>
+              <Upload className="w-4 h-4" />
+              <span>Upload Another Image</span>
             </Link>
           </div>
         </div>

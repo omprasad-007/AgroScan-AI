@@ -116,9 +116,22 @@ def test_plant_verification_detector():
     from app.services.plant_detector import PlantDetector
     # Blank/non-vegetation bytes
     blank_bytes = b"NON_PLANT_BYTES_TEST"
-    is_plant, conf, reason = PlantDetector.verify_plant_image(blank_bytes)
+    is_plant, status, reason = PlantDetector.verify_plant_image(blank_bytes)
     assert is_plant is False
-    assert "Invalid image" in reason or "doesn't appear" in reason
+    assert status == "NON_PLANT_IMAGE"
+    assert "You have not scanned a leaf or plant." in reason
+
+def test_validate_image_endpoint():
+    # Test non-plant image validation endpoint
+    response = client.post(
+        "/api/v1/predictions/validate-image",
+        files={"file": ("selfie.jpg", b"NON_PLANT_SELFIE_BYTES", "image/jpeg")}
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["is_plant"] is False
+    assert data["status"] == "NON_PLANT_IMAGE"
+    assert "You have not scanned a leaf or plant." in data["message"]
 
 def test_crop_specific_weather_risk_explanation():
     from app.services.weather_service import WeatherRiskService

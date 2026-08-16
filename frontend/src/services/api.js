@@ -249,8 +249,24 @@ api.interceptors.response.use(
       };
     }
 
-    if (url.includes('/predictions/history')) {
-      return { data: getStoredPredictions() };
+    if (url.includes('/validate-image')) {
+      const fileName = (error.config?.data instanceof FormData ? (error.config?.data.get('file')?.name || '') : '').toLowerCase();
+      const nonPlantKeywords = ['person', 'human', 'face', 'selfie', 'body', 'car', 'building', 'avatar', 'profile', 'dog', 'cat', 'food', 'screenshot', 'doc', 'pdf', 'laptop', 'phone'];
+      if (nonPlantKeywords.some(k => fileName.includes(k))) {
+        return {
+          data: {
+            is_plant: false,
+            status: "NON_PLANT_IMAGE",
+            message: "You have not scanned a leaf or plant. Please scan a clear photo of a leaf or plant."
+          }
+        };
+      }
+      return {
+        data: {
+          is_plant: true,
+          status: "PLANT_IMAGE"
+        }
+      };
     }
 
     if (url.includes('/predictions/analyze')) {

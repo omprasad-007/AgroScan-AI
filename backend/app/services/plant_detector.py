@@ -1,25 +1,31 @@
 import cv2
 import numpy as np
-from typing import Tuple, Dict, Any
+from typing import Tuple, Optional
 
 class PlantDetector:
     """
-    OpenCV based Stage 1 Plant Detection Engine.
-    Evaluates whether an uploaded image contains plant foliage (leaves, stems, flowers, fruit)
-    or non-plant content (people, faces, skin, buildings, cars, animals, documents, screenshots).
+    OpenCV based Stage 1 Plant Detection & Fail-Safe Validation Engine.
+    Evaluates whether an uploaded image contains plant foliage (leaves, stems, flowers, crops, trees)
+    or non-plant content (selfies, human faces, bodies, animals, buildings, vehicles, food, documents, laptops, phones, blank images).
     """
 
     @classmethod
-    def verify_plant_image(cls, image_bytes: bytes) -> Tuple[bool, float, str]:
+    def verify_plant_image(cls, image_bytes: bytes) -> Tuple[Optional[bool], str, str]:
         """
-        Returns (is_plant: bool, confidence: float, message: str)
+        Returns (is_plant: Optional[bool], status: str, message: str)
+        - Non-plant: (False, "NON_PLANT_IMAGE", "You have not scanned a leaf or plant. Please scan a clear photo of a leaf or plant.")
+        - Plant: (True, "PLANT_IMAGE", "Plant image validated successfully.")
+        - Fail-Safe: (None, "VALIDATION_UNAVAILABLE", "We couldn't verify the image. Please try again.")
         """
+        if not image_bytes or len(image_bytes) < 100:
+            return False, "NON_PLANT_IMAGE", "You have not scanned a leaf or plant. Please scan a clear photo of a leaf or plant."
+
         try:
             np_arr = np.frombuffer(image_bytes, np.uint8)
             img = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
 
             if img is None:
-                return False, 0.0, "Invalid image binary."
+                return False, "NON_PLANT_IMAGE", "You have not scanned a leaf or plant. Please scan a clear photo of a leaf or plant."
 
             h, w, c = img.shape
             total_pixels = h * w
@@ -28,13 +34,11 @@ class PlantDetector:
             hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
             # 1. Vegetation HSV Color Mask (Green + Yellowish-Green + Brown Leaf Lesions)
-            # Hue range for plants: 15 to 85 (Yellow-Green to Deep Green)
             lower_green = np.array([15, 25, 25])
             upper_green = np.array([85, 255, 255])
             green_mask = cv2.inRange(hsv, lower_green, upper_green)
 
-            # 2. Skin-tone mask (Human faces, hands, body photos)
-            # Hue range for human skin: 0 to 20 & 160 to 180 in HSV
+            # 2. Skin-tone mask (Human faces, hands, selfies, body photos)
             lower_skin1 = np.array([0, 30, 60])
             upper_skin1 = np.array([20, 150, 255])
             lower_skin2 = np.array([160, 30, 60])
@@ -49,18 +53,18 @@ class PlantDetector:
             green_ratio = green_pixels / total_pixels
             skin_ratio = skin_pixels / total_pixels
 
-            # 3. Decision Logic
-            # If skin-tone ratio is high (> 30%) or vegetation ratio is low (< 6%), reject as non-plant
-            if skin_ratio > 0.30 and green_ratio < 0.20:
-                return False, round(1.0 - green_ratio, 2), "This image appears to contain a person or skin tones, not a plant."
+            # Decision Logic:
+            # Rejection 1: Skin-tone ratio > 25% (Human face / selfie / body photo)
+            if skin_ratio > 0.25 and green_ratio < 0.20:
+                return False, "NON_PLANT_IMAGE", "You have not scanned a leaf or plant. Please scan a clear photo of a leaf or plant."
 
-            if green_ratio < 0.05:
-                return False, round(1.0 - green_ratio, 2), "This image doesn't appear to contain a plant."
+            # Rejection 2: Vegetation ratio < 6% (Laptop, phone, building, car, animal, food, document, screenshot, blank)
+            if green_ratio < 0.06:
+                return False, "NON_PLANT_IMAGE", "You have not scanned a leaf or plant. Please scan a clear photo of a leaf or plant."
 
-            # Confident plant vegetation detected
-            plant_confidence = min(0.99, round(max(0.60, green_ratio * 2.5), 2))
-            return True, plant_confidence, "Plant vegetation detected successfully."
+            # Valid plant foliage/crop image
+            return True, "PLANT_IMAGE", "Plant image validated successfully."
 
         except Exception as e:
-            # Safe default fallback
-            return True, 0.75, "Basic plant check passed."
+            # Rule Fail-Safe: Never assume an image is a plant when validation encounters an error
+            return None, "VALIDATION_UNAVAILABLE", "We couldn't verify the image. Please try again."

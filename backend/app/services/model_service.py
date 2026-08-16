@@ -11,7 +11,8 @@ class BaseDiseasePredictor(ABC):
         """
         Returns structured dictionary:
         {
-            "is_plant": bool,
+            "is_plant": Optional[bool],
+            "status": str,
             "crop": str,
             "disease_name": str,
             "disease_code": str,
@@ -38,14 +39,15 @@ class DemoPredictor(BaseDiseasePredictor):
 
     def predict(self, image_bytes: bytes) -> Dict[str, Any]:
         # Stage 1: Plant Verification
-        is_plant, plant_conf, reason = PlantDetector.verify_plant_image(image_bytes)
-        if not is_plant:
+        is_plant, status, reason = PlantDetector.verify_plant_image(image_bytes)
+        if is_plant is not True:
             return {
-                "is_plant": False,
+                "is_plant": is_plant,
+                "status": status,
                 "crop": "Unrecognized",
                 "disease_name": "No Plant Detected",
                 "disease_code": "non_plant",
-                "confidence": plant_conf,
+                "confidence": 0.0,
                 "is_demo": True,
                 "error_message": reason
             }
@@ -59,6 +61,7 @@ class DemoPredictor(BaseDiseasePredictor):
 
         return {
             "is_plant": True,
+            "status": "PLANT_IMAGE",
             "crop": selected["crop"],
             "disease_name": selected["disease_name"],
             "disease_code": selected["disease_code"],
@@ -90,14 +93,15 @@ class CNNPredictor(BaseDiseasePredictor):
 
     def predict(self, image_bytes: bytes) -> Dict[str, Any]:
         # Stage 1: Plant Verification
-        is_plant, plant_conf, reason = PlantDetector.verify_plant_image(image_bytes)
-        if not is_plant:
+        is_plant, status, reason = PlantDetector.verify_plant_image(image_bytes)
+        if is_plant is not True:
             return {
-                "is_plant": False,
+                "is_plant": is_plant,
+                "status": status,
                 "crop": "Unrecognized",
                 "disease_name": "No Plant Detected",
                 "disease_code": "non_plant",
-                "confidence": plant_conf,
+                "confidence": 0.0,
                 "is_demo": False,
                 "error_message": reason
             }
@@ -131,6 +135,7 @@ class CNNPredictor(BaseDiseasePredictor):
 
             return {
                 "is_plant": True,
+                "status": "PLANT_IMAGE",
                 "crop": info["crop"],
                 "disease_name": info["disease_name"],
                 "disease_code": disease_code,
