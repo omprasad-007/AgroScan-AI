@@ -24,6 +24,8 @@ import { AssistantPage } from './pages/AssistantPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { AdminDashboardPage } from './pages/AdminDashboardPage';
 
+import { MobileNav } from './components/common/MobileNav';
+
 const AppLayout = () => {
   const { isAuthenticated } = useAuth();
   const location = useLocation();
@@ -36,7 +38,7 @@ const AppLayout = () => {
       <div className="flex-1 flex w-full">
         {isAuthenticated && !isPublicPage && <Sidebar />}
 
-        <main className={`flex-1 p-4 sm:p-6 lg:p-8 ${isAuthenticated && !isPublicPage ? 'max-w-7xl mx-auto w-full' : 'w-full'}`}>
+        <main className={`flex-1 p-4 sm:p-6 lg:p-8 ${isAuthenticated && !isPublicPage ? 'max-w-7xl mx-auto w-full pb-20 md:pb-8' : 'w-full'}`}>
           <Routes>
             {/* Public Routes */}
             <Route path="/" element={<LandingPage />} />
@@ -62,6 +64,8 @@ const AppLayout = () => {
           </Routes>
         </main>
       </div>
+
+      {isAuthenticated && !isPublicPage && <MobileNav />}
     </div>
   );
 };
