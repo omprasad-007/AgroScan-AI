@@ -28,23 +28,58 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// User-specific localStorage Helpers
+// User Account Storage & Credential Authentication Engine
+const SEEDED_ACCOUNTS = [
+  {
+    id: "usr_101",
+    email: "farmer@agroscan.ai",
+    password: "password123",
+    full_name: "Kisan Ramesh Patil",
+    role: "farmer",
+    city: "Pune",
+    state: "Maharashtra"
+  },
+  {
+    id: "usr_admin_01",
+    email: "admin@agroscan.ai",
+    password: "admin123",
+    full_name: "Dr. Agro Admin",
+    role: "admin",
+    city: "Pune",
+    state: "Maharashtra"
+  }
+];
+
+const getRegisteredAccounts = () => {
+  try {
+    const saved = localStorage.getItem('agroscan_accounts');
+    if (saved) return JSON.parse(saved);
+  } catch (e) {}
+  localStorage.setItem('agroscan_accounts', JSON.stringify(SEEDED_ACCOUNTS));
+  return SEEDED_ACCOUNTS;
+};
+
+const saveRegisteredAccounts = (accounts) => {
+  localStorage.setItem('agroscan_accounts', JSON.stringify(accounts));
+};
+
 const getStoredUser = () => {
   try {
     const saved = localStorage.getItem('agroscan_user');
-    return saved ? JSON.parse(saved) : MOCK_USER;
-  } catch (e) {
-    return MOCK_USER;
-  }
+    if (saved) return JSON.parse(saved);
+  } catch (e) {}
+  return null;
 };
 
 const getUserStorageKey = (prefix) => {
   const u = getStoredUser();
+  if (!u) return `${prefix}_anonymous`;
   return `${prefix}_${u.email || u.id || 'default'}`;
 };
 
 const getStoredPredictions = () => {
   const u = getStoredUser();
+  if (!u) return [];
   const key = getUserStorageKey('agroscan_predictions');
   const saved = localStorage.getItem(key);
   if (saved) {
@@ -61,6 +96,7 @@ const saveStoredPredictions = (preds) => {
 
 const getStoredFarms = () => {
   const u = getStoredUser();
+  if (!u) return [];
   const key = getUserStorageKey('agroscan_farms');
   const saved = localStorage.getItem(key);
   if (saved) {
@@ -93,25 +129,108 @@ api.interceptors.response.use(
 
     console.warn(`API Server offline/unreachable at ${url}. Operating via LocalStorage Persistence.`);
 
-    // Mock Route Handling with Per-User LocalStorage Persistence
+    // Real Credential Authentication Route Handling
     if (url.includes('/auth/login')) {
       const body = JSON.parse(error.config.data || '{}');
-      const isPass = body.password === 'password123' || body.password === 'admin123' || body.password.length >= 6;
-      if (!isPass) {
-        return Promise.reject({ response: { data: { detail: 'Incorrect email or password' } } });
+      const inputEmail = (body.email || '').trim().toLowerCase();
+      const inputPassword = body.password || '';
+
+      if (!inputEmail || !inputPassword) {
+        return Promise.reject({ response: { data: { detail: 'Please enter both email address and password.' } } });
       }
-      const user = body.email.includes('admin') ? MOCK_ADMIN : { ...MOCK_USER, email: body.email };
-      localStorage.setItem('agroscan_user', JSON.stringify(user));
-      localStorage.setItem('agroscan_token', 'mock_jwt_token_123');
-      return { data: { access_token: 'mock_jwt_token_123', token_type: 'bearer', user } };
+
+      const accounts = getRegisteredAccounts();
+      const existingAccount = accounts.find(a => a.email.toLowerCase() === inputEmail);
+
+      if (existingAccount) {
+        if (existingAccount.password !== inputPassword) {
+          return Promise.reject({ response: { data: { detail: `Incorrect password for ${inputEmail}. Please try again.` } } });
+        }
+        const userObj = {
+          id: existingAccount.id,
+          uid: existingAccount.id,
+          email: existingAccount.email,
+          full_name: existingAccount.full_name,
+          displayName: existingAccount.full_name,
+          role: existingAccount.role,
+          city: existingAccount.city || 'Pune'
+        };
+        localStorage.setItem('agroscan_user', JSON.stringify(userObj));
+        localStorage.setItem('agroscan_token', `jwt_token_${Date.now()}`);
+        return { data: { access_token: `jwt_token_${Date.now()}`, token_type: 'bearer', user: userObj } };
+      }
+
+      // Auto-register new user account if credentials meet requirements
+      if (inputPassword.length < 6) {
+        return Promise.reject({ response: { data: { detail: 'Account not found. Password must be at least 6 characters to register.' } } });
+      }
+
+      const derivedName = inputEmail.split('@')[0];
+      const cleanName = derivedName.charAt(0).toUpperCase() + derivedName.slice(1);
+      const newAccount = {
+        id: `usr_${Date.now()}`,
+        email: inputEmail,
+        password: inputPassword,
+        full_name: cleanName,
+        role: inputEmail.includes('admin') ? 'admin' : 'farmer',
+        city: 'Pune'
+      };
+
+      accounts.push(newAccount);
+      saveRegisteredAccounts(accounts);
+
+      const userObj = {
+        id: newAccount.id,
+        uid: newAccount.id,
+        email: newAccount.email,
+        full_name: newAccount.full_name,
+        displayName: newAccount.full_name,
+        role: newAccount.role,
+        city: newAccount.city
+      };
+      localStorage.setItem('agroscan_user', JSON.stringify(userObj));
+      localStorage.setItem('agroscan_token', `jwt_token_${Date.now()}`);
+      return { data: { access_token: `jwt_token_${Date.now()}`, token_type: 'bearer', user: userObj } };
     }
 
     if (url.includes('/auth/register')) {
       const body = JSON.parse(error.config.data || '{}');
-      const user = { ...MOCK_USER, email: body.email, full_name: body.full_name, city: body.city || 'Pune' };
-      localStorage.setItem('agroscan_user', JSON.stringify(user));
-      localStorage.setItem('agroscan_token', 'mock_jwt_token_123');
-      return { data: { access_token: 'mock_jwt_token_123', token_type: 'bearer', user } };
+      const inputEmail = (body.email || '').trim().toLowerCase();
+      const inputPassword = body.password || '';
+      const inputName = (body.full_name || '').trim();
+
+      const accounts = getRegisteredAccounts();
+      const existing = accounts.find(a => a.email.toLowerCase() === inputEmail);
+      if (existing) {
+        return Promise.reject({ response: { data: { detail: 'This email is already registered. Please sign in.' } } });
+      }
+
+      const cleanName = inputName || inputEmail.split('@')[0];
+      const newAccount = {
+        id: `usr_${Date.now()}`,
+        email: inputEmail,
+        password: inputPassword,
+        full_name: cleanName,
+        role: inputEmail.includes('admin') ? 'admin' : 'farmer',
+        city: body.city || 'Pune'
+      };
+
+      accounts.push(newAccount);
+      saveRegisteredAccounts(accounts);
+
+      const userObj = {
+        id: newAccount.id,
+        uid: newAccount.id,
+        email: newAccount.email,
+        full_name: newAccount.full_name,
+        displayName: newAccount.full_name,
+        role: newAccount.role,
+        city: newAccount.city
+      };
+
+      localStorage.setItem('agroscan_user', JSON.stringify(userObj));
+      localStorage.setItem('agroscan_token', `jwt_token_${Date.now()}`);
+      return { data: { access_token: `jwt_token_${Date.now()}`, token_type: 'bearer', user: userObj } };
     }
 
     if (url.includes('/analytics/dashboard')) {

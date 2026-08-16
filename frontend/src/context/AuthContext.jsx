@@ -132,29 +132,23 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     try {
       let fbUser = null;
-      const cleanName = email ? email.split('@')[0] : 'Farmer User';
       try {
         fbUser = await loginUser(email, password);
       } catch (fbErr) {
         console.warn("Firebase Auth Login warning:", fbErr.message);
-        if (fbErr.message.includes('Incorrect email') || fbErr.message.includes('invalid-credential') || fbErr.message.includes('user-not-found')) {
-          try {
-            fbUser = await registerUser(email, password, cleanName);
-          } catch (createErr) {
-            console.warn("Firebase auto-register fallback warning:", createErr.message);
-          }
-        }
       }
 
-      // Sync with Backend API
-      const backendUser = await syncBackendUser(email, password, cleanName);
+      // Sync with Backend API (which authenticates credentials via localStorage/database)
+      const backendUser = await syncBackendUser(email, password, email.split('@')[0]);
+      
+      const role = backendUser?.role || (email.includes('admin') ? 'admin' : 'farmer');
+      const userDisplayName = backendUser?.full_name || fbUser?.displayName || (email ? email.split('@')[0] : 'Farmer');
+      const userEmail = backendUser?.email || email;
 
-      const role = email.includes('admin') ? 'admin' : 'farmer';
-      const userDisplayName = fbUser?.displayName || backendUser?.full_name || cleanName;
       const userObj = {
         uid: fbUser?.uid || backendUser?.id || `user_${Date.now()}`,
         id: fbUser?.uid || backendUser?.id || `user_${Date.now()}`,
-        email: email,
+        email: userEmail,
         displayName: userDisplayName,
         full_name: userDisplayName,
         role: role
