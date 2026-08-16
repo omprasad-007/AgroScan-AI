@@ -104,7 +104,8 @@ api.interceptors.response.use(
     const url = error.config?.url || '';
     const method = (error.config?.method || 'get').toLowerCase();
 
-    console.warn(`API Server offline/unreachable at ${url}. Operating via LocalStorage Persistence.`);
+    // Silent local fallback mode
+    // console.warn(`API Server offline/unreachable at ${url}. Operating via LocalStorage Persistence.`);
 
     // Real Credential Authentication Route Handling
     if (url.includes('/auth/login')) {
