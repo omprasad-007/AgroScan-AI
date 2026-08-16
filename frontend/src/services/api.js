@@ -217,13 +217,33 @@ api.interceptors.response.use(
     if (url.includes('/analytics/dashboard')) {
       const preds = getStoredPredictions();
       const total = preds.length;
-      const healthy = preds.filter(p => (p.disease_name || '').includes('Healthy')).length;
+      const healthy = preds.filter(p => (p.disease_name || '').toLowerCase().includes('healthy')).length;
+      const diseased = total - healthy;
+
       return { 
         data: {
-          ...MOCK_DASHBOARD_ANALYTICS,
-          total_predictions: total || MOCK_DASHBOARD_ANALYTICS.total_predictions,
-          healthy_count: healthy || MOCK_DASHBOARD_ANALYTICS.healthy_count,
-          diseased_count: (total - healthy) || MOCK_DASHBOARD_ANALYTICS.diseased_count
+          total_predictions: total,
+          healthy_count: healthy,
+          diseased_count: diseased,
+          average_confidence: total > 0 ? round(preds.reduce((acc, p) => acc + (p.confidence_score || 0.9), 0) / total, 3) : 0.0,
+          top_diseases: total > 0 ? [
+            { name: preds[0].disease_name, crop: preds[0].crop_detected, percentage: 100.0 }
+          ] : [],
+          disease_distribution: total > 0 ? [
+            { name: preds[0].disease_name, count: total }
+          ] : [],
+          severity_distribution: total > 0 ? [
+            { name: preds[0].severity_level || 'Moderate', value: total }
+          ] : [],
+          monthly_trends: total > 0 ? [
+            { month: "Aug", scans: total, healthy: healthy, diseased: diseased, avg_severity: 15.0 }
+          ] : [],
+          weather_risk_summary: {
+            overall_risk_level: "Medium",
+            current_temp: 26.5,
+            current_humidity: 82.0,
+            alert: total > 0 ? "Microclimate relative humidity monitored for active crops." : "Scan a plant leaf to start tracking outbreak risk."
+          }
         } 
       };
     }

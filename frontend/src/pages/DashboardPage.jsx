@@ -76,7 +76,7 @@ export const DashboardPage = () => {
             </div>
           </div>
           <div className="mt-3">
-            <span className="text-2xl font-bold text-white">{analytics?.total_predictions || 50}</span>
+            <span className="text-2xl font-bold text-white">{analytics?.total_predictions ?? 0}</span>
             <span className="text-xs text-slate-400 ml-2">recorded</span>
           </div>
         </div>
@@ -89,7 +89,7 @@ export const DashboardPage = () => {
             </div>
           </div>
           <div className="mt-3">
-            <span className="text-2xl font-bold text-emerald-400">{analytics?.healthy_count || 26}</span>
+            <span className="text-2xl font-bold text-emerald-400">{analytics?.healthy_count ?? 0}</span>
             <span className="text-xs text-slate-400 ml-2">crops clean</span>
           </div>
         </div>
@@ -102,7 +102,7 @@ export const DashboardPage = () => {
             </div>
           </div>
           <div className="mt-3">
-            <span className="text-2xl font-bold text-amber-400">{analytics?.diseased_count || 24}</span>
+            <span className="text-2xl font-bold text-amber-400">{analytics?.diseased_count ?? 0}</span>
             <span className="text-xs text-slate-400 ml-2">detected</span>
           </div>
         </div>
@@ -116,7 +116,7 @@ export const DashboardPage = () => {
           </div>
           <div className="mt-3">
             <span className="text-2xl font-bold text-white">
-              {((analytics?.average_confidence || 0.94) * 100).toFixed(1)}%
+              {((analytics?.average_confidence ?? 0) * 100).toFixed(1)}%
             </span>
             <span className="text-xs text-slate-400 ml-2">accuracy</span>
           </div>
