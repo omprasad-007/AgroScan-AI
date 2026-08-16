@@ -4,46 +4,93 @@
 
 @layer base {
   body {
-    @apply bg-slate-950 text-slate-100 min-h-screen font-sans;
+    @apply min-h-screen font-sans transition-colors duration-300;
   }
 }
 
-/* Glassmorphic Stitch UI styling */
-.glass-panel {
+html.dark body {
+  @apply bg-slate-950 text-slate-100;
+}
+
+html.light body {
+  @apply bg-emerald-50/40 text-slate-900;
+}
+
+/* Glassmorphic Stitch UI styling for Dark Mode */
+html.dark .glass-panel {
   background: rgba(15, 23, 42, 0.75);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.glass-panel-light {
-  background: rgba(255, 255, 255, 0.9);
+/* Glassmorphic Stitch UI styling for Light Mode */
+html.light .glass-panel {
+  background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(16px);
-  border: 1px solid rgba(226, 227, 225, 0.6);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(16, 185, 129, 0.15);
+  box-shadow: 0 10px 30px -10px rgba(16, 185, 129, 0.08);
 }
 
-.glass-panel-hover {
-  transition: all 0.3s ease;
-}
-.glass-panel-hover:hover {
+html.dark .glass-panel-hover:hover {
   background: rgba(30, 41, 59, 0.85);
   border-color: rgba(46, 125, 50, 0.3);
   transform: translateY(-2px);
   box-shadow: 0 10px 30px -10px rgba(46, 125, 50, 0.15);
 }
 
-/* Custom Scrollbars */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+html.light .glass-panel-hover:hover {
+  background: #ffffff;
+  border-color: rgba(16, 185, 129, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px -10px rgba(16, 185, 129, 0.2);
 }
-::-webkit-scrollbar-track {
+
+/* Text & Input color overrides for Light Mode */
+html.light .text-white {
+  color: #0f172a !important;
+}
+
+html.light .text-slate-400 {
+  color: #475569 !important;
+}
+
+html.light .text-slate-300 {
+  color: #334155 !important;
+}
+
+html.light .bg-slate-900 {
+  background-color: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+html.light .bg-slate-950 {
+  background-color: #f8fafc !important;
+}
+
+html.light .bg-slate-800 {
+  background-color: #e2e8f0 !important;
+  color: #0f172a !important;
+}
+
+html.light .border-slate-800 {
+  border-color: #cbd5e1 !important;
+}
+
+/* Custom Scrollbars */
+html.dark ::-webkit-scrollbar-track {
   background: #0f172a;
 }
-::-webkit-scrollbar-thumb {
+html.dark ::-webkit-scrollbar-thumb {
   background: #334155;
   border-radius: 4px;
 }
-::-webkit-scrollbar-thumb:hover {
-  background: #475569;
+html.light ::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+html.light ::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
 }

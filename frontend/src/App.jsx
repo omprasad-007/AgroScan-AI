@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { LanguageProvider } from './context/LanguageContext';
+import { ThemeProvider } from './context/ThemeContext';
 
 import { ErrorBoundary } from './components/common/ErrorBoundary';
 import { Navbar } from './components/common/Navbar';
@@ -29,7 +30,7 @@ const AppLayout = () => {
   const isPublicPage = ['/', '/login', '/register', '/forgot-password'].includes(location.pathname);
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-950 text-slate-100 font-sans">
+    <div className="min-h-screen flex flex-col font-sans transition-colors duration-300">
       <Navbar />
 
       <div className="flex-1 flex w-full">
@@ -68,13 +69,15 @@ const AppLayout = () => {
 export default function App() {
   return (
     <ErrorBoundary>
-      <Router>
-        <AuthProvider>
-          <LanguageProvider>
-            <AppLayout />
-          </LanguageProvider>
-        </AuthProvider>
-      </Router>
+      <ThemeProvider>
+        <Router>
+          <AuthProvider>
+            <LanguageProvider>
+              <AppLayout />
+            </LanguageProvider>
+          </AuthProvider>
+        </Router>
+      </ThemeProvider>
     </ErrorBoundary>
   );
 }

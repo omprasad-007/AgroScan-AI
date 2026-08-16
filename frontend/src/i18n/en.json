@@ -1,6 +1,7 @@
 {
   "app_title": "AgroScan AI",
   "subtitle": "Smart Plant Disease Detection & Crop Health Monitoring System",
+  "subtitle_short": "Smart Agriculture AI",
   "nav": {
     "dashboard": "Dashboard",
     "scan": "Scan Leaf",
@@ -9,12 +10,53 @@
     "weather": "Weather Risk",
     "assistant": "AI Agronomist",
     "admin": "Admin Console",
-    "profile": "Profile",
+    "profile": "My Farm Profile",
     "logout": "Logout",
-    "login": "Login",
-    "register": "Register"
+    "login": "Sign In",
+    "register": "Create Account"
   },
-  "demo_banner": "DEMO AI MODE ACTIVE — Running baseline mock inference pipeline. Model training in progress.",
+  "landing": {
+    "badge": "AI-Powered Smart Agriculture Platform",
+    "title_part1": "Protect Your Crops with",
+    "title_part2": "Instant AI Disease Diagnostics",
+    "desc": "Detect plant leaf pathologies in seconds using Computer Vision, OpenCV severity estimation, Perenual botanical guidance, and weather-based risk forecasting.",
+    "btn_start_scan": "Start Camera Leaf Scan",
+    "btn_explore_demo": "Explore Live Demo",
+    "stat_accuracy": "Diagnostic Accuracy Rate",
+    "stat_crops": "Supported Crop Species",
+    "stat_diseases": "Detectable Leaf Pathologies",
+    "feature1_title": "Real-Time Camera Scan",
+    "feature1_desc": "Capture leaf photos directly from your browser with automatic quality verification.",
+    "feature2_title": "Lesion Severity Analysis",
+    "feature2_desc": "OpenCV HSV color space segmentation calculates affected leaf tissue percentage.",
+    "feature3_title": "Weather Outbreak Forecast",
+    "feature3_desc": "Predicts fungal and bacterial transmission risks based on humidity & temperature matrix.",
+    "feature4_title": "Vetted Cultivation Remedies",
+    "feature4_desc": "Provides certified organic, chemical, and preventive crop management steps."
+  },
+  "login": {
+    "title": "Sign In to AgroScan AI",
+    "desc": "Access smart plant disease monitoring & crop health tools",
+    "email": "Email Address",
+    "password": "Password",
+    "btn_login": "Sign In to Account",
+    "forgot_pass": "Forgot Password?",
+    "no_account": "Don't have an account?",
+    "create_account": "Create Account"
+  },
+  "register": {
+    "title": "Create Farmer Account",
+    "desc": "Get instant access to AI disease diagnostics & weather risk alerts",
+    "full_name": "Full Name",
+    "email": "Email Address",
+    "password": "Password",
+    "confirm_password": "Confirm Password",
+    "city": "District / City",
+    "language": "Preferred Language",
+    "btn_register": "Create Account",
+    "have_account": "Already have an account?",
+    "sign_in": "Sign In"
+  },
   "dashboard": {
     "welcome": "Welcome back,",
     "summary_title": "Crop Health Summary",
@@ -23,26 +65,103 @@
     "diseased_scans": "Diseased Crops",
     "avg_confidence": "Avg Confidence",
     "quick_scan": "Quick Leaf Scan",
-    "recent_scans": "Recent Scans",
-    "view_all": "View All History"
+    "recent_scans": "Recent Leaf Scans",
+    "view_all": "View All History",
+    "no_scans": "No leaf scans recorded yet. Click 'Quick Leaf Scan' to start your first analysis."
+  },
+  "camera": {
+    "title": "Camera-First Leaf Scanner",
+    "guidance": "Place the affected leaf inside the central frame overlay.",
+    "permission_denied": "Camera permission was denied. Please allow camera access in your browser settings.",
+    "camera_unavailable": "No camera device detected. Please use file upload below.",
+    "btn_capture": "Capture Leaf Photo",
+    "btn_retake": "Retake Photo",
+    "btn_use_photo": "Scan Leaf Now",
+    "or_upload": "Or upload leaf image from device:"
   },
   "scan": {
     "title": "Smart Plant Leaf Analysis",
     "drag_drop": "Drag & drop leaf photo here, or click to upload",
     "supported_formats": "Supports JPEG, PNG, WEBP up to 10MB",
-    "sample_picker": "Or choose a sample leaf for instant Demo Mode analysis:",
-    "analyzing": "Running OpenCV preprocessing & AI disease detection...",
+    "sample_picker": "Or choose a sample leaf photo for instant analysis:",
     "btn_analyze": "Analyze Leaf Image"
   },
   "result": {
-    "title": "Diagnostic Report",
+    "title": "Diagnostic & Cultivation Report",
     "detected_disease": "Detected Condition",
-    "confidence": "Confidence Score",
+    "confidence": "Confidence Percentage",
     "severity": "Lesion Severity",
     "weather_risk": "Weather Outbreak Risk",
     "organic_remedy": "Recommended Organic Remedy",
     "chemical_remedy": "Chemical Treatment",
     "prevention": "Preventive Guidelines",
+    "cultivation_title": "Crop Cultivation Timeline & Care",
+    "soil": "Soil Requirement",
+    "sunlight": "Sunlight Exposure",
+    "sowing": "Sowing Period",
+    "spacing": "Transplanting Spacing",
+    "irrigation": "Irrigation Schedule",
+    "fertilization": "Fertilization Doses",
+    "harvesting": "Harvest Indicators",
+    "btn_save": "Save Scan",
+    "btn_history": "View History",
+    "btn_ask_ai": "Ask AgroScan AI",
+    "btn_scan_another": "Scan Another Leaf",
     "disclaimer": "Decision-support guidance only. Follow locally approved product labels and agricultural extension guidelines."
+  },
+  "weather": {
+    "title": "Weather Disease Risk Matrix",
+    "subtitle": "Real-time relative humidity, thermal, and rainfall outbreak risk engine",
+    "current_temp": "Current Temperature",
+    "humidity": "Relative Humidity",
+    "rainfall": "Rainfall Volume",
+    "risk_level": "Disease Outbreak Risk",
+    "contributing_factors": "Contributing Risk Factors",
+    "preventive_advice": "Recommended Preventive Action"
+  },
+  "assistant": {
+    "title": "Gemini AI Agronomist",
+    "subtitle": "Context-aware AI agricultural assistant for disease, crop care & treatments",
+    "placeholder": "Ask a question about crop diseases, remedies, or cultivation...",
+    "btn_send": "Send Message",
+    "suggestion1": "How do I treat Tomato Late Blight organically?",
+    "suggestion2": "What is the optimal irrigation schedule for potatoes?",
+    "suggestion3": "How does high humidity trigger fungal outbreaks?"
+  },
+  "history": {
+    "title": "Scan History Archive",
+    "subtitle": "Your complete log of recorded plant disease diagnostic reports",
+    "col_crop": "Crop Species",
+    "col_disease": "Detected Condition",
+    "col_severity": "Severity",
+    "col_confidence": "Confidence",
+    "col_date": "Date & Time",
+    "col_action": "Action",
+    "view_report": "View Report"
+  },
+  "analytics": {
+    "title": "Crop Health & Outbreak Analytics",
+    "subtitle": "Data Science breakdown of disease prevalence, severity levels & monthly trends",
+    "disease_dist": "Disease Prevalence Distribution",
+    "severity_dist": "Severity Breakdown",
+    "monthly_trend": "Monthly Diagnostic Trend"
+  },
+  "profile": {
+    "title": "My Farm Profile",
+    "subtitle": "Manage field locations, cultivated crops, and soil characteristics",
+    "farmer_name": "Farmer Name",
+    "email": "Email Address",
+    "city": "District / Location",
+    "role": "Account Type",
+    "my_farms": "Registered Farm Plot Fields",
+    "btn_add_farm": "Add New Farm Field"
+  },
+  "admin": {
+    "title": "System Admin Console",
+    "subtitle": "System metrics, user management & computer vision model analytics",
+    "total_users": "Registered Farmers",
+    "total_scans": "Total Diagnostics Executed",
+    "ml_scans": "Computer Vision ML Scans",
+    "system_status": "API Server Health"
   }
 }
