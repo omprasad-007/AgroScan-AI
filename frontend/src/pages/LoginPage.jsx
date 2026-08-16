@@ -49,9 +49,22 @@ export const LoginPage = () => {
         </div>
 
         {error && (
-          <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs flex items-center space-x-2">
-            <AlertCircle className="w-4 h-4 shrink-0" />
-            <span>{error}</span>
+          <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs space-y-2">
+            <div className="flex items-center space-x-2">
+              <AlertCircle className="w-4 h-4 shrink-0 text-red-400" />
+              <span className="font-semibold">{error}</span>
+            </div>
+            {(error.toLowerCase().includes('not found') || error.toLowerCase().includes('create an account')) && (
+              <div className="pt-2 border-t border-red-500/20 flex items-center justify-between">
+                <span className="text-[11px] text-slate-300">Don't have an account yet?</span>
+                <Link
+                  to="/register"
+                  className="px-3 py-1 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-[11px] transition shadow-md"
+                >
+                  Create Account
+                </Link>
+              </div>
+            )}
           </div>
         )}
 

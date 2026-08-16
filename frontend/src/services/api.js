@@ -142,51 +142,35 @@ api.interceptors.response.use(
       const accounts = getRegisteredAccounts();
       const existingAccount = accounts.find(a => a.email.toLowerCase() === inputEmail);
 
-      if (existingAccount) {
-        if (existingAccount.password !== inputPassword) {
-          return Promise.reject({ response: { data: { detail: `Incorrect password for ${inputEmail}. Please try again.` } } });
-        }
-        const userObj = {
-          id: existingAccount.id,
-          uid: existingAccount.id,
-          email: existingAccount.email,
-          full_name: existingAccount.full_name,
-          displayName: existingAccount.full_name,
-          role: existingAccount.role,
-          city: existingAccount.city || 'Pune'
-        };
-        localStorage.setItem('agroscan_user', JSON.stringify(userObj));
-        localStorage.setItem('agroscan_token', `jwt_token_${Date.now()}`);
-        return { data: { access_token: `jwt_token_${Date.now()}`, token_type: 'bearer', user: userObj } };
+      if (!existingAccount) {
+        return Promise.reject({
+          response: {
+            data: {
+              detail: 'User account not found. Please create an account to get started.',
+              user_not_found: true
+            }
+          }
+        });
       }
 
-      // Auto-register new user account if credentials meet requirements
-      if (inputPassword.length < 6) {
-        return Promise.reject({ response: { data: { detail: 'Account not found. Password must be at least 6 characters to register.' } } });
+      if (existingAccount.password !== inputPassword) {
+        return Promise.reject({
+          response: {
+            data: {
+              detail: `Incorrect password for ${inputEmail}. Please verify and try again.`
+            }
+          }
+        });
       }
-
-      const derivedName = inputEmail.split('@')[0];
-      const cleanName = derivedName.charAt(0).toUpperCase() + derivedName.slice(1);
-      const newAccount = {
-        id: `usr_${Date.now()}`,
-        email: inputEmail,
-        password: inputPassword,
-        full_name: cleanName,
-        role: inputEmail.includes('admin') ? 'admin' : 'farmer',
-        city: 'Pune'
-      };
-
-      accounts.push(newAccount);
-      saveRegisteredAccounts(accounts);
 
       const userObj = {
-        id: newAccount.id,
-        uid: newAccount.id,
-        email: newAccount.email,
-        full_name: newAccount.full_name,
-        displayName: newAccount.full_name,
-        role: newAccount.role,
-        city: newAccount.city
+        id: existingAccount.id,
+        uid: existingAccount.id,
+        email: existingAccount.email,
+        full_name: existingAccount.full_name,
+        displayName: existingAccount.full_name,
+        role: existingAccount.role,
+        city: existingAccount.city || 'Pune'
       };
       localStorage.setItem('agroscan_user', JSON.stringify(userObj));
       localStorage.setItem('agroscan_token', `jwt_token_${Date.now()}`);
