@@ -1,0 +1,37 @@
+services:
+  - type: web
+    name: agroscan-ai-backend
+    env: python
+    region: singapore
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: APP_NAME
+        value: AgroScan AI
+      - key: ENVIRONMENT
+        value: production
+      - key: DEMO_MODE
+        value: true
+      - key: DATABASE_URL
+        value: sqlite:///./agroscan.db
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_ALGORITHM
+        value: HS256
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: 1440
+      - key: PLANT_ID_API_KEY
+        sync: false
+      - key: PERENUAL_API_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: OPENROUTER_API_KEY
+        sync: false
+      - key: WEATHER_API_KEY
+        sync: false
+      - key: FRONTEND_URL
+        value: https://agroscan-ai.vercel.app

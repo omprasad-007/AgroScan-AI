@@ -33,10 +33,13 @@ def post_chat_message(
     db.add(user_msg)
     db.commit()
 
-    # Retrieve scan context if prediction_id provided
+    # Retrieve scan context if prediction_id provided (enforce user ownership)
     scan_ctx = None
     if chat_in.prediction_id:
-        pred = db.query(ScanPrediction).filter(ScanPrediction.id == chat_in.prediction_id).first()
+        pred = db.query(ScanPrediction).filter(
+            ScanPrediction.id == chat_in.prediction_id,
+            ScanPrediction.user_id == current_user.id
+        ).first()
         if pred:
             scan_ctx = {
                 "crop_detected": pred.crop_detected,
@@ -46,8 +49,15 @@ def post_chat_message(
                 "weather_risk_level": pred.weather_risk_level
             }
 
-    # Generate response via Gemini API proxy
-    bot_reply_text = GeminiAssistantService.generate_chat_response(chat_in.message, scan_ctx)
+    # Generate response via Gemini API proxy safely
+    try:
+        bot_reply_text = GeminiAssistantService.generate_chat_response(chat_in.message, scan_ctx)
+    except Exception as gemini_err:
+        bot_reply_text = (
+            "I am currently operating in offline advisory mode. "
+            "For standard crop health advice, ensure good soil drainage, inspect leaves regularly for lesions, "
+            "and consult your local agricultural extension service."
+        )
 
     # Save Assistant Message
     bot_msg = ChatMessage(

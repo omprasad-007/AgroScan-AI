@@ -1,3 +1,62 @@
+CROP_CULTIVATION_KB = {
+    "Tomato": {
+        "common_name": "Tomato",
+        "scientific_name": "Solanum lycopersicum",
+        "family": "Solanaceae (Nightshade)",
+        "growth_cycle": "Annual (90 - 120 days from sowing)",
+        "soil": "Well-drained sandy loam or clay loam, rich in organic matter (pH 6.0 - 6.8).",
+        "sunlight": "Full sun (6 to 8 hours of direct daily sunlight).",
+        "sowing": "Sow seeds 0.5 cm deep in nursery beds during Oct-Nov (Rabi) or Jun-Jul (Kharif).",
+        "transplanting": "Transplant 25-30 day old healthy seedlings at 60 cm x 45 cm spacing.",
+        "irrigation": "Drip irrigation recommended. Water at 5-7 day intervals; maintain uniform soil moisture to prevent blossom end rot.",
+        "fertilization": "Apply NPK 100:60:60 kg/ha with basal FYM (15-20 t/ha). Top dress Nitrogen at 30 and 45 days after transplanting.",
+        "harvest_indicators": "Fruits turn firm, glossy, and transition from green to pinkish-red.",
+        "estimated_period": "70 - 80 days after transplanting; harvest every 3 - 4 days for 6 - 8 weeks."
+    },
+    "Potato": {
+        "common_name": "Potato",
+        "scientific_name": "Solanum tuberosum",
+        "family": "Solanaceae (Nightshade)",
+        "growth_cycle": "Annual Tuber Crop (90 - 110 days)",
+        "soil": "Loose, friable, well-drained loamy soil high in organic content (pH 5.2 - 6.4).",
+        "sunlight": "Full sun exposure (6 - 8 hours daily).",
+        "sowing": "Plant disease-free seed tubers 5-7 cm deep during Oct-Nov (Winter crop in plains).",
+        "transplanting": "Direct tuber planting at 60 cm row-to-row and 20 cm plant-to-plant distance.",
+        "irrigation": "Light irrigation after planting; repeat every 8-10 days. Stop watering 10 days before harvest.",
+        "fertilization": "NPK 120:80:100 kg/ha. Apply full Phosphorous and Potash with half Nitrogen as basal dose.",
+        "harvest_indicators": "Vines turn yellow, dry up, and skin of tubers becomes firm and non-peeling.",
+        "estimated_period": "90 - 105 days after planting depending on variety."
+    },
+    "Corn (Maize)": {
+        "common_name": "Corn (Maize)",
+        "scientific_name": "Zea mays",
+        "family": "Poaceae (Grasses)",
+        "growth_cycle": "Annual Cereal (85 - 110 days)",
+        "soil": "Deep, fertile, well-drained silt loam or clay loam (pH 6.5 - 7.5).",
+        "sunlight": "Full direct sunlight (8+ hours daily).",
+        "sowing": "Sow seeds 4-5 cm deep during June-July (Kharif) or Oct-Nov (Rabi).",
+        "transplanting": "Direct seed dibbling at 60 cm x 20 cm spacing.",
+        "irrigation": "Critical irrigation stages: Tasseling, Silking, and Grain filling stage.",
+        "fertilization": "NPK 120:60:40 kg/ha. Top dress N at knee-high and silking stages.",
+        "harvest_indicators": "Husks dry out and turn light tan; kernel milk-line disappears and black layer forms at cob base.",
+        "estimated_period": "90 - 110 days after sowing."
+    },
+    "General Crop": {
+        "common_name": "General Field Crop",
+        "scientific_name": "Plantae",
+        "family": "Agronomic Variety",
+        "growth_cycle": "Seasonal Annual",
+        "soil": "Fertile, well-drained agricultural soil rich in organic humus (pH 6.0 - 7.2).",
+        "sunlight": "Direct sunlight 6 - 8 hours per day.",
+        "sowing": "Follow seasonal cropping calendar (Kharif / Rabi / Zaid).",
+        "transplanting": "Standard row spacing depending on field geometry.",
+        "irrigation": "Irrigate according to moisture tension and crop growth phase.",
+        "fertilization": "Balanced NPK application according to soil test recommendations.",
+        "harvest_indicators": "Crop reaches full physiological maturity with characteristic color change.",
+        "estimated_period": "Seasonal cycle (90 - 150 days)."
+    }
+}
+
 DISEASE_KNOWLEDGE_BASE = {
     "tomato_late_blight": {
         "crop": "Tomato",
@@ -68,4 +127,28 @@ DISEASE_KNOWLEDGE_BASE = {
 }
 
 def get_disease_by_code(code: str) -> dict:
-    return DISEASE_KNOWLEDGE_BASE.get(code, DISEASE_KNOWLEDGE_BASE["healthy_leaf"])
+    info = DISEASE_KNOWLEDGE_BASE.get(code, DISEASE_KNOWLEDGE_BASE["healthy_leaf"])
+    crop_name = info.get("crop", "General Crop")
+    cult_info = CROP_CULTIVATION_KB.get(crop_name, CROP_CULTIVATION_KB["General Crop"])
+    
+    result = dict(info)
+    result["plant_info"] = {
+        "common_name": cult_info["common_name"],
+        "scientific_name": info.get("scientific_name") or cult_info["scientific_name"],
+        "family": cult_info["family"],
+        "growth_cycle": cult_info["growth_cycle"]
+    }
+    result["cultivation"] = {
+        "soil": cult_info["soil"],
+        "sunlight": cult_info["sunlight"],
+        "sowing": cult_info["sowing"],
+        "transplanting": cult_info["transplanting"],
+        "irrigation": cult_info["irrigation"],
+        "fertilization": cult_info["fertilization"]
+    }
+    result["harvesting"] = {
+        "indicators": cult_info["harvest_indicators"],
+        "estimated_period": cult_info["estimated_period"]
+    }
+    return result
+

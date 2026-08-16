@@ -56,12 +56,13 @@ def login(user_in: UserLogin, db: Session = Depends(get_db)):
 def firebase_login(user_in: FirebaseLoginRequest, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == user_in.email).first()
     if not user:
-        role = "admin" if "admin" in user_in.email.lower() else (user_in.role or "farmer")
+        # Default all external/firebase signups to standard farmer role to prevent privilege escalation
+        assigned_role = "farmer"
         user = User(
             email=user_in.email,
             full_name=user_in.full_name or "Farmer User",
             hashed_password=get_password_hash("firebase_authenticated_user_pass"),
-            role=role,
+            role=assigned_role,
             city=user_in.city or "Pune",
             state=user_in.state or "Maharashtra"
         )

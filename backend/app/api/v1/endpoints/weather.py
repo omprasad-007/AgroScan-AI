@@ -1,4 +1,5 @@
 import urllib.request
+import urllib.parse
 import json
 from fastapi import APIRouter
 from app.core.config import settings
@@ -10,10 +11,11 @@ router = APIRouter()
 @router.get("/current")
 def get_current_weather(city: str = "Pune"):
     api_key = getattr(settings, "WEATHER_API_KEY", None) or "58f50b7f998a3e7f90d73d87f6534183"
+    safe_city = urllib.parse.quote(city.strip()) if city else "Pune"
     
     if api_key and api_key != "your_openweather_api_key_here":
         try:
-            url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units=metric"
+            url = f"https://api.openweathermap.org/data/2.5/weather?q={safe_city}&appid={api_key}&units=metric"
             req = urllib.request.Request(url, headers={'User-Agent': 'AgroScanAI/1.0'})
             with urllib.request.urlopen(req, timeout=5) as resp:
                 if resp.status == 200:

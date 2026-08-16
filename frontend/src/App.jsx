@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'r
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { LanguageProvider } from './context/LanguageContext';
 
+import { ErrorBoundary } from './components/common/ErrorBoundary';
 import { DemoBanner } from './components/common/DemoBanner';
 import { Navbar } from './components/common/Navbar';
 import { Sidebar } from './components/common/Sidebar';
@@ -68,12 +69,14 @@ const AppLayout = () => {
 
 export default function App() {
   return (
-    <Router>
-      <AuthProvider>
-        <LanguageProvider>
-          <AppLayout />
-        </LanguageProvider>
-      </AuthProvider>
-    </Router>
+    <ErrorBoundary>
+      <Router>
+        <AuthProvider>
+          <LanguageProvider>
+            <AppLayout />
+          </LanguageProvider>
+        </AuthProvider>
+      </Router>
+    </ErrorBoundary>
   );
 }

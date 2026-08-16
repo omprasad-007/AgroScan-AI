@@ -14,7 +14,10 @@ def get_recommendation_by_prediction(
     db: Session = Depends(get_db),
     current_user = Depends(get_current_user)
 ):
-    pred = db.query(ScanPrediction).filter(ScanPrediction.id == prediction_id).first()
+    pred = db.query(ScanPrediction).filter(
+        ScanPrediction.id == prediction_id,
+        ScanPrediction.user_id == current_user.id
+    ).first()
     if not pred:
         raise HTTPException(status_code=404, detail="Prediction record not found")
 
