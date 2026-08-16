@@ -1,57 +1,58 @@
+import logging
 import httpx
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 from app.core.config import settings
-from app.services.disease_knowledge_base import get_crop_cultivation_info
+
+logger = logging.getLogger("agroscan")
 
 class PlantKnowledgeService:
     """
-    Plant Knowledge & Care Service using Perenual Plant API
-    combined with AgroScan's local Crop Knowledge System.
+    Service wrapper for Perenual Botanical Care & Cultivation API.
+    Never causes primary disease diagnosis to crash if botanical API is unreachable.
     """
-    PERENUAL_BASE_URL = "https://perenual.com/api/species-list"
+    SEARCH_URL = "https://perenual.com/api/species-list"
 
     @classmethod
-    def get_plant_details(cls, crop_name: str) -> Dict[str, Any]:
-        """
-        Fetches botanical & cultivation details for a crop.
-        Combines external API data with AgroScan's internal database.
-        """
-        local_info = get_crop_cultivation_info(crop_name)
-        perenual_info = {}
+    async def get_crop_care_info(cls, crop_name: str) -> Dict[str, Any]:
+        api_key = settings.PERENUAL_API_KEY
 
-        if settings.PERENUAL_API_KEY and not settings.DEMO_MODE:
-            try:
-                params = {
-                    "key": settings.PERENUAL_API_KEY,
-                    "q": crop_name
-                }
-                with httpx.Client(timeout=8.0) as client:
-                    resp = client.get(cls.PERENUAL_BASE_URL, params=params)
-                    if resp.status_code == 200:
-                        data = resp.json()
-                        data_list = data.get("data", [])
-                        if data_list:
-                            first = data_list[0]
-                            perenual_info = {
-                                "perenual_id": first.get("id"),
-                                "scientific_name": first.get("scientific_name", [local_info.get("scientific_name")])[0],
-                                "watering": first.get("watering"),
-                                "sunlight": first.get("sunlight", []),
-                                "cycle": first.get("cycle")
-                            }
-            except Exception as e:
-                print(f"Perenual API warning: {e}")
+        if not api_key:
+            return cls._get_default_care_fallback(crop_name)
 
-        # Merge local AgroScan knowledge base with API metadata
+        try:
+            async with httpx.AsyncClient(timeout=5.0) as client:
+                response = await client.get(
+                    cls.SEARCH_URL,
+                    params={"key": api_key, "q": crop_name}
+                )
+
+                if response.status_code == 200:
+                    data = response.json()
+                    results = data.get("data", [])
+                    if results:
+                        top = results[0]
+                        return {
+                            "crop": crop_name,
+                            "scientific_name": top.get("scientific_name", [crop_name])[0],
+                            "sunlight": ", ".join(top.get("sunlight", ["Full Sun"])),
+                            "watering": top.get("watering", "Average"),
+                            "status": "available"
+                        }
+
+                logger.warning(f"Perenual API HTTP {response.status_code}. Using fallback info.")
+                return cls._get_default_care_fallback(crop_name)
+
+        except Exception as e:
+            logger.warn(f"PlantKnowledgeService exception for {crop_name}: {e}")
+            return cls._get_default_care_fallback(crop_name)
+
+    @staticmethod
+    def _get_default_care_fallback(crop_name: str) -> Dict[str, Any]:
         return {
             "crop": crop_name,
-            "scientific_name": perenual_info.get("scientific_name") or local_info.get("scientific_name", "Solanum species"),
-            "sunlight": perenual_info.get("sunlight") or [local_info.get("sunlight", "Full Sun")],
-            "watering": perenual_info.get("watering") or local_info.get("irrigation_schedule", "Regular moist soil"),
-            "soil": local_info.get("soil_type", "Well-drained fertile loam"),
-            "sowing_period": local_info.get("sowing_period", "June - July / Oct - Nov"),
-            "spacing": local_info.get("spacing", "60cm x 45cm"),
-            "fertilization": local_info.get("fertilization", "NPK 120:60:60 kg/ha"),
-            "harvest_indicators": local_info.get("harvest_indicators", "Fruit turns firm and uniform red"),
-            "harvest_period": local_info.get("harvest_period", "75-90 days after transplanting")
+            "scientific_name": f"{crop_name} (Solanum sp.)",
+            "sunlight": "Full Sun (6-8 hours daily)",
+            "watering": "Regular irrigation at soil level",
+            "status": "partially_available",
+            "notice": "Additional plant information is temporarily unavailable."
         }

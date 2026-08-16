@@ -11,3 +11,12 @@ def health_check():
         "demo_mode": settings.DEMO_MODE,
         "model_type": settings.MODEL_TYPE
     }
+
+@router.get("/health/ready")
+def readiness_check():
+    return {
+        "status": "ok",
+        "ready": True,
+        "environment": settings.APP_ENV,
+        "demo_mode": settings.DEMO_MODE
+    }
