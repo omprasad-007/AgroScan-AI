@@ -18,13 +18,17 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   const syncBackendUser = async (email, password = null, fullName = 'Farmer User') => {
+    const existingToken = localStorage.getItem('agroscan_token');
+    if (existingToken && !password) {
+      return JSON.parse(localStorage.getItem('agroscan_user') || 'null');
+    }
+
     try {
       let res;
       if (password) {
         try {
           res = await api.post('/auth/login', { email, password });
         } catch (err) {
-          // If password login fails or user not in backend DB, try firebase-login sync
           res = await api.post('/auth/firebase-login', { email, full_name: fullName });
         }
       } else {
@@ -36,7 +40,6 @@ export const AuthProvider = ({ children }) => {
       }
       return res.data?.user;
     } catch (err) {
-      console.warn("Backend API sync fallback used:", err);
       return null;
     }
   };
