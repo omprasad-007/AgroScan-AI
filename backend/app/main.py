@@ -21,6 +21,21 @@ Base.metadata.create_all(bind=engine)
 def seed_initial_data():
     db = SessionLocal()
     try:
+        # 0. Migrate SQLite columns if missing
+        try:
+            with engine.connect() as conn:
+                for col_def in [
+                    "village VARCHAR", "taluka VARCHAR", "district VARCHAR",
+                    "state VARCHAR", "pincode VARCHAR", "latitude FLOAT", "longitude FLOAT"
+                ]:
+                    col_name = col_def.split()[0]
+                    try:
+                        conn.execute(Base.metadata.schema and None or engine.raw_connection().cursor().execute(f"ALTER TABLE users ADD COLUMN {col_def}"))
+                    except Exception:
+                        pass
+        except Exception:
+            pass
+
         # Seed default Demo Farmer
         demo_user = db.query(User).filter(User.email == "farmer@agroscan.ai").first()
         if not demo_user:

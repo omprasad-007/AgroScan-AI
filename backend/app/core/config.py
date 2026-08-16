@@ -28,7 +28,8 @@ class Settings(BaseSettings):
     ]
     MAX_UPLOAD_SIZE_MB: int = 10
 
-    # External API Keys
+    # External API Keys & AI Provider
+    AI_PROVIDER: str = "gemini"  # "gemini" or "openai"
     GEMINI_API_KEY: Optional[str] = None
     PLANT_ID_API_KEY: Optional[str] = None
     PERENUAL_API_KEY: Optional[str] = None

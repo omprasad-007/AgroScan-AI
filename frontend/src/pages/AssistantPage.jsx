@@ -181,6 +181,31 @@ export const AssistantPage = () => {
           <div className="flex items-center space-x-2">
             <button
               type="button"
+              onClick={() => {
+                if (messages.length === 0) return;
+                const plantName = selectedPlant || scanData?.crop_detected || 'Crop';
+                const dateStr = new Date().toISOString().split('T')[0];
+                let md = `# AgroScan AI — Chat Transcript\n\nDate: ${dateStr}\nPlant Context: ${plantName}\n-----------------------------------\n\n`;
+                messages.forEach(msg => {
+                  md += `### ${msg.sender === 'user' ? 'You' : 'AgroScan AI'}\n${msg.content}\n\n`;
+                });
+                const blob = new Blob([md], { type: 'text/markdown;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', `agroscan-chat-${plantName.toLowerCase().replace(/[^a-z0-9]/g, '_')}-${dateStr}.md`);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+              }}
+              disabled={messages.length === 0}
+              className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 border border-slate-700 flex items-center space-x-1.5 transition disabled:opacity-50"
+            >
+              <span>Export Chat</span>
+            </button>
+
+            <button
+              type="button"
               onClick={() => setShowSearchModal(true)}
               className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 border border-slate-700 flex items-center space-x-1.5 transition"
             >

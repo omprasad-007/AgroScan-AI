@@ -33,12 +33,12 @@ const AppLayout = () => {
 
   return (
     <div className="min-h-screen flex flex-col font-sans transition-colors duration-300">
-      <Navbar />
+      {location.pathname !== '/' && <Navbar />}
 
       <div className="flex-1 flex w-full">
         {isAuthenticated && !isPublicPage && <Sidebar />}
 
-        <main className={`flex-1 p-4 sm:p-6 lg:p-8 ${isAuthenticated && !isPublicPage ? 'max-w-7xl mx-auto w-full pb-20 md:pb-8' : 'w-full'}`}>
+        <main className={`flex-1 ${isAuthenticated && !isPublicPage ? 'p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full pb-20 md:pb-8' : 'w-full'}`}>
           <Routes>
             {/* Public Routes */}
             <Route path="/" element={<LandingPage />} />

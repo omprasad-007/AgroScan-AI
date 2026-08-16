@@ -55,19 +55,14 @@ def post_chat_message(
             "severity_level": "None"
         }
 
-    # Generate response via Gemini API proxy safely
-    try:
-        bot_reply_text = GeminiAssistantService.generate_chat_response(
-            message=chat_in.message,
-            scan_context=scan_ctx,
-            language=chat_in.language or "en"
-        )
-    except Exception as gemini_err:
-        bot_reply_text = (
-            "I am currently operating in offline advisory mode. "
-            "For standard crop health advice, ensure good soil drainage, inspect leaves regularly for lesions, "
-            "and consult your local agricultural extension service."
-        )
+    # Generate response via AIProviderService (Primary/Fallback logic)
+    from app.services.ai_provider_service import AIProviderService
+    bot_reply_text = AIProviderService.generate_response(
+        message=chat_in.message,
+        scan_context=scan_ctx,
+        language=chat_in.language or "en",
+        is_manual=bool(chat_in.manual_plant)
+    )
 
     # Save Assistant Message
     bot_msg = ChatMessage(

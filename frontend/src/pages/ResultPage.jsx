@@ -8,10 +8,13 @@ import {
   Sparkles, 
   Bot, 
   ArrowLeft,
-  FileText
+  FileText,
+  MapPin,
+  Calendar
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { SeverityBadge, WeatherRiskBadge } from '../components/common/Badge';
+import { AIAssistantPanel } from '../components/assistant/AIAssistantPanel';
 import api from '../services/api';
 
 export const ResultPage = () => {
@@ -57,6 +60,8 @@ export const ResultPage = () => {
     );
   }
 
+  const formattedDate = scan.created_at ? new Date(scan.created_at).toLocaleDateString() : new Date().toLocaleDateString();
+
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       
@@ -78,39 +83,50 @@ export const ResultPage = () => {
       {/* Main Report Card */}
       <div className="glass-panel p-6 sm:p-8 rounded-2xl space-y-6">
         
-        {/* Title */}
+        {/* Title & Metadata */}
         <div className="border-b border-slate-800 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <span className="text-xs font-semibold text-agri-400 uppercase tracking-wider">{scan.crop_detected} Crop</span>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-white mt-0.5">{scan.disease_name}</h1>
+            <div className="flex items-center space-x-2 text-xs font-semibold text-emerald-400 uppercase tracking-wider">
+              <span>{scan.plant || scan.crop_detected}</span>
+              {scan.scientific_name && scan.scientific_name !== 'N/A' && (
+                <span className="text-slate-400 italic lowercase font-normal">({scan.scientific_name})</span>
+              )}
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-white mt-0.5">{scan.disease || scan.disease_name}</h1>
+            <div className="flex items-center space-x-4 text-xs text-slate-400 mt-2">
+              <span className="flex items-center space-x-1">
+                <Calendar className="w-3.5 h-3.5 text-slate-500" />
+                <span>Date: {formattedDate}</span>
+              </span>
+            </div>
           </div>
           <div className="flex items-center space-x-3">
-            <SeverityBadge level={scan.severity_level} />
-            <WeatherRiskBadge level={scan.weather_risk_level} />
+            <SeverityBadge level={scan.severity || scan.severity_level} />
+            <WeatherRiskBadge level={scan.risk || scan.weather_risk_level} />
           </div>
         </div>
 
-        {/* Diagnostic Metrics Grid */}
+        {/* Real Diagnostic Metrics Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           
           <div className="bg-slate-900/60 p-4 rounded-xl border border-slate-800">
             <span className="text-xs text-slate-400 block">{t('result.confidence')}</span>
             <span className="text-xl font-bold text-emerald-400 mt-1 block">
-              {(scan.confidence_score * 100).toFixed(1)}%
+              {((scan.confidence || scan.confidence_score || 0.90) * 100).toFixed(1)}%
             </span>
           </div>
 
           <div className="bg-slate-900/60 p-4 rounded-xl border border-slate-800">
             <span className="text-xs text-slate-400 block">{t('result.severity')}</span>
             <span className="text-xl font-bold text-amber-400 mt-1 block">
-              {scan.severity_percentage}% ({scan.severity_level})
+              {scan.severity_percentage || 0}% ({scan.severity || scan.severity_level || 'Normal'})
             </span>
           </div>
 
           <div className="bg-slate-900/60 p-4 rounded-xl border border-slate-800">
             <span className="text-xs text-slate-400 block">Affected Leaf Area</span>
             <span className="text-xl font-bold text-white mt-1 block">
-              {scan.affected_area_cm2} cm²
+              {scan.affected_area || scan.affected_area_cm2 || 0} cm²
             </span>
           </div>
 
@@ -126,7 +142,7 @@ export const ResultPage = () => {
                 <CheckCircle2 className="w-4 h-4" />
                 <span>{t('result.organic_remedy')}</span>
               </h3>
-              <p className="text-xs text-slate-300 leading-relaxed">{recommendation.organic_treatment}</p>
+              <p className="text-xs text-slate-300 leading-relaxed">{recommendation.organic_treatment || recommendation.organic_remedy}</p>
             </div>
 
             {/* Chemical Treatment */}
@@ -135,7 +151,7 @@ export const ResultPage = () => {
                 <FileText className="w-4 h-4" />
                 <span>{t('result.chemical_remedy')}</span>
               </h3>
-              <p className="text-xs text-slate-300 leading-relaxed">{recommendation.chemical_treatment}</p>
+              <p className="text-xs text-slate-300 leading-relaxed">{recommendation.chemical_treatment || recommendation.chemical_remedy}</p>
             </div>
 
             {/* Prevention */}
@@ -144,7 +160,7 @@ export const ResultPage = () => {
                 <ShieldCheck className="w-4 h-4" />
                 <span>{t('result.prevention')}</span>
               </h3>
-              <p className="text-xs text-slate-300 leading-relaxed">{recommendation.prevention}</p>
+              <p className="text-xs text-slate-300 leading-relaxed">{recommendation.prevention || recommendation.preventive_steps}</p>
             </div>
 
           </div>
@@ -157,25 +173,16 @@ export const ResultPage = () => {
 
       </div>
 
-      {/* CTA to Gemini AI Assistant */}
-      <div className="glass-panel p-6 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center border border-purple-500/20 shrink-0">
-            <Bot className="w-5 h-5" />
-          </div>
-          <div>
-            <h4 className="text-sm font-bold text-white">Have questions about this disease treatment?</h4>
-            <p className="text-xs text-slate-400">Ask the Gemini AI Agronomist for dosage, organic alternatives, or prevention.</p>
-          </div>
-        </div>
-        <Link
-          to={`/assistant?predictionId=${scan.id}`}
-          className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs transition shadow-lg shadow-purple-600/20 text-center shrink-0"
-        >
-          Ask AI Assistant
-        </Link>
+      {/* Auto-Embedded AI Assistant Panel (Phase 9.2) */}
+      <div className="space-y-3 pt-2">
+        <h2 className="text-lg font-extrabold text-white flex items-center space-x-2">
+          <Bot className="w-5 h-5 text-emerald-400" />
+          <span>AgroScan AI Agronomist Chat</span>
+        </h2>
+        <AIAssistantPanel scanData={scan} predictionId={scan.id} autoOpen={true} />
       </div>
 
     </div>
   );
 };
+

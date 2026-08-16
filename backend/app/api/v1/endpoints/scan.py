@@ -194,14 +194,18 @@ async def analyze_leaf(
         raise HTTPException(status_code=500, detail="Failed to save uploaded file safely.")
 
     try:
-        # 1. Stage 1 Plant Verification & Stage 2 Disease Inference
-        predictor = ModelServiceFactory.get_predictor()
-        pred_res = predictor.predict(contents)
+        # 1. Stage 1 Plant Verification & Stage 2 Disease Inference via PlantDiseaseService or Model Predictor
+        from app.services.plant_disease_service import PlantDiseaseService
+        if settings.PLANT_ID_API_KEY and not settings.DEMO_MODE:
+            pred_res = await PlantDiseaseService.analyze_leaf_image(contents)
+        else:
+            predictor = ModelServiceFactory.get_predictor()
+            pred_res = predictor.predict(contents)
 
         if not pred_res.get("is_plant", True):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=pred_res.get("error_message") or "This image doesn't appear to contain a plant. Please capture a clear image of a leaf, stem, fruit, flower, or other plant part."
+                detail=pred_res.get("error_message") or "You have not scanned a leaf or plant. Please scan a clear photo of a leaf or plant."
             )
 
         # 2. OpenCV Severity Analysis
