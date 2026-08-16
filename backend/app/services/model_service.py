@@ -3,6 +3,7 @@ import random
 from abc import ABC, abstractmethod
 from typing import Dict, Any
 from app.core.config import settings
+from app.services.plant_detector import PlantDetector
 
 class BaseDiseasePredictor(ABC):
     @abstractmethod
@@ -10,6 +11,7 @@ class BaseDiseasePredictor(ABC):
         """
         Returns structured dictionary:
         {
+            "is_plant": bool,
             "crop": str,
             "disease_name": str,
             "disease_code": str,
@@ -23,7 +25,7 @@ class BaseDiseasePredictor(ABC):
 class DemoPredictor(BaseDiseasePredictor):
     """
     Deterministic Mock Inference Predictor for DEMO_MODE.
-    Generates realistic predictions without requiring trained TensorFlow weights.
+    Performs Stage 1 Plant Verification before generating demo inferences.
     """
     DEMO_CLASSES = [
         {"crop": "Tomato", "disease_name": "Tomato Late Blight", "disease_code": "tomato_late_blight", "confidence_range": (0.88, 0.97)},
@@ -35,7 +37,20 @@ class DemoPredictor(BaseDiseasePredictor):
     ]
 
     def predict(self, image_bytes: bytes) -> Dict[str, Any]:
-        # Hash byte length to make demo predictions deterministic for identical images
+        # Stage 1: Plant Verification
+        is_plant, plant_conf, reason = PlantDetector.verify_plant_image(image_bytes)
+        if not is_plant:
+            return {
+                "is_plant": False,
+                "crop": "Unrecognized",
+                "disease_name": "No Plant Detected",
+                "disease_code": "non_plant",
+                "confidence": plant_conf,
+                "is_demo": True,
+                "error_message": reason
+            }
+
+        # Stage 2: Plant Disease Analysis
         hash_seed = len(image_bytes) % len(self.DEMO_CLASSES)
         selected = self.DEMO_CLASSES[hash_seed]
         
@@ -43,6 +58,7 @@ class DemoPredictor(BaseDiseasePredictor):
         confidence = round(random.uniform(low_c, high_c), 4)
 
         return {
+            "is_plant": True,
             "crop": selected["crop"],
             "disease_name": selected["disease_name"],
             "disease_code": selected["disease_code"],
@@ -73,9 +89,21 @@ class CNNPredictor(BaseDiseasePredictor):
                 print(f"Warning: Failed to load TensorFlow model from {self.model_path}: {e}")
 
     def predict(self, image_bytes: bytes) -> Dict[str, Any]:
+        # Stage 1: Plant Verification
+        is_plant, plant_conf, reason = PlantDetector.verify_plant_image(image_bytes)
+        if not is_plant:
+            return {
+                "is_plant": False,
+                "crop": "Unrecognized",
+                "disease_name": "No Plant Detected",
+                "disease_code": "non_plant",
+                "confidence": plant_conf,
+                "is_demo": False,
+                "error_message": reason
+            }
+
         self._load_model()
         if self.model is None:
-            # Fallback to DemoPredictor if model binary is missing
             fallback = DemoPredictor()
             result = fallback.predict(image_bytes)
             result["is_demo"] = True
@@ -102,6 +130,7 @@ class CNNPredictor(BaseDiseasePredictor):
             info = get_disease_by_code(disease_code)
 
             return {
+                "is_plant": True,
                 "crop": info["crop"],
                 "disease_name": info["disease_name"],
                 "disease_code": disease_code,

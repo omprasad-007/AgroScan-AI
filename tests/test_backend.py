@@ -112,4 +112,12 @@ def test_idor_protection_recommendation():
     )
     assert response.status_code == 404
 
+def test_plant_verification_detector():
+    from app.services.plant_detector import PlantDetector
+    # Blank/non-vegetation bytes
+    blank_bytes = b"NON_PLANT_BYTES_TEST"
+    is_plant, conf, reason = PlantDetector.verify_plant_image(blank_bytes)
+    assert is_plant is False
+    assert "Invalid image" in reason or "doesn't appear" in reason
+
 

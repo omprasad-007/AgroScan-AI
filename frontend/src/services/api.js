@@ -254,6 +254,20 @@ api.interceptors.response.use(
     }
 
     if (url.includes('/predictions/analyze')) {
+      const fileName = (error.config?.data instanceof FormData ? (error.config?.data.get('file')?.name || '') : '').toLowerCase();
+      const nonPlantKeywords = ['person', 'human', 'face', 'car', 'building', 'avatar', 'profile', 'dog', 'cat', 'screenshot', 'doc', 'pdf'];
+      if (nonPlantKeywords.some(k => fileName.includes(k))) {
+        return Promise.reject({
+          response: {
+            status: 400,
+            data: {
+              detail: "This image doesn't appear to contain a plant. Please capture a clear image of a leaf, stem, fruit, flower, or other plant part.",
+              is_plant: false
+            }
+          }
+        });
+      }
+
       const preds = getStoredPredictions();
       const newPred = {
         id: `pred_${Date.now()}`,
