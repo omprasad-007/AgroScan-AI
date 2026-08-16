@@ -7,7 +7,7 @@ class Settings(BaseSettings):
     APP_ENV: str = "development"
     DEBUG: bool = True
     PORT: int = 8000
-    DEMO_MODE: bool = True
+    DEMO_MODE: bool = False
 
     # Database
     DATABASE_URL: str = "sqlite:///./agroscan.db"
