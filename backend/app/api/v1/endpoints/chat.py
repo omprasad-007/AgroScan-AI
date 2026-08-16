@@ -48,10 +48,20 @@ def post_chat_message(
                 "severity_percentage": pred.severity_percentage,
                 "weather_risk_level": pred.weather_risk_level
             }
+    elif chat_in.manual_plant:
+        scan_ctx = {
+            "crop_detected": chat_in.manual_plant,
+            "disease_name": "General Cultivation & Care",
+            "severity_level": "None"
+        }
 
     # Generate response via Gemini API proxy safely
     try:
-        bot_reply_text = GeminiAssistantService.generate_chat_response(chat_in.message, scan_ctx)
+        bot_reply_text = GeminiAssistantService.generate_chat_response(
+            message=chat_in.message,
+            scan_context=scan_ctx,
+            language=chat_in.language or "en"
+        )
     except Exception as gemini_err:
         bot_reply_text = (
             "I am currently operating in offline advisory mode. "

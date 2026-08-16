@@ -128,6 +128,8 @@ class ChatMessageCreate(BaseModel):
     message: str
     session_id: Optional[str] = None
     prediction_id: Optional[str] = None
+    language: Optional[str] = "en"
+    manual_plant: Optional[str] = None
 
 class ChatMessageResponse(BaseModel):
     id: str

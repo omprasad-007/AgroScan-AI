@@ -4,7 +4,6 @@ import {
   Scan, 
   CheckCircle2, 
   AlertTriangle, 
-  ShieldAlert, 
   CloudSun, 
   TrendingUp, 
   ArrowRight,
@@ -47,12 +46,12 @@ export const DashboardPage = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-white">
-            {t('dashboard.welcome')} {user?.full_name || user?.email?.split('@')[0] || 'Farmer'} 👋
+            {t('dashboard.title')} — {user?.full_name || user?.email?.split('@')[0] || 'Farmer'} 👋
           </h1>
           <p className="text-xs sm:text-sm text-slate-400 mt-1 flex items-center space-x-2">
             <span className="text-emerald-400 font-semibold">{user?.email || 'user@gmail.com'}</span>
             <span>•</span>
-            <span>Real-time crop disease diagnostics & weather outbreak monitoring</span>
+            <span>{t('dashboard.subtitle')}</span>
           </p>
         </div>
 
@@ -70,55 +69,49 @@ export const DashboardPage = () => {
         
         <div className="glass-panel p-5 rounded-2xl">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-400">{t('dashboard.total_scans')}</span>
+            <span className="text-xs font-medium text-slate-400">{t('dashboard.card_total')}</span>
             <div className="p-2 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20">
               <Activity className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-3">
             <span className="text-2xl font-bold text-white">{analytics?.total_predictions ?? 0}</span>
-            <span className="text-xs text-slate-400 ml-2">recorded</span>
           </div>
         </div>
 
         <div className="glass-panel p-5 rounded-2xl">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-400">{t('dashboard.healthy_scans')}</span>
+            <span className="text-xs font-medium text-slate-400">{t('dashboard.card_healthy')}</span>
             <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
               <CheckCircle2 className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-3">
             <span className="text-2xl font-bold text-emerald-400">{analytics?.healthy_count ?? 0}</span>
-            <span className="text-xs text-slate-400 ml-2">crops clean</span>
           </div>
         </div>
 
         <div className="glass-panel p-5 rounded-2xl">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-400">{t('dashboard.diseased_scans')}</span>
+            <span className="text-xs font-medium text-slate-400">{t('dashboard.card_diseased')}</span>
             <div className="p-2 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20">
               <AlertTriangle className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-3">
             <span className="text-2xl font-bold text-amber-400">{analytics?.diseased_count ?? 0}</span>
-            <span className="text-xs text-slate-400 ml-2">detected</span>
           </div>
         </div>
 
         <div className="glass-panel p-5 rounded-2xl">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-400">{t('dashboard.avg_confidence')}</span>
+            <span className="text-xs font-medium text-slate-400">{t('dashboard.card_risk')}</span>
             <div className="p-2 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20">
               <TrendingUp className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-3">
-            <span className="text-2xl font-bold text-white">
-              {((analytics?.average_confidence ?? 0) * 100).toFixed(1)}%
-            </span>
-            <span className="text-xs text-slate-400 ml-2">accuracy</span>
+            <WeatherRiskBadge level={analytics?.weather_risk_summary?.overall_risk_level || 'Low'} />
           </div>
         </div>
 
@@ -133,9 +126,9 @@ export const DashboardPage = () => {
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center space-x-2">
                 <CloudSun className="w-5 h-5 text-agri-400" />
-                <h3 className="text-base font-bold text-white">Weather Disease Risk</h3>
+                <h3 className="text-base font-bold text-white">{t('nav.weather')}</h3>
               </div>
-              <WeatherRiskBadge level={analytics?.weather_risk_summary?.overall_risk_level || 'High'} />
+              <WeatherRiskBadge level={analytics?.weather_risk_summary?.overall_risk_level || 'Low'} />
             </div>
 
             <div className="bg-slate-900/60 p-4 rounded-xl border border-slate-800 space-y-3 mb-4">
@@ -150,7 +143,7 @@ export const DashboardPage = () => {
             </div>
 
             <p className="text-xs text-amber-300/90 leading-relaxed bg-amber-500/10 p-3 rounded-xl border border-amber-500/20">
-              {analytics?.weather_risk_summary?.alert || 'High relative humidity and warm temp promote fungal spore growth.'}
+              {analytics?.weather_risk_summary?.alert || t('dashboard.empty_msg')}
             </p>
           </div>
 
@@ -166,16 +159,16 @@ export const DashboardPage = () => {
         {/* Recent Scans Table */}
         <div className="glass-panel p-6 rounded-2xl lg:col-span-2">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-base font-bold text-white">{t('dashboard.recent_scans')}</h3>
+            <h3 className="text-base font-bold text-white">{t('nav.history')}</h3>
             <Link to="/history" className="text-xs text-agri-400 hover:underline flex items-center space-x-1">
-              <span>{t('dashboard.view_all')}</span>
+              <span>View All</span>
               <ArrowRight className="w-3 h-3" />
             </Link>
           </div>
 
           {(!Array.isArray(recentScans) || recentScans.length === 0) ? (
             <div className="text-center py-10 text-slate-500 text-xs">
-              No leaf scans recorded yet. Click "Quick Leaf Scan" to start your first analysis.
+              {t('dashboard.empty_msg')}
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -198,7 +191,7 @@ export const DashboardPage = () => {
                         <SeverityBadge level={scan.severity_level} />
                       </td>
                       <td className="py-3 px-3 font-mono text-agri-400">
-                        {(scan.confidence_score * 100).toFixed(1)}%
+                        {((scan.confidence_score || 0.9) * 100).toFixed(1)}%
                       </td>
                       <td className="py-3 px-3 text-right">
                         <Link

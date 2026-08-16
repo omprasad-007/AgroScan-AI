@@ -1,35 +1,30 @@
-import React, { createContext, useContext, useState } from 'react';
-import en from '../i18n/en.json';
-import mr from '../i18n/mr.json';
-
-const translations = { en, mr };
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { getTranslation } from '../i18n';
 
 const LanguageContext = createContext();
 
 export const LanguageProvider = ({ children }) => {
-  const [lang, setLang] = useState('en');
+  const [lang, setLangState] = useState(() => {
+    return localStorage.getItem('agroscan_language') || 'en';
+  });
+
+  const setLang = (newLang) => {
+    const validLang = newLang === 'mr' ? 'mr' : 'en';
+    setLangState(validLang);
+    localStorage.setItem('agroscan_language', validLang);
+  };
 
   const toggleLanguage = () => {
-    setLang(prev => (prev === 'en' ? 'mr' : 'en'));
+    setLang(lang === 'en' ? 'mr' : 'en');
   };
 
-  const t = (path) => {
-    const keys = path.split('.');
-    let current = translations[lang];
-    for (const key of keys) {
-      if (!current || current[key] === undefined) {
-        // Fallback to English
-        let fallback = translations['en'];
-        for (const fKey of keys) {
-          if (!fallback) return path;
-          fallback = fallback[fKey];
-        }
-        return fallback || path;
-      }
-      current = current[key];
-    }
-    return current;
+  const t = (key, params = {}) => {
+    return getTranslation(lang, key, params);
   };
+
+  useEffect(() => {
+    document.documentElement.lang = lang;
+  }, [lang]);
 
   return (
     <LanguageContext.Provider value={{ lang, setLang, toggleLanguage, t }}>

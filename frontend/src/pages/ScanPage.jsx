@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Upload, Sparkles, AlertCircle, CheckCircle2, Camera } from 'lucide-react';
+import { Upload, Sparkles, AlertCircle, CheckCircle2, Camera, RefreshCw } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { CameraScanner } from '../components/camera/CameraScanner';
 
@@ -15,20 +15,14 @@ export const ScanPage = () => {
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState('camera'); // 'camera' or 'upload'
 
-  const sampleLeaves = [
-    { name: 'Tomato Late Blight', crop: 'Tomato', url: 'https://images.unsplash.com/photo-1592417817098-8f3d6eb16431?w=400&q=80' },
-    { name: 'Potato Late Blight', crop: 'Potato', url: 'https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=400&q=80' },
-    { name: 'Healthy Leaf', crop: 'General', url: 'https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?w=400&q=80' }
-  ];
-
   const handleFileChange = (file) => {
     if (!file) return;
     if (!['image/jpeg', 'image/png', 'image/webp', 'image/jpg'].includes(file.type)) {
-      setError('Please upload a valid image file (JPEG, PNG, or WEBP).');
+      setError(t('scan.err_invalid_type') || 'Please upload a valid image file (JPEG, PNG, or WEBP).');
       return;
     }
     if (file.size > 10 * 1024 * 1024) {
-      setError('Image file size must be less than 10MB.');
+      setError(t('scan.err_max_size') || 'Image file size must be less than 10MB.');
       return;
     }
     setError('');
@@ -49,23 +43,16 @@ export const ScanPage = () => {
     }
   };
 
-  const handleSampleSelect = async (sample) => {
+  const handleReset = () => {
+    setSelectedFile(null);
+    setPreviewUrl(null);
     setError('');
-    try {
-      const response = await fetch(sample.url);
-      const blob = await response.blob();
-      const file = new File([blob], `${sample.crop.toLowerCase()}_sample.jpg`, { type: 'image/jpeg' });
-      setSelectedFile(file);
-      setPreviewUrl(sample.url);
-    } catch (err) {
-      setError('Failed to load sample image.');
-    }
   };
 
   const handleUploadAndAnalyze = (overrideFile = null) => {
     const targetFile = overrideFile || selectedFile;
     if (!targetFile) {
-      setError('Please select or capture a leaf photo first.');
+      setError(t('scan.err_no_photo') || 'Please select or capture a leaf photo first.');
       return;
     }
     setIsAnalyzing(true);
@@ -79,13 +66,13 @@ export const ScanPage = () => {
       {/* Header */}
       <div>
         <h1 className="text-2xl sm:text-3xl font-extrabold text-white flex items-center space-x-2">
-          <span>{t('scan.title')}</span>
+          <span>{t('scan.title') || 'Scan Plant'}</span>
           <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-[10px] font-bold text-emerald-400 uppercase tracking-wide">
             Live AI Scanner
           </span>
         </h1>
         <p className="text-xs sm:text-sm text-slate-400 mt-1">
-          Open your device camera or upload a leaf photo for instant plant identification, disease diagnosis, and complete cultivation advice.
+          {t('scan.subtitle') || 'Open your device camera or upload a plant photo for instant identification and disease analysis.'}
         </p>
       </div>
 
@@ -108,7 +95,7 @@ export const ScanPage = () => {
           }`}
         >
           <Camera className="w-3.5 h-3.5" />
-          <span>1. Open Camera</span>
+          <span>{t('scan.tab_camera') || '1. Open Camera'}</span>
         </button>
 
         <button
@@ -121,11 +108,11 @@ export const ScanPage = () => {
           }`}
         >
           <Upload className="w-3.5 h-3.5" />
-          <span>2. Upload File</span>
+          <span>{t('scan.tab_upload') || '2. Upload File'}</span>
         </button>
       </div>
 
-      {/* Tab 1: Live Browser Camera Scanner (Primary Feature) */}
+      {/* Tab 1: Live Browser Camera Scanner */}
       {activeTab === 'camera' && (
         <CameraScanner
           onImageCaptured={handleCameraCaptured}
@@ -147,19 +134,23 @@ export const ScanPage = () => {
             <div className="space-y-4">
               <img 
                 src={previewUrl} 
-                alt="Leaf Preview" 
+                alt="Plant Preview" 
                 className="max-h-64 mx-auto rounded-xl shadow-lg border border-slate-700 object-cover" 
               />
               <div className="flex items-center justify-center space-x-3 text-xs text-slate-300">
                 <CheckCircle2 className="w-4 h-4 text-agri-400" />
-                <span>Image loaded successfully ({selectedFile?.name || 'Sample Leaf'})</span>
+                <span>{t('scan.img_loaded') || 'Image loaded successfully'} ({selectedFile?.name})</span>
               </div>
-              <button
-                onClick={() => { setSelectedFile(null); setPreviewUrl(null); }}
-                className="text-xs text-slate-400 hover:text-red-400 underline"
-              >
-                Choose different image
-              </button>
+              <div className="flex justify-center space-x-3 pt-2">
+                <button
+                  type="button"
+                  onClick={handleReset}
+                  className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300 border border-slate-700 flex items-center space-x-1.5 transition"
+                >
+                  <RefreshCw className="w-3.5 h-3.5" />
+                  <span>{t('scan.btn_retake') || 'Retake / Select Different'}</span>
+                </button>
+              </div>
             </div>
           ) : (
             <div className="space-y-4 py-6">
@@ -167,14 +158,15 @@ export const ScanPage = () => {
                 <Upload className="w-8 h-8" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-slate-200">{t('scan.drag_drop')}</p>
-                <p className="text-xs text-slate-500 mt-1">{t('scan.supported_formats')}</p>
+                <p className="text-sm font-semibold text-slate-200">{t('scan.drag_drop') || 'Drag and drop your plant photo here'}</p>
+                <p className="text-xs text-slate-500 mt-1">{t('scan.supported_formats') || 'Supports JPEG, PNG, or WEBP (Max 10MB)'}</p>
               </div>
               <button
+                type="button"
                 onClick={() => fileInputRef.current?.click()}
                 className="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 border border-slate-700 transition"
               >
-                Browse Local Files
+                {t('scan.btn_browse') || 'Browse Local Files'}
               </button>
             </div>
           )}
@@ -189,38 +181,17 @@ export const ScanPage = () => {
         </div>
       )}
 
-      {/* Sample Leaf Selector for Demo Mode */}
-      <div className="glass-panel p-6 rounded-2xl space-y-3">
-        <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wider">
-          {t('scan.sample_picker')}
-        </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          {sampleLeaves.map((sample, idx) => (
-            <button
-              key={idx}
-              onClick={() => handleSampleSelect(sample)}
-              className="flex items-center space-x-3 p-3 rounded-xl bg-slate-900/60 hover:bg-slate-800 border border-slate-800 text-left transition group"
-            >
-              <img src={sample.url} alt={sample.name} className="w-12 h-12 rounded-lg object-cover border border-slate-700 group-hover:scale-105 transition" />
-              <div>
-                <span className="block text-xs font-bold text-slate-200">{sample.name}</span>
-                <span className="text-[10px] text-agri-400">{sample.crop}</span>
-              </div>
-            </button>
-          ))}
-        </div>
-      </div>
-
       {/* Action Button for File Upload Mode */}
-      {activeTab === 'upload' && (
+      {activeTab === 'upload' && selectedFile && (
         <div className="flex justify-end">
           <button
+            type="button"
             onClick={() => handleUploadAndAnalyze()}
             disabled={!selectedFile || isAnalyzing}
             className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-primary hover:bg-agri-700 text-on-primary font-extrabold text-sm transition shadow-lg shadow-primary/25 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Sparkles className="w-4 h-4" />
-            <span>{isAnalyzing ? t('scan.analyzing') : t('scan.btn_analyze')}</span>
+            <span>{isAnalyzing ? (t('scan.analyzing') || 'Analyzing...') : (t('scan.btn_analyze') || 'Analyze Plant')}</span>
           </button>
         </div>
       )}
@@ -228,4 +199,3 @@ export const ScanPage = () => {
     </div>
   );
 };
-
