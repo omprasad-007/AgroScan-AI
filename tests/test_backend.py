@@ -87,7 +87,7 @@ def test_corrupt_image_upload_shield():
         files={"file": ("fake.jpg", corrupt_bytes, "image/jpeg")}
     )
     assert response.status_code == 400
-    assert "Corrupt or invalid image file" in response.json()["detail"]
+    assert "Please capture a clearer image" in response.json()["detail"]
 
 def test_pbkdf2_password_hashing_security():
     from app.core.security import get_password_hash, verify_password

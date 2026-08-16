@@ -126,10 +126,16 @@ DISEASE_KNOWLEDGE_BASE = {
     }
 }
 
+def get_crop_cultivation_info(crop_name: str) -> dict:
+    for key, val in CROP_CULTIVATION_KB.items():
+        if key.lower() in crop_name.lower() or crop_name.lower() in key.lower():
+            return val
+    return CROP_CULTIVATION_KB.get("General Crop", {})
+
 def get_disease_by_code(code: str) -> dict:
     info = DISEASE_KNOWLEDGE_BASE.get(code, DISEASE_KNOWLEDGE_BASE["healthy_leaf"])
     crop_name = info.get("crop", "General Crop")
-    cult_info = CROP_CULTIVATION_KB.get(crop_name, CROP_CULTIVATION_KB["General Crop"])
+    cult_info = get_crop_cultivation_info(crop_name)
     
     result = dict(info)
     result["plant_info"] = {

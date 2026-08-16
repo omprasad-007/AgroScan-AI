@@ -3,11 +3,15 @@ import { RotateCcw, Sparkles, CheckCircle, ArrowRight } from 'lucide-react';
 
 export const ImagePreview = ({ imageUrl, onRetake, onUsePhoto, isScanning }) => {
   const steps = [
-    { label: "Image Quality Check", desc: "Checking clarity & lighting..." },
-    { label: "Plant Identification", desc: "Recognizing species..." },
-    { label: "Disease Detection", desc: "Scanning for leaf pathogens..." },
-    { label: "Severity Analysis", desc: "Estimating affected area..." },
-    { label: "Generating Report", desc: "Preparing cultivation advice..." }
+    { label: "Uploading image", desc: "Transferring binary payload safely..." },
+    { label: "Checking image", desc: "Evaluating resolution, lighting & blur..." },
+    { label: "Identifying plant", desc: "Recognizing botanical species..." },
+    { label: "Detecting disease", desc: "Scanning for leaf pathogens & lesions..." },
+    { label: "Assessing severity", desc: "Estimating affected tissue percentage..." },
+    { label: "Loading plant information", desc: "Fetching cultivation & care data..." },
+    { label: "Checking weather", desc: "Evaluating humidity & outbreak risk..." },
+    { label: "Preparing recommendations", desc: "Structuring treatment guidance..." },
+    { label: "Complete", desc: "Generating final diagnostic report..." }
   ];
 
   const [activeStepIdx, setActiveStepIdx] = useState(0);

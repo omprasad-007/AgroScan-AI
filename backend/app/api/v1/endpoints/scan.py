@@ -102,11 +102,45 @@ async def analyze_leaf(
     try:
         img = Image.open(io.BytesIO(contents))
         img.verify()
+
+        # Phase 4 Image Quality Check (Resolution, Brightness, Blur)
+        import cv2
+        import numpy as np
+        np_arr = np.frombuffer(contents, np.uint8)
+        cv_img = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
+
+        if cv_img is not None:
+            h, w, _ = cv_img.shape
+            if h < 80 or w < 80:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Please capture a clearer image of the affected leaf (resolution too low)."
+                )
+
+            # Brightness check
+            gray = cv2.cvtColor(cv_img, cv2.COLOR_BGR2GRAY)
+            mean_brightness = np.mean(gray)
+            if mean_brightness < 12.0 or mean_brightness > 248.0:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Please capture a clearer image of the affected leaf (lighting too dark or overexposed)."
+                )
+
+            # Sharpness / Blur check via Variance of Laplacian
+            laplacian_var = cv2.Laplacian(gray, cv2.CV_64F).var()
+            if laplacian_var < 5.0:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Please capture a clearer image of the affected leaf (photo is blurry)."
+                )
+
+    except HTTPException as http_ex:
+        raise http_ex
     except Exception as img_err:
-        logger.warning(f"Corrupt image upload attempted by user {current_user.id}: {img_err}")
+        logger.warning(f"Corrupt or invalid image upload attempted by user {current_user.id}: {img_err}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Corrupt or invalid image file. Please upload a valid plant leaf image."
+            detail="Please capture a clearer image of the affected leaf."
         )
 
     # Sanitize input environmental parameters
