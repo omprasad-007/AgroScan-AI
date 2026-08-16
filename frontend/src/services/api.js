@@ -44,12 +44,14 @@ const getUserStorageKey = (prefix) => {
 };
 
 const getStoredPredictions = () => {
+  const u = getStoredUser();
   const key = getUserStorageKey('agroscan_predictions');
   const saved = localStorage.getItem(key);
   if (saved) {
     try { return JSON.parse(saved); } catch (e) {}
   }
-  return MOCK_PREDICTIONS;
+  // Return pre-populated mock data ONLY for the seeded demo account
+  return u.email === 'farmer@agroscan.ai' ? MOCK_PREDICTIONS : [];
 };
 
 const saveStoredPredictions = (preds) => {
@@ -58,12 +60,13 @@ const saveStoredPredictions = (preds) => {
 };
 
 const getStoredFarms = () => {
+  const u = getStoredUser();
   const key = getUserStorageKey('agroscan_farms');
   const saved = localStorage.getItem(key);
   if (saved) {
     try { return JSON.parse(saved); } catch (e) {}
   }
-  return MOCK_FARMS;
+  return u.email === 'farmer@agroscan.ai' ? MOCK_FARMS : [];
 };
 
 const saveStoredFarms = (farms) => {

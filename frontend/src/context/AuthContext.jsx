@@ -44,13 +44,23 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const unsubscribe = subscribeToAuthState(async (firebaseUser) => {
       if (firebaseUser) {
+        const deriveName = (email, inputName) => {
+          if (inputName && inputName.trim()) return inputName.trim();
+          if (email) {
+            const prefix = email.split('@')[0];
+            return prefix.charAt(0).toUpperCase() + prefix.slice(1);
+          }
+          return 'Farmer User';
+        };
+
         const role = firebaseUser.email?.includes('admin') ? 'admin' : 'farmer';
+        const name = deriveName(firebaseUser.email, firebaseUser.displayName);
         const userObj = {
           uid: firebaseUser.uid,
           id: firebaseUser.uid,
           email: firebaseUser.email,
-          displayName: firebaseUser.displayName || (role === 'admin' ? 'Dr. Agro Admin' : 'Kisan Ramesh Patil'),
-          full_name: firebaseUser.displayName || (role === 'admin' ? 'Dr. Agro Admin' : 'Kisan Ramesh Patil'),
+          displayName: name,
+          full_name: name,
           photoURL: firebaseUser.photoURL || null,
           emailVerified: firebaseUser.emailVerified,
           role: role
@@ -86,7 +96,7 @@ export const AuthProvider = ({ children }) => {
         const res = await api.post('/auth/register', {
           email,
           password,
-          full_name: fullName || 'Farmer',
+          full_name: fullName || email.split('@')[0],
           role: email.includes('admin') ? 'admin' : 'farmer',
           city: 'Pune',
           state: 'Maharashtra'
@@ -100,12 +110,13 @@ export const AuthProvider = ({ children }) => {
       }
 
       const role = email.includes('admin') ? 'admin' : 'farmer';
+      const cleanName = fullName.trim() || (email ? email.split('@')[0] : 'Farmer User');
       const userObj = {
         uid: fbUser?.uid || backendUser?.id || `user_${Date.now()}`,
         id: fbUser?.uid || backendUser?.id || `user_${Date.now()}`,
         email: email,
-        displayName: fullName || fbUser?.displayName || (role === 'admin' ? 'Dr. Agro Admin' : 'Kisan Ramesh Patil'),
-        full_name: fullName || (role === 'admin' ? 'Dr. Agro Admin' : 'Kisan Ramesh Patil'),
+        displayName: cleanName,
+        full_name: cleanName,
         role: role
       };
 
@@ -121,14 +132,14 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     try {
       let fbUser = null;
+      const cleanName = email ? email.split('@')[0] : 'Farmer User';
       try {
         fbUser = await loginUser(email, password);
       } catch (fbErr) {
         console.warn("Firebase Auth Login warning:", fbErr.message);
-        // If user is not yet created in Firebase (e.g. demo accounts), auto-create in Firebase
         if (fbErr.message.includes('Incorrect email') || fbErr.message.includes('invalid-credential') || fbErr.message.includes('user-not-found')) {
           try {
-            fbUser = await registerUser(email, password, email.includes('admin') ? 'Dr. Agro Admin' : 'Kisan Ramesh Patil');
+            fbUser = await registerUser(email, password, cleanName);
           } catch (createErr) {
             console.warn("Firebase auto-register fallback warning:", createErr.message);
           }
@@ -136,15 +147,16 @@ export const AuthProvider = ({ children }) => {
       }
 
       // Sync with Backend API
-      const backendUser = await syncBackendUser(email, password, email.includes('admin') ? 'Dr. Agro Admin' : 'Kisan Ramesh Patil');
+      const backendUser = await syncBackendUser(email, password, cleanName);
 
       const role = email.includes('admin') ? 'admin' : 'farmer';
+      const userDisplayName = fbUser?.displayName || backendUser?.full_name || cleanName;
       const userObj = {
         uid: fbUser?.uid || backendUser?.id || `user_${Date.now()}`,
         id: fbUser?.uid || backendUser?.id || `user_${Date.now()}`,
         email: email,
-        displayName: fbUser?.displayName || backendUser?.full_name || (role === 'admin' ? 'Dr. Agro Admin' : 'Kisan Ramesh Patil'),
-        full_name: fbUser?.displayName || backendUser?.full_name || (role === 'admin' ? 'Dr. Agro Admin' : 'Kisan Ramesh Patil'),
+        displayName: userDisplayName,
+        full_name: userDisplayName,
         role: role
       };
 
@@ -167,6 +179,7 @@ export const AuthProvider = ({ children }) => {
       setUser(null);
       localStorage.removeItem('agroscan_user');
       localStorage.removeItem('agroscan_token');
+      sessionStorage.clear();
     } finally {
       setLoading(false);
     }

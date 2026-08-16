@@ -47,10 +47,12 @@ export const DashboardPage = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-white">
-            {t('dashboard.welcome')} {user?.full_name || 'Farmer'} 👋
+            {t('dashboard.welcome')} {user?.full_name || user?.email?.split('@')[0] || 'Farmer'} 👋
           </h1>
-          <p className="text-xs sm:text-sm text-slate-400 mt-1">
-            Real-time crop disease diagnostics & weather outbreak monitoring for {user?.city || 'Maharashtra'}
+          <p className="text-xs sm:text-sm text-slate-400 mt-1 flex items-center space-x-2">
+            <span className="text-emerald-400 font-semibold">{user?.email || 'user@gmail.com'}</span>
+            <span>•</span>
+            <span>Real-time crop disease diagnostics & weather outbreak monitoring</span>
           </p>
         </div>
 

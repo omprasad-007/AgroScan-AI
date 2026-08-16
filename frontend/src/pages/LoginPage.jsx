@@ -9,8 +9,8 @@ export const LoginPage = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState('farmer@agroscan.ai');
-  const [password, setPassword] = useState('password123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -27,7 +27,7 @@ export const LoginPage = () => {
       await login(email.trim(), password);
       navigate('/dashboard');
     } catch (err) {
-      setError(err.message || 'Firebase login failed. Please verify email & password.');
+      setError(err.message || 'Login failed. Please verify email & password.');
     } finally {
       setLoading(false);
     }
@@ -65,7 +65,7 @@ export const LoginPage = () => {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="farmer@agroscan.ai"
+              placeholder="name@gmail.com"
               className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-primary"
               required
             />
