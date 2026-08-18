@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { 
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, 
-  PieChart, Pie, Cell, LineChart, Line, AreaChart, Area 
+  PieChart, Pie, Cell, AreaChart, Area 
 } from 'recharts';
-import { BarChart3, TrendingUp, PieChart as PieIcon, ShieldAlert } from 'lucide-react';
+import { BarChart3, TrendingUp, PieChart as PieIcon } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 import api from '../services/api';
 
 const COLORS = ['#ef4444', '#f97316', '#eab308', '#84cc16', '#22c55e'];
 
 export const AnalyticsPage = () => {
+  const { t, translateDisease, translateSeverity } = useLanguage();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -27,17 +29,35 @@ export const AnalyticsPage = () => {
   }, []);
 
   if (loading) {
-    return <div className="py-20 text-center text-xs text-slate-400 animate-pulse">Loading Crop Analytics & Recharts Data...</div>;
+    return (
+      <div className="py-20 text-center text-xs text-slate-400 animate-pulse">
+        {t('analytics.loading') || 'Loading Crop Analytics & Visualizations...'}
+      </div>
+    );
   }
+
+  // Localize disease names in distribution
+  const localizedDistribution = (data?.disease_distribution || []).map(item => ({
+    ...item,
+    displayName: translateDisease(item.name)
+  }));
+
+  // Localize severity distribution
+  const localizedSeverity = (data?.severity_distribution || []).map(item => ({
+    ...item,
+    displayName: translateSeverity(item.name)
+  }));
 
   return (
     <div className="space-y-6">
       
       {/* Header */}
       <div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-white">Crop Health & Disease Analytics</h1>
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-white">
+          {t('analytics.title') || 'Crop Health & Disease Analytics'}
+        </h1>
         <p className="text-xs sm:text-sm text-slate-400 mt-1">
-          Data science visualizations of disease prevalence, severity distributions, and monthly outbreak trends.
+          {t('analytics.subtitle') || 'Data science visualizations of disease prevalence, severity distributions, and monthly outbreak trends.'}
         </p>
       </div>
 
@@ -48,7 +68,9 @@ export const AnalyticsPage = () => {
         <div className="glass-panel p-6 rounded-2xl space-y-4">
           <div className="flex items-center space-x-2">
             <TrendingUp className="w-5 h-5 text-agri-400" />
-            <h3 className="text-sm font-bold text-white">Monthly Disease Outbreak Trends</h3>
+            <h3 className="text-sm font-bold text-white">
+              {t('analytics.monthly_trends') || 'Monthly Disease Outbreak Trends'}
+            </h3>
           </div>
           <div className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
@@ -68,8 +90,8 @@ export const AnalyticsPage = () => {
                 <Tooltip 
                   contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '0.75rem', fontSize: '12px' }}
                 />
-                <Area type="monotone" dataKey="diseased" stroke="#ef4444" fillOpacity={1} fill="url(#diseasedGrad)" name="Diseased Scans" />
-                <Area type="monotone" dataKey="healthy" stroke="#22c55e" fillOpacity={1} fill="url(#healthyGrad)" name="Healthy Scans" />
+                <Area type="monotone" dataKey="diseased" stroke="#ef4444" fillOpacity={1} fill="url(#diseasedGrad)" name={t('analytics.diseased_scans') || 'Diseased Scans'} />
+                <Area type="monotone" dataKey="healthy" stroke="#22c55e" fillOpacity={1} fill="url(#healthyGrad)" name={t('analytics.healthy_scans') || 'Healthy Scans'} />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -79,22 +101,24 @@ export const AnalyticsPage = () => {
         <div className="glass-panel p-6 rounded-2xl space-y-4">
           <div className="flex items-center space-x-2">
             <PieIcon className="w-5 h-5 text-agri-400" />
-            <h3 className="text-sm font-bold text-white">Disease Prevalence Share</h3>
+            <h3 className="text-sm font-bold text-white">
+              {t('analytics.disease_share') || 'Disease Prevalence Share'}
+            </h3>
           </div>
           <div className="h-64 w-full flex items-center justify-center">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
-                  data={data?.disease_distribution || []}
+                  data={localizedDistribution}
                   cx="50%"
                   cy="50%"
                   innerRadius={60}
                   outerRadius={90}
                   paddingAngle={5}
                   dataKey="count"
-                  nameKey="name"
+                  nameKey="displayName"
                 >
-                  {(data?.disease_distribution || []).map((entry, index) => (
+                  {localizedDistribution.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
@@ -110,12 +134,14 @@ export const AnalyticsPage = () => {
         <div className="glass-panel p-6 rounded-2xl space-y-4 lg:col-span-2">
           <div className="flex items-center space-x-2">
             <BarChart3 className="w-5 h-5 text-agri-400" />
-            <h3 className="text-sm font-bold text-white">Leaf Lesion Severity Breakdown</h3>
+            <h3 className="text-sm font-bold text-white">
+              {t('analytics.severity_dist') || 'Leaf Lesion Severity Breakdown'}
+            </h3>
           </div>
           <div className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={data?.severity_distribution || []}>
-                <XAxis dataKey="name" stroke="#64748b" fontSize={11} />
+              <BarChart data={localizedSeverity}>
+                <XAxis dataKey="displayName" stroke="#64748b" fontSize={11} />
                 <YAxis stroke="#64748b" fontSize={11} />
                 <Tooltip 
                   contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '0.75rem', fontSize: '12px' }}

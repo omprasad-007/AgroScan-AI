@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Bot, Send, Download, Sparkles, RefreshCw } from 'lucide-react';
+import { Bot, Send, Download, Sparkles } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import api from '../../services/api';
 
 export const AIAssistantPanel = ({ scanData, predictionId, autoOpen = true }) => {
-  const { lang, setLang, t } = useLanguage();
+  const { lang, setLang, t, translateCrop, translateDisease } = useLanguage();
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -13,9 +13,11 @@ export const AIAssistantPanel = ({ scanData, predictionId, autoOpen = true }) =>
   // Initial Pre-seeded Context Greeting
   useEffect(() => {
     if (scanData) {
-      const plant = scanData.crop_detected || scanData.plant || 'Crop';
-      const disease = scanData.disease_name || scanData.disease || 'Healthy';
-      const isHealthy = disease.toLowerCase().includes('healthy') || disease.toLowerCase().includes('no disease');
+      const rawCrop = scanData.crop_detected || scanData.plant || 'Crop';
+      const rawDisease = scanData.disease_name || scanData.disease || 'Healthy';
+      const plant = translateCrop(rawCrop);
+      const disease = translateDisease(rawDisease);
+      const isHealthy = rawDisease.toLowerCase().includes('healthy') || rawDisease.toLowerCase().includes('no disease');
 
       let greeting = '';
       if (lang === 'mr') {
@@ -24,8 +26,8 @@ export const AIAssistantPanel = ({ scanData, predictionId, autoOpen = true }) =>
           : `मी पाहत आहे की **${plant}** वर **${disease}** चे लक्षण आढळले आहे. सेंद्रिय उपचार, फवारणीचे प्रमाण किंवा प्रतिबंधात्मक उपायांबद्दल विचारू शकता.`;
       } else {
         greeting = isHealthy
-          ? `I see this is **${plant}** with no disease detected — ask me anything about care, watering, or fertilizing.`
-          : `I see this is **${plant}** with **${disease}** detected — ask me anything about organic remedies, chemical options, or prevention.`;
+          ? `I see this is **${rawCrop}** with no disease detected — ask me anything about care, watering, or fertilizing.`
+          : `I see this is **${rawCrop}** with **${rawDisease}** detected — ask me anything about organic remedies, chemical options, or prevention.`;
       }
 
       setMessages([{ sender: 'assistant', content: greeting, timestamp: new Date().toLocaleTimeString() }]);
@@ -35,7 +37,7 @@ export const AIAssistantPanel = ({ scanData, predictionId, autoOpen = true }) =>
         : "Hello! I am your AgroScan AI Agronomist. Ask me anything about crop diseases, remedies, or farming guidance.";
       setMessages([{ sender: 'assistant', content: welcome, timestamp: new Date().toLocaleTimeString() }]);
     }
-  }, [scanData, lang]);
+  }, [scanData, lang, translateCrop, translateDisease]);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -76,7 +78,7 @@ export const AIAssistantPanel = ({ scanData, predictionId, autoOpen = true }) =>
     }
   };
 
-  // Phase 10: Export Chat as Markdown (.md)
+  // Export Chat with UTF-8 BOM to guarantee zero mojibake in Marathi
   const handleExportChat = () => {
     if (messages.length === 0) return;
 
@@ -90,14 +92,15 @@ export const AIAssistantPanel = ({ scanData, predictionId, autoOpen = true }) =>
     md += `**Plant**: ${plantName}\n`;
     md += `**Disease / Status**: ${diseaseName}\n`;
     md += `**Confidence**: ${confidence}\n`;
+    md += `**Language**: ${lang === 'mr' ? 'मराठी' : 'English'}\n`;
     md += `--------------------------------------------------\n\n`;
 
     messages.forEach((msg) => {
-      const label = msg.sender === 'user' ? 'You' : 'AgroScan AI Agronomist';
+      const label = msg.sender === 'user' ? (lang === 'mr' ? 'शेतकरी' : 'Farmer') : (lang === 'mr' ? 'AgroScan AI कृषी सल्लागार' : 'AgroScan AI Agronomist');
       md += `### ${label} (${msg.timestamp || 'N/A'})\n${msg.content}\n\n`;
     });
 
-    const blob = new Blob([md], { type: 'text/markdown;charset=utf-8;' });
+    const blob = new Blob(["\uFEFF" + md], { type: 'text/markdown;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     
@@ -111,25 +114,54 @@ export const AIAssistantPanel = ({ scanData, predictionId, autoOpen = true }) =>
 
   const getQuickReplies = () => {
     if (scanData) {
-      const plant = scanData.crop_detected || scanData.plant || 'Crop';
-      const disease = scanData.disease_name || scanData.disease || '';
-      const isHealthy = disease.toLowerCase().includes('healthy');
+      const rawCrop = scanData.crop_detected || scanData.plant || 'Crop';
+      const rawDisease = scanData.disease_name || scanData.disease || '';
+      const plant = translateCrop(rawCrop);
+      const disease = translateDisease(rawDisease);
+      const isHealthy = rawDisease.toLowerCase().includes('healthy');
+
+      if (lang === 'mr') {
+        if (isHealthy) {
+          return [
+            `${plant} ची काळजी कशी घ्यावी?`,
+            `${plant} साठी सर्वोत्तम सेंद्रिय खत कोणते?`,
+            `${plant} साठी पाणी देण्याचे वेळापत्रक`,
+            `रोग प्रतिबंधक उपाय`
+          ];
+        }
+        return [
+          `${disease} ची लक्षणे व तीव्रता`,
+          `${disease} वर सेंद्रिय उपाय`,
+          `${disease} साठी रासायनिक फवारणी`,
+          `हा रोग कसा रोखावा?`
+        ];
+      }
 
       if (isHealthy) {
         return [
-          `How to care for ${plant}?`,
-          `Best organic fertilizers for ${plant}`,
-          `Watering schedule for ${plant}`,
-          `Prevent common ${plant} diseases`
+          `How to care for ${rawCrop}?`,
+          `Best organic fertilizers for ${rawCrop}`,
+          `Watering schedule for ${rawCrop}`,
+          `Prevent common ${rawCrop} diseases`
         ];
       }
       return [
-        `Symptoms of ${disease}`,
-        `Organic treatment for ${disease}`,
-        `Chemical options for ${disease}`,
-        `How to prevent ${disease}`
+        `Symptoms of ${rawDisease}`,
+        `Organic treatment for ${rawDisease}`,
+        `Chemical options for ${rawDisease}`,
+        `How to prevent ${rawDisease}`
       ];
     }
+
+    if (lang === 'mr') {
+      return [
+        "सेंद्रिय कंपोस्ट खत कसे बनवावे?",
+        "ठिबक सिंचन मार्गदर्शन",
+        "कीड नियंत्रण टिप्स",
+        "माती परीक्षण माहिती"
+      ];
+    }
+
     return [
       "How to make organic compost?",
       "Drip irrigation guidance",
@@ -149,15 +181,19 @@ export const AIAssistantPanel = ({ scanData, predictionId, autoOpen = true }) =>
           </div>
           <div>
             <h3 className="text-sm font-bold text-white flex items-center space-x-2">
-              <span>AgroScan AI Agronomist</span>
-              <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 text-[10px] uppercase font-bold">Live AI</span>
+              <span>{t('assistant.title') || 'AgroScan AI Agronomist'}</span>
+              <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 text-[10px] uppercase font-bold">
+                {lang === 'mr' ? 'थेट AI' : 'Live AI'}
+              </span>
             </h3>
-            <p className="text-[11px] text-slate-400">Contextual guidance for Indian smallholder farmers</p>
+            <p className="text-[11px] text-slate-400">
+              {lang === 'mr' ? 'भारतीय शेतकऱ्यांसाठी संदर्भयुक्त कृषी मार्गदर्शन' : 'Contextual guidance for Indian smallholder farmers'}
+            </p>
           </div>
         </div>
 
         <div className="flex items-center space-x-2">
-          {/* Export Chat Button (Phase 10) */}
+          {/* Export Chat Button */}
           <button
             type="button"
             onClick={handleExportChat}
@@ -166,7 +202,7 @@ export const AIAssistantPanel = ({ scanData, predictionId, autoOpen = true }) =>
             title="Export full chat transcript as Markdown (.md)"
           >
             <Download className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Export Chat</span>
+            <span>{lang === 'mr' ? 'संवाद जतन करा' : 'Export Chat'}</span>
           </button>
 
           {/* Language Toggle */}
@@ -214,7 +250,7 @@ export const AIAssistantPanel = ({ scanData, predictionId, autoOpen = true }) =>
         {loading && (
           <div className="flex items-center space-x-2 text-xs text-emerald-400 font-semibold animate-pulse">
             <Sparkles className="w-4 h-4 animate-spin" />
-            <span>Thinking...</span>
+            <span>{t('assistant.thinking') || 'Thinking...'}</span>
           </div>
         )}
         <div ref={chatEndRef} />
@@ -240,7 +276,7 @@ export const AIAssistantPanel = ({ scanData, predictionId, autoOpen = true }) =>
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder={lang === 'mr' ? "पिकांबद्दल काहीही विचारा..." : "Ask AgroScan AI about crop care, dosage, or remedies..."}
+            placeholder={t('assistant.placeholder_input') || (lang === 'mr' ? "पिकांबद्दल काहीही विचारा..." : "Ask AgroScan AI about crop care, dosage, or remedies...")}
             className="flex-1 h-10 px-3.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none focus:border-emerald-500 placeholder:text-slate-500"
           />
           <button

@@ -84,7 +84,7 @@ export const ScanPage = () => {
         <h1 className="text-2xl sm:text-3xl font-extrabold text-white flex items-center space-x-2">
           <span>{t('scan.title') || 'Scan Plant'}</span>
           <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-[10px] font-bold text-emerald-400 uppercase tracking-wide">
-            Live AI Scanner
+            {t('scan.live_scanner') || 'Live AI Scanner'}
           </span>
         </h1>
         <p className="text-xs sm:text-sm text-slate-400 mt-1">
@@ -106,14 +106,14 @@ export const ScanPage = () => {
               className="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-xs font-semibold text-white focus:outline-none focus:border-agri-500"
             >
               {farms.map((f) => (
-                <option key={f.id} value={f.id}>{f.name} ({f.village || 'Kagal'}, {f.district || 'Kolhapur'})</option>
+                <option key={f.id} value={f.id}>{f.name} ({f.village || ''}, {f.district || ''})</option>
               ))}
             </select>
           </div>
           {selectedFarm && (
             <div className="flex items-center space-x-2 text-[11px] text-slate-400 pt-1 border-t border-slate-800/60">
               <MapPin className="w-3.5 h-3.5 text-slate-500 shrink-0" />
-              <span>Location: <strong>{selectedFarm.village || 'Kagal'}, {selectedFarm.taluka || 'Kagal'}, {selectedFarm.district || 'Kolhapur'}, {selectedFarm.state || 'Maharashtra'} (PIN: {selectedFarm.pincode || '416216'})</strong></span>
+              <span>{t('profile.location') || 'Location'}: <strong>{selectedFarm.village || ''}, {selectedFarm.taluka || ''}, {selectedFarm.district || ''}, {selectedFarm.state || ''} {selectedFarm.pincode ? `(PIN: ${selectedFarm.pincode})` : ''}</strong></span>
             </div>
           )}
         </div>

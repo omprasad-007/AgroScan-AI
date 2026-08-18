@@ -3,8 +3,10 @@ import { CameraPreview } from './CameraPreview';
 import { ImagePreview } from './ImagePreview';
 import { CameraError } from './CameraError';
 import { Camera, Upload } from 'lucide-react';
+import { useLanguage } from '../../context/LanguageContext';
 
 export const CameraScanner = ({ onImageCaptured, onFallbackUpload, isAnalyzing }) => {
+  const { t } = useLanguage();
   const videoRef = useRef(null);
   const [isCameraActive, setIsCameraActive] = useState(false);
   const [stream, setStream] = useState(null);
@@ -62,7 +64,7 @@ export const CameraScanner = ({ onImageCaptured, onFallbackUpload, isAnalyzing }
       console.error('Camera access error:', err);
       let msg = 'Failed to open camera.';
       if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
-        msg = 'Camera permission was denied. Please grant camera access in browser settings.';
+        msg = t('scan.camera_denied') || 'Camera permission was denied. Please grant camera access in browser settings.';
       } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
         msg = 'No camera device found on this system.';
       } else if (err.name === 'NotReadableError' || err.name === 'TrackStartError') {
@@ -160,7 +162,7 @@ export const CameraScanner = ({ onImageCaptured, onFallbackUpload, isAnalyzing }
         />
       )}
 
-      {/* 4. Primary Standby Camera Action Card (When camera is closed & no photo captured) */}
+      {/* 4. Primary Standby Camera Action Card */}
       {!isCameraActive && !capturedDataUrl && !errorInfo && (
         <div className="p-8 rounded-2xl bg-gradient-to-br from-emerald-950/40 via-slate-900 to-slate-950 border border-emerald-500/30 text-center space-y-4 shadow-xl">
           <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto shadow-inner">
@@ -168,9 +170,9 @@ export const CameraScanner = ({ onImageCaptured, onFallbackUpload, isAnalyzing }
           </div>
 
           <div className="space-y-1">
-            <h3 className="text-lg font-extrabold text-slate-100">Live Camera Leaf Scanner</h3>
+            <h3 className="text-lg font-extrabold text-slate-100">{t('scan.title') || 'Live Camera Leaf Scanner'}</h3>
             <p className="text-xs text-slate-400 max-w-md mx-auto">
-              Capture a clear photo of the affected plant leaf using your phone camera or laptop webcam for instant disease detection.
+              {t('scan.subtitle') || 'Capture a clear photo of the affected plant leaf using your phone camera or laptop webcam for instant disease detection.'}
             </p>
           </div>
 
@@ -181,7 +183,7 @@ export const CameraScanner = ({ onImageCaptured, onFallbackUpload, isAnalyzing }
               className="px-8 py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs uppercase tracking-wider transition shadow-lg shadow-emerald-500/30 flex items-center justify-center space-x-2"
             >
               <Camera className="w-4 h-4" />
-              <span>Open Camera Scanner</span>
+              <span>{t('scan.camera_start') || 'Open Camera Scanner'}</span>
             </button>
 
             <button
@@ -190,7 +192,7 @@ export const CameraScanner = ({ onImageCaptured, onFallbackUpload, isAnalyzing }
               className="px-6 py-3.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs border border-slate-700 transition flex items-center justify-center space-x-2"
             >
               <Upload className="w-4 h-4" />
-              <span>Upload From Device</span>
+              <span>{t('scan.tab_upload') || 'Upload From Device'}</span>
             </button>
           </div>
         </div>

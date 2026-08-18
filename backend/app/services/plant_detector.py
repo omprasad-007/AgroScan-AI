@@ -33,16 +33,17 @@ class PlantDetector:
             # Convert BGR to HSV
             hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
-            # 1. Vegetation HSV Color Mask (Green + Yellowish-Green + Brown Leaf Lesions)
-            lower_green = np.array([15, 25, 25])
-            upper_green = np.array([85, 255, 255])
+            # 1. Vegetation HSV Color Mask (Green + Yellowish-Green + Foliage)
+            # Hue 28 to 88 strictly captures plant chlorophyll / leaves without overlapping human skin tones (0-25)
+            lower_green = np.array([28, 40, 35])
+            upper_green = np.array([88, 255, 255])
             green_mask = cv2.inRange(hsv, lower_green, upper_green)
 
             # 2. Skin-tone mask (Human faces, hands, selfies, body photos)
             lower_skin1 = np.array([0, 30, 60])
-            upper_skin1 = np.array([20, 150, 255])
+            upper_skin1 = np.array([25, 180, 255])
             lower_skin2 = np.array([160, 30, 60])
-            upper_skin2 = np.array([180, 150, 255])
+            upper_skin2 = np.array([180, 180, 255])
             skin_mask1 = cv2.inRange(hsv, lower_skin1, upper_skin1)
             skin_mask2 = cv2.inRange(hsv, lower_skin2, upper_skin2)
             skin_mask = cv2.bitwise_or(skin_mask1, skin_mask2)
@@ -54,12 +55,12 @@ class PlantDetector:
             skin_ratio = skin_pixels / total_pixels
 
             # Decision Logic:
-            # Rejection 1: Skin-tone ratio > 25% (Human face / selfie / body photo)
-            if skin_ratio > 0.25 and green_ratio < 0.20:
+            # Rejection 1: Skin-tone ratio > 20% (Human face / selfie / body photo)
+            if skin_ratio > 0.20 and green_ratio < 0.25:
                 return False, "NON_PLANT_IMAGE", "You have not scanned a leaf or plant. Please scan a clear photo of a leaf or plant."
 
-            # Rejection 2: Vegetation ratio < 6% (Laptop, phone, building, car, animal, food, document, screenshot, blank)
-            if green_ratio < 0.06:
+            # Rejection 2: Vegetation ratio < 10% (Laptop, phone, building, car, animal, food, document, screenshot, blank)
+            if green_ratio < 0.10:
                 return False, "NON_PLANT_IMAGE", "You have not scanned a leaf or plant. Please scan a clear photo of a leaf or plant."
 
             # Valid plant foliage/crop image

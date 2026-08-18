@@ -17,7 +17,7 @@ export const LoginPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!email || !password) {
-      setError('Please enter both email and password.');
+      setError(t('login.err_required') || 'Please enter both email and password.');
       return;
     }
     setLoading(true);
@@ -27,7 +27,7 @@ export const LoginPage = () => {
       await login(email.trim(), password);
       navigate('/dashboard');
     } catch (err) {
-      setError(err.message || 'Login failed. Please verify email & password.');
+      setError(err.message || t('login.err_failed') || 'Login failed. Please verify email & password.');
     } finally {
       setLoading(false);
     }
@@ -42,9 +42,9 @@ export const LoginPage = () => {
           <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center mx-auto border border-primary/20">
             <Leaf className="w-6 h-6" />
           </div>
-          <h1 className="text-2xl font-bold text-white">{t('login.title')}</h1>
+          <h1 className="text-2xl font-bold text-white">{t('login.title') || 'Sign In to AgroScan AI'}</h1>
           <p className="text-xs text-slate-400">
-            Access AgroScan AI disease monitoring & crop health tools
+            {t('login.subtitle') || 'Access AgroScan AI disease monitoring & crop health tools'}
           </p>
         </div>
 
@@ -56,12 +56,12 @@ export const LoginPage = () => {
             </div>
             {(error.toLowerCase().includes('not found') || error.toLowerCase().includes('create an account')) && (
               <div className="pt-2 border-t border-red-500/20 flex items-center justify-between">
-                <span className="text-[11px] text-slate-300">Don't have an account yet?</span>
+                <span className="text-[11px] text-slate-300">{t('login.no_account') || "Don't have an account yet?"}</span>
                 <Link
                   to="/register"
                   className="px-3 py-1 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-[11px] transition shadow-md"
                 >
-                  Create Account
+                  {t('login.create_account') || 'Create Account'}
                 </Link>
               </div>
             )}
@@ -72,7 +72,7 @@ export const LoginPage = () => {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-xs font-medium text-slate-300 mb-1.5">
-              {t('login.email')}
+              {t('login.email') || 'Email Address'}
             </label>
             <input
               type="email"
@@ -87,10 +87,10 @@ export const LoginPage = () => {
           <div>
             <div className="flex justify-between items-center mb-1.5">
               <label className="text-xs font-medium text-slate-300">
-                {t('login.password')}
+                {t('login.password') || 'Password'}
               </label>
               <Link to="/forgot-password" className="text-xs text-agri-400 hover:underline">
-                Forgot Password?
+                {t('login.forgot_password') || 'Forgot Password?'}
               </Link>
             </div>
             <input
@@ -106,18 +106,18 @@ export const LoginPage = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 rounded-xl bg-primary hover:bg-agri-700 text-white font-bold text-xs transition shadow-lg shadow-primary/25 flex items-center justify-center space-x-2 disabled:opacity-50"
+            className="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs transition shadow-lg shadow-emerald-500/20 flex items-center justify-center space-x-2 disabled:opacity-50"
           >
             <LogIn className="w-4 h-4" />
-            <span>{loading ? 'Authenticating...' : t('login.btn_login')}</span>
+            <span>{loading ? (t('login.signing_in') || 'Signing In...') : (t('login.submit') || 'Sign In')}</span>
           </button>
         </form>
 
         <div className="text-center pt-2">
           <p className="text-xs text-slate-400">
-            Don't have an account?{' '}
+            {t('login.no_account') || "Don't have an account?"}{' '}
             <Link to="/register" className="text-agri-400 hover:underline font-semibold">
-              Create Account
+              {t('login.create_account') || 'Create Account'}
             </Link>
           </p>
         </div>

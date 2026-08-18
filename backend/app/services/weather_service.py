@@ -208,42 +208,95 @@ class WeatherRiskService:
         }
 
     @classmethod
-    async def fetch_live_weather(cls, city: str = "Pune") -> Dict[str, Any]:
+    async def fetch_live_weather(cls, city: str = "Pune", lat: Optional[float] = None, lon: Optional[float] = None, lang: str = "en") -> Dict[str, Any]:
         api_key = settings.WEATHER_API_KEY
         if not api_key:
-            return cls._get_weather_fallback(city)
+            return cls._get_weather_fallback(city, lang=lang)
+
+        params = {"appid": api_key, "units": "metric", "lang": "mr" if lang == "mr" else "en"}
+        if lat is not None and lon is not None:
+            params["lat"] = str(lat)
+            params["lon"] = str(lon)
+        else:
+            params["q"] = city
 
         try:
             async with httpx.AsyncClient(timeout=5.0) as client:
-                res = await client.get(
-                    cls.WEATHER_URL,
-                    params={"q": city, "appid": api_key, "units": "metric"}
-                )
+                res = await client.get(cls.WEATHER_URL, params=params)
                 if res.status_code == 200:
                     data = res.json()
                     main = data.get("main", {})
+                    weather_list = data.get("weather", [{}])
                     rain = data.get("rain", {}).get("1h", 0.0)
+                    condition_text = weather_list[0].get("description", "Clear").title() if weather_list else "Clear"
                     return {
-                        "city": city,
+                        "city": data.get("name", city),
                         "temp_c": main.get("temp", 26.5),
                         "humidity_pct": main.get("humidity", 82.0),
                         "rainfall_mm": rain,
+                        "condition": condition_text,
                         "status": "available"
                     }
 
                 logger.warning(f"OpenWeatherMap HTTP {res.status_code}. Returning controlled fallback.")
-                return cls._get_weather_fallback(city)
+                return cls._get_weather_fallback(city, lang=lang)
         except Exception as e:
             logger.warning(f"WeatherRiskService exception: {e}")
-            return cls._get_weather_fallback(city)
+            return cls._get_weather_fallback(city, lang=lang)
+
+    @classmethod
+    def fetch_weather_sync(cls, city: str = "Pune", lat: Optional[float] = None, lon: Optional[float] = None, lang: str = "en") -> Dict[str, Any]:
+        api_key = settings.WEATHER_API_KEY
+        if not api_key:
+            return cls._get_weather_fallback(city, lang=lang)
+
+        params = {"appid": api_key, "units": "metric", "lang": "mr" if lang == "mr" else "en"}
+        if lat is not None and lon is not None:
+            params["lat"] = str(lat)
+            params["lon"] = str(lon)
+        else:
+            params["q"] = city
+
+        try:
+            with httpx.Client(timeout=4.0) as client:
+                res = client.get(cls.WEATHER_URL, params=params)
+                if res.status_code == 200:
+                    data = res.json()
+                    main = data.get("main", {})
+                    weather_list = data.get("weather", [{}])
+                    rain = data.get("rain", {}).get("1h", 0.0)
+                    condition_text = weather_list[0].get("description", "Clear").title() if weather_list else "Clear"
+                    return {
+                        "city": data.get("name", city),
+                        "temp_c": main.get("temp", 26.5),
+                        "humidity_pct": main.get("humidity", 82.0),
+                        "rainfall_mm": rain,
+                        "condition": condition_text,
+                        "status": "available"
+                    }
+        except Exception as e:
+            logger.warning(f"WeatherRiskService sync fetch error: {e}")
+
+        return cls._get_weather_fallback(city, lang=lang)
 
     @staticmethod
-    def _get_weather_fallback(city: str) -> Dict[str, Any]:
+    def _get_weather_fallback(city: str, lang: str = "en") -> Dict[str, Any]:
+        if lang == "mr":
+            return {
+                "city": city,
+                "temp_c": 26.5,
+                "humidity_pct": 82.0,
+                "rainfall_mm": 5.0,
+                "condition": "हलका पाऊस / मध्यम आर्द्रता",
+                "status": "partially_available",
+                "notice": "थेट हवामान माहिती तात्पुरती अनुपलब्ध आहे."
+            }
         return {
             "city": city,
             "temp_c": 26.5,
             "humidity_pct": 82.0,
             "rainfall_mm": 5.0,
+            "condition": "Pleasant / Mild Humidity",
             "status": "partially_available",
             "notice": "Live weather information temporarily unavailable."
         }

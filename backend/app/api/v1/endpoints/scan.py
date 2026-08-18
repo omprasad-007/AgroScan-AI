@@ -196,9 +196,15 @@ async def analyze_leaf(
     try:
         # 1. Stage 1 Plant Verification & Stage 2 Disease Inference via PlantDiseaseService or Model Predictor
         from app.services.plant_disease_service import PlantDiseaseService
+        pred_res = None
         if settings.PLANT_ID_API_KEY and not settings.DEMO_MODE:
-            pred_res = await PlantDiseaseService.analyze_leaf_image(contents)
-        else:
+            try:
+                pred_res = await PlantDiseaseService.analyze_leaf_image(contents)
+            except Exception as plant_id_err:
+                logger.warning(f"Plant.id API error: {plant_id_err}. Falling back to internal inference engine.")
+                pred_res = None
+
+        if not pred_res:
             predictor = ModelServiceFactory.get_predictor()
             pred_res = predictor.predict(contents)
 
@@ -260,6 +266,9 @@ async def analyze_leaf(
             "prevention": kb_data["prevention"],
             "disclaimer": "Decision-support guidance only. Follow locally approved product labels."
         })
+    except HTTPException:
+        db.rollback()
+        raise
     except Exception as e:
         logger.error(f"Error analyzing leaf image for user {current_user.id}: {e}", exc_info=True)
         db.rollback()

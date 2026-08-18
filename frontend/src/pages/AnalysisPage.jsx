@@ -14,10 +14,10 @@ export const AnalysisPage = () => {
   const [analyzedPred, setAnalyzedPred] = useState(null);
 
   const steps = [
-    { label: "Executing Stage 1 Image Validation...", duration: 500 },
-    { label: "Normalizing image & applying OpenCV HSV color space mask...", duration: 700 },
-    { label: "Executing MobileNetV2 Deep Learning inference model...", duration: 800 },
-    { label: "Evaluating weather-based disease risk matrix...", duration: 600 }
+    { label: t('analysis.step1') || "Executing Stage 1 Image Validation...", duration: 500 },
+    { label: t('analysis.step2') || "Normalizing image & applying OpenCV HSV color space mask...", duration: 700 },
+    { label: t('analysis.step3') || "Executing MobileNetV2 Deep Learning inference model...", duration: 800 },
+    { label: t('analysis.step4') || "Evaluating weather-based disease risk matrix...", duration: 600 }
   ];
 
   const imageFile = location.state?.imageFile;
@@ -45,14 +45,14 @@ export const AnalysisPage = () => {
 
         if (valRes.data?.is_plant === false) {
           if (isMounted) {
-            setError(valRes.data.message || "You have not scanned a leaf or plant. Please scan a clear photo of a leaf or plant.");
+            setError(valRes.data.message || t('analysis.val_error_tip') || "You have not scanned a leaf or plant. Please scan a clear photo of a leaf or plant.");
           }
           return;
         }
 
         if (valRes.data?.is_plant === null) {
           if (isMounted) {
-            setError(valRes.data.message || "We couldn't verify the image. Please try again.");
+            setError(valRes.data.message || t('analysis.val_error_tip') || "We couldn't verify the image. Please try again.");
           }
           return;
         }
@@ -67,7 +67,7 @@ export const AnalysisPage = () => {
         }
       } catch (err) {
         if (isMounted) {
-          const detail = err.response?.data?.detail || err.message || "You have not scanned a leaf or plant. Please scan a clear photo of a leaf or plant.";
+          const detail = err.response?.data?.detail || err.message || t('analysis.val_error_tip') || "You have not scanned a leaf or plant. Please scan a clear photo of a leaf or plant.";
           setError(detail);
         }
       }
@@ -76,7 +76,7 @@ export const AnalysisPage = () => {
     runAnalysisPipeline();
 
     return () => { isMounted = false; };
-  }, [imageFile, navigate]);
+  }, [imageFile, navigate, t]);
 
   useEffect(() => {
     let timeoutId;
@@ -90,7 +90,7 @@ export const AnalysisPage = () => {
       }, 500);
     }
     return () => clearTimeout(timeoutId);
-  }, [currentStep, analyzedPred, error, navigate]);
+  }, [currentStep, analyzedPred, error, navigate, steps]);
 
   if (error) {
     return (
@@ -100,14 +100,16 @@ export const AnalysisPage = () => {
             <AlertCircle className="w-8 h-8" />
           </div>
 
-          <h2 className="text-xl font-extrabold text-white">Validation Error</h2>
+          <h2 className="text-xl font-extrabold text-white">
+            {t('analysis.val_error') || 'Validation Error'}
+          </h2>
           
           <p className="text-xs sm:text-sm text-red-200/90 leading-relaxed bg-red-500/10 p-4 rounded-xl border border-red-500/20 font-medium">
             {error}
           </p>
 
           <p className="text-xs text-slate-400">
-            Ensure your photo clearly shows a leaf, stem, fruit, or plant part with good lighting.
+            {t('analysis.val_error_tip') || 'Ensure your photo clearly shows a leaf, stem, fruit, or plant part with good lighting.'}
           </p>
 
           <div className="pt-4 flex flex-col sm:flex-row gap-3 justify-center">
@@ -116,14 +118,14 @@ export const AnalysisPage = () => {
               className="px-6 py-3 rounded-xl bg-agri-500 hover:bg-agri-400 text-slate-950 font-bold text-xs transition shadow-lg shadow-agri-500/20 inline-flex items-center justify-center space-x-2"
             >
               <RefreshCw className="w-4 h-4" />
-              <span>Scan Again</span>
+              <span>{t('analysis.scan_again') || 'Scan Again'}</span>
             </Link>
             <Link
               to="/scan"
               className="px-6 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs border border-slate-700 inline-flex items-center justify-center space-x-2"
             >
               <Upload className="w-4 h-4" />
-              <span>Upload Another Image</span>
+              <span>{t('analysis.upload_another') || 'Upload Another Image'}</span>
             </Link>
           </div>
         </div>
@@ -138,11 +140,13 @@ export const AnalysisPage = () => {
       <div>
         <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-agri-400 text-xs font-semibold mb-3">
           <Sparkles className="w-4 h-4 text-agri-400 animate-pulse" />
-          <span>AI Plant Detection & Computer Vision Pipeline</span>
+          <span>{t('analysis.pipeline_tag') || 'AI Plant Detection & Computer Vision Pipeline'}</span>
         </div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-white">Analyzing Plant Leaf...</h1>
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-white">
+          {t('analysis.title') || 'Analyzing Plant Leaf...'}
+        </h1>
         <p className="text-xs sm:text-sm text-slate-400 mt-1">
-          Processing plant verification, OpenCV color masks, and disease classification.
+          {t('analysis.subtitle') || 'Processing plant verification, OpenCV color masks, and disease classification.'}
         </p>
       </div>
 
@@ -159,7 +163,9 @@ export const AnalysisPage = () => {
         {/* Central Overlay Badge */}
         <div className="absolute bg-slate-950/80 backdrop-blur-md px-4 py-2 rounded-xl border border-agri-500/30 text-xs font-bold text-agri-400 flex items-center space-x-2">
           <Loader2 className="w-4 h-4 animate-spin text-agri-400" />
-          <span>Processing Step {Math.min(currentStep + 1, steps.length)} of {steps.length}</span>
+          <span>
+            {t('analysis.processing_step', { current: Math.min(currentStep + 1, steps.length), total: steps.length })}
+          </span>
         </div>
       </div>
 

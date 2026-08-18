@@ -2,6 +2,8 @@ import os
 from pydantic_settings import BaseSettings
 from typing import Optional
 
+_BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 class Settings(BaseSettings):
     APP_NAME: str = "AgroScan AI"
     APP_ENV: str = "development"
@@ -29,12 +31,13 @@ class Settings(BaseSettings):
     MAX_UPLOAD_SIZE_MB: int = 10
 
     # External API Keys & AI Provider
-    AI_PROVIDER: str = "gemini"  # "gemini" or "openai"
+    AI_PROVIDER: str = "openai"  # "openai" (OpenRouter/OpenAI) or "gemini"
     GEMINI_API_KEY: Optional[str] = None
     PLANT_ID_API_KEY: Optional[str] = None
     PERENUAL_API_KEY: Optional[str] = None
     OPENAI_API_KEY: Optional[str] = None
     OPENROUTER_API_KEY: Optional[str] = None
+    WEATHER_API_KEY: Optional[str] = None
 
     # ML Config
     MODEL_TYPE: str = "demo"
@@ -42,7 +45,12 @@ class Settings(BaseSettings):
     UPLOAD_DIR: str = "./uploads"
 
     model_config = {
-        "env_file": ".env",
+        "env_file": [
+            os.path.join(_BASE_DIR, ".env"),
+            os.path.join(_BASE_DIR, "../.env"),
+            ".env",
+            "backend/.env"
+        ],
         "extra": "ignore"
     }
 

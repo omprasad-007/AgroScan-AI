@@ -1,15 +1,15 @@
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, ConfigDict
 from typing import Optional, List, Dict, Any
 from datetime import datetime
 
 # --- Location Schema ---
 class LocationSchema(BaseModel):
-    village: Optional[str] = "Kagal"
-    taluka: Optional[str] = "Kagal"
-    district: Optional[str] = "Kolhapur"
-    state: Optional[str] = "Maharashtra"
-    pincode: Optional[str] = "416216"
-    city: Optional[str] = "Kolhapur"
+    village: Optional[str] = None
+    taluka: Optional[str] = None
+    district: Optional[str] = None
+    state: Optional[str] = None
+    pincode: Optional[str] = None
+    city: Optional[str] = None
     latitude: Optional[float] = None
     longitude: Optional[float] = None
 
@@ -19,12 +19,12 @@ class UserRegister(BaseModel):
     full_name: str
     password: str
     role: Optional[str] = "farmer"
-    village: Optional[str] = "Kagal"
-    taluka: Optional[str] = "Kagal"
-    district: Optional[str] = "Kolhapur"
-    state: Optional[str] = "Maharashtra"
-    pincode: Optional[str] = "416216"
-    city: Optional[str] = "Kolhapur"
+    village: Optional[str] = None
+    taluka: Optional[str] = None
+    district: Optional[str] = None
+    state: Optional[str] = None
+    pincode: Optional[str] = None
+    city: Optional[str] = None
 
 class UserLogin(BaseModel):
     email: EmailStr
@@ -39,20 +39,24 @@ class UserUpdate(BaseModel):
     pincode: Optional[str] = None
     city: Optional[str] = None
     language: Optional[str] = None
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
 
 class FirebaseLoginRequest(BaseModel):
     email: EmailStr
     full_name: Optional[str] = "Farmer User"
     firebase_uid: Optional[str] = None
     role: Optional[str] = "farmer"
-    village: Optional[str] = "Kagal"
-    taluka: Optional[str] = "Kagal"
-    district: Optional[str] = "Kolhapur"
-    state: Optional[str] = "Maharashtra"
-    pincode: Optional[str] = "416216"
-    city: Optional[str] = "Kolhapur"
+    village: Optional[str] = None
+    taluka: Optional[str] = None
+    district: Optional[str] = None
+    state: Optional[str] = None
+    pincode: Optional[str] = None
+    city: Optional[str] = None
 
 class UserResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: str
     email: str
     full_name: str
@@ -65,9 +69,6 @@ class UserResponse(BaseModel):
     city: Optional[str] = None
     created_at: datetime
 
-    class Config:
-        from_attributes = True
-
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
@@ -76,17 +77,17 @@ class TokenResponse(BaseModel):
 # --- Farm Schemas ---
 class FarmCreate(BaseModel):
     name: str
-    village: Optional[str] = "Kagal"
-    taluka: Optional[str] = "Kagal"
-    district: Optional[str] = "Kolhapur"
-    state: Optional[str] = "Maharashtra"
-    pincode: Optional[str] = "416216"
+    village: Optional[str] = None
+    taluka: Optional[str] = None
+    district: Optional[str] = None
+    state: Optional[str] = None
+    pincode: Optional[str] = None
     latitude: Optional[float] = None
     longitude: Optional[float] = None
     location_source: Optional[str] = "MANUAL"
     gps_accuracy: Optional[float] = None
-    crop_types: Optional[str] = "Tomato, Potato, Sugarcane"
-    area_acres: Optional[float] = 2.5
+    crop_types: Optional[str] = "General Crops"
+    area_acres: Optional[float] = 1.0
     irrigation_type: Optional[str] = "Drip Irrigation"
 
 class FarmUpdate(BaseModel):
@@ -105,29 +106,30 @@ class FarmUpdate(BaseModel):
     irrigation_type: Optional[str] = None
 
 class FarmResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: str
     user_id: str
     name: str
-    village: Optional[str]
-    taluka: Optional[str]
-    district: Optional[str]
-    state: Optional[str]
-    pincode: Optional[str]
+    village: Optional[str] = None
+    taluka: Optional[str] = None
+    district: Optional[str] = None
+    state: Optional[str] = None
+    pincode: Optional[str] = None
     latitude: Optional[float] = None
     longitude: Optional[float] = None
     location_source: Optional[str] = "MANUAL"
     gps_accuracy: Optional[float] = None
-    crop_types: Optional[str]
+    crop_types: Optional[str] = None
     area_acres: float
     irrigation_type: Optional[str] = "Drip Irrigation"
     created_at: datetime
     updated_at: Optional[datetime] = None
 
-    class Config:
-        from_attributes = True
-
 # --- Disease & Prediction Schemas ---
 class DiseaseInfoResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: str
     disease_code: str
     crop: str
@@ -138,9 +140,6 @@ class DiseaseInfoResponse(BaseModel):
     chemical_treatment: str
     prevention: str
 
-    class Config:
-        from_attributes = True
-
 class RecommendationResponse(BaseModel):
     organic_treatment: str
     chemical_treatment: str
@@ -148,10 +147,12 @@ class RecommendationResponse(BaseModel):
     disclaimer: Optional[str] = "Decision-support guidance only. Follow locally approved product labels."
 
 class PredictionResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: str
     image_url: str
     plant: str
-    scientific_name: Optional[str] = "Solanum lycopersicum"
+    scientific_name: Optional[str] = None
     disease: str
     confidence: float
     severity: str
@@ -166,11 +167,8 @@ class PredictionResponse(BaseModel):
     severity_level: Optional[str] = None
     confidence_score: Optional[float] = None
     weather_risk_level: Optional[str] = None
-    is_demo: Optional[bool] = True
+    is_demo: Optional[bool] = False
     created_at: Optional[datetime] = None
-
-    class Config:
-        from_attributes = True
 
 # --- Analytics & Weather Schemas ---
 class DashboardAnalyticsResponse(BaseModel):
@@ -207,21 +205,22 @@ class ChatMessageCreate(BaseModel):
     prediction_id: Optional[str] = None
     language: Optional[str] = "en"
     manual_plant: Optional[str] = None
+    conversation_history: Optional[List[Dict[str, str]]] = None
+    location: Optional[Dict[str, Any]] = None
 
 class ChatMessageResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: str
+    session_id: Optional[str] = None
     sender: str
     content: str
     created_at: datetime
 
-    class Config:
-        from_attributes = True
-
 class ChatSessionResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: str
     title: str
     created_at: datetime
     messages: List[ChatMessageResponse] = []
-
-    class Config:
-        from_attributes = True

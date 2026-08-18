@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
-import { User, Mail, MapPin, Plus, LogOut, CheckCircle, Sprout, Home, Edit2, Navigation } from 'lucide-react';
+import { User, Mail, MapPin, Plus, LogOut, CheckCircle, Sprout, Home, Edit2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { LocationPickerModal } from '../components/location/LocationPickerModal';
 import api from '../services/api';
@@ -20,26 +20,26 @@ export const ProfilePage = () => {
 
   // User Profile Location State
   const [userLoc, setUserLoc] = useState({
-    village: 'Kagal',
-    taluka: 'Kagal',
-    district: 'Kolhapur',
-    state: 'Maharashtra',
-    pincode: '416216',
-    latitude: 16.5889,
-    longitude: 74.3150,
+    village: user?.village || '',
+    taluka: user?.taluka || '',
+    district: user?.district || '',
+    state: user?.state || (lang === 'mr' ? 'महाराष्ट्र' : 'Maharashtra'),
+    pincode: user?.pincode || '',
+    latitude: user?.latitude || null,
+    longitude: user?.longitude || null,
     location_source: 'GPS'
   });
 
   // New Farm State
   const [newFarm, setNewFarm] = useState({
     name: '',
-    village: 'Kagal',
-    taluka: 'Kagal',
-    district: 'Kolhapur',
-    state: 'Maharashtra',
-    pincode: '416216',
-    latitude: 16.5889,
-    longitude: 74.3150,
+    village: '',
+    taluka: '',
+    district: '',
+    state: lang === 'mr' ? 'महाराष्ट्र' : 'Maharashtra',
+    pincode: '',
+    latitude: null,
+    longitude: null,
     location_source: 'MANUAL',
     crop_types: 'Tomato, Potato, Sugarcane',
     area_acres: 2.5,
@@ -47,9 +47,30 @@ export const ProfilePage = () => {
   });
 
   useEffect(() => {
+    // Load farms
     api.get('/farms')
       .then(res => setFarms(Array.isArray(res.data) ? res.data : []))
       .catch(() => setFarms([]));
+
+    // Load current user's profile location
+    api.get('/auth/me')
+      .then(res => {
+        const u = res.data;
+        if (u && (u.village || u.district || u.latitude)) {
+          setUserLoc(prev => ({
+            ...prev,
+            village: u.village || prev.village,
+            taluka: u.taluka || prev.taluka,
+            district: u.district || prev.district,
+            state: u.state || prev.state,
+            pincode: u.pincode || prev.pincode,
+            latitude: u.latitude || prev.latitude,
+            longitude: u.longitude || prev.longitude,
+            location_source: u.latitude ? 'GPS' : 'MANUAL'
+          }));
+        }
+      })
+      .catch(() => {});
   }, []);
 
   const handleLogout = async () => {
@@ -127,9 +148,9 @@ export const ProfilePage = () => {
 
             <div className="space-y-1">
               <h2 className="text-lg font-bold text-white flex items-center space-x-2">
-                <span>{user?.displayName || user?.full_name || 'Farmer Account'}</span>
+                <span>{user?.displayName || user?.full_name || t('header.role_farmer')}</span>
                 <span className="px-2 py-0.5 rounded-full bg-primary/20 text-agri-400 text-[10px] font-semibold uppercase">
-                  {user?.role || 'Farmer'}
+                  {user?.role || t('header.role_farmer')}
                 </span>
               </h2>
               <div className="flex items-center space-x-4 text-xs text-slate-400">
@@ -139,7 +160,7 @@ export const ProfilePage = () => {
                 </span>
                 <span className="flex items-center space-x-1">
                   <MapPin className="w-3.5 h-3.5 text-slate-500" />
-                  <span>{userLoc.village}, {userLoc.district}, {userLoc.state}</span>
+                  <span>{userLoc.village || ''}{userLoc.district ? `, ${userLoc.district}` : ''}{userLoc.state ? `, ${userLoc.state}` : ''}</span>
                 </span>
               </div>
             </div>
@@ -159,29 +180,35 @@ export const ProfilePage = () => {
           <div className="p-3 rounded-xl bg-slate-900/60 border border-slate-800 space-y-1">
             <span className="text-slate-500 text-[10px] block uppercase font-bold flex items-center justify-between">
               <span>{t('profile.location')}</span>
-              <span className="text-agri-400 font-mono text-[9px]">Source: {userLoc.location_source || 'MANUAL'}</span>
+              <span className="text-agri-400 font-mono text-[9px]">
+                {lang === 'mr' ? 'स्रोत' : 'Source'}: {userLoc.location_source || 'MANUAL'}
+              </span>
             </span>
-            <span className="font-semibold text-slate-200 block">Village: {userLoc.village} | Taluka: {userLoc.taluka}</span>
-            <span className="text-slate-400 block text-[11px]">District: {userLoc.district}, {userLoc.state} ({userLoc.pincode})</span>
+            <span className="font-semibold text-slate-200 block">
+              {t('profile.village')}: {userLoc.village || 'N/A'} | {t('profile.taluka')}: {userLoc.taluka || 'N/A'}
+            </span>
+            <span className="text-slate-400 block text-[11px]">
+              {t('profile.district')}: {userLoc.district || 'N/A'}, {userLoc.state || ''} ({userLoc.pincode || 'N/A'})
+            </span>
           </div>
 
           <div className="p-3 rounded-xl bg-slate-900/60 border border-slate-800 space-y-1">
             <span className="text-slate-500 text-[10px] block uppercase font-bold">{t('profile.status')}</span>
             <div className="flex items-center space-x-1 text-emerald-400 font-semibold">
               <CheckCircle className="w-3.5 h-3.5" />
-              <span>Active Verified Farmer</span>
+              <span>{lang === 'mr' ? 'सक्रिय नोंदणीकृत शेतकरी' : 'Active Verified Farmer'}</span>
             </div>
           </div>
 
           <div className="p-3 rounded-xl bg-slate-900/60 border border-slate-800 space-y-1">
             <span className="text-slate-500 text-[10px] block uppercase font-bold">{t('profile.language')}</span>
             <div className="flex items-center justify-between">
-              <span className="text-slate-200 font-semibold">{lang === 'en' ? 'English (EN)' : 'Marathi (मराठी)'}</span>
+              <span className="text-slate-200 font-semibold">{lang === 'en' ? 'English (EN)' : 'मराठी (MR)'}</span>
               <button 
                 onClick={() => setLang(lang === 'en' ? 'mr' : 'en')}
                 className="text-[10px] text-agri-400 hover:underline font-bold"
               >
-                Switch
+                {t('header.toggle_lang') || 'Switch'}
               </button>
             </div>
           </div>
@@ -193,7 +220,9 @@ export const ProfilePage = () => {
         <div className="flex justify-between items-center">
           <div>
             <h2 className="text-base font-bold text-white">{t('profile.farms')}</h2>
-            <p className="text-xs text-slate-400">Manage agricultural land plots and edit individual farm locations</p>
+            <p className="text-xs text-slate-400">
+              {lang === 'mr' ? 'शेताचे प्लॉट व्यवस्थापित करा व शेताचे स्थान बदला' : 'Manage agricultural land plots and edit individual farm locations'}
+            </p>
           </div>
           <button
             onClick={() => setShowAddFarmModal(true)}
@@ -224,17 +253,21 @@ export const ProfilePage = () => {
                       className="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-agri-400 font-bold text-[10px] flex items-center space-x-1 transition border border-slate-700"
                     >
                       <Edit2 className="w-3 h-3" />
-                      <span>Location</span>
+                      <span>{t('profile.location')}</span>
                     </button>
                     <span className="px-2 py-0.5 rounded bg-agri-500/10 text-agri-400 text-[10px] font-bold">
-                      {f.area_acres} Acres
+                      {f.area_acres} {lang === 'mr' ? 'एकर' : 'Acres'}
                     </span>
                   </div>
                 </div>
-                <p className="text-xs text-slate-400">Primary Crops: <strong className="text-slate-200">{f.crop_types}</strong></p>
-                <p className="text-xs text-slate-400">Location: <strong className="text-slate-300">{f.village || 'Kagal'}, {f.taluka || 'Kagal'}, {f.district || 'Kolhapur'}, {f.state || 'Maharashtra'} ({f.pincode || '416216'})</strong></p>
+                <p className="text-xs text-slate-400">
+                  {lang === 'mr' ? 'मुख्य पिके' : 'Primary Crops'}: <strong className="text-slate-200">{f.crop_types}</strong>
+                </p>
+                <p className="text-xs text-slate-400">
+                  {lang === 'mr' ? 'स्थान' : 'Location'}: <strong className="text-slate-300">{f.village || ''}, {f.taluka || ''}, {f.district || ''}, {f.state || ''} {f.pincode ? `(${f.pincode})` : ''}</strong>
+                </p>
                 <div className="flex justify-between items-center text-xs text-slate-500 pt-2 border-t border-slate-800 font-mono text-[10px]">
-                  <span>Source: {f.location_source || 'MANUAL'}</span>
+                  <span>{lang === 'mr' ? 'स्रोत' : 'Source'}: {f.location_source || 'MANUAL'}</span>
                   <span>PIN: {f.pincode || '416216'}</span>
                 </div>
               </div>
@@ -255,7 +288,9 @@ export const ProfilePage = () => {
       {showAddFarmModal && (
         <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="glass-panel p-6 rounded-2xl max-w-lg w-full space-y-4 border border-slate-700 max-h-[90vh] overflow-y-auto">
-            <h3 className="text-lg font-bold text-white">Register Farm Plot & Land Info</h3>
+            <h3 className="text-lg font-bold text-white">
+              {lang === 'mr' ? 'नवीन शेत व जमिनीची माहिती नोंदवा' : 'Register Farm Plot & Land Info'}
+            </h3>
             <form onSubmit={handleAddFarm} className="space-y-3">
               <div>
                 <label className="block text-xs font-medium text-slate-300 mb-1">{t('profile.farm_name')}</label>

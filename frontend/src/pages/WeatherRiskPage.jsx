@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { CloudSun, ShieldAlert, Thermometer, Droplets, CloudRain, HelpCircle, CheckCircle2 } from 'lucide-react';
+import { CloudSun, HelpCircle } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 import { WeatherRiskBadge } from '../components/common/Badge';
 import api from '../services/api';
 
 export const WeatherRiskPage = () => {
+  const { t, translateCrop, lang } = useLanguage();
   const [temp, setTemp] = useState(24.5);
   const [humidity, setHumidity] = useState(82.0);
   const [rainfall, setRainfall] = useState(5.0);
@@ -40,13 +42,13 @@ export const WeatherRiskPage = () => {
       {/* Header */}
       <div>
         <h1 className="text-2xl sm:text-3xl font-extrabold text-white flex items-center space-x-2">
-          <span>Weather Outbreak Risk Simulator</span>
+          <span>{t('weather.title') || 'Weather Outbreak Risk Simulator'}</span>
           <span className="px-2.5 py-0.5 rounded-full bg-agri-500/10 border border-agri-500/30 text-[10px] font-bold text-agri-400 uppercase tracking-wide">
-            Scientific Decision Engine
+            {t('weather.decision_engine') || 'Scientific Decision Engine'}
           </span>
         </h1>
         <p className="text-xs sm:text-sm text-slate-400 mt-1">
-          Evaluate ambient weather parameters against crop-specific pathogen germination thresholds to forecast outbreak probability and explain WHY.
+          {t('weather.subtitle') || 'Evaluate ambient weather parameters against crop-specific pathogen germination thresholds to forecast outbreak probability and explain WHY.'}
         </p>
       </div>
 
@@ -56,25 +58,27 @@ export const WeatherRiskPage = () => {
         <form onSubmit={handleEvaluate} className="glass-panel p-6 rounded-2xl space-y-4">
           <h3 className="text-sm font-bold text-white flex items-center space-x-2">
             <CloudSun className="w-4 h-4 text-agri-400" />
-            <span>Weather & Crop Parameters</span>
+            <span>{t('weather.card_params') || 'Weather & Crop Parameters'}</span>
           </h3>
 
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1">Target Crop</label>
+            <label className="block text-xs font-medium text-slate-300 mb-1">
+              {t('weather.target_crop') || 'Target Crop'}
+            </label>
             <select
               value={crop}
               onChange={(e) => setCrop(e.target.value)}
               className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-200 focus:outline-none focus:border-agri-500 font-semibold"
             >
               {availableCrops.map((c) => (
-                <option key={c} value={c}>{c}</option>
+                <option key={c} value={c}>{translateCrop(c)}</option>
               ))}
             </select>
           </div>
 
           <div>
             <label className="block text-xs font-medium text-slate-300 mb-1 flex justify-between">
-              <span>Ambient Temperature (°C)</span>
+              <span>{t('weather.temp') || 'Ambient Temperature (°C)'}</span>
               <strong className="text-agri-400">{temp}°C</strong>
             </label>
             <input
@@ -90,7 +94,7 @@ export const WeatherRiskPage = () => {
 
           <div>
             <label className="block text-xs font-medium text-slate-300 mb-1 flex justify-between">
-              <span>Relative Humidity (%)</span>
+              <span>{t('weather.humidity') || 'Relative Humidity (%)'}</span>
               <strong className="text-agri-400">{humidity}%</strong>
             </label>
             <input
@@ -106,7 +110,7 @@ export const WeatherRiskPage = () => {
 
           <div>
             <label className="block text-xs font-medium text-slate-300 mb-1 flex justify-between">
-              <span>24h Rainfall (mm)</span>
+              <span>{t('weather.rainfall') || '24h Rainfall (mm)'}</span>
               <strong className="text-agri-400">{rainfall} mm</strong>
             </label>
             <input
@@ -125,7 +129,7 @@ export const WeatherRiskPage = () => {
             disabled={loading}
             className="w-full py-3 rounded-xl bg-agri-500 hover:bg-agri-400 text-slate-950 font-extrabold text-xs transition shadow-lg shadow-agri-500/20"
           >
-            {loading ? 'Evaluating Model...' : 'Calculate Outbreak Risk'}
+            {loading ? (t('weather.simulating') || 'Evaluating Model...') : (t('weather.simulate_btn') || 'Calculate Outbreak Risk')}
           </button>
         </form>
 
@@ -135,7 +139,7 @@ export const WeatherRiskPage = () => {
             <div className="space-y-4">
               <div className="flex items-center justify-between border-b border-slate-800 pb-3">
                 <div>
-                  <span className="text-xs text-slate-400 block">Outbreak Risk Index</span>
+                  <span className="text-xs text-slate-400 block">{t('weather.outbreak_risk') || 'Outbreak Risk Index'}</span>
                   <span className="text-[10px] text-slate-500 font-mono">Target: {riskResult.pathogen}</span>
                 </div>
                 <WeatherRiskBadge level={riskResult.risk_level} />
@@ -143,14 +147,16 @@ export const WeatherRiskPage = () => {
 
               <div className="text-center py-2 bg-slate-900/60 rounded-xl border border-slate-800">
                 <span className="text-4xl font-extrabold text-white">{riskResult.risk_score}</span>
-                <span className="text-xs text-slate-400 block mt-0.5">out of 100 Risk Score</span>
+                <span className="text-xs text-slate-400 block mt-0.5">
+                  {lang === 'mr' ? '१०० पैकी जोखीम गुण' : 'out of 100 Risk Score'}
+                </span>
               </div>
 
               {/* Scientific "Explain WHY" Breakdown */}
               <div className="bg-slate-900/80 p-4 rounded-xl border border-slate-800 space-y-2">
                 <div className="flex items-center space-x-1.5 text-xs font-bold text-agri-400 border-b border-slate-800 pb-2">
                   <HelpCircle className="w-4 h-4" />
-                  <span>Scientific Breakdown — Explain WHY</span>
+                  <span>{t('weather.why_this_risk') || 'Scientific Breakdown — Explain WHY'}</span>
                 </div>
                 <ul className="space-y-2 text-xs text-slate-300 pt-1">
                   {(riskResult.contributing_factors || []).map((f, i) => (
@@ -168,12 +174,18 @@ export const WeatherRiskPage = () => {
             </div>
           ) : (
             <div className="text-center py-16 text-slate-500 text-xs">
-              Select a crop, adjust parameters, and click <strong>"Calculate Outbreak Risk"</strong> to view scientific pathogen transmission forecasts.
+              {lang === 'mr' 
+                ? 'पीक निवडा, हवामान घटक समायोजित करा आणि रोग प्रादुर्भावाचा वैज्ञानिक अंदाज पाहण्यासाठी "रोग प्रादुर्भाव धोका तपासा" वर क्लिक करा.'
+                : 'Select a crop, adjust parameters, and click "Calculate Outbreak Risk" to view scientific pathogen transmission forecasts.'
+              }
             </div>
           )}
 
           <p className="text-[11px] text-slate-500 italic pt-3 border-t border-slate-800">
-            Note: Transparent 7-stage risk evaluation pipeline based on temperature, relative humidity, and rainfall germination thresholds.
+            {lang === 'mr'
+              ? 'टीप: तापमान, सापेक्ष आर्द्रता आणि पाऊस या घटकांवर आधारित पारदर्शक ७-टप्प्यांची मूल्यांकन प्रणाली.'
+              : 'Note: Transparent 7-stage risk evaluation pipeline based on temperature, relative humidity, and rainfall germination thresholds.'
+            }
           </p>
         </div>
 

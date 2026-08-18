@@ -29,17 +29,17 @@ export const RegisterPage = () => {
     setError('');
 
     if (!formData.fullName.trim() || !formData.email.trim() || !formData.password) {
-      setError('Please fill in all required fields.');
+      setError(t('register.err_required') || 'Please fill in all required fields.');
       return;
     }
 
     if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters long.');
+      setError(t('register.password') || 'Password must be at least 6 characters long.');
       return;
     }
 
     if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match. Please verify and try again.');
+      setError(t('register.err_match') || 'Passwords do not match. Please verify and try again.');
       return;
     }
 
@@ -51,7 +51,7 @@ export const RegisterPage = () => {
       await register(formData.email.trim(), formData.password, formData.fullName.trim());
       navigate('/dashboard');
     } catch (err) {
-      setError(err.message || 'Registration failed. Email may already be registered.');
+      setError(err.message || t('login.err_failed') || 'Registration failed. Email may already be registered.');
     } finally {
       setLoading(false);
     }
@@ -66,9 +66,9 @@ export const RegisterPage = () => {
           <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center mx-auto border border-primary/20">
             <UserPlus className="w-6 h-6" />
           </div>
-          <h1 className="text-2xl font-bold text-white">{t('register.title')}</h1>
+          <h1 className="text-2xl font-bold text-white">{t('register.title') || 'Create Farmer Account'}</h1>
           <p className="text-xs text-slate-400">
-            Create your farmer account for disease diagnostics & weather alerts
+            {t('register.subtitle') || 'Create your farmer account for disease diagnostics & weather alerts'}
           </p>
         </div>
 
@@ -83,7 +83,7 @@ export const RegisterPage = () => {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-xs font-medium text-slate-300 mb-1.5">
-              Full Name *
+              {t('register.full_name') || 'Full Name'} *
             </label>
             <input
               type="text"
@@ -98,7 +98,7 @@ export const RegisterPage = () => {
 
           <div>
             <label className="block text-xs font-medium text-slate-300 mb-1.5">
-              {t('register.email')} *
+              {t('register.email') || 'Email Address'} *
             </label>
             <input
               type="email"
@@ -114,7 +114,7 @@ export const RegisterPage = () => {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-medium text-slate-300 mb-1.5">
-                {t('register.password')} *
+                {t('register.password') || 'Password'} *
               </label>
               <input
                 type="password"
@@ -129,7 +129,7 @@ export const RegisterPage = () => {
 
             <div>
               <label className="block text-xs font-medium text-slate-300 mb-1.5">
-                Confirm Password *
+                {t('register.confirm_password') || 'Confirm Password'} *
               </label>
               <input
                 type="password"
@@ -146,7 +146,7 @@ export const RegisterPage = () => {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-medium text-slate-300 mb-1.5">
-                District / City
+                {t('profile.district') || 'District / City'}
               </label>
               <input
                 type="text"
@@ -160,16 +160,16 @@ export const RegisterPage = () => {
 
             <div>
               <label className="block text-xs font-medium text-slate-300 mb-1.5">
-                Preferred Language
+                {t('profile.language') || 'Preferred Language'}
               </label>
               <select
                 name="preferredLanguage"
                 value={formData.preferredLanguage}
                 onChange={handleChange}
-                className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-xs text-white focus:outline-none focus:border-primary"
+                className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-xs text-white focus:outline-none focus:border-primary font-semibold"
               >
                 <option value="en">English (EN)</option>
-                <option value="mr">Marathi (मराठी)</option>
+                <option value="mr">मराठी (MR)</option>
               </select>
             </div>
           </div>
@@ -177,18 +177,18 @@ export const RegisterPage = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 rounded-xl bg-primary hover:bg-agri-700 text-white font-bold text-xs transition shadow-lg shadow-primary/25 flex items-center justify-center space-x-2 disabled:opacity-50"
+            className="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs transition shadow-lg shadow-emerald-500/20 flex items-center justify-center space-x-2 disabled:opacity-50"
           >
             <UserPlus className="w-4 h-4" />
-            <span>{loading ? 'Creating Account...' : t('register.btn_register')}</span>
+            <span>{loading ? (t('register.registering') || 'Creating Account...') : (t('register.submit') || 'Register Account')}</span>
           </button>
         </form>
 
         <div className="text-center pt-2">
           <p className="text-xs text-slate-400">
-            Already have an account?{' '}
+            {t('register.have_account') || 'Already have an account?'}{' '}
             <Link to="/login" className="text-agri-400 hover:underline font-semibold">
-              Login
+              {t('register.sign_in') || 'Login'}
             </Link>
           </p>
         </div>

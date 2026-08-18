@@ -19,6 +19,10 @@ export class ErrorBoundary extends React.Component {
     window.location.reload();
   };
 
+  handleReset = () => {
+    this.setState({ hasError: false, error: null, errorInfo: null });
+  };
+
   handleClearStorage = () => {
     try {
       localStorage.clear();
@@ -29,6 +33,8 @@ export class ErrorBoundary extends React.Component {
 
   render() {
     if (this.state.hasError) {
+      const isMarathi = typeof window !== 'undefined' && localStorage.getItem('agroscan_language') === 'mr';
+
       return (
         <div className="min-h-screen flex items-center justify-center bg-slate-950 p-6 text-slate-100 font-sans">
           <div className="max-w-md w-full bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-2xl text-center space-y-6">
@@ -39,9 +45,14 @@ export class ErrorBoundary extends React.Component {
             </div>
             
             <div>
-              <h2 className="text-xl font-bold text-slate-100">Session Recovered</h2>
+              <h2 className="text-xl font-bold text-slate-100">
+                {isMarathi ? 'सत्र सुरक्षितपणे पुनर्प्राप्त केले' : 'Session Recovered'}
+              </h2>
               <p className="text-slate-400 text-xs sm:text-sm mt-2">
-                AgroScan AI protected your application from a mobile session error. Tap below to reload or reset session.
+                {isMarathi
+                  ? 'AgroScan AI ने ॲप्लिकेशन सुरक्षित ठेवले आहे. पुन्हा लोड करण्यासाठी खालील बटण दाबा.'
+                  : 'AgroScan AI protected your application from a session error. Tap below to reload or reset session.'
+                }
               </p>
             </div>
 
@@ -50,13 +61,13 @@ export class ErrorBoundary extends React.Component {
                 onClick={this.handleReset}
                 className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-xl transition border border-slate-700"
               >
-                Try Again
+                {isMarathi ? 'पुन्हा प्रयत्न करा' : 'Try Again'}
               </button>
               <button
                 onClick={this.handleReload}
                 className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl transition shadow-lg shadow-emerald-900/30"
               >
-                Reload App
+                {isMarathi ? 'ॲप पुन्हा लोड करा' : 'Reload App'}
               </button>
             </div>
 
@@ -65,7 +76,7 @@ export class ErrorBoundary extends React.Component {
                 onClick={this.handleClearStorage}
                 className="text-xs text-slate-400 hover:text-red-400 underline transition"
               >
-                Clear Cache & Reset Session
+                {isMarathi ? 'कॅशे साफ करा आणि रीसेट करा' : 'Clear Cache & Reset Session'}
               </button>
             </div>
           </div>

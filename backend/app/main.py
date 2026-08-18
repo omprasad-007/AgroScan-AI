@@ -111,20 +111,69 @@ async def global_exception_handler(request: Request, exc: Exception):
         }
     )
 
-# Security & Bulletproof CORS Middleware: Preflight, Payload Size & Headers
+from fastapi.responses import JSONResponse, Response
+from collections import defaultdict
+
+# In-memory sliding window rate limiter for expensive third-party endpoints
+RATE_LIMIT_WINDOWS = defaultdict(list)
+RATE_LIMITS = {
+    "/predictions/analyze": (20, 60),    # 20 requests per 60s
+    "/api/v1/predictions/analyze": (20, 60),
+    "/api/predictions/analyze": (20, 60),
+    "/chat": (40, 60),                   # 40 requests per 60s
+    "/api/v1/chat": (40, 60),
+    "/api/chat": (40, 60)
+}
+
+def is_allowed_origin(origin: str) -> bool:
+    if not origin:
+        return True
+    if origin in origins:
+        return True
+    # Allow localhost / 127.0.0.1 and vercel preview domains
+    if origin.startswith("http://localhost:") or origin.startswith("http://127.0.0.1:"):
+        return True
+    if origin.endswith(".vercel.app"):
+        return True
+    return False
+
+# Security & CORS Middleware: Origin Verification, Rate Limiting, Payload Size & Headers
 @app.middleware("http")
 async def security_and_limit_middleware(request: Request, call_next):
     origin = request.headers.get("origin", "")
+    allowed = is_allowed_origin(origin)
 
     # Clean preflight OPTIONS handling to prevent CORS block on browser preflight
     if request.method == "OPTIONS":
         res = Response(status_code=204)
-        if origin:
+        if origin and allowed:
             res.headers["Access-Control-Allow-Origin"] = origin
             res.headers["Access-Control-Allow-Credentials"] = "true"
             res.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH"
             res.headers["Access-Control-Allow-Headers"] = "*"
         return res
+
+    # Endpoint Rate Limiting (scan and chat)
+    path = request.url.path
+    client_ip = request.client.host if request.client else "unknown"
+    for route_prefix, (limit, window_sec) in RATE_LIMITS.items():
+        if path.endswith(route_prefix) or route_prefix in path:
+            key = f"{client_ip}:{route_prefix}"
+            now = time.time()
+            # Clean old timestamps
+            RATE_LIMIT_WINDOWS[key] = [t for t in RATE_LIMIT_WINDOWS[key] if now - t < window_sec]
+            if len(RATE_LIMIT_WINDOWS[key]) >= limit:
+                logger.warning(f"Rate limit hit for IP {client_ip} on {path}")
+                res = JSONResponse(
+                    status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                    content={"detail": "Rate limit exceeded. Please wait a moment before sending more requests."}
+                )
+                if origin and allowed:
+                    res.headers["Access-Control-Allow-Origin"] = origin
+                    res.headers["Access-Control-Allow-Credentials"] = "true"
+                return res
+            RATE_LIMIT_WINDOWS[key].append(now)
+            break
 
     # Check max content length to protect against OOM / DoS
     content_length = request.headers.get("content-length")
@@ -136,7 +185,7 @@ async def security_and_limit_middleware(request: Request, call_next):
                     status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
                     content={"detail": f"Payload size exceeds the maximum limit of {settings.MAX_UPLOAD_SIZE_MB}MB."}
                 )
-                if origin:
+                if origin and allowed:
                     res.headers["Access-Control-Allow-Origin"] = origin
                     res.headers["Access-Control-Allow-Credentials"] = "true"
                 return res
@@ -145,8 +194,8 @@ async def security_and_limit_middleware(request: Request, call_next):
 
     response = await call_next(request)
     
-    # Guarantee CORS Headers on all responses (including 4xx/5xx errors)
-    if origin:
+    # Guarantee CORS Headers on authorized origins
+    if origin and allowed:
         response.headers["Access-Control-Allow-Origin"] = origin
         response.headers["Access-Control-Allow-Credentials"] = "true"
         response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH"

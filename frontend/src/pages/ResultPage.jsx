@@ -2,14 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { 
   CheckCircle2, 
-  AlertTriangle, 
   ShieldCheck, 
-  CloudSun, 
-  Sparkles, 
   Bot, 
   ArrowLeft,
   FileText,
-  MapPin,
   Calendar
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
@@ -19,7 +15,7 @@ import api from '../services/api';
 
 export const ResultPage = () => {
   const { scanId } = useParams();
-  const { t } = useLanguage();
+  const { t, translateCrop, translateDisease, translateSeverity, formatDate } = useLanguage();
   const [scan, setScan] = useState(null);
   const [recommendation, setRecommendation] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -35,18 +31,18 @@ export const ResultPage = () => {
         setScan(scRes.data);
         setRecommendation(recRes.data);
       } catch (err) {
-        setError('Diagnostic report not found.');
+        setError(t('result.not_found') || 'Diagnostic report not found.');
       } finally {
         setLoading(false);
       }
     };
     fetchReport();
-  }, [scanId]);
+  }, [scanId, t]);
 
   if (loading) {
     return (
       <div className="text-center py-20 text-slate-400 text-sm animate-pulse">
-        Generating diagnostic report & calculating leaf lesion severity...
+        {t('result.generating') || 'Generating diagnostic report & calculating leaf lesion severity...'}
       </div>
     );
   }
@@ -54,13 +50,22 @@ export const ResultPage = () => {
   if (error || !scan) {
     return (
       <div className="text-center py-12">
-        <p className="text-red-400 text-sm mb-4">{error || 'Report not available.'}</p>
-        <Link to="/scan" className="text-xs text-agri-400 hover:underline">Return to Scan Page</Link>
+        <p className="text-red-400 text-sm mb-4">{error || t('result.not_found') || 'Report not available.'}</p>
+        <Link to="/scan" className="text-xs text-agri-400 hover:underline">
+          {t('result.return_to_scan') || 'Return to Scan Page'}
+        </Link>
       </div>
     );
   }
 
-  const formattedDate = scan.created_at ? new Date(scan.created_at).toLocaleDateString() : new Date().toLocaleDateString();
+  const rawCrop = scan.plant || scan.crop_detected || 'Crop';
+  const rawDisease = scan.disease || scan.disease_name || 'Healthy';
+  const rawSeverity = scan.severity || scan.severity_level || 'Normal';
+
+  const displayCrop = translateCrop(rawCrop);
+  const displayDisease = translateDisease(rawDisease);
+  const displaySeverity = translateSeverity(rawSeverity);
+  const formattedDate = formatDate(scan.created_at || new Date());
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -69,12 +74,12 @@ export const ResultPage = () => {
       <div className="flex items-center justify-between">
         <Link to="/dashboard" className="flex items-center space-x-1.5 text-xs text-slate-400 hover:text-white transition">
           <ArrowLeft className="w-4 h-4" />
-          <span>Back to Dashboard</span>
+          <span>{t('result.back_to_dashboard') || 'Back to Dashboard'}</span>
         </Link>
         <div className="flex items-center space-x-2">
           {scan.is_demo && (
             <span className="px-2.5 py-1 rounded bg-amber-500/10 border border-amber-500/30 text-amber-400 text-[10px] font-bold uppercase tracking-wider">
-              Demo Inference Result
+              {t('result.demo_badge') || 'Demo Inference Result'}
             </span>
           )}
         </div>
@@ -87,16 +92,16 @@ export const ResultPage = () => {
         <div className="border-b border-slate-800 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <div className="flex items-center space-x-2 text-xs font-semibold text-emerald-400 uppercase tracking-wider">
-              <span>{scan.plant || scan.crop_detected}</span>
+              <span>{displayCrop}</span>
               {scan.scientific_name && scan.scientific_name !== 'N/A' && (
                 <span className="text-slate-400 italic lowercase font-normal">({scan.scientific_name})</span>
               )}
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-white mt-0.5">{scan.disease || scan.disease_name}</h1>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-white mt-0.5">{displayDisease}</h1>
             <div className="flex items-center space-x-4 text-xs text-slate-400 mt-2">
               <span className="flex items-center space-x-1">
                 <Calendar className="w-3.5 h-3.5 text-slate-500" />
-                <span>Date: {formattedDate}</span>
+                <span>{t('result.date') || 'Date'}: {formattedDate}</span>
               </span>
             </div>
           </div>
@@ -119,12 +124,12 @@ export const ResultPage = () => {
           <div className="bg-slate-900/60 p-4 rounded-xl border border-slate-800">
             <span className="text-xs text-slate-400 block">{t('result.severity')}</span>
             <span className="text-xl font-bold text-amber-400 mt-1 block">
-              {scan.severity_percentage || 0}% ({scan.severity || scan.severity_level || 'Normal'})
+              {scan.severity_percentage || 0}% ({displaySeverity})
             </span>
           </div>
 
           <div className="bg-slate-900/60 p-4 rounded-xl border border-slate-800">
-            <span className="text-xs text-slate-400 block">Affected Leaf Area</span>
+            <span className="text-xs text-slate-400 block">{t('result.affected_area')}</span>
             <span className="text-xl font-bold text-white mt-1 block">
               {scan.affected_area || scan.affected_area_cm2 || 0} cm²
             </span>
@@ -173,11 +178,11 @@ export const ResultPage = () => {
 
       </div>
 
-      {/* Auto-Embedded AI Assistant Panel (Phase 9.2) */}
+      {/* Auto-Embedded AI Assistant Panel */}
       <div className="space-y-3 pt-2">
         <h2 className="text-lg font-extrabold text-white flex items-center space-x-2">
           <Bot className="w-5 h-5 text-emerald-400" />
-          <span>AgroScan AI Agronomist Chat</span>
+          <span>{t('result.chat_title') || 'AgroScan AI Agronomist Chat'}</span>
         </h2>
         <AIAssistantPanel scanData={scan} predictionId={scan.id} autoOpen={true} />
       </div>
@@ -185,4 +190,3 @@ export const ResultPage = () => {
     </div>
   );
 };
-

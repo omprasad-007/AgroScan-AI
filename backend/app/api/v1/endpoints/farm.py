@@ -13,17 +13,17 @@ def create_farm(farm_in: FarmCreate, db: Session = Depends(get_db), current_user
     farm = Farm(
         user_id=current_user.id,
         name=farm_in.name,
-        village=farm_in.village or current_user.village or "Kagal",
-        taluka=farm_in.taluka or current_user.taluka or "Kagal",
-        district=farm_in.district or current_user.district or "Kolhapur",
-        state=farm_in.state or current_user.state or "Maharashtra",
-        pincode=farm_in.pincode or current_user.pincode or "416216",
-        latitude=farm_in.latitude,
-        longitude=farm_in.longitude,
+        village=farm_in.village or current_user.village,
+        taluka=farm_in.taluka or current_user.taluka,
+        district=farm_in.district or current_user.district,
+        state=farm_in.state or current_user.state,
+        pincode=farm_in.pincode or current_user.pincode,
+        latitude=farm_in.latitude or current_user.latitude,
+        longitude=farm_in.longitude or current_user.longitude,
         location_source=farm_in.location_source or "MANUAL",
         gps_accuracy=farm_in.gps_accuracy,
-        crop_types=farm_in.crop_types or "Tomato, Potato, Sugarcane",
-        area_acres=farm_in.area_acres or 2.5,
+        crop_types=farm_in.crop_types or "General Crops",
+        area_acres=farm_in.area_acres or 1.0,
         irrigation_type=farm_in.irrigation_type or "Drip Irrigation"
     )
     db.add(farm)

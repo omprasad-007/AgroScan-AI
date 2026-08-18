@@ -1,9 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Body
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.core.security import verify_password, get_password_hash, create_access_token
 from app.models.all_models import User
-from app.schemas.schemas import UserRegister, UserLogin, FirebaseLoginRequest, TokenResponse, UserResponse
+from app.schemas.schemas import UserRegister, UserLogin, FirebaseLoginRequest, TokenResponse, UserResponse, UserUpdate
 from app.api.deps import get_current_user
 
 router = APIRouter()
@@ -85,5 +85,21 @@ def firebase_login(user_in: FirebaseLoginRequest, db: Session = Depends(get_db))
 
 @router.get("/me", response_model=UserResponse)
 def get_me(current_user: User = Depends(get_current_user)):
+    return current_user
+
+@router.patch("/profile", response_model=UserResponse)
+@router.patch("/me", response_model=UserResponse)
+def update_profile(
+    user_update: UserUpdate = Body(...),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    update_data = user_update.model_dump(exclude_unset=True)
+    for field, val in update_data.items():
+        if hasattr(current_user, field) and val is not None:
+            setattr(current_user, field, val)
+
+    db.commit()
+    db.refresh(current_user)
     return current_user
 

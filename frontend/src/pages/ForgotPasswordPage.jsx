@@ -16,7 +16,7 @@ export const ForgotPasswordPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!email.trim()) {
-      setErrorMsg('Please enter your email address.');
+      setErrorMsg(t('login.err_required') || 'Please enter your email address.');
       return;
     }
 
@@ -26,7 +26,7 @@ export const ForgotPasswordPage = () => {
 
     try {
       await resetPassword(email.trim());
-      setSuccessMsg('Password reset email sent! Check your inbox for reset instructions.');
+      setSuccessMsg(t('forgot.success') || 'Password reset email sent! Check your inbox for reset instructions.');
       setEmail('');
     } catch (err) {
       setErrorMsg(err.message || 'Failed to send password reset email.');
@@ -39,7 +39,7 @@ export const ForgotPasswordPage = () => {
     <div className="max-w-md mx-auto py-12 space-y-6">
       <Link to="/login" className="inline-flex items-center space-x-2 text-xs font-semibold text-slate-400 hover:text-white transition">
         <ArrowLeft className="w-4 h-4" />
-        <span>Back to Login</span>
+        <span>{t('forgot.back_to_login') || 'Back to Sign In'}</span>
       </Link>
 
       <div className="glass-panel p-8 rounded-2xl space-y-6">
@@ -47,9 +47,9 @@ export const ForgotPasswordPage = () => {
           <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center mx-auto border border-primary/20">
             <Mail className="w-6 h-6" />
           </div>
-          <h1 className="text-2xl font-bold text-white">Reset Password</h1>
+          <h1 className="text-2xl font-bold text-white">{t('forgot.title') || 'Reset Your Password'}</h1>
           <p className="text-xs text-slate-400">
-            Enter your registered email address and we will send you a link to reset your password.
+            {t('forgot.subtitle') || 'Enter your registered email address and we will send you a link to reset your password.'}
           </p>
         </div>
 
@@ -70,7 +70,7 @@ export const ForgotPasswordPage = () => {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-xs font-medium text-slate-300 mb-1.5">
-              Email Address
+              {t('login.email') || 'Email Address'}
             </label>
             <input
               type="email"
@@ -85,15 +85,15 @@ export const ForgotPasswordPage = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 rounded-xl bg-primary hover:bg-agri-700 text-white font-bold text-xs transition shadow-lg shadow-primary/25 disabled:opacity-50"
+            className="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs transition shadow-lg shadow-emerald-500/25 disabled:opacity-50"
           >
-            {loading ? 'Sending Link...' : 'Send Reset Link'}
+            {loading ? (t('common.loading') || 'Sending Link...') : (t('forgot.submit') || 'Send Reset Link')}
           </button>
         </form>
 
         <div className="text-center pt-2">
           <Link to="/login" className="text-xs text-agri-400 hover:underline">
-            Remembered your password? Login
+            {t('forgot.back_to_login') || 'Back to Sign In'}
           </Link>
         </div>
       </div>
