@@ -245,6 +245,10 @@ def root():
         "demo_mode": settings.DEMO_MODE
     }
 
+@app.get("/health")
+def health():
+    return {"status": "ok", "service": "agroscan-ai-backend"}
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("app.main:app", host="0.0.0.0", port=settings.PORT, reload=settings.DEBUG)

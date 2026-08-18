@@ -34,4 +34,4 @@ services:
       - key: WEATHER_API_KEY
         sync: false
       - key: FRONTEND_URL
-        value: https://agroscan-ai.vercel.app
+        value: https://agro-scan-ai-nine.vercel.app

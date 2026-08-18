@@ -1,7 +1,13 @@
 import axios from 'axios';
 
+const rawApiUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1';
+// Ensure base URL points to /api/v1 without duplicate trailing paths
+const normalizedBaseUrl = rawApiUrl.endsWith('/api/v1') 
+  ? rawApiUrl 
+  : rawApiUrl.replace(/\/+$/, '') + (rawApiUrl.includes('/api') ? '' : '/api/v1');
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1',
+  baseURL: normalizedBaseUrl,
   timeout: 15000,
   headers: {
     'Content-Type': 'application/json',
