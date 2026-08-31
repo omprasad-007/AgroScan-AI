@@ -125,6 +125,29 @@ RATE_LIMITS = {
     "/api/chat": (40, 60)
 }
 
+# Configure Allowed Origins for CORS
+origins = list(set([
+    "https://agro-scan-ai-nine.vercel.app",
+    "http://localhost:5173",
+    "http://localhost:3000",
+    "http://127.0.0.1:5173",
+    "http://127.0.0.1:3000",
+    *(settings.ALLOWED_ORIGINS or [])
+]))
+if settings.FRONTEND_URL and settings.FRONTEND_URL not in origins:
+    origins.append(settings.FRONTEND_URL)
+
+# Configure Starlette CORSMiddleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_origin_regex=r"^https?://.*\.vercel\.app$|^http://(localhost|127\.0\.0\.1)(:\d+)?$",
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH", "HEAD"],
+    allow_headers=["*"],
+    expose_headers=["*"]
+)
+
 def is_allowed_origin(origin: str) -> bool:
     if not origin:
         return True
@@ -137,21 +160,15 @@ def is_allowed_origin(origin: str) -> bool:
         return True
     return False
 
-# Security & CORS Middleware: Origin Verification, Rate Limiting, Payload Size & Headers
+# Security & Rate Limiting Middleware
 @app.middleware("http")
 async def security_and_limit_middleware(request: Request, call_next):
+    # Allow CORSMiddleware to handle OPTIONS preflight cleanly
+    if request.method == "OPTIONS":
+        return await call_next(request)
+
     origin = request.headers.get("origin", "")
     allowed = is_allowed_origin(origin)
-
-    # Clean preflight OPTIONS handling to prevent CORS block on browser preflight
-    if request.method == "OPTIONS":
-        res = Response(status_code=204)
-        if origin and allowed:
-            res.headers["Access-Control-Allow-Origin"] = origin
-            res.headers["Access-Control-Allow-Credentials"] = "true"
-            res.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH"
-            res.headers["Access-Control-Allow-Headers"] = "*"
-        return res
 
     # Endpoint Rate Limiting (scan and chat)
     path = request.url.path
@@ -193,13 +210,6 @@ async def security_and_limit_middleware(request: Request, call_next):
             pass
 
     response = await call_next(request)
-    
-    # Guarantee CORS Headers on authorized origins
-    if origin and allowed:
-        response.headers["Access-Control-Allow-Origin"] = origin
-        response.headers["Access-Control-Allow-Credentials"] = "true"
-        response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH"
-        response.headers["Access-Control-Allow-Headers"] = "*"
 
     # Inject Security HTTP Headers
     response.headers["X-Content-Type-Options"] = "nosniff"
@@ -207,23 +217,6 @@ async def security_and_limit_middleware(request: Request, call_next):
     response.headers["X-XSS-Protection"] = "1; mode=block"
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
     return response
-
-# Configure Starlette CORSMiddleware as fallback
-origins = settings.ALLOWED_ORIGINS.copy()
-if settings.FRONTEND_URL and settings.FRONTEND_URL not in origins:
-    origins.append(settings.FRONTEND_URL)
-
-if "https://agro-scan-ai-nine.vercel.app" not in origins:
-    origins.append("https://agro-scan-ai-nine.vercel.app")
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
-    allow_headers=["*"],
-    expose_headers=["*"]
-)
 
 # Serve uploaded leaf images statically
 os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
