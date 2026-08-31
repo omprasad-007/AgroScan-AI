@@ -26,6 +26,7 @@ api_router.include_router(scan.router, prefix="/predictions", tags=["Predictions
 api_router.include_router(weather.router, prefix="/weather", tags=["Weather"])
 api_router.include_router(recommendations.router, prefix="/recommendations", tags=["Recommendations"])
 api_router.include_router(chat.router, prefix="/chat", tags=["AI Chatbot"])
+api_router.include_router(chat.router, prefix="/assistant", tags=["Assistant Advisory & Research"])
 api_router.include_router(analytics.router, prefix="/analytics", tags=["Analytics"])
 api_router.include_router(admin.router, prefix="/admin", tags=["Admin"])
 api_router.include_router(crop_guides.router, prefix="/crop-guides", tags=["Crop Cultivation Guides"])

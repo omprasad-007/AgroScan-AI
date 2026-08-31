@@ -1,0 +1,31 @@
+[tool.pyrefly]
+venv = ".venv"
+search_paths = [
+    "backend",
+    "backend/app",
+    ".venv/Lib/site-packages"
+]
+source_roots = [
+    "backend",
+    "backend/app"
+]
+project_roots = [
+    "backend"
+]
+
+[tool.pyright]
+venvPath = "."
+venv = ".venv"
+extraPaths = [
+    "backend",
+    "backend/app",
+    ".venv/Lib/site-packages"
+]
+executionEnvironments = [
+  { "root": "backend", "extraPaths": ["backend", "backend/app", ".venv/Lib/site-packages"] }
+]
+
+[tool.pytest.ini_options]
+pythonpath = [
+  "backend"
+]

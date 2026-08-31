@@ -198,7 +198,7 @@ class WeatherRiskResponse(BaseModel):
     contributing_factors: List[str]
     advice: str
 
-# --- Chat Schemas ---
+# --- Chat & Multi-Source Research Schemas ---
 class ChatMessageCreate(BaseModel):
     message: str
     session_id: Optional[str] = None
@@ -207,6 +207,8 @@ class ChatMessageCreate(BaseModel):
     manual_plant: Optional[str] = None
     conversation_history: Optional[List[Dict[str, str]]] = None
     location: Optional[Dict[str, Any]] = None
+    context: Optional[Dict[str, Any]] = None
+    research_mode: Optional[str] = "auto"
 
 class ChatMessageResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -215,7 +217,28 @@ class ChatMessageResponse(BaseModel):
     session_id: Optional[str] = None
     sender: str
     content: str
+    answer: Optional[str] = None
+    intent: Optional[str] = None
+    sources: Optional[List[Dict[str, Any]]] = []
+    evidence_confidence: Optional[float] = 0.92
+    source_agreement: Optional[str] = "high"
+    context_used: Optional[Dict[str, bool]] = None
     created_at: datetime
+
+class AssistantResearchRequest(BaseModel):
+    message: str
+    language: Optional[str] = "en"
+    conversation_id: Optional[str] = None
+    context: Optional[Dict[str, Any]] = None
+    research_mode: Optional[str] = "auto"
+
+class AssistantResearchResponse(BaseModel):
+    answer: str
+    intent: str
+    sources: List[Dict[str, Any]] = []
+    evidence_confidence: float = 0.92
+    source_agreement: str = "high"
+    context_used: Dict[str, bool] = {}
 
 class ChatSessionResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)

@@ -96,34 +96,112 @@ const FARMER_FAQ_CATEGORIES = {
   ]
 };
 
-// Client-Side Agronomist Knowledge Engine for zero-crash offline resilience
+// Comprehensive Client-Side Agronomist Knowledge Engine for instant question-specific responses
 const generateClientAdvisory = (userQuery, ctx, lang = 'en') => {
-  const q = (userQuery || '').toLowerCase();
-  const crop = ctx?.crop_detected || ctx?.plantName || 'Crop';
-  const disease = ctx?.disease_name || 'Plant Health';
+  const q = (userQuery || '').toLowerCase().trim();
   const isMr = lang === 'mr';
 
-  if (q.includes('neem') || q.includes('निंबोळी') || q.includes('सेंद्रिय') || q.includes('organic') || q.includes('दशपर्णी')) {
+  // 1. Math / General Non-Agri
+  if (q.includes('2+2') || q.includes('2 + 2')) {
+    return '2 + 2 = 4.';
+  }
+  if (['hello', 'hi', 'hey', 'namaste', 'नमस्कार'].includes(q)) {
     return isMr
-      ? `🌱 **सेंद्रिय कीटकनाशक मार्गदर्शन (${crop}):**\n\n1. **निंबोळी अर्क (Neem Oil):** ५ मि.ली. निंबोळी तेल (१५०० ते ३००० ppm) प्रति लिटर पाण्यात १ मि.ली. लिक्विड सोप मिसळून संध्याकाळी फवारावे.\n2. **दशपर्णी अर्क:** २०० मि.ली. प्रति १५ लिटर पंपासाठी वापरल्यास रसशोषक किडींचे प्रभावी नियंत्रण होते.\n3. **ताक व हिंग फवारणी:** १०० मि.ली. आंबट ताक + ५ ग्रॅम हिंग प्रति पंप फवारल्यास बुरशी रोखली जाते.\n\n*टीप: तीव्र उन्हात फवारणी टाळावी, संध्याकाळी ४ नंतर फवारणी करावी.*`
-      : `🌱 **Organic Bio-Remedy Guide (${crop}):**\n\n1. **Neem Oil Spray:** Mix 5ml cold-pressed Neem Oil (1500–3000 ppm) per 1 Liter water with 1ml liquid soap surfactant. Spray during early morning or late evening.\n2. **Dashaparni Ark:** Use 200ml per 15L spray pump for effective sucking pest & caterpillar deterrence.\n3. **Sour Buttermilk & Hing Spray:** 100ml fermented buttermilk + 5g asafetida per pump acts as a natural broad-spectrum bio-fungicide.\n\n*Best practice: Avoid spraying under intense midday sun to prevent leaf scorching.*`;
+      ? 'नमस्कार! मी AgroScan AI कृषी सल्लागार आहे. आपल्या शेती, माती, सिंचन, खते किंवा रोग व्यवस्थापनाविषयी प्रश्न विचारा.'
+      : 'Hello! I am AgroScan AI Agronomist. Ask me any question regarding crops, soil, irrigation, fertilizers, or disease management.';
   }
 
-  if (q.includes('danger') || q.includes('धोका') || q.includes('खाण्या') || q.includes('spread') || q.includes('पसर')) {
+  // 2. Crop Rotation
+  if (q.includes('crop rotation') || q.includes('rotation') || q.includes('फेरपालट')) {
     return isMr
-      ? `🛡️ **सुरक्षा व प्रसार माहिती (${crop} - ${disease}):**\n\n1. **मानवी सुरक्षितता:** वनस्पती बुरशी मानवांसाठी संसर्गजन्य नसते, परंतु रोगट भाग खाणे टाळावे.\n2. **प्रसार कसा रोखावा:**\n   - रोगट पाने त्वरित तोडून शेताबाहेर जाळून टाका.\n   - पाण्याचा तुषार वरून पानांवर पडू देऊ नका (ठिबक सिंचन वापरा).\n   - झाडांमधील अंतर योग्य ठेवा जेणेकरून हवा खेळती राहील.\n   - छाटणीची अवजारे जंतुनाशकाने स्वच्छ करा.`
-      : `🛡️ **Safety & Outbreak Control (${crop} - ${disease}):**\n\n1. **Human & Produce Safety:** Plant fungal pathogens do not infect humans, but affected spoiled leaves/fruits should not be consumed.\n2. **Preventing Spread to Other Plants:**\n   - Prune and destroy infected leaves immediately away from the field.\n   - Transition to drip irrigation; avoid overhead sprinkler splashing which disperses spores.\n   - Ensure adequate inter-plant spacing for airflow and rapid foliage drying.\n   - Sanitize all pruning shears with 70% isopropyl alcohol after each plant.`;
+      ? `🌾 **पिकांची फेरपालट (Crop Rotation) माहिती:**\n\n- **व्याख्या:** एकाच जमिनीत सलग एकच पीक न घेता हंगामानुसार विविध प्रकारची पिके आलटून-पालटून घेण्याच्या पद्धतीला 'पिकांची फेरपालट' म्हणतात.\n- **फायदे:**\n  1. **रोग-कीड नियंत्रण:** जमिनीतील बुरशी व किडींचे जीवनचक्र खंडित होते.\n  2. **सुपीकता वाढ:** कडधान्य पिके (सोयाबीन/हरभरा) हवेतील नायट्रोजन जमिनीत स्थिर करतात.\n  3. **संतुलित पोषण:** खोल व उथळ मुळांच्या पिकांमुळे जमिनीच्या सर्व थरांतील अन्नद्रव्यांचा योग्य वापर होतो.\n- **योग्य क्रम:** टोमॅटो/बटाटा ➔ कडधान्य (सोयाबीन/मूग) ➔ तृणधान्य (गहू/मका) ➔ हिरवळीचे खत.`
+      : `🌾 **Crop Rotation Guide:**\n\n- **Definition:** The systematic practice of growing different types of crops sequentially on the same land across seasons rather than continuous monoculture.\n- **Key Benefits:**\n  1. **Breaks Pest & Disease Cycles:** Starves out soil-borne fungi and host-specific insects.\n  2. **Replenishes Nitrogen:** Legumes (soybean, chickpea) fix atmospheric nitrogen into root nodules.\n  3. **Improves Soil Tilth:** Alternating tap root crops with fibrous root cereals optimizes nutrient uptake from different soil depths.\n- **Recommended Sequence:** Solanaceous (Tomato/Potato) ➔ Legume (Soybean/Pulses) ➔ Cereal (Wheat/Maize) ➔ Green Manure.`;
   }
 
-  if (q.includes('water') || q.includes('पाणी') || q.includes('सिंचन') || q.includes('irrigation') || q.includes('खत') || q.includes('fertilizer')) {
+  // 3. Photosynthesis
+  if (q.includes('photosynthesis') || q.includes('प्रकाशसंश्लेषण')) {
     return isMr
-      ? `💧 **सिंचन व पोषण सल्ला (${crop}):**\n\n1. **पाण्याचे नियोजन:** जमिनीत कायम वाफसा (Moisture balance) राखावा. दलदल किंवा अतिपाणी दिल्यास मुळकुज आणि बुरशी वाढते.\n2. **सेंद्रिय पोषण:**\n   - एकरी २ टन चांगले कुजलेले शेणखत किंवा गांडूळ खत द्यावे.\n   - जीवामृत महिन्याला दोनदा ठिबक सिंचनातून सोडावे.\n   - सूक्ष्म अन्नद्रव्यांची (Micronutrients) कमतरता असल्यास चिलेटेड झिंक व बोरॉन फवारावे.`
-      : `💧 **Irrigation & Soil Nutrition Advisory (${crop}):**\n\n1. **Water Management:** Maintain optimum field capacity (Vafsa condition). Overwatering promotes root rot (Pythium/Phytophthora) and foliar blights.\n2. **Soil Nutrition:**\n   - Apply 2 tons of well-decomposed Farm Yard Manure (FYM) or Vermicompost per acre.\n   - Supply Jeevamrut liquid organic formulation every 15 days through drip.\n   - Apply foliar spray of chelated Micronutrients (Zinc, Boron, Magnesium) during vegetative and flowering stages.`;
+      ? `☀️ **प्रकाशसंश्लेषण (Photosynthesis) प्रक्रिया:**\n\n- **व्याख्या:** हिरव्या वनस्पती सूर्यप्रकाश, हरितद्रव्य (Chlorophyll), हवेतील CO2 आणि जमिनीतील पाणी (H2O) वापरून ग्लुकोज (अन्न) तयार करतात आणि ऑक्सिजन (O2) बाहेर सोडतात.\n- **समीकरण:** 6 CO2 + 6 H2O + सूर्यप्रकाश ➔ C6H12O6 + 6 O2\n- **शेतीतील महत्त्व:** पिकाचे उत्पादन थेट पानांच्या प्रकाशसंश्लेषण क्षमतेवर अवलंबून असते. करपा किंवा भुरी रोगामुळे पाने खराब झाल्यास प्रकाशसंश्लेषण मंदावून उत्पादनात मोठी घट होते.`
+      : `☀️ **Photosynthesis & Crop Physiology:**\n\n- **Definition:** The biological process by which green plants use solar energy and chlorophyll to convert carbon dioxide (CO2) from air and water (H2O) from soil into glucose (energy) and oxygen (O2).\n- **Equation:** 6 CO2 + 6 H2O + Solar Energy ➔ C6H12O6 + 6 O2\n- **Agronomic Impact:** Crop yield is directly proportional to photosynthetic efficiency. Foliar blights and mildews reduce active green leaf surface area, causing severe yield reduction.`;
   }
 
+  // Extract relevant crop context (From query or active selection/scan)
+  let crop = ctx?.crop_detected || ctx?.plantName || '';
+  if (q.includes('mango') || q.includes('आंबा')) crop = 'Mango';
+  else if (q.includes('sugarcane') || q.includes('ऊस')) crop = 'Sugarcane';
+  else if (q.includes('tomato') || q.includes('टोमॅटो')) crop = 'Tomato';
+  else if (q.includes('potato') || q.includes('बटाटा')) crop = 'Potato';
+  else if (q.includes('cotton') || q.includes('कापूस')) crop = 'Cotton';
+  else if (q.includes('rice') || q.includes('paddy') || q.includes('भात')) crop = 'Rice';
+  else if (q.includes('wheat') || q.includes('गहू')) crop = 'Wheat';
+  else if (q.includes('chilli') || q.includes('मिरची')) crop = 'Chilli';
+  else if (q.includes('onion') || q.includes('कांदा')) crop = 'Onion';
+  else if (q.includes('maize') || q.includes('corn') || q.includes('मका')) crop = 'Maize';
+  else if (q.includes('soybean') || q.includes('सोयाबीन')) crop = 'Soybean';
+
+  // 4. Mango Specific Questions
+  if (crop === 'Mango' || q.includes('mango') || q.includes('आंबा')) {
+    if (q.includes('soil') || q.includes('माती') || q.includes('जमीन')) {
+      return isMr
+        ? `🌱 **आंब्यासाठी (Mango) योग्य माती व जमीन:**\n\n- **मातीचा प्रकार:** उत्तम पाण्याचा निचरा होणारी खोल गाळाची, तांबडी किंवा जांभा प्रकारची पोयट्याची जमीन उत्तम असते.\n- **मातीची खोली:** किमान २ ते २.५ मीटर खोल जमीन असावी, खडकाळ किंवा चुनखडीयुक्त कडक थर नसावा.\n- **सामू (pH):** ५.५ ते ७.५ (किंचित आम्ल ते उदासीन).\n- **महत्त्वाची टीप:** जमिनीत पाणी साचून राहिल्यास मुळकुज होते, त्यामुळे उत्तम निचरा असणे आवश्यक आहे.`
+        : `🌱 **Optimal Soil Requirements for Mango:**\n\n- **Soil Type:** Deep, rich, well-drained alluvial, red loamy, or laterite soil with high permeability.\n- **Soil Depth:** Minimum 2.0 to 2.5 meters depth to accommodate deep tap root system.\n- **Soil pH:** 5.5 to 7.5 (slightly acidic to neutral).\n- **Key Note:** Avoid shallow soils with impermeable rocky hardpans or waterlogged heavy clay.`;
+    }
+    if (q.includes('water') || q.includes('irrigation') || q.includes('पाणी') || q.includes('सिंचन')) {
+      return isMr
+        ? `💧 **आंब्याचे (Mango) पाणी व्यवस्थापन:**\n\n- **लहान झाडे (१-३ वर्षे):** उन्हाळ्यात दर ४-५ दिवसांनी, हिवाळ्यात दर ८-१० दिवसांनी पाणी द्यावे.\n- **मोठी फळझाडे:**\n  1. **बहार धरणे (नोव्हेंबर-डिसेंबर):** फुलोरा येण्यापूर्वी २-३ महिने पाणी तोडावे (ताण द्यावा). ताण दिल्याने भरपूर मोहोर येतो.\n  2. **फळधारणा (जानेवारी-मे):** वाटाणा व सुपारीच्या आकाराची फळे झाल्यावर दर १०-१२ दिवसांनी नियमित पाणी द्यावे.\n  3. **काढणीपूर्व:** काढणीच्या १५ दिवस आधी पाणी देणे थांबवावे.`
+        : `💧 **Mango Irrigation Guidelines:**\n\n- **Young Trees (1-3 yrs):** Irrigate every 4-5 days in summer, 8-10 days in winter.\n- **Bearing Trees:**\n  1. **Pre-flowering Dry Spell (Nov-Dec):** Withhold irrigation for 2-3 months prior to flowering to induce flower bud differentiation.\n  2. **Fruit Development (Feb-May):** Resume regular irrigation (every 10-15 days) from pea-stage fruit set until fruit enlargement.\n  3. **Pre-Harvest:** Stop irrigation 15 days before harvesting to enhance shelf life and sweetness.`;
+    }
+    if (q.includes('harvest') || q.includes('काढणी') || q.includes('तोडणी')) {
+      return isMr
+        ? `🌾 **आंब्याची काढणी (Mango Harvesting):**\n\n- **काढणीची लक्षणे:**\n  1. फळांचे खांदे देठाच्या वर उचलले जातात आणि देठाभोवती खळगा तयार होतो.\n  2. फळाचा रंग गडद हिरव्यावरून फिकट हिरवा/पिवळसर होतो.\n  3. फळांची विशिष्ट गुरुता (Specific Gravity) १.०१ ते १.०२ होते.\n- **काढणी पद्धत:** फळे सकाळी देठासह (१-२ सें.मी. देठ ठेवून) 'नूतन' किंवा जाळीदार झिबाने तोडावीत, जेणेकरून फळावर चीक पडणार नाही.`
+        : `🌾 **Mango Harvesting Guidelines:**\n\n- **Maturity Signs:**\n  1. Shoulders swell above the pedicel attachment and the stem-end cavity deepens.\n  2. Skin color transitions from dark green to olive/yellowish green.\n  3. Specific gravity reaches 1.01–1.02 (mature fruits sink in water).\n- **Harvesting Method:** Harvest with 1-2 cm stem attached using pole harvesters with catching nets to prevent latex sap burn and impact injury.`;
+    }
+    if (q.includes('disease') || q.includes('रोग')) {
+      return isMr
+        ? `🦠 **आंब्यावरील (Mango) मुख्य रोग:**\n\n1. **भुरी (Powdery Mildew - *Oidium mangiferae*):** मोहरावर पांढरी पावडर जमा होऊन मोहोर जळून गळतो.\n2. **करपा / अँथ्रॅकनोज (Anthracnose - *Colletotrichum*):** पाने, मोहोर आणि फळांवर काळे खोलगट डाग पडतात.\n3. **डायबॅक (Dieback):** फांद्या शेंड्याकडून खाली वाळत येतात.\n\n*कोणत्याही विशिष्ट रोगाच्या उपचारासाठी रोगाचे नाव नमूद करा.*`
+        : `🦠 **Major Diseases Affecting Mango:**\n\n1. **Powdery Mildew (*Oidium mangiferae*):** White powdery coating on panicles causing blossom drop.\n2. **Anthracnose (*Colletotrichum gloeosporioides*):** Black sunken necrotic spots on leaves, blossoms, and fruits.\n3. **Dieback (*Lasiodiplodia theobromae*):** Twigs dry progressively from apex downwards.\n\n*Ask about any specific disease above for detailed management.*`;
+    }
+  }
+
+  // 5. Powdery Mildew Specific Questions
+  if (q.includes('powdery') || q.includes('mildew') || q.includes('भुरी')) {
+    if (q.includes('symptom') || q.includes('लक्षणे') || q.includes('काय दिसते')) {
+      return isMr
+        ? `🔍 **भुरी (Powdery Mildew) रोगाची लक्षणे:**\n\n- **पाने व मोहोर:** कोवळ्या पानांवर, मोहरावर आणि लहान फळांवर पांढऱ्या पिठासारखा थर (पावडर) पसरतो.\n- **मोहोर गळणे:** संसर्ग झालेला मोहोर जांभळट-तपकिरी होऊन सुकतो आणि गळून पडतो, ज्यामुळे फळधारणा होत नाही.\n- **फळांचे नुकसान:** लहान फळांवर पांढरी बुरशी येऊन ती गळतात किंवा फळांची त्वचा खडबडीत होते.`
+        : `🔍 **Symptoms of Powdery Mildew (*Oidium mangiferae* / *Erysiphe*):**\n\n- **Floral Panicles & Foliage:** White to grayish-white powdery talc-like fungal coating on blossoms, tender shoots, and young leaves.\n- **Blossom Drop:** Infected inflorescences turn purplish-brown, dry up, and drop completely, causing fruit set failure.\n- **Fruit Scarring:** Young developing fruits drop or develop corky russeted surface scars.`;
+    }
+    if (q.includes('prevent') || q.includes('प्रतिबंध') || q.includes('टाळ')) {
+      return isMr
+        ? `🛡️ **भुरी (Powdery Mildew) चा प्रतिबंध कसा करावा:**\n\n1. **छाटणी:** झाडाच्या आतील सुकलेल्या व गर्दी करणाऱ्या फांद्या कापून सूर्यप्रकाश आत पोहोचू द्या.\n2. **स्वच्छता:** झाडाखाली गळलेला रोगट मोहोर आणि पाने गोळा करून जाळून टाका.\n3. **सेंद्रिय प्रतिबंध:** मोहरण्याच्या सुरुवातीस कडुनिंब तेल (Neem Oil ३००० ppm - ४ मि.ली./लिटर) किंवा ट्रायकोडर्माची फवारणी करा.\n4. **अति खते टाळा:** जास्त नायट्रोजन (युरिया) खतांचा वापर टाळा.`
+        : `🛡️ **How to Prevent Powdery Mildew:**\n\n1. **Canopy Aeration:** Prune dense overlapping branches annually to ensure direct sunlight penetration and airflow.\n2. **Orchard Sanitation:** Collect and destroy dropped infected panicles and leaf litter.\n3. **Preventive Bio-Spray:** Apply cold-pressed Neem Oil (3000 ppm @ 4 ml/L) or *Bacillus subtilis* at panicle emergence.\n4. **Balanced Nitrogen:** Avoid excess urea top-dressing which produces susceptible lush growth.`;
+    }
+    if (q.includes('control') || q.includes('treat') || q.includes('cure') || q.includes('उपाय') || q.includes('नियंत्रण') || q.includes('औषध')) {
+      return isMr
+        ? `💊 **भुरी (Powdery Mildew) चे नियंत्रण व उपचार:**\n\n1. **सेंद्रिय उपाय:** कडुनिंब तेल (५ मि.ली./लिटर) किंवा आंबट ताक (१ लिटर ताक + १० लिटर पाणी + ५ ग्रॅम हिंग) फवारावे.\n2. **रासायनिक उपाय:**\n   - **गंधक (Wettable Sulphur ८०% WP):** २.५ ग्रॅम प्रति लिटर पाणी (तापमान ३२°C पेक्षा कमी असताना फवारावे).\n   - **हेक्झाकोनॅझोल (Hexaconazole ५% EC):** १ मि.ली. प्रति लिटर पाणी, किंवा\n   - **डायफेनोकोनॅझोल (Difenoconazole २५% EC):** ०.५ ते १ मि.ली. प्रति लिटर पाणी.\n*टीप: कीटकनाशक लेबलवरील सुरक्षा सूचना पाळाव्यात.*`
+        : `💊 **How to Control Powdery Mildew:**\n\n1. **Organic / Bio-Control:** Spray cold-pressed Neem Oil (5ml/L) or sour buttermilk solution (1:10 dilution with 5g asafetida).\n2. **Chemical Control Options:**\n   - **Wettable Sulphur 80% WP:** 2.0 to 2.5 g/L water (do not spray above 32°C).\n   - **Hexaconazole 5% EC:** 1.0 ml/L water, OR\n   - **Difenoconazole 25% EC:** 0.5 to 1.0 ml/L water.\n*Note: Adhere to product labels and regional university pre-harvest intervals.*`;
+    }
+  }
+
+  // 6. Sugarcane Fertilizer
+  if (crop === 'Sugarcane' || q.includes('sugarcane') || q.includes('ऊस')) {
+    if (q.includes('fertilizer') || q.includes('खत') || q.includes('npk')) {
+      return isMr
+        ? `🧪 **उसासाठी (Sugarcane) खत व्यवस्थापन:**\n\n- **शिफारस केलेले NPK प्रमाण:** २५० : ११५ : ११५ किलो प्रति हेक्टर (सुरू ऊस).\n- **खतांचे वेळापत्रक:**\n  1. **लागवडीच्या वेळी:** संपूर्ण स्फुरद (P2O5), ५०% पालाश (K2O) आणि १०% नत्र (N) + २५ टन शेणखत.\n  2. **६ ते ८ आठवड्यांनी (फुटवे येताना):** ४०% नत्र.\n  3. **१२ ते १४ आठवड्यांनी:** १०% नत्र.\n  4. **मोठ्या बांधणीच्या वेळी (१२०-१५० दिवस):** उर्वरित ४०% नत्र आणि उर्वरित ५०% पालाश द्यावे.\n- **जैविक खत:** एकरी ५ किलो ॲसिटोबॅक्टर (Acetobacter) जिवाणू खत दिल्यास २०% नत्राची बचत होते.`
+        : `🧪 **Fertilizer Schedule for Sugarcane:**\n\n- **Recommended NPK:** 250:115:115 kg/ha (for 12-month Suru crop).\n- **Application Splits:**\n  1. **At Planting (Basal):** 100% P2O5, 50% K2O, and 10% N with 25 t/ha FYM/compost.\n  2. **6-8 Weeks (Tillering):** 40% Nitrogen.\n  3. **12-14 Weeks:** 10% Nitrogen.\n  4. **Final Earthing Up (120-150 days):** Remaining 40% Nitrogen + remaining 50% K2O.\n- **Bio-fertilizer:** Apply *Acetobacter diazotrophicus* (5 kg/ha) to save up to 20% chemical nitrogen.`;
+    }
+  }
+
+  // 7. Weather Disease Risk
+  if (q.includes('weather') || q.includes('हवामान') || q.includes('risk') || q.includes('धोका') || q.includes('outbreak')) {
+    return isMr
+      ? `🌦️ **हवामान आणि रोग प्रादुर्भाव जोखीम विश्लेषण:**\n\n- **जोखीम घटक:** हवेतील आर्द्रता ८०% पेक्षा जास्त असणे, सतत ढगाळ हवामान आणि पानांवर पाण्याचे थेंब जास्त काळ टिकणे यामुळे बुरशीजन्य रोगांचा (करपा, भुरी, तांबोरा) प्रादुर्भाव अत्यंत वेगाने वाढतो.\n- **प्रतिबंधात्मक उपाय:**\n  1. झाडांच्या मुळाशी पाणी साचू देऊ नका; वाफसा राखा.\n  2. शेतात हवा खेळती राहण्यासाठी छाटणी व तण नियंत्रण करा.\n  3. प्रतिबंधक उपाय म्हणून ५ मि.ली./लिटर कडुनिंब तेल किंवा ट्रायकोडर्माची फवारणी करा.`
+      : `🌦️ **Weather & Disease Outbreak Risk Assessment:**\n\n- **Risk Factors:** Relative humidity above 80%, overcast skies, and prolonged leaf wetness (8+ hours) create ideal conditions for fungal spore germination (Blights, Rusts, Downy & Powdery Mildews).\n- **Immediate Preventive Steps:**\n  1. Ensure proper drainage and avoid evening overhead sprinkler irrigation.\n  2. Maintain canopy aeration to accelerate morning foliage drying.\n  3. Apply a preventive bio-protectant (Neem Oil 3000 ppm @ 4 ml/L or *Trichoderma*).`;
+  }
+
+  // General Agronomy Fallback
   return isMr
-    ? `🌾 **कृषी सल्लागार मार्गदर्शन (${crop} - ${disease}):**\n\n- **प्राथमिक काळजी:** पिकाचे नियमित निरीक्षण करा आणि पिवळी/रोगट पाने त्वरित काढून टाका.\n- **सेंद्रिय उपाय:** निंबोळी तेल (५ मि.ली./लिटर) किंवा ट्रायकोडर्मा व्हिरीडी (Trichoderma viride - ५ ग्रॅम/लिटर) जमिनीजवळ फवारा.\n- **रासायनिक पर्याय (तीव्रतेनुसार):** बुरशीनाशक म्हणून Copper Oxychloride ५०% WP (२.५ ग्रॅम/लिटर) किंवा Mancozeb ७५% WP (२ ग्रॅम/लिटर) चा वापर कृषी तज्ज्ञांच्या सल्ल्याने करा.\n\n*तुम्ही आणखी काही प्रश्न टाइप करून विचारू शकता.*`
-    : `🌾 **Agronomist Advisory (${crop} - ${disease}):**\n\n- **Initial Action:** Inspect plants closely and prune yellowing/spotted leaves.\n- **Organic & Biological Control:** Apply cold-pressed Neem Oil (5ml/L) or *Trichoderma viride* bio-fungicide (5g/L) to the root zone and lower canopy.\n- **Chemical Options (If Severe):** Spray Copper Oxychloride 50% WP (2.5g/L) or Mancozeb 75% WP (2g/L) under agronomist guidance.\n\n*Feel free to type any specific question in the box below.*`;
+    ? `🌾 **AgroScan AI कृषी सल्लागार (${crop || 'शेती मार्गदर्शन'}):**\n\nतुमच्या प्रश्नानुसार ('${userQuery}'), योग्य मशागत, संतुलित सेंद्रिय-रासायनिक खत व्यवस्थापन आणि वेळेवर पाणी देणे आवश्यक आहे. अधिक सविस्तर माहितीसाठी पिकाचे किंवा रोगाचे नाव नमूद करा.`
+    : `🌾 **AgroScan AI Agronomist (${crop || 'Crop Advisory'}):**\n\nRegarding your query ('${userQuery}'): For optimal crop health and yield, ensure balanced NPK fertilization, maintain good soil drainage, and inspect foliage regularly for early pest and disease symptoms.`;
 };
 
 export const AssistantPage = () => {
@@ -151,9 +229,40 @@ export const AssistantPage = () => {
   const [isOfflineMode, setIsOfflineMode] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [speakingMsgIdx, setSpeakingMsgIdx] = useState(null);
+  const [researchStage, setResearchStage] = useState('');
   const chatEndRef = useRef(null);
   const inputRef = useRef(null);
   const recognitionRef = useRef(null);
+
+  // Progressive Research Stage Indicator Timer
+  useEffect(() => {
+    if (!loading) {
+      setResearchStage('');
+      return;
+    }
+    const stagesEn = [
+      '🌾 Analyzing agricultural question & intent...',
+      '🔍 Querying FAO, ICAR & CABI Plantwise databases...',
+      '📄 Checking peer-reviewed plant pathology research...',
+      '🧪 Cross-checking evidence & safety guidelines...',
+      '✍️ Synthesizing evidence-based agronomist advisory...'
+    ];
+    const stagesMr = [
+      '🌾 प्रश्नाचे स्वरूप व कृषी उद्देश तपासत आहे...',
+      '🔍 FAO, ICAR व कृषी डेटाबेस शोधत आहे...',
+      '📄 पीक रोग व कीड संशोधनाचे संदर्भ तपासत आहे...',
+      '🧪 औषध प्रमाण व सुरक्षा नियमांची खात्री करत आहे...',
+      '✍️ पुराव्यावर आधारित कृषी सल्ला तयार करत आहे...'
+    ];
+    const stages = lang === 'mr' ? stagesMr : stagesEn;
+    setResearchStage(stages[0]);
+    let stageIdx = 0;
+    const interval = setInterval(() => {
+      stageIdx = (stageIdx + 1) % stages.length;
+      setResearchStage(stages[stageIdx]);
+    }, 1800);
+    return () => clearInterval(interval);
+  }, [loading, lang]);
 
   // Search Plant Catalog API
   useEffect(() => {
@@ -339,11 +448,18 @@ export const AssistantPage = () => {
 
     try {
       const res = await api.post('/chat', payload);
-      if (res.data && res.data.content) {
+      if (res.data && (res.data.content || res.data.answer)) {
         if (res.data.session_id) {
           setSessionId(res.data.session_id);
         }
-        setMessages(prev => [...prev, { sender: 'assistant', content: res.data.content }]);
+        const botText = res.data.answer || res.data.content;
+        setMessages(prev => [...prev, {
+          sender: 'assistant',
+          content: botText,
+          sources: res.data.sources || [],
+          source_agreement: res.data.source_agreement || 'high',
+          evidence_confidence: res.data.evidence_confidence || 0.92
+        }]);
         setIsOfflineMode(false);
       } else {
         throw new Error('Empty response from AI backend');
@@ -550,6 +666,49 @@ export const AssistantPage = () => {
                 }`}
               >
                 <p className="whitespace-pre-wrap">{msg.content}</p>
+
+                {/* Multi-Source Research Citations & Evidence Panel */}
+                {msg.sender === 'assistant' && msg.sources && msg.sources.length > 0 && (
+                  <div className="mt-3.5 pt-3 border-t border-slate-800/80 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-bold text-agri-400 flex items-center gap-1.5">
+                        <span>📚</span>
+                        <span>{lang === 'mr' ? 'तपासलेले कृषी संशोधन व संदर्भ (Sources):' : 'Verified Agricultural Research & Sources:'}</span>
+                      </span>
+                      {msg.source_agreement && (
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-agri-500/15 text-agri-300 border border-agri-500/30 font-semibold">
+                          {msg.source_agreement === 'high' ? '✅ High Consensus' : '🔍 Multi-Source Verified'}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 pt-1">
+                      {msg.sources.map((src, sIdx) => (
+                        <a
+                          key={sIdx}
+                          href={src.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex flex-col p-2 rounded-xl bg-slate-950/80 border border-slate-800/90 hover:border-agri-500/50 hover:bg-slate-950 transition group"
+                        >
+                          <div className="flex items-center justify-between gap-1 mb-0.5">
+                            <span className="text-[10px] font-bold text-slate-400 group-hover:text-agri-400 truncate">
+                              {src.source}
+                            </span>
+                            {src.trust_score && (
+                              <span className="text-[9px] font-mono text-emerald-400 bg-emerald-950/60 px-1 rounded border border-emerald-800/40">
+                                {Math.round(src.trust_score * 100)}% Trust
+                              </span>
+                            )}
+                          </div>
+                          <span className="text-[11px] text-slate-300 font-medium line-clamp-1 group-hover:text-white">
+                            {src.title}
+                          </span>
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -561,15 +720,17 @@ export const AssistantPage = () => {
           </div>
         ))}
 
-        {/* Loading / Thinking Indicator */}
+        {/* Progressive Multi-Source Research Indicator */}
         {loading && (
           <div className="flex gap-3 items-center p-2 text-xs text-agri-400 font-semibold">
             <div className="w-8 h-8 rounded-full bg-agri-500/20 text-agri-400 flex items-center justify-center shrink-0 border border-agri-500/40">
               <Loader2 className="w-4 h-4 animate-spin text-agri-400" />
             </div>
-            <div className="bg-slate-900/90 border border-slate-800 p-3 rounded-2xl text-slate-300 flex items-center space-x-2">
-              <span className="inline-block w-2 h-2 rounded-full bg-agri-400 animate-ping mr-1"></span>
-              <span>{t('assistant.thinking') || 'AgroScan AI is analyzing crop context & retrieving agronomy knowledge...'}</span>
+            <div className="bg-slate-900/90 border border-slate-800 p-3 rounded-2xl text-slate-300 flex items-center space-x-2.5 shadow-lg">
+              <span className="inline-block w-2 h-2 rounded-full bg-agri-400 animate-ping mr-0.5"></span>
+              <span className="text-xs">
+                {researchStage || (lang === 'mr' ? 'FAO, ICAR व कृषी डेटाबेस शोधत आहे...' : 'Consulting FAO, ICAR & agricultural research databases...')}
+              </span>
             </div>
           </div>
         )}

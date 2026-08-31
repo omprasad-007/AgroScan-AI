@@ -1,6 +1,6 @@
+from typing import List, Any, cast
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from typing import List
 from app.core.database import get_db
 from app.models.all_models import User, ChatSession, ChatMessage, ScanPrediction, Farm
 from app.schemas.schemas import ChatMessageCreate, ChatMessageResponse, ChatSessionResponse
@@ -67,26 +67,22 @@ def post_chat_message(
         ).first()
         if pred:
             scan_ctx = {
+                "scan_id": pred.id,
                 "crop_detected": pred.crop_detected,
                 "disease_name": pred.disease_name,
                 "severity_level": pred.severity_level,
                 "severity_percentage": pred.severity_percentage,
                 "confidence_score": pred.confidence_score,
-                "weather_risk_level": pred.weather_risk_level
+                "weather_risk_level": pred.weather_risk_level,
+                "created_at": str(pred.created_at)
             }
-    elif chat_in.manual_plant:
-        scan_ctx = {
-            "crop_detected": chat_in.manual_plant,
-            "disease_name": "General Cultivation & Care",
-            "severity_level": "None"
-        }
 
-    # 4. Resolve confirmed user farm location
+    # 4. Resolve confirmed user farm location (Priority: Current Request -> Farm -> Profile -> None)
     location_info = chat_in.location
     if not location_info:
         # Check user profile or latest farm
         farm = db.query(Farm).filter(Farm.user_id == current_user.id).order_by(Farm.created_at.desc()).first()
-        if farm and farm.village:
+        if farm and (farm.village or farm.district or farm.latitude):
             location_info = {
                 "village": farm.village,
                 "taluka": farm.taluka,
@@ -96,7 +92,7 @@ def post_chat_message(
                 "latitude": farm.latitude,
                 "longitude": farm.longitude
             }
-        elif current_user.village:
+        elif current_user.village or current_user.district:
             location_info = {
                 "village": current_user.village,
                 "taluka": current_user.taluka,
@@ -111,29 +107,37 @@ def post_chat_message(
     weather_info = None
     if AgriRAGService.is_weather_relevant(chat_in.message) and location_info:
         from app.services.weather_service import WeatherRiskService
-        import asyncio
         lat = location_info.get("latitude")
         lon = location_info.get("longitude")
-        city = location_info.get("district") or location_info.get("village") or "Pune"
-        try:
-            weather_info = WeatherRiskService.fetch_weather_sync(city=city, lat=lat, lon=lon)
-        except Exception:
-            pass
+        city_val = location_info.get("district") or location_info.get("village")
+        city_str = str(city_val) if city_val else ""
+        if city_str or (lat and lon):
+            try:
+                weather_info = WeatherRiskService.fetch_weather_sync(city=city_str, lat=lat, lon=lon)
+            except Exception:
+                pass
 
-    # 6. Generate response via AIProviderService with full conversation history
-    bot_reply_text = AIProviderService.generate_response(
+    # 6. Generate multi-source response via AIProviderService with full conversation history & research
+    manual_crop = chat_in.manual_plant
+    if not manual_crop and chat_in.context:
+        manual_crop = chat_in.context.get("plant") or chat_in.context.get("plant_name")
+
+    res_payload = AIProviderService.generate_structured_research_response(
         message=chat_in.message,
         conversation_history=conv_history,
         scan_context=scan_ctx,
+        manual_plant=manual_crop,
         location_info=location_info,
         weather_info=weather_info,
         language=chat_in.language or "en",
-        is_manual=bool(chat_in.manual_plant)
+        research_mode=chat_in.research_mode or "auto"
     )
+
+    bot_reply_text = str(res_payload.get("answer", ""))
 
     # 7. Save Assistant Message
     bot_msg = ChatMessage(
-        session_id=session.id,
+        session_id=str(session.id),
         sender="assistant",
         content=bot_reply_text
     )
@@ -142,12 +146,28 @@ def post_chat_message(
     db.refresh(bot_msg)
 
     return ChatMessageResponse(
-        id=bot_msg.id,
-        session_id=session.id,
-        sender=bot_msg.sender,
-        content=bot_msg.content,
-        created_at=bot_msg.created_at
+        id=str(bot_msg.id),
+        session_id=str(bot_msg.session_id) if bot_msg.session_id else None,
+        sender=str(bot_msg.sender),
+        content=str(bot_msg.content),
+        answer=str(bot_msg.content),
+        intent=res_payload.get("intent"),
+        sources=res_payload.get("sources", []),
+        evidence_confidence=res_payload.get("evidence_confidence", 0.92),
+        source_agreement=res_payload.get("source_agreement", "high"),
+        context_used=res_payload.get("context_used", {}),
+        created_at=cast(Any, bot_msg.created_at)
     )
+
+@router.post("/research", response_model=ChatMessageResponse)
+def post_assistant_research(
+    chat_in: ChatMessageCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Direct research endpoint for deep multi-source agricultural inquiries."""
+    chat_in.research_mode = "deep_research"
+    return post_chat_message(chat_in=chat_in, db=db, current_user=current_user)
 
 
 @router.get("/sessions", response_model=List[ChatSessionResponse])

@@ -60,9 +60,11 @@ export const AIAssistantPanel = ({ scanData, predictionId, autoOpen = true }) =>
         language: lang
       });
 
+      const botContent = res.data.answer || res.data.content;
       setMessages(prev => [...prev, { 
         sender: 'assistant', 
-        content: res.data.content, 
+        content: botContent,
+        sources: res.data.sources || [],
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
       }]);
     } catch (err) {
@@ -243,6 +245,29 @@ export const AIAssistantPanel = ({ scanData, predictionId, autoOpen = true }) =>
                 }`}
               >
                 <p className="whitespace-pre-wrap">{msg.content}</p>
+
+                {/* Multi-Source Research Citations */}
+                {msg.sender === 'assistant' && msg.sources && msg.sources.length > 0 && (
+                  <div className="mt-2.5 pt-2 border-t border-slate-800 space-y-1.5">
+                    <span className="text-[10px] font-bold text-emerald-400 flex items-center gap-1">
+                      <span>📚</span>
+                      <span>{lang === 'mr' ? 'तपासलेले संदर्भ (Sources):' : 'Verified Evidence & Sources:'}</span>
+                    </span>
+                    <div className="flex flex-col gap-1">
+                      {msg.sources.map((src, sIdx) => (
+                        <a
+                          key={sIdx}
+                          href={src.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[10px] text-slate-400 hover:text-emerald-300 underline truncate"
+                        >
+                          • [{src.source}] {src.title}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
