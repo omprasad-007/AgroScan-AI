@@ -22,7 +22,7 @@ extraPaths = [
     ".venv/Lib/site-packages"
 ]
 executionEnvironments = [
-  { "root": "backend", "extraPaths": ["backend", "backend/app", ".venv/Lib/site-packages"] }
+  { root = "backend", extraPaths = ["backend", "backend/app", ".venv/Lib/site-packages"] }
 ]
 
 [tool.pytest.ini_options]

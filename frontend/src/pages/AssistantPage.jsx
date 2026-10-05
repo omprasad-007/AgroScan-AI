@@ -4,7 +4,8 @@ import { useLanguage } from '../context/LanguageContext';
 import { 
   Bot, User, Send, Search, Sparkles, Sprout, AlertCircle, RefreshCw, 
   X, Loader2, RotateCcw, Download, Mic, MicOff, Volume2, VolumeX,
-  HelpCircle, ShieldCheck, Droplets, Sun, Bug, Zap
+  HelpCircle, ShieldCheck, Droplets, Sun, Bug, Zap,
+  History, Plus, Trash2, MessageSquare, Clock, ChevronRight
 } from 'lucide-react';
 import api from '../services/api';
 
@@ -138,8 +139,57 @@ const generateClientAdvisory = (userQuery, ctx, lang = 'en') => {
   else if (q.includes('onion') || q.includes('कांदा')) crop = 'Onion';
   else if (q.includes('maize') || q.includes('corn') || q.includes('मका')) crop = 'Maize';
   else if (q.includes('soybean') || q.includes('सोयाबीन')) crop = 'Soybean';
+  else if (q.includes('pomegranate') || q.includes('dalimb') || q.includes('डाळिंब')) crop = 'Pomegranate';
+  else if (q.includes('banana') || q.includes('kela') || q.includes('केळी')) crop = 'Banana';
+  else if (q.includes('grape') || q.includes('grapes') || q.includes('draksh') || q.includes('द्राक्षे')) crop = 'Grape';
+  else if (q.includes('groundnut') || q.includes('peanut') || q.includes('भूईमूग')) crop = 'Groundnut';
+  else if (q.includes('chickpea') || q.includes('gram') || q.includes('harbara') || q.includes('हरभरा')) crop = 'Chickpea';
+  else if (q.includes('apple') || q.includes('सफरचंद')) crop = 'Apple';
+  else if (q.includes('guava') || q.includes('पेरू')) crop = 'Guava';
 
-  // 4. Mango Specific Questions
+  // 4. Pomegranate / Telya Specific
+  if (q.includes('telya') || q.includes('तेल्या') || (crop === 'Pomegranate' && (q.includes('disease') || q.includes('रोग')))) {
+    return isMr
+      ? `🔴 **डाळिंबावरील तेल्या (Bacterial Blight - *Xanthomonas*) रोगाचे नियंत्रण:**\n\n1. **स्वच्छता व छाटणी:** प्रादुर्भाव झालेल्या फांद्या ५ सें.मी. खालून कापून ताबडतोब जाळून टाकाव्यात व छाटलेल्या भागावर १०% बोर्डो पेस्ट लावावी.\n2. **प्रतिबंधात्मक फवारणी:**\n   - **स्ट्रेप्टोसायक्लिन (Streptocycline):** ०.५ ग्रॅम प्रति लिटर + **कॉपर ऑक्सिक्लोराईड (COC ५०% WP):** २.५ ग्रॅम प्रति लिटर पाण्यात मिसळून फवारावे.\n   - पाऊस पडल्यानंतर लगेच किंवा ढगाळ वातावरणात १२-१५ दिवसांच्या अंतराने फवारणी करावी.\n3. **फळ कव्हरिंग:** रोगमुक्त फळांना बटर पेपर किंवा नॉन-वोव्हेन पिशव्यांचे कव्हर घालावे.`
+      : `🔴 **Pomegranate Bacterial Blight (Telya - *Xanthomonas axonopodis* pv. *punicae*) Management:**\n\n1. **Sanitation Pruning:** Cut infected twigs 5-10 cm below canker lesions and burn immediately. Paint cut wounds with Bordeaux paste (10%).\n2. **Bactericide Schedule:**\n   - Spray **Streptocycline (0.5 g/L)** mixed with **Copper Oxychloride 50% WP (2.5 g/L)** or Copper Hydroxide (2.0 g/L) at 10-12 day intervals during humid/rainy spells.\n3. **Fruit Bagging:** Bag developing fruits with butter paper covers to prevent raindrop bacterial transmission.`;
+  }
+
+  // 5. Banana Sigatoka & Panama Wilt
+  if (q.includes('sigatoka') || q.includes('सिगाटोका') || q.includes('panama') || q.includes('पनामा') || (crop === 'Banana' && (q.includes('disease') || q.includes('रोग')))) {
+    return isMr
+      ? `🍌 **केळीवरील मुख्य रोग व उपाय (Sigatoka & Panama Wilt):**\n\n1. **सिगाटोका करपा (Sigatoka Leaf Spot):**\n   - ५०% पेक्षा जास्त जळालेली जुनी पाने कापून नष्ट करा.\n   - **प्रॉपिकोनाझोल (Propiconazole २५% EC):** १ मि.ली. प्रति लिटर + मिनरल स्प्रे ऑईल (१० मि.ली./लिटर) फवारावे.\n2. **पनामा मर रोग (Panama Wilt TR4):**\n   - जमिनीतून पसरणाऱ्या बुरशीमुळे खोड फाटते व पाने सुकतात.\n   - मुळांच्या भागात ट्रायकोडर्मा (Trichoderma ५ किलो/एकर) शेणखतात मिसळून द्यावे.\n   - प्रादुर्भाव झालेल्या झाडाच्या गड्डे भागात २% कार्बेन्डाझिमचे इंजेक्शन द्यावे.`
+      : `🍌 **Banana Disease Management (Sigatoka & Panama Wilt):**\n\n1. **Sigatoka Leaf Spot:** Surgically de-leaf heavily infected foliage (>50% necrosis). Spray **Propiconazole 25% EC (1.0 ml/L)** mixed with mineral spray oil (1%).\n2. **Panama Wilt (Fusarium TR4):** Soil-borne vascular wilt causing pseudostem splitting and yellow leaf skirts. Drench root zone with **Trichoderma harzianum (5 kg/ha in FYM)** and practice crop rotation with paddy/sugarcane.`;
+  }
+
+  // 6. Soil Salinity / Sodic Reclamation
+  if (q.includes('saline') || q.includes('sodic') || q.includes('gypsum') || q.includes('खारवट') || q.includes('चोपण') || q.includes('जिप्सम')) {
+    return isMr
+      ? `🌱 **खारवट व चोपण जमिनीची सुधारणा (Soil Reclamation):**\n\n1. **चोपण जमीन (Sodic Soil - pH > ८.५):** माती परीक्षणानुसार एकरी २ ते ३ टन **कृषी जिप्सम (Gypsum - CaSO4)** मिसळून घ्यावे व शेतात पाणी साठवून निचरा करावा. ढेंचा (Dhaincha) हिरवळीचे खत गाडावे.\n2. **खारवट जमीन (Saline Soil - EC > ४.० dS/m):** शेतात भूमिगत चर (Subsurface Drainage) काढून चांगल्या गोड्या पाण्याने क्षार वाहून (Leaching) काढावेत.\n3. **सेंद्रिय कर्ब:** एकरी १०-१५ टन कुजलेले शेणखत किंवा गांडूळ खत वापरावे.`
+      : `🌱 **Saline & Sodic Soil Reclamation Protocol:**\n\n1. **Sodic / Alkali Soils (pH > 8.5, ESP > 15%):** Incorporate **Agricultural Gypsum (Calcium Sulfate @ 2-5 tonnes/acre)** to replace sodium (Na+) with calcium (Ca2+), followed by deep leaching. Grow Dhaincha (*Sesbania*) green manure.\n2. **Saline Soils (ECe > 4.0 dS/m):** Install subsurface tile drainage channels and leach soluble root-zone salts with good quality fresh water.\n3. **Organic Matter:** Add 10-15 tonnes/ha FYM/compost to buffer soil porosity and microbial health.`;
+  }
+
+  // 7. Kisan Drone Spraying
+  if (q.includes('drone') || q.includes('ड्रोन') || q.includes('uav')) {
+    return isMr
+      ? `🚁 **किसान ड्रोन (Kisan Drone) फवारणी नियमावली:**\n\n1. **उड्डाण उंची व वेग:** पिकाच्या शेंड्यापासून १.५ ते २.५ मीटर उंची आणि ३ ते ५ मीटर/सेकंद (१०-१८ किमी/तास) वेग असावा.\n2. **पाण्याचे प्रमाण:** अल्ट्रा लो व्हॉल्यूम (ULV) तंत्रज्ञानाने एकरी ८ ते १० लिटर पाणी लागते (औषधाचे प्रमाण पारंपारिक एकराप्रमाणेच ठेवावे).\n3. **हवामान मर्यादा:** वाऱ्याचा वेग १० किमी/तासापेक्षा जास्त असताना आणि दुपारच्या तीव्र उन्हात फवारणी करू नये.\n4. **फायदे:** ९०% पाण्याची बचत, २५-३०% कीटकनाशक बचत, आणि शेतकऱ्यांच्या आरोग्याची सुरक्षा.`
+      : `🚁 **Kisan Agricultural Drone Spraying Guidelines:**\n\n1. **Flight Parameters:** Maintain flight altitude of 1.5 to 2.5 meters above crop canopy at 3–5 m/s flight speed.\n2. **Water Volume:** Ultra-Low Volume (ULV) requires 20–30 L/ha (8-10 L/acre) water with rotary centrifugal anti-drift nozzles.\n3. **Weather Window:** Do not spray when wind speed exceeds 10 km/h or ambient temperature exceeds 35°C to avoid drift and evaporation.\n4. **Key Benefits:** 90% water conservation, uniform droplet penetration (150-250µm), and zero farmer chemical exposure.`;
+  }
+
+  // 8. Natural Farming / Jeevamrut
+  if (q.includes('jeevamrut') || q.includes('zbnf') || q.includes('जीवामृत') || q.includes('नैसर्गिक शेती')) {
+    return isMr
+      ? `🌿 **जीवामृत तयार करण्याची कृती व वापर (ZBNF):**\n\n- **साहित्य (२०० लिटर पाण्यासाठी):** १० किलो देशी गाईचे शेण + १० लिटर गोमूत्र + २ किलो गूळ + २ किलो डाळीचे पीठ (बेसन) + मूठभर शेताच्या बांधावरील माती.\n- **कृती:** प्लास्टिकच्या ड्रममध्ये सर्व घटक चांगले मिसळून ४८ ते ७२ तास सावलीत आंबवावे (दिवसातून २ वेळा काठीने घड्याळाच्या दिशेने ढवळावे).\n- **वापर:** एकरी २०० लिटर जीवामृत पाण्यासोबत (ठिबक किंवा पाटाने) द्यावे किंवा १०% द्रावणाची पानांवर फवारणी करावी.`
+      : `🌿 **Jeevamrut Formulation & Application (ZBNF):**\n\n- **Ingredients (for 200 L water):** 10 kg indigenous desi cow dung + 10 L cow urine + 2 kg organic jaggery + 2 kg pulse flour (besan) + handful of virgin bund soil.\n- **Fermentation:** Mix in plastic barrel and ferment for 48–72 hours under shade (stir clockwise twice daily).\n- **Application:** Apply 200 L/acre through irrigation water or as a 10% foliar spray every 21 days to activate beneficial soil microbes.`;
+  }
+
+  // 9. Blossom End Rot
+  if (q.includes('blossom end rot') || q.includes('ber') || (q.includes('bottom') && q.includes('black') && (crop === 'Tomato' || q.includes('tomato') || q.includes('टोमॅटो')))) {
+    return isMr
+      ? `🍅 **टोमॅटो फळांचा खालचा भाग काळा पडणे (Blossom End Rot - कॅल्शियमची कमतरता):**\n\n- **कारण:** हा बुरशीजन्य रोग नसून फळांच्या पेशींमध्ये कॅल्शियमची (Calcium) कमतरता आणि पाण्याचा अनियमित पुरवठा (कधी अतिशय कोरडी तर कधी दलदल जमीन) यामुळे होतो.\n- **त्वरित उपाय:**\n  1. **कॅल्शियम नायट्रेट (Calcium Nitrate):** ४ ते ५ ग्रॅम प्रति लिटर + **बोरॉन (Boron):** १ ग्रॅम प्रति लिटर पाण्यात मिसळून फळांवर फवारावे.\n  2. **नियमित सिंचन:** ठिबक सिंचनाने जमिनीत सतत योग्य ओलावा (वाफसा) टिकवून ठेवावा.`
+      : `🍅 **Tomato Blossom End Rot (BER — Calcium Deficiency):**\n\n- **Cause:** Non-pathogenic physiological disorder caused by localized Calcium (Ca2+) deficiency in rapidly expanding fruits, triggered by fluctuating soil moisture.\n- **Corrective Action:**\n  1. **Foliar Spray:** Apply **Calcium Nitrate (4.0–5.0 g/L)** mixed with **Boron (1.0 g/L)** directed at developing fruit clusters.\n  2. **Water Management:** Maintain steady, uniform root-zone moisture via drip irrigation to ensure continuous calcium uptake.`;
+  }
+
+  // 10. Mango Specific Questions
   if (crop === 'Mango' || q.includes('mango') || q.includes('आंबा')) {
     if (q.includes('soil') || q.includes('माती') || q.includes('जमीन')) {
       return isMr
@@ -156,24 +206,14 @@ const generateClientAdvisory = (userQuery, ctx, lang = 'en') => {
         ? `🌾 **आंब्याची काढणी (Mango Harvesting):**\n\n- **काढणीची लक्षणे:**\n  1. फळांचे खांदे देठाच्या वर उचलले जातात आणि देठाभोवती खळगा तयार होतो.\n  2. फळाचा रंग गडद हिरव्यावरून फिकट हिरवा/पिवळसर होतो.\n  3. फळांची विशिष्ट गुरुता (Specific Gravity) १.०१ ते १.०२ होते.\n- **काढणी पद्धत:** फळे सकाळी देठासह (१-२ सें.मी. देठ ठेवून) 'नूतन' किंवा जाळीदार झिबाने तोडावीत, जेणेकरून फळावर चीक पडणार नाही.`
         : `🌾 **Mango Harvesting Guidelines:**\n\n- **Maturity Signs:**\n  1. Shoulders swell above the pedicel attachment and the stem-end cavity deepens.\n  2. Skin color transitions from dark green to olive/yellowish green.\n  3. Specific gravity reaches 1.01–1.02 (mature fruits sink in water).\n- **Harvesting Method:** Harvest with 1-2 cm stem attached using pole harvesters with catching nets to prevent latex sap burn and impact injury.`;
     }
-    if (q.includes('disease') || q.includes('रोग')) {
-      return isMr
-        ? `🦠 **आंब्यावरील (Mango) मुख्य रोग:**\n\n1. **भुरी (Powdery Mildew - *Oidium mangiferae*):** मोहरावर पांढरी पावडर जमा होऊन मोहोर जळून गळतो.\n2. **करपा / अँथ्रॅकनोज (Anthracnose - *Colletotrichum*):** पाने, मोहोर आणि फळांवर काळे खोलगट डाग पडतात.\n3. **डायबॅक (Dieback):** फांद्या शेंड्याकडून खाली वाळत येतात.\n\n*कोणत्याही विशिष्ट रोगाच्या उपचारासाठी रोगाचे नाव नमूद करा.*`
-        : `🦠 **Major Diseases Affecting Mango:**\n\n1. **Powdery Mildew (*Oidium mangiferae*):** White powdery coating on panicles causing blossom drop.\n2. **Anthracnose (*Colletotrichum gloeosporioides*):** Black sunken necrotic spots on leaves, blossoms, and fruits.\n3. **Dieback (*Lasiodiplodia theobromae*):** Twigs dry progressively from apex downwards.\n\n*Ask about any specific disease above for detailed management.*`;
-    }
   }
 
-  // 5. Powdery Mildew Specific Questions
+  // 11. Powdery Mildew Specific Questions
   if (q.includes('powdery') || q.includes('mildew') || q.includes('भुरी')) {
     if (q.includes('symptom') || q.includes('लक्षणे') || q.includes('काय दिसते')) {
       return isMr
         ? `🔍 **भुरी (Powdery Mildew) रोगाची लक्षणे:**\n\n- **पाने व मोहोर:** कोवळ्या पानांवर, मोहरावर आणि लहान फळांवर पांढऱ्या पिठासारखा थर (पावडर) पसरतो.\n- **मोहोर गळणे:** संसर्ग झालेला मोहोर जांभळट-तपकिरी होऊन सुकतो आणि गळून पडतो, ज्यामुळे फळधारणा होत नाही.\n- **फळांचे नुकसान:** लहान फळांवर पांढरी बुरशी येऊन ती गळतात किंवा फळांची त्वचा खडबडीत होते.`
         : `🔍 **Symptoms of Powdery Mildew (*Oidium mangiferae* / *Erysiphe*):**\n\n- **Floral Panicles & Foliage:** White to grayish-white powdery talc-like fungal coating on blossoms, tender shoots, and young leaves.\n- **Blossom Drop:** Infected inflorescences turn purplish-brown, dry up, and drop completely, causing fruit set failure.\n- **Fruit Scarring:** Young developing fruits drop or develop corky russeted surface scars.`;
-    }
-    if (q.includes('prevent') || q.includes('प्रतिबंध') || q.includes('टाळ')) {
-      return isMr
-        ? `🛡️ **भुरी (Powdery Mildew) चा प्रतिबंध कसा करावा:**\n\n1. **छाटणी:** झाडाच्या आतील सुकलेल्या व गर्दी करणाऱ्या फांद्या कापून सूर्यप्रकाश आत पोहोचू द्या.\n2. **स्वच्छता:** झाडाखाली गळलेला रोगट मोहोर आणि पाने गोळा करून जाळून टाका.\n3. **सेंद्रिय प्रतिबंध:** मोहरण्याच्या सुरुवातीस कडुनिंब तेल (Neem Oil ३००० ppm - ४ मि.ली./लिटर) किंवा ट्रायकोडर्माची फवारणी करा.\n4. **अति खते टाळा:** जास्त नायट्रोजन (युरिया) खतांचा वापर टाळा.`
-        : `🛡️ **How to Prevent Powdery Mildew:**\n\n1. **Canopy Aeration:** Prune dense overlapping branches annually to ensure direct sunlight penetration and airflow.\n2. **Orchard Sanitation:** Collect and destroy dropped infected panicles and leaf litter.\n3. **Preventive Bio-Spray:** Apply cold-pressed Neem Oil (3000 ppm @ 4 ml/L) or *Bacillus subtilis* at panicle emergence.\n4. **Balanced Nitrogen:** Avoid excess urea top-dressing which produces susceptible lush growth.`;
     }
     if (q.includes('control') || q.includes('treat') || q.includes('cure') || q.includes('उपाय') || q.includes('नियंत्रण') || q.includes('औषध')) {
       return isMr
@@ -182,7 +222,7 @@ const generateClientAdvisory = (userQuery, ctx, lang = 'en') => {
     }
   }
 
-  // 6. Sugarcane Fertilizer
+  // 12. Sugarcane Fertilizer
   if (crop === 'Sugarcane' || q.includes('sugarcane') || q.includes('ऊस')) {
     if (q.includes('fertilizer') || q.includes('खत') || q.includes('npk')) {
       return isMr
@@ -191,14 +231,28 @@ const generateClientAdvisory = (userQuery, ctx, lang = 'en') => {
     }
   }
 
-  // 7. Weather Disease Risk
+  // 13. Yellow Leaves / Chlorosis / Nutrient & Watering Causes
+  if (q.includes('yellow') || q.includes('पिवळे') || q.includes('chlorosis')) {
+    return isMr
+      ? `🍂 **पाने पिवळी पडण्याची संभाव्य कारणे व उपाय (${crop || 'पीक'}):**\n\n1. **अन्नद्रव्यांची कमतरता (नत्र/झिंक/लोह):** जुनी पाने पिवळी पडत असल्यास नत्राची (Nitrogen) कमतरता असू शकते. नत्रयुक्त खते द्यावीत. नवीन शेंड्याची पाने पिवळी पडल्यास सूक्ष्म अन्नद्रव्ये (Micronutrients) फवारावीत.\n2. **पाण्याचा निचरा न होणे / जास्तीचे पाणी:** जमिनीत पाणी साचल्यास मुळांना प्राणवायू मिळत नाही व पाने पिवळी पडतात. पाणी देणे कमी करा व वाफसा राखा.\n3. **बुरशीजन्य करपा किंवा रसशोषक किडी:** पानांच्या खालच्या बाजूला मावा किंवा पांढरी माशी असल्यास कडुनिंब तेल (५ मि.ली./लिटर) फवारावे.`
+      : `🍂 **Why Leaves Turn Yellow — Causes & Remedies (${crop || 'Crop'}):**\n\n1. **Nutrient Deficiency (Nitrogen / Zinc / Iron):** If older lower leaves turn pale yellow, it indicates Nitrogen deficiency. If young apical leaves turn yellow with green veins (interveinal chlorosis), it indicates Iron or Zinc deficiency.\n2. **Overwatering & Poor Drainage:** Saturated soil creates anaerobic root zones, preventing oxygen and nutrient uptake.\n3. **Early Stage Fungal Infection or Sap-Sucking Pests:** Check leaf undersides for aphids or whiteflies; apply cold-pressed Neem Oil (3000 ppm @ 4 ml/L).`;
+  }
+
+  // 14. Disease Spread / Transmission
+  if (q.includes('spread') || q.includes('पसर') || q.includes('transmit') || q.includes('other plant')) {
+    return isMr
+      ? `💨 **रोगाचा प्रसार आणि संसर्ग रोखणे (${crop || 'पीक'}):**\n\n- **प्रसाराचे माध्यम:** बुरशीचे बीजाणू हवेच्या प्रवाहाने, पावसाच्या पाण्याच्या शिंतोड्यांनी आणि अस्वच्छ शेती अवजारांनी शेजारील झाडांवर वेगाने पसरतात.\n- **प्रसार रोखण्यासाठी त्वरित उपाय:**\n  1. संसर्ग झालेली पाने/फांद्या तत्काळ कापून शेताबाहेर नेऊन जाळून टाका.\n  2. तुषार किंवा वरून पाणी देणे टाळा; केवळ मुळांशी पाणी द्या.\n  3. शेजारील निरोगी झाडांवर प्रतिबंधक म्हणून कॉपर ऑक्सिक्लोराईड (२.५ ग्रॅम/लिटर) किंवा कडुनिंब तेलाची फवारणी करा.`
+      : `💨 **Disease Transmission & Stopping Spread (${crop || 'Crop'}):**\n\n- **How It Spreads:** Airborne fungal spores, rain splash, and contaminated tools rapidly transmit pathogens to neighboring healthy foliage.\n- **Immediate Containment Protocol:**\n  1. Prune and destroy heavily infected lower leaves and burn plant debris away from the field.\n  2. Avoid overhead sprinkler irrigation to keep foliage dry.\n  3. Spray a protective barrier (Mancozeb 75% WP @ 2.5 g/L or Copper Oxychloride 50% WP) across neighboring healthy crops.`;
+  }
+
+  // 15. Weather Disease Risk
   if (q.includes('weather') || q.includes('हवामान') || q.includes('risk') || q.includes('धोका') || q.includes('outbreak')) {
     return isMr
       ? `🌦️ **हवामान आणि रोग प्रादुर्भाव जोखीम विश्लेषण:**\n\n- **जोखीम घटक:** हवेतील आर्द्रता ८०% पेक्षा जास्त असणे, सतत ढगाळ हवामान आणि पानांवर पाण्याचे थेंब जास्त काळ टिकणे यामुळे बुरशीजन्य रोगांचा (करपा, भुरी, तांबोरा) प्रादुर्भाव अत्यंत वेगाने वाढतो.\n- **प्रतिबंधात्मक उपाय:**\n  1. झाडांच्या मुळाशी पाणी साचू देऊ नका; वाफसा राखा.\n  2. शेतात हवा खेळती राहण्यासाठी छाटणी व तण नियंत्रण करा.\n  3. प्रतिबंधक उपाय म्हणून ५ मि.ली./लिटर कडुनिंब तेल किंवा ट्रायकोडर्माची फवारणी करा.`
       : `🌦️ **Weather & Disease Outbreak Risk Assessment:**\n\n- **Risk Factors:** Relative humidity above 80%, overcast skies, and prolonged leaf wetness (8+ hours) create ideal conditions for fungal spore germination (Blights, Rusts, Downy & Powdery Mildews).\n- **Immediate Preventive Steps:**\n  1. Ensure proper drainage and avoid evening overhead sprinkler irrigation.\n  2. Maintain canopy aeration to accelerate morning foliage drying.\n  3. Apply a preventive bio-protectant (Neem Oil 3000 ppm @ 4 ml/L or *Trichoderma*).`;
   }
 
-  // General Agronomy Fallback
+  // 16. General Agronomy Fallback
   return isMr
     ? `🌾 **AgroScan AI कृषी सल्लागार (${crop || 'शेती मार्गदर्शन'}):**\n\nतुमच्या प्रश्नानुसार ('${userQuery}'), योग्य मशागत, संतुलित सेंद्रिय-रासायनिक खत व्यवस्थापन आणि वेळेवर पाणी देणे आवश्यक आहे. अधिक सविस्तर माहितीसाठी पिकाचे किंवा रोगाचे नाव नमूद करा.`
     : `🌾 **AgroScan AI Agronomist (${crop || 'Crop Advisory'}):**\n\nRegarding your query ('${userQuery}'): For optimal crop health and yield, ensure balanced NPK fertilization, maintain good soil drainage, and inspect foliage regularly for early pest and disease symptoms.`;
@@ -219,11 +273,15 @@ export const AssistantPage = () => {
   const [showSearchModal, setShowSearchModal] = useState(false);
   const [activeFaqTab, setActiveFaqTab] = useState('disease');
 
-  // Session & Message State
+  // Session & Past History State
   const [sessionId, setSessionId] = useState(null);
   const [messages, setMessages] = useState([]);
+  const [pastSessions, setPastSessions] = useState([]);
+  const [showHistoryDrawer, setShowHistoryDrawer] = useState(false);
+  const [historySearch, setHistorySearch] = useState('');
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [loadingHistory, setLoadingHistory] = useState(false);
   const [lastFailedMessage, setLastFailedMessage] = useState(null);
   const [chatError, setChatError] = useState(null);
   const [isOfflineMode, setIsOfflineMode] = useState(false);
@@ -233,6 +291,48 @@ export const AssistantPage = () => {
   const chatEndRef = useRef(null);
   const inputRef = useRef(null);
   const recognitionRef = useRef(null);
+
+  // Load Past Chat Sessions from Backend API and Local Storage
+  const fetchPastSessions = async () => {
+    setLoadingHistory(true);
+    let serverSessions = [];
+    try {
+      const res = await api.get('/chat/sessions');
+      if (Array.isArray(res.data)) {
+        serverSessions = res.data;
+      }
+    } catch (e) {
+      console.warn('Failed to load server chat sessions, relying on local storage cache:', e);
+    }
+
+    // Merge with local storage cache
+    try {
+      const cached = JSON.parse(localStorage.getItem('agroscan_chat_sessions_v1') || '[]');
+      const combinedMap = new Map();
+      
+      serverSessions.forEach(s => combinedMap.set(s.id, s));
+      cached.forEach(s => {
+        if (!combinedMap.has(s.id)) {
+          combinedMap.set(s.id, s);
+        }
+      });
+
+      const mergedList = Array.from(combinedMap.values()).sort(
+        (a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0)
+      );
+
+      setPastSessions(mergedList);
+      localStorage.setItem('agroscan_chat_sessions_v1', JSON.stringify(mergedList));
+    } catch {
+      setPastSessions(serverSessions);
+    } finally {
+      setLoadingHistory(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchPastSessions();
+  }, []);
 
   // Progressive Research Stage Indicator Timer
   useEffect(() => {
@@ -275,13 +375,93 @@ export const AssistantPage = () => {
     }
   }, [plantSearch]);
 
-  // Initialize & Reset Assistant Messages when Context / Prediction ID / Plant changes
-  useEffect(() => {
-    setSessionId(`session_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`);
+  // Start Clean New Chat Session
+  const handleStartNewChat = () => {
+    const newSessionId = `session_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+    setSessionId(newSessionId);
+    setContextMode('none');
+    setSelectedPlant('');
+    setScanData(null);
     setChatError(null);
     setLastFailedMessage(null);
+    setShowHistoryDrawer(false);
 
+    const welcomeMsg = {
+      sender: 'assistant',
+      content: t('assistant.state_a_welcome') || "Welcome to AgroScan AI Agronomist! Type any question below regarding crop health, organic bio-sprays, diseases, fertilizers, or farm care."
+    };
+    setMessages([welcomeMsg]);
+    localStorage.setItem('agroscan_active_session_id', newSessionId);
+    if (inputRef.current) inputRef.current.focus();
+  };
+
+  // Load Selected Past Session
+  const handleSelectSession = async (session) => {
+    if (!session || !session.id) return;
+    setLoading(true);
+    setSessionId(session.id);
+    setShowHistoryDrawer(false);
+    localStorage.setItem('agroscan_active_session_id', session.id);
+
+    try {
+      const res = await api.get(`/chat/sessions/${session.id}`);
+      if (res.data && Array.isArray(res.data.messages) && res.data.messages.length > 0) {
+        setMessages(res.data.messages.map(m => ({
+          sender: m.sender,
+          content: m.content || m.answer,
+          sources: m.sources || [],
+          source_agreement: m.source_agreement || 'high',
+          evidence_confidence: m.evidence_confidence || 0.92,
+          created_at: m.created_at
+        })));
+        return;
+      }
+    } catch (err) {
+      console.warn('Failed to fetch session detail from server, using cached messages:', err);
+    }
+
+    // Fallback to local session messages if present
+    if (session.messages && session.messages.length > 0) {
+      setMessages(session.messages.map(m => ({
+        sender: m.sender,
+        content: m.content || m.answer,
+        sources: m.sources || [],
+        source_agreement: m.source_agreement || 'high',
+        evidence_confidence: m.evidence_confidence || 0.92
+      })));
+    }
+    setLoading(false);
+  };
+
+  // Delete a Past Chat Session
+  const handleDeleteSession = async (targetSessionId, e) => {
+    e.stopPropagation();
+    if (!targetSessionId) return;
+
+    // Optimistic local state update
+    const updated = pastSessions.filter(s => s.id !== targetSessionId);
+    setPastSessions(updated);
+    localStorage.setItem('agroscan_chat_sessions_v1', JSON.stringify(updated));
+
+    try {
+      await api.delete(`/chat/sessions/${targetSessionId}`);
+    } catch (err) {
+      console.warn('Failed to delete session on server:', err);
+    }
+
+    if (sessionId === targetSessionId) {
+      handleStartNewChat();
+    }
+  };
+
+  // Initialize & Reset Assistant Messages when Context / Prediction ID / Plant changes
+  useEffect(() => {
     if (predictionId) {
+      const newSid = `session_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+      setSessionId(newSid);
+      setChatError(null);
+      setLastFailedMessage(null);
+
       api.get(`/predictions/${predictionId}`)
         .then(res => {
           const data = res.data;
@@ -321,9 +501,14 @@ export const AssistantPage = () => {
           setMessages([{ sender: 'assistant', content: t('assistant.state_a_welcome') || "Welcome to AgroScan AI Agronomist! Type any question below regarding crop health, organic bio-sprays, diseases, fertilizers, or farm care." }]);
         });
     } else {
-      setContextMode('none');
-      setScanData(null);
-      setMessages([{ sender: 'assistant', content: t('assistant.state_a_welcome') || "Welcome to AgroScan AI Agronomist! Type any question below regarding crop health, organic bio-sprays, diseases, fertilizers, or farm care." }]);
+      // If no active prediction ID, initialize session if not already set
+      if (!sessionId) {
+        const initialSid = localStorage.getItem('agroscan_active_session_id') || `session_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+        setSessionId(initialSid);
+        if (messages.length === 0) {
+          setMessages([{ sender: 'assistant', content: t('assistant.state_a_welcome') || "Welcome to AgroScan AI Agronomist! Type any question below regarding crop health, organic bio-sprays, diseases, fertilizers, or farm care." }]);
+        }
+      }
     }
   }, [predictionId, lang, t]);
 
@@ -449,18 +634,40 @@ export const AssistantPage = () => {
     try {
       const res = await api.post('/chat', payload);
       if (res.data && (res.data.content || res.data.answer)) {
-        if (res.data.session_id) {
-          setSessionId(res.data.session_id);
+        const returnedSid = res.data.session_id || sessionId;
+        if (returnedSid) {
+          setSessionId(returnedSid);
+          localStorage.setItem('agroscan_active_session_id', returnedSid);
         }
         const botText = res.data.answer || res.data.content;
-        setMessages(prev => [...prev, {
+        const newBotMsg = {
           sender: 'assistant',
           content: botText,
           sources: res.data.sources || [],
           source_agreement: res.data.source_agreement || 'high',
-          evidence_confidence: res.data.evidence_confidence || 0.92
-        }]);
+          evidence_confidence: res.data.evidence_confidence || 0.92,
+          created_at: new Date().toISOString()
+        };
+        const allNewMessages = [...updatedMessages, newBotMsg];
+        setMessages(allNewMessages);
         setIsOfflineMode(false);
+
+        // Update pastSessions list and local storage
+        const currentTitle = userText.length > 38 ? userText.substring(0, 36) + '...' : userText;
+        setPastSessions(prev => {
+          const filtered = prev.filter(s => s.id !== returnedSid);
+          const updatedSession = {
+            id: returnedSid,
+            title: currentTitle,
+            created_at: new Date().toISOString(),
+            message_count: allNewMessages.length,
+            last_message: botText.length > 55 ? botText.substring(0, 52) + '...' : botText,
+            messages: allNewMessages
+          };
+          const updatedList = [updatedSession, ...filtered];
+          localStorage.setItem('agroscan_chat_sessions_v1', JSON.stringify(updatedList));
+          return updatedList;
+        });
       } else {
         throw new Error('Empty response from AI backend');
       }
@@ -472,8 +679,27 @@ export const AssistantPage = () => {
         contextMode === 'scan' ? scanData : { plantName: selectedPlant },
         lang
       );
-      setMessages(prev => [...prev, { sender: 'assistant', content: localReply }]);
+      const localBotMsg = { sender: 'assistant', content: localReply, created_at: new Date().toISOString() };
+      const allLocalMsgs = [...updatedMessages, localBotMsg];
+      setMessages(allLocalMsgs);
       setIsOfflineMode(true);
+
+      // Save locally even in offline mode
+      const currentTitle = userText.length > 38 ? userText.substring(0, 36) + '...' : userText;
+      setPastSessions(prev => {
+        const filtered = prev.filter(s => s.id !== sessionId);
+        const updatedSession = {
+          id: sessionId,
+          title: currentTitle,
+          created_at: new Date().toISOString(),
+          message_count: allLocalMsgs.length,
+          last_message: localReply.length > 55 ? localReply.substring(0, 52) + '...' : localReply,
+          messages: allLocalMsgs
+        };
+        const updatedList = [updatedSession, ...filtered];
+        localStorage.setItem('agroscan_chat_sessions_v1', JSON.stringify(updatedList));
+        return updatedList;
+      });
     } finally {
       setLoading(false);
       if (inputRef.current) {
@@ -532,7 +758,37 @@ export const AssistantPage = () => {
             </div>
           </div>
 
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center flex-wrap gap-1.5 sm:gap-2">
+            {/* New Chat Button */}
+            <button
+              type="button"
+              onClick={handleStartNewChat}
+              className="px-2.5 py-1.5 rounded-xl bg-agri-500/20 hover:bg-agri-500/30 text-agri-400 border border-agri-500/40 text-xs font-bold flex items-center space-x-1.5 transition shadow-sm"
+              title={lang === 'mr' ? 'नवीन संवाद सुरू करा' : 'Start a fresh new advisory chat'}
+            >
+              <Plus className="w-3.5 h-3.5 text-agri-400" />
+              <span className="hidden sm:inline">{lang === 'mr' ? 'नवीन संवाद' : 'New Chat'}</span>
+            </button>
+
+            {/* Past History Drawer Trigger */}
+            <button
+              type="button"
+              onClick={() => {
+                fetchPastSessions();
+                setShowHistoryDrawer(true);
+              }}
+              className="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 border border-slate-700 flex items-center space-x-1.5 transition relative"
+              title={lang === 'mr' ? 'मागील संवाद इतिहास पहा' : 'View past chat history'}
+            >
+              <History className="w-3.5 h-3.5 text-slate-400" />
+              <span className="hidden sm:inline">{lang === 'mr' ? 'इतिहास' : 'History'}</span>
+              {pastSessions.length > 0 && (
+                <span className="px-1.5 py-0.2 rounded-full bg-agri-500/20 text-agri-400 text-[10px] font-mono font-bold">
+                  {pastSessions.length}
+                </span>
+              )}
+            </button>
+
             {/* Export Chat Button with UTF-8 BOM encoding for Marathi safety */}
             <button
               type="button"
@@ -558,7 +814,7 @@ export const AssistantPage = () => {
               title="Export conversation history"
             >
               <Download className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">{lang === 'mr' ? 'संवाद जतन करा' : 'Export'}</span>
+              <span className="hidden sm:inline">{lang === 'mr' ? 'जतन करा' : 'Export'}</span>
             </button>
 
             <button
@@ -928,6 +1184,167 @@ export const AssistantPage = () => {
                   <span className="text-[11px] text-slate-500 italic">{p.scientific_name}</span>
                 </button>
               ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Past Chat History Slide-Over Drawer */}
+      {showHistoryDrawer && (
+        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex justify-end transition-opacity">
+          <div className="w-full max-w-md h-full bg-slate-900 border-l border-slate-800 flex flex-col shadow-2xl animate-in slide-in-from-right duration-200">
+            
+            {/* Drawer Header */}
+            <div className="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/70">
+              <div className="flex items-center space-x-2.5">
+                <div className="w-8 h-8 rounded-xl bg-agri-500/20 border border-agri-500/40 flex items-center justify-center text-agri-400">
+                  <History className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-white leading-tight">
+                    {lang === 'mr' ? 'मागील कृषी संवाद इतिहास' : 'Past Consultations'}
+                  </h3>
+                  <p className="text-[11px] text-slate-400">
+                    {lang === 'mr' ? `${pastSessions.length} जतन केलेले संवाद` : `${pastSessions.length} saved consultations`}
+                  </p>
+                </div>
+              </div>
+              
+              <button
+                type="button"
+                onClick={() => setShowHistoryDrawer(false)}
+                className="w-8 h-8 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition"
+                aria-label="Close history drawer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Quick Action: Start New Chat */}
+            <div className="p-3 border-b border-slate-800/80 bg-slate-950/40 space-y-2">
+              <button
+                type="button"
+                onClick={handleStartNewChat}
+                className="w-full py-2.5 px-3.5 rounded-xl bg-agri-500 hover:bg-agri-400 text-slate-950 font-bold text-xs flex items-center justify-center space-x-2 transition shadow-lg shadow-agri-500/15"
+              >
+                <Plus className="w-4 h-4" />
+                <span>{lang === 'mr' ? '+ नवीन कृषी संवाद सुरू करा' : '+ Start New Advisory Chat'}</span>
+              </button>
+
+              {/* History Search Filter */}
+              {pastSessions.length > 3 && (
+                <div className="relative">
+                  <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-2.5" />
+                  <input
+                    type="text"
+                    value={historySearch}
+                    onChange={(e) => setHistorySearch(e.target.value)}
+                    placeholder={lang === 'mr' ? 'इतिहास शोधा (उदा. करपा, ऊस, खत)...' : 'Search past topics...'}
+                    className="w-full pl-8 pr-3 py-1.5 rounded-lg bg-slate-950 border border-slate-800 text-xs text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-agri-500"
+                  />
+                  {historySearch && (
+                    <button
+                      type="button"
+                      onClick={() => setHistorySearch('')}
+                      className="absolute right-2.5 top-2 text-slate-500 hover:text-slate-300 text-xs"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Past Sessions List */}
+            <div className="flex-1 overflow-y-auto p-3 space-y-2">
+              {loadingHistory ? (
+                <div className="p-8 text-center text-xs text-slate-400 space-y-2">
+                  <Loader2 className="w-6 h-6 animate-spin mx-auto text-agri-400" />
+                  <p>{lang === 'mr' ? 'इतिहास लोड होत आहे...' : 'Loading past chats...'}</p>
+                </div>
+              ) : pastSessions.length === 0 ? (
+                <div className="p-8 text-center text-slate-500 text-xs space-y-2">
+                  <MessageSquare className="w-8 h-8 mx-auto text-slate-600 opacity-60" />
+                  <p className="font-semibold text-slate-400">
+                    {lang === 'mr' ? 'कोणताही मागील संवाद सापडला नाही' : 'No past conversations found'}
+                  </p>
+                  <p className="text-[11px]">
+                    {lang === 'mr' ? 'तुम्ही AI सल्लागाराला विचारलेले प्रश्न येथे जतन केले जातील.' : 'Your consultations with AgroScan AI will automatically be saved here.'}
+                  </p>
+                </div>
+              ) : (
+                pastSessions
+                  .filter(s => {
+                    if (!historySearch.trim()) return true;
+                    const q = historySearch.toLowerCase();
+                    return (s.title || '').toLowerCase().includes(q) || (s.last_message || '').toLowerCase().includes(q);
+                  })
+                  .map((s) => {
+                    const isActive = s.id === sessionId;
+                    const dateDisplay = s.created_at ? formatDate(s.created_at) : '';
+                    return (
+                      <div
+                        key={s.id}
+                        onClick={() => handleSelectSession(s)}
+                        className={`group p-3 rounded-xl border transition cursor-pointer relative ${
+                          isActive
+                            ? 'bg-agri-500/10 border-agri-500/50 shadow-md shadow-agri-500/5'
+                            : 'bg-slate-950/70 border-slate-800 hover:border-slate-700 hover:bg-slate-950'
+                        }`}
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex items-center space-x-2 flex-1 min-w-0">
+                            {isActive ? (
+                              <span className="w-2 h-2 rounded-full bg-agri-400 shrink-0 animate-pulse" />
+                            ) : (
+                              <MessageSquare className="w-3.5 h-3.5 text-slate-500 shrink-0 group-hover:text-agri-400" />
+                            )}
+                            <h4 className="text-xs font-bold text-slate-200 group-hover:text-white truncate">
+                              {s.title || 'AgroScan Advisory'}
+                            </h4>
+                          </div>
+
+                          <div className="flex items-center space-x-1 shrink-0">
+                            <button
+                              type="button"
+                              onClick={(e) => handleDeleteSession(s.id, e)}
+                              className="p-1 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition opacity-70 group-hover:opacity-100"
+                              title={lang === 'mr' ? 'संवाद हटवा' : 'Delete chat session'}
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </div>
+
+                        {s.last_message && (
+                          <p className="text-[11px] text-slate-400 line-clamp-2 mt-1.5 pl-4 leading-relaxed">
+                            {s.last_message}
+                          </p>
+                        )}
+
+                        <div className="flex items-center justify-between text-[10px] text-slate-500 mt-2 pl-4">
+                          <span className="flex items-center space-x-1">
+                            <Clock className="w-3 h-3" />
+                            <span>{dateDisplay || 'Recent'}</span>
+                          </span>
+                          {s.message_count > 0 && (
+                            <span className="px-1.5 py-0.5 rounded bg-slate-900 border border-slate-800 font-mono">
+                              {s.message_count} {lang === 'mr' ? 'संदेश' : 'msgs'}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })
+              )}
+            </div>
+
+            {/* Drawer Footer */}
+            <div className="p-3 border-t border-slate-800 bg-slate-950/90 text-center">
+              <span className="text-[11px] text-slate-500 flex items-center justify-center space-x-1">
+                <ShieldCheck className="w-3.5 h-3.5 text-agri-400" />
+                <span>{lang === 'mr' ? 'तुमचा संवाद सुरक्षितपणे जतन केला जातो' : 'All consultations securely backed up'}</span>
+              </span>
             </div>
           </div>
         </div>

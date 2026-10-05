@@ -164,11 +164,29 @@ class PredictionResponse(BaseModel):
     # Backward compatibility aliases
     crop_detected: Optional[str] = None
     disease_name: Optional[str] = None
+    disease_code: Optional[str] = None
     severity_level: Optional[str] = None
     confidence_score: Optional[float] = None
+    affected_area_cm2: Optional[float] = None
     weather_risk_level: Optional[str] = None
+    weather_risk_score: Optional[float] = None
+    ambient_temp_c: Optional[float] = None
+    humidity_pct: Optional[float] = None
+    rainfall_mm: Optional[float] = None
     is_demo: Optional[bool] = False
     created_at: Optional[datetime] = None
+
+    # Multi-API Consensus & Leaf Validation Extensions
+    consensus_score: Optional[float] = None
+    providers_agreed: Optional[str] = None
+    providers_called: Optional[int] = None
+    agreement_level: Optional[str] = None
+    primary_provider: Optional[str] = None
+    supporting_providers: Optional[List[str]] = None
+    alternative_diagnoses: Optional[List[Dict[str, Any]]] = None
+    image_quality_metrics: Optional[Dict[str, Any]] = None
+    leaf_validation: Optional[Dict[str, Any]] = None
+    uncertainty_note: Optional[str] = None
 
 # --- Analytics & Weather Schemas ---
 class DashboardAnalyticsResponse(BaseModel):
@@ -240,10 +258,15 @@ class AssistantResearchResponse(BaseModel):
     source_agreement: str = "high"
     context_used: Dict[str, bool] = {}
 
+class ChatSessionTitleUpdate(BaseModel):
+    title: str
+
 class ChatSessionResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: str
     title: str
     created_at: datetime
+    message_count: Optional[int] = 0
+    last_message: Optional[str] = None
     messages: List[ChatMessageResponse] = []

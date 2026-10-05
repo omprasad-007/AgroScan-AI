@@ -1,5 +1,6 @@
 import React from 'react';
 import { CaptureButton } from './CaptureButton';
+import { useLanguage } from '../../context/LanguageContext';
 
 export const CameraPreview = ({
   videoRef,
@@ -9,6 +10,8 @@ export const CameraPreview = ({
   canSwitch,
   facingMode
 }) => {
+  const { t } = useLanguage();
+
   return (
     <div className="relative w-full h-[450px] sm:h-[520px] bg-black rounded-2xl overflow-hidden shadow-2xl border border-slate-800 flex flex-col justify-between">
       {/* Live Video Feed */}
@@ -26,7 +29,7 @@ export const CameraPreview = ({
         {/* Top Visual Guidance Banner */}
         <div className="mb-auto mt-4 px-4 py-2 rounded-full bg-slate-900/80 backdrop-blur-md border border-slate-700/60 text-xs font-semibold text-emerald-400 flex items-center space-x-2 shadow-lg">
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-          <span>Place the affected leaf inside the frame</span>
+          <span>{t('scan.camera_leaf_guide') || 'Place one clear leaf inside the frame • Good lighting & focus'}</span>
         </div>
 
         {/* Scanning Box Viewfinder */}

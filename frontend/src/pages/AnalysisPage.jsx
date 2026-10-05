@@ -14,10 +14,10 @@ export const AnalysisPage = () => {
   const [analyzedPred, setAnalyzedPred] = useState(null);
 
   const steps = [
-    { label: t('analysis.step1') || "Executing Stage 1 Image Validation...", duration: 500 },
-    { label: t('analysis.step2') || "Normalizing image & applying OpenCV HSV color space mask...", duration: 700 },
-    { label: t('analysis.step3') || "Executing MobileNetV2 Deep Learning inference model...", duration: 800 },
-    { label: t('analysis.step4') || "Evaluating weather-based disease risk matrix...", duration: 600 }
+    { label: t('analysis.step1') || "Executing Stage 1 Leaf-Only & Image Quality Validation Gate...", duration: 500 },
+    { label: t('analysis.step2') || "Executing Multi-API Provider Routing (Kindwise, Pl@ntNet, Plantix, Local)...", duration: 700 },
+    { label: t('analysis.step3') || "Evaluating Multi-Model Evidence Fusion & Consensus Verification...", duration: 800 },
+    { label: t('analysis.step4') || "Calculating lesion severity & biological weather risk matrix...", duration: 600 }
   ];
 
   const imageFile = location.state?.imageFile;
@@ -38,14 +38,14 @@ export const AnalysisPage = () => {
         const formData = new FormData();
         formData.append('file', imageFile);
 
-        // Stage 1: Mandatory Image Validation
+        // Stage 1: Mandatory Leaf-Only & Image Quality Validation
         const valRes = await api.post('/predictions/validate-image', formData, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
 
-        if (valRes.data?.is_plant === false) {
+        if (valRes.data?.is_leaf === false || valRes.data?.is_plant === false || valRes.data?.usable_for_diagnosis === false) {
           if (isMounted) {
-            setError(valRes.data.message || t('analysis.val_error_tip') || "You have not scanned a leaf or plant. Please scan a clear photo of a leaf or plant.");
+            setError(valRes.data.message || t('analysis.val_error_tip') || "No clear leaf was detected in this image. Please capture a close, well-lit photo of a plant leaf.");
           }
           return;
         }
@@ -61,6 +61,18 @@ export const AnalysisPage = () => {
         const res = await api.post('/predictions/analyze', formData, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
+
+        if (res.data) {
+          try {
+            const rawStored = localStorage.getItem('agroscan_scans_v1');
+            const currentList = rawStored ? JSON.parse(rawStored) : [];
+            const updatedList = [res.data, ...currentList.filter(item => item.id !== res.data.id)];
+            localStorage.setItem('agroscan_scans_v1', JSON.stringify(updatedList));
+            window.dispatchEvent(new Event('agroscan_scan_completed'));
+          } catch (storageErr) {
+            console.warn('LocalStorage save failed:', storageErr);
+          }
+        }
 
         if (isMounted) {
           setAnalyzedPred(res.data);

@@ -74,7 +74,7 @@ export default function App() {
   return (
     <ErrorBoundary>
       <ThemeProvider>
-        <Router>
+        <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <AuthProvider>
             <LanguageProvider>
               <AppLayout />

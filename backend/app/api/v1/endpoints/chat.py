@@ -1,14 +1,26 @@
-from typing import List, Any, cast
-from fastapi import APIRouter, Depends, HTTPException
+import logging
+from typing import List, Any, cast, Optional
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.models.all_models import User, ChatSession, ChatMessage, ScanPrediction, Farm
-from app.schemas.schemas import ChatMessageCreate, ChatMessageResponse, ChatSessionResponse
+from app.schemas.schemas import ChatMessageCreate, ChatMessageResponse, ChatSessionResponse, ChatSessionTitleUpdate
 from app.api.deps import get_current_user
 from app.services.ai_provider_service import AIProviderService
 from app.services.agri_rag_service import AgriRAGService
 
+logger = logging.getLogger("agroscan")
+
 router = APIRouter()
+
+def _generate_session_title(message: str, plant: Optional[str] = None) -> str:
+    """Generate a clean, readable title for a chat session from user query."""
+    clean = (message or "").strip().replace("\n", " ")
+    if len(clean) > 40:
+        clean = clean[:38] + "..."
+    if plant and plant.lower() not in clean.lower():
+        return f"{plant}: {clean}"
+    return clean or "Agricultural Advisory"
 
 @router.post("", response_model=ChatMessageResponse)
 def post_chat_message(
@@ -24,10 +36,15 @@ def post_chat_message(
         ).first()
 
     if not session:
-        session = ChatSession(user_id=current_user.id, title="AgroScan AI Advisory")
+        title = _generate_session_title(chat_in.message, chat_in.manual_plant)
+        session = ChatSession(user_id=current_user.id, title=title)
         db.add(session)
         db.commit()
         db.refresh(session)
+    elif session.title in ["AgroScan AI Advisory", "Agronomy Chat", "New Advisory"]:
+        # Update placeholder title with first substantive query
+        session.title = _generate_session_title(chat_in.message, chat_in.manual_plant)
+        db.commit()
 
     # 1. Build accumulated conversation history from DB session and/or incoming request
     db_messages = db.query(ChatMessage).filter(
@@ -80,28 +97,31 @@ def post_chat_message(
     # 4. Resolve confirmed user farm location (Priority: Current Request -> Farm -> Profile -> None)
     location_info = chat_in.location
     if not location_info:
-        # Check user profile or latest farm
-        farm = db.query(Farm).filter(Farm.user_id == current_user.id).order_by(Farm.created_at.desc()).first()
-        if farm and (farm.village or farm.district or farm.latitude):
-            location_info = {
-                "village": farm.village,
-                "taluka": farm.taluka,
-                "district": farm.district,
-                "state": farm.state,
-                "pincode": farm.pincode,
-                "latitude": farm.latitude,
-                "longitude": farm.longitude
-            }
-        elif current_user.village or current_user.district:
-            location_info = {
-                "village": current_user.village,
-                "taluka": current_user.taluka,
-                "district": current_user.district,
-                "state": current_user.state,
-                "pincode": current_user.pincode,
-                "latitude": current_user.latitude,
-                "longitude": current_user.longitude
-            }
+        try:
+            # Check user profile or latest farm
+            farm = db.query(Farm).filter(Farm.user_id == current_user.id).order_by(Farm.created_at.desc()).first()
+            if farm and (getattr(farm, "village", None) or getattr(farm, "district", None) or getattr(farm, "latitude", None)):
+                location_info = {
+                    "village": getattr(farm, "village", None),
+                    "taluka": getattr(farm, "taluka", None),
+                    "district": getattr(farm, "district", None),
+                    "state": getattr(farm, "state", None),
+                    "pincode": getattr(farm, "pincode", None),
+                    "latitude": getattr(farm, "latitude", None),
+                    "longitude": getattr(farm, "longitude", None)
+                }
+            elif getattr(current_user, "village", None) or getattr(current_user, "district", None):
+                location_info = {
+                    "village": getattr(current_user, "village", None),
+                    "taluka": getattr(current_user, "taluka", None),
+                    "district": getattr(current_user, "district", None),
+                    "state": getattr(current_user, "state", None),
+                    "pincode": getattr(current_user, "pincode", None),
+                    "latitude": getattr(current_user, "latitude", None),
+                    "longitude": getattr(current_user, "longitude", None)
+                }
+        except Exception as e:
+            logger.warning(f"Failed to fetch farm/user location in chat: {e}")
 
     # 5. Fetch weather conditionally only when relevant to question
     weather_info = None
@@ -130,7 +150,8 @@ def post_chat_message(
         location_info=location_info,
         weather_info=weather_info,
         language=chat_in.language or "en",
-        research_mode=chat_in.research_mode or "auto"
+        research_mode=chat_in.research_mode or "auto",
+        user_id=str(current_user.id)
     )
 
     bot_reply_text = str(res_payload.get("answer", ""))
@@ -175,8 +196,143 @@ def get_user_chat_sessions(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
+    """Retrieve all past chat sessions for the logged-in user with summary stats."""
     sessions = db.query(ChatSession).filter(
         ChatSession.user_id == current_user.id
-    ).order_by(ChatSession.created_at.desc()).limit(20).all()
+    ).order_by(ChatSession.created_at.desc()).limit(50).all()
 
-    return sessions
+    result = []
+    for s in sessions:
+        msgs = db.query(ChatMessage).filter(
+            ChatMessage.session_id == s.id
+        ).order_by(ChatMessage.created_at.asc()).all()
+        last_msg = msgs[-1].content if msgs else None
+        if last_msg and len(last_msg) > 60:
+            last_msg = last_msg[:58] + "..."
+        result.append(ChatSessionResponse(
+            id=str(s.id),
+            title=str(s.title or "AgroScan Advisory"),
+            created_at=cast(Any, s.created_at),
+            message_count=len(msgs),
+            last_message=last_msg,
+            messages=[
+                ChatMessageResponse(
+                    id=str(m.id),
+                    session_id=str(m.session_id),
+                    sender=str(m.sender),
+                    content=str(m.content),
+                    created_at=cast(Any, m.created_at)
+                ) for m in msgs
+            ]
+        ))
+
+    return result
+
+
+@router.get("/sessions/{session_id}", response_model=ChatSessionResponse)
+def get_chat_session_by_id(
+    session_id: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Retrieve a specific past chat session with its full historical conversation transcript."""
+    session = db.query(ChatSession).filter(
+        ChatSession.id == session_id,
+        ChatSession.user_id == current_user.id
+    ).first()
+
+    if not session:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Chat session not found or does not belong to the user"
+        )
+
+    msgs = db.query(ChatMessage).filter(
+        ChatMessage.session_id == session.id
+    ).order_by(ChatMessage.created_at.asc()).all()
+
+    last_msg = msgs[-1].content if msgs else None
+    return ChatSessionResponse(
+        id=str(session.id),
+        title=str(session.title or "AgroScan Advisory"),
+        created_at=cast(Any, session.created_at),
+        message_count=len(msgs),
+        last_message=last_msg,
+        messages=[
+            ChatMessageResponse(
+                id=str(m.id),
+                session_id=str(m.session_id),
+                sender=str(m.sender),
+                content=str(m.content),
+                created_at=cast(Any, m.created_at)
+            ) for m in msgs
+        ]
+    )
+
+
+@router.delete("/sessions/{session_id}")
+def delete_chat_session(
+    session_id: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Delete a past chat session and all associated messages."""
+    session = db.query(ChatSession).filter(
+        ChatSession.id == session_id,
+        ChatSession.user_id == current_user.id
+    ).first()
+
+    if not session:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Chat session not found"
+        )
+
+    db.delete(session)
+    db.commit()
+
+    return {"status": "success", "message": "Chat session deleted", "id": session_id}
+
+
+@router.patch("/sessions/{session_id}", response_model=ChatSessionResponse)
+def update_chat_session_title(
+    session_id: str,
+    title_in: ChatSessionTitleUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Update title for a specific chat session."""
+    session = db.query(ChatSession).filter(
+        ChatSession.id == session_id,
+        ChatSession.user_id == current_user.id
+    ).first()
+
+    if not session:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Chat session not found"
+        )
+
+    session.title = title_in.title.strip()[:60]
+    db.commit()
+    db.refresh(session)
+
+    msgs = db.query(ChatMessage).filter(
+        ChatMessage.session_id == session.id
+    ).order_by(ChatMessage.created_at.asc()).all()
+
+    return ChatSessionResponse(
+        id=str(session.id),
+        title=str(session.title),
+        created_at=cast(Any, session.created_at),
+        message_count=len(msgs),
+        messages=[
+            ChatMessageResponse(
+                id=str(m.id),
+                session_id=str(m.session_id),
+                sender=str(m.sender),
+                content=str(m.content),
+                created_at=cast(Any, m.created_at)
+            ) for m in msgs
+        ]
+    )

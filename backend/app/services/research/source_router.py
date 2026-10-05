@@ -47,8 +47,52 @@ class SourceRouter:
         elif any(w in p_clean or w in q_lower for w in ["tomato", "potato", "टोमॅटो", "बटाटा", "blight", "करपा", "spot"]):
             categories.append("tomato_potato_blights_pathology")
 
-        # 4. General Biology / Agronomy / Weather
-        if intent in [AgriculturalIntent.GENERAL_AGRICULTURE, AgriculturalIntent.WEATHER, AgriculturalIntent.WEATHER_DISEASE_RISK] or any(w in q_lower for w in ["rotation", "photosynthesis", "ipm", "ph", "सामू", "प्रकाशसंश्लेषण", "फेरपालट", "weather", "हवामान"]):
+        # 4. Cotton
+        elif any(w in p_clean or w in q_lower for w in ["cotton", "kapas", "कापूस"]):
+            categories.append("cotton_pathology_agronomy")
+
+        # 5. Rice / Paddy
+        elif any(w in p_clean or w in q_lower for w in ["rice", "paddy", "भात", "धान", "blast"]):
+            categories.append("rice_blast_agronomy")
+
+        # 6. Wheat
+        elif any(w in p_clean or w in q_lower for w in ["wheat", "gehun", "गहू", "rust"]):
+            categories.append("wheat_rust_agronomy")
+
+        # 7. Chilli / Onion
+        elif any(w in p_clean or w in q_lower for w in ["chilli", "mirchi", "मिरची", "onion", "kanda", "कांदा"]):
+            categories.append("chilli_onion_pathology")
+
+        # 8. Banana
+        elif any(w in p_clean or w in q_lower for w in ["banana", "kela", "केळी", "sigatoka", "panama"]):
+            categories.append("banana_pathology_agronomy")
+
+        # 9. Grape
+        elif any(w in p_clean or w in q_lower for w in ["grape", "grapes", "draksh", "द्राक्षे", "downy", "द्राक्ष"]):
+            categories.append("grape_downy_powdery_pathology")
+
+        # 10. Pomegranate
+        elif any(w in p_clean or w in q_lower for w in ["pomegranate", "dalimb", "डाळिंब", "telya"]):
+            categories.append("pomegranate_telya_pathology")
+
+        # 11. Pulses & Oilseeds (Groundnut / Chickpea / Pigeonpea)
+        elif any(w in p_clean or w in q_lower for w in ["groundnut", "peanut", "bhuimug", "भूईमूग", "chickpea", "gram", "harbara", "हरभरा", "tikka", "chana", "tur", "तूर", "arhar", "pigeonpea"]):
+            categories.append("pulses_oilseeds_pathology")
+
+        # 12. Apple & Temperate Fruits
+        elif any(w in p_clean or w in q_lower for w in ["apple", "safarchand", "सफरचंद", "scab"]):
+            categories.append("apple_temperate_horticulture")
+
+        # 13. Guava & Citrus
+        elif any(w in p_clean or w in q_lower for w in ["guava", "peru", "पेरू", "amrood", "citrus", "lemon", "lime", "लिंबू", "canker"]):
+            categories.append("guava_citrus_pathology")
+
+        # 14. Brinjal & Solanaceous IPM
+        elif any(w in p_clean or w in q_lower for w in ["brinjal", "eggplant", "vangi", "वांगी", "baingan"]):
+            categories.append("brinjal_vegetable_ipm")
+
+        # 15. General Biology / Agronomy / Weather / Weed / Mulch
+        if intent in [AgriculturalIntent.GENERAL_AGRICULTURE, AgriculturalIntent.WEATHER, AgriculturalIntent.WEATHER_DISEASE_RISK] or any(w in q_lower for w in ["rotation", "photosynthesis", "ipm", "ph", "सामू", "प्रकाशसंश्लेषण", "फेरपालट", "weather", "हवामान", "drone", "salinity", "biostimulant", "zbnf", "hydroponic", "weed", "तण", "mulch", "मल्चिंग", "frost", "थंडी"]):
             categories.append("general_agronomy_principles")
 
         if not categories:

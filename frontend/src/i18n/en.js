@@ -38,6 +38,10 @@ export const en = {
   "dashboard.rainfall": "Rainfall",
   "dashboard.wind": "Wind Speed",
   "dashboard.ai_advisory": "Agronomist Quick Advisory",
+  "dashboard.reset_data": "Reset Scans",
+  "dashboard.reset_confirm": "Are you sure you want to clear scan records? The dashboard will return to a fresh blank state.",
+  "dashboard.blank_cta": "Start First Leaf Scan",
+  "dashboard.blank_desc": "Your dashboard is currently blank. Upload or capture a plant leaf photo to generate live AI diagnostics, severity metrics, and microclimate risk alerts.",
 
   // Scan Leaf Page
   "scan.title": "Scan Plant Leaf",
@@ -61,9 +65,27 @@ export const en = {
   "scan.camera_capture": "Capture Leaf Photo",
   "scan.camera_switch": "Switch Camera",
   "scan.camera_tip": "Position the leaf clearly in center with good lighting",
+  "scan.camera_leaf_guide": "Place one clear leaf inside the frame • Good lighting & focus",
 
   // Analysis Loading Page
   "analysis.title": "Analyzing Plant Leaf...",
+  "analysis.subtitle": "Executing leaf verification, multi-API disease routing, and evidence consensus.",
+  "analysis.pipeline_tag": "AI Leaf-Only & Multi-Provider Consensus Pipeline",
+  "analysis.processing_step": "Step {current} of {total}: Analyzing leaf foliage & running multi-model verification...",
+  "analysis.val_error": "Leaf Validation Gate",
+  "analysis.val_error_tip": "Ensure your photo clearly shows a single plant leaf with good lighting and no background clutter.",
+  "analysis.scan_again": "Scan Again",
+  "analysis.upload_another": "Upload Another Leaf Image",
+
+  // Result Page
+  "result.title": "Diagnostic Report",
+  "result.confidence": "Confidence Score",
+  "result.providers_agreeing": "Model Agreement",
+  "result.leaf_verified": "Leaf-Only Gate",
+  "result.image_quality": "Image Quality",
+  "result.alternative_conditions": "Alternative Possibilities Evaluated:",
+  "result.severity": "Visual Severity",
+  "result.affected_area": "Affected Leaf Area",
   "analysis.subtitle": "Processing plant verification, OpenCV color masks, and disease classification.",
   "analysis.pipeline_tag": "AI Plant Detection & Computer Vision Pipeline",
   "analysis.processing_step": "Processing Step {current} of {total}",

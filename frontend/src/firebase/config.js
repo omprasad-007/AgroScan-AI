@@ -16,10 +16,14 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
 let analytics = null;
-if (typeof window !== 'undefined') {
+if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' && !import.meta.env.DEV) {
   isSupported().then((supported) => {
     if (supported) {
-      analytics = getAnalytics(app);
+      try {
+        analytics = getAnalytics(app);
+      } catch (err) {
+        console.debug("Firebase Analytics skipped:", err);
+      }
     }
   }).catch((err) => {
     console.debug("Firebase Analytics unsupported in current environment:", err);

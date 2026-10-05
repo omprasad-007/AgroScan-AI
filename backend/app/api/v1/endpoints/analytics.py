@@ -30,56 +30,44 @@ def get_dashboard_analytics(
         sev = p.severity_level if p.severity_level in severity_map else "Mild"
         severity_map[sev] += 1
 
-    # Fallback default mock data for empty initial state
+    # Return genuine blank state if no scans exist
     if total == 0:
-        disease_dist = [
-            {"name": "Tomato Late Blight", "count": 14, "color": "#ef4444"},
-            {"name": "Potato Late Blight", "count": 8, "color": "#f97316"},
-            {"name": "Tomato Early Blight", "count": 6, "color": "#eab308"},
-            {"name": "Corn Common Rust", "count": 4, "color": "#84cc16"},
-            {"name": "Healthy Crops", "count": 18, "color": "#22c55e"}
-        ]
-        severity_dist = [
-            {"name": "Healthy (<5%)", "value": 18, "color": "#22c55e"},
-            {"name": "Mild (5-15%)", "value": 14, "color": "#eab308"},
-            {"name": "Moderate (15-35%)", "value": 11, "color": "#f97316"},
-            {"name": "Severe (>35%)", "value": 7, "color": "#ef4444"}
-        ]
-        monthly_trends = [
-            {"month": "Mar", "scans": 12, "healthy": 8, "diseased": 4, "avg_severity": 8.5},
-            {"month": "Apr", "scans": 18, "healthy": 11, "diseased": 7, "avg_severity": 12.0},
-            {"month": "May", "scans": 25, "healthy": 14, "diseased": 11, "avg_severity": 14.5},
-            {"month": "Jun", "scans": 34, "healthy": 18, "diseased": 16, "avg_severity": 18.2},
-            {"month": "Jul", "scans": 42, "healthy": 22, "diseased": 20, "avg_severity": 21.0},
-            {"month": "Aug", "scans": 50, "healthy": 26, "diseased": 24, "avg_severity": 16.4}
-        ]
-        top_diseases = [
-            {"name": "Tomato Late Blight", "crop": "Tomato", "percentage": 28.0},
-            {"name": "Potato Late Blight", "crop": "Potato", "percentage": 16.0},
-            {"name": "Tomato Early Blight", "crop": "Tomato", "percentage": 12.0}
-        ]
+        disease_dist = []
+        severity_dist = []
+        monthly_trends = []
+        top_diseases = []
+        weather_summary = {
+            "overall_risk_level": "None",
+            "current_temp": 26.5,
+            "current_humidity": 65.0,
+            "alert": "No leaf scans recorded yet. Scan a plant leaf to start tracking health and disease risk."
+        }
     else:
         disease_dist = [{"name": k, "count": v} for k, v in dist_map.items()]
         severity_dist = [{"name": k, "value": v} for k, v in severity_map.items()]
         top_diseases = [{"name": k, "percentage": round((v / total) * 100, 1)} for k, v in dist_map.items()][:3]
         monthly_trends = [
-            {"month": "Jul", "scans": total // 2, "healthy": healthy // 2, "diseased": diseased // 2, "avg_severity": 14.0},
-            {"month": "Aug", "scans": total, "healthy": healthy, "diseased": diseased, "avg_severity": 16.8}
+            {"month": "Recent", "scans": total, "healthy": healthy, "diseased": diseased, "avg_severity": 15.0}
         ]
+        # Determine highest risk level from recent scans
+        recent_risks = [p.weather_risk_level for p in preds if p.weather_risk_level]
+        top_risk = "High" if "High" in recent_risks else ("Moderate" if "Moderate" in recent_risks else "Low")
+        latest_pred = preds[-1]
+        weather_summary = {
+            "overall_risk_level": top_risk,
+            "current_temp": latest_pred.ambient_temp_c or 26.5,
+            "current_humidity": latest_pred.humidity_pct or 75.0,
+            "alert": f"Active monitoring for {latest_pred.crop_detected} ({latest_pred.disease_name})."
+        }
 
     return DashboardAnalytics(
-        total_predictions=total or 50,
-        healthy_count=healthy or 26,
-        diseased_count=diseased or 24,
-        average_confidence=avg_conf,
+        total_predictions=total,
+        healthy_count=healthy,
+        diseased_count=diseased,
+        average_confidence=avg_conf if total > 0 else 0.0,
         top_diseases=top_diseases,
         disease_distribution=disease_dist,
         severity_distribution=severity_dist,
         monthly_trends=monthly_trends,
-        weather_risk_summary={
-            "overall_risk_level": "High",
-            "current_temp": 26.5,
-            "current_humidity": 82.0,
-            "alert": "High humidity & warm temperatures favor late blight transmission."
-        }
+        weather_risk_summary=weather_summary
     )

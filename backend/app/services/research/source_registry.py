@@ -162,6 +162,149 @@ VERIFIED_RESEARCH_ENTRIES: Dict[str, List[Dict[str, Any]]] = {
         }
     ],
 
+    "cotton_pathology_agronomy": [
+        {
+            "claim": "Cotton thrives in deep black clayey (vertisol) or alluvial soils with pH 6.0-8.0. Bacterial blight (Xanthomonas albilineans) is controlled with seed treatment (Streptocycline 100ppm) and Copper Oxychloride (2.5g/L).",
+            "source": "ICAR-Central Institute for Cotton Research (CICR)",
+            "source_type": SourceCategory.LEVEL_1_GOV_INTL,
+            "url": "https://cicr.icar.gov.in/cotton-production-technology/",
+            "published_date": "2023-09-15",
+            "authority_score": 1.00,
+            "evidence_quality": 0.96,
+            "title": "ICAR-CICR Cotton Production and Disease Management"
+        }
+    ],
+
+    "rice_blast_agronomy": [
+        {
+            "claim": "Rice blast (Magnaporthe oryzae) causes spindle-shaped eye-like lesions with grey centers and brown margins. Controlled by balanced nitrogen (split into 3-4 doses), tricyclazole 75% WP (0.6g/L), and water saturation.",
+            "source": "ICAR-National Rice Research Institute (NRRI)",
+            "source_type": SourceCategory.LEVEL_1_GOV_INTL,
+            "url": "https://icar-nrri.in/rice-protection-guidelines/",
+            "published_date": "2023-10-05",
+            "authority_score": 1.00,
+            "evidence_quality": 0.97,
+            "title": "ICAR-NRRI Rice Blast & Crop Management"
+        }
+    ],
+
+    "wheat_rust_agronomy": [
+        {
+            "claim": "Wheat stripe and leaf rust (Puccinia spp.) thrive in cool, humid conditions. Management involves timely sowing of resistant cultivars (HD 2967, DBW 187) and Propiconazole 25% EC (1ml/L) at first symptom onset.",
+            "source": "ICAR-Indian Institute of Wheat & Barley Research (IIWBR)",
+            "source_type": SourceCategory.LEVEL_1_GOV_INTL,
+            "url": "https://iiwbr.icar.gov.in/wheat-rust-advisory/",
+            "published_date": "2023-11-12",
+            "authority_score": 1.00,
+            "evidence_quality": 0.96,
+            "title": "ICAR-IIWBR Wheat Rust Advisory and IPM"
+        }
+    ],
+
+    "banana_pathology_agronomy": [
+        {
+            "claim": "Sigatoka leaf spot is managed by de-leafing necrotic foliage and spraying Propiconazole 25% EC (1ml/L) with mineral oil. Panama Wilt TR4 requires strict quarantine, tissue culture saplings, and Trichoderma root application.",
+            "source": "ICAR-National Research Centre for Banana (NRCB)",
+            "source_type": SourceCategory.LEVEL_1_GOV_INTL,
+            "url": "https://nrcb.icar.gov.in/banana-disease-management/",
+            "published_date": "2024-01-10",
+            "authority_score": 1.00,
+            "evidence_quality": 0.97,
+            "title": "ICAR-NRCB Banana Production & Disease Protection Protocols"
+        }
+    ],
+
+    "grape_downy_powdery_pathology": [
+        {
+            "claim": "Downy mildew of grapes (Plasmopara viticola) follows the 3-10 rule (temp>10°C, rain>10mm, shoot>10cm). Prophylactic Bordeaux 1% or Mancozeb, followed by Dimethomorph or Metalaxyl post-infection.",
+            "source": "ICAR-National Research Centre for Grapes (NRCG)",
+            "source_type": SourceCategory.LEVEL_1_GOV_INTL,
+            "url": "https://nrcgrapes.icar.gov.in/advisories/",
+            "published_date": "2024-02-05",
+            "authority_score": 1.00,
+            "evidence_quality": 0.98,
+            "title": "ICAR-NRCG Viticulture Disease Forecast & Protection Chart"
+        }
+    ],
+
+    "pomegranate_telya_pathology": [
+        {
+            "claim": "Pomegranate Bacterial Blight (Telya - Xanthomonas axonopodis pv. punicae) is controlled by clean pruning, Bordeaux paste, and Streptocycline (0.5g/L) + Copper Oxychloride (2.5g/L) foliar sprays.",
+            "source": "ICAR-National Research Centre on Pomegranate (NRCP)",
+            "source_type": SourceCategory.LEVEL_1_GOV_INTL,
+            "url": "https://nrcpomegranate.icar.gov.in/advisory-bacterial-blight/",
+            "published_date": "2023-10-25",
+            "authority_score": 1.00,
+            "evidence_quality": 0.97,
+            "title": "ICAR-NRCP Integrated Management of Pomegranate Bacterial Blight"
+        }
+    ],
+
+    "pulses_oilseeds_pathology": [
+        {
+            "claim": "Groundnut Tikka disease (Cercospora) is controlled by Saaf (Carbendazim+Mancozeb 2g/L) and Gypsum (400-500 kg/ha at pegging). Chickpea Fusarium wilt requires seed treatment with Trichoderma + Carbendazim and resistant cultivars (Digvijay, JG-11).",
+            "source": "ICAR-Indian Institute of Pulses Research (IIPR) & DGR",
+            "source_type": SourceCategory.LEVEL_1_GOV_INTL,
+            "url": "https://iipr.icar.gov.in/chickpea-advisory/",
+            "published_date": "2023-11-28",
+            "authority_score": 1.00,
+            "evidence_quality": 0.96,
+            "title": "ICAR-IIPR Pulses & Oilseeds Pathology Compendium"
+        }
+    ],
+
+    "chilli_onion_pathology": [
+        {
+            "claim": "Chilli Leaf Curl is transmitted by whiteflies; manage using yellow sticky traps and Imidacloprid 17.8% SL (0.3ml/L) or neem oil. Purple Blotch of Onion (Alternaria porri) is controlled by Mancozeb 75% WP (2.5g/L) with sticking agent.",
+            "source": "ICAR-Directorate of Onion and Garlic Research (DOGR)",
+            "source_type": SourceCategory.LEVEL_1_GOV_INTL,
+            "url": "https://dogr.icar.gov.in/advisory-onion-diseases/",
+            "published_date": "2023-12-18",
+            "authority_score": 1.00,
+            "evidence_quality": 0.95,
+            "title": "ICAR-DOGR Onion & Solanaceous Crop Protection"
+        }
+    ],
+
+    "apple_temperate_horticulture": [
+        {
+            "claim": "Apple scab (Venturia inaequalis) requires autumn urea leaf treatment (5%) and Difenoconazole 25% EC (0.5ml/L) post-petal fall. Chilling requirement (800-1200 hours) is mandatory for uniform bud break.",
+            "source": "ICAR-Central Institute of Temperate Horticulture (CITH)",
+            "source_type": SourceCategory.LEVEL_1_GOV_INTL,
+            "url": "https://cith.icar.gov.in/apple-scab-management/",
+            "published_date": "2024-02-14",
+            "authority_score": 1.00,
+            "evidence_quality": 0.98,
+            "title": "ICAR-CITH Apple Integrated Pest & Disease Protocol"
+        }
+    ],
+
+    "guava_citrus_pathology": [
+        {
+            "claim": "Guava wilt (Fusarium) requires root drenching with Trichoderma harzianum and avoidance of water stagnation. Citrus Canker (Xanthomonas) is managed by pruning, Bordeaux paste, and Streptocycline (0.1g/L) with Copper Oxychloride (2.5g/L).",
+            "source": "ICAR-Central Citrus Research Institute (CCRI) & CISH",
+            "source_type": SourceCategory.LEVEL_1_GOV_INTL,
+            "url": "https://ccri.icar.gov.in/citrus-canker-advisory/",
+            "published_date": "2024-01-18",
+            "authority_score": 1.00,
+            "evidence_quality": 0.97,
+            "title": "ICAR-CCRI Citrus & Subtropical Fruit Protection Manual"
+        }
+    ],
+
+    "brinjal_vegetable_ipm": [
+        {
+            "claim": "Brinjal shoot & fruit borer (Leucinodes orbonalis) is controlled by clipping infested shoots, Lucinlure pheromone traps (15/ha), and Emamectin Benzoate 5% SG (0.4g/L). Little leaf phytoplasma requires leafhopper vector control.",
+            "source": "ICAR-Indian Institute of Vegetable Research (IIVR)",
+            "source_type": SourceCategory.LEVEL_1_GOV_INTL,
+            "url": "https://iivr.icar.gov.in/brinjal-ipm/",
+            "published_date": "2023-12-05",
+            "authority_score": 1.00,
+            "evidence_quality": 0.97,
+            "title": "ICAR-IIVR Package of Practices for Solanaceous Vegetables"
+        }
+    ],
+
     "general_agronomy_principles": [
         {
             "claim": "Crop rotation breaks host-specific pathogen and nematode life cycles while legume root nodules fix atmospheric nitrogen. Photosynthesis (6CO2 + 6H2O -> C6H12O6 + 6O2) is the primary driver of crop yield; foliar blights damage chlorophyll and directly reduce dry matter accumulation.",
@@ -174,7 +317,7 @@ VERIFIED_RESEARCH_ENTRIES: Dict[str, List[Dict[str, Any]]] = {
             "title": "FAO Principles of Sustainable Agronomy & Physiology"
         },
         {
-            "claim": "Optimal soil pH for nutrient availability is 6.0 to 7.5. Acidic soils (pH<6.0) require agricultural lime (CaCO3), whereas sodic soils (pH>8.0) require gypsum (CaSO4) and organic manure.",
+            "claim": "Optimal soil pH for nutrient availability is 6.0 to 7.5. Acidic soils (pH<6.0) require agricultural lime (CaCO3), whereas sodic soils (pH>8.0) require gypsum (CaSO4) and organic manure. Saline soils require leaching with subsurface drainage.",
             "source": "ICAR-Indian Institute of Soil Science (IISS)",
             "source_type": SourceCategory.LEVEL_1_GOV_INTL,
             "url": "https://iiss.icar.gov.in/advisory/",
@@ -182,6 +325,16 @@ VERIFIED_RESEARCH_ENTRIES: Dict[str, List[Dict[str, Any]]] = {
             "authority_score": 1.00,
             "evidence_quality": 0.96,
             "title": "ICAR-IISS Soil Health & Nutrient Bioavailability"
+        },
+        {
+            "claim": "Silver-black plastic mulch (25-30 micron) conserves 40-50% root-zone moisture, suppresses weeds, and reflects sunlight to repel aphids/thrips. Pre-emergence Pendimethalin applied within 48 hours of sowing controls annual grassy weeds.",
+            "source": "ICAR-Directorate of Weed Research (DWR)",
+            "source_type": SourceCategory.LEVEL_1_GOV_INTL,
+            "url": "https://dwr.icar.gov.in/weed-management-bulletin/",
+            "published_date": "2024-02-01",
+            "authority_score": 1.00,
+            "evidence_quality": 0.97,
+            "title": "ICAR-DWR Integrated Weed Management & Plasticulture Guidelines"
         }
     ]
 }

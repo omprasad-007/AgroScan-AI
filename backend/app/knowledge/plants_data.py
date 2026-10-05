@@ -385,6 +385,449 @@ PLANTS_KNOWLEDGE_BASE: Dict[str, Dict[str, Any]] = {
         "prevention": "Install pheromone traps for Fall Armyworm monitoring. Apply Metarhizium anisopliae or Bacillus thuringiensis (Bt) in whorls. Seed treatment with Thiamethoxam.",
         "harvesting": "Harvest when husk leaves dry to light straw color, kernel moisture drops to 20-25%, and a black layer forms at base of grain.",
         "post_harvest": "Dry de-husked cobs in sun to 12-14% moisture before shelling with mechanical maize sheller. Store shelled grain in dry pest-proof bins."
+    },
+    "banana": {
+        "common_name": "Banana",
+        "scientific_name": "Musa acuminata / Musa balbisiana",
+        "plant_type": "Perennial Monocot Giant Herbaceous Crop",
+        "soil": "Deep, rich, fertile, well-drained alluvial or clay loam soil rich in organic matter. Soil depth minimum 1 meter. Extremely sensitive to waterlogging and salinity.",
+        "pH": "6.0 to 7.5 (optimum 6.5).",
+        "climate": "Warm, humid tropical climate with high humidity (>60%) and protection from strong winds.",
+        "temperature": "Optimum growing temperature: 25°C to 30°C. Below 15°C growth halts; frost causes severe leaf necrosis.",
+        "rainfall": "Requires 1500 mm to 2000 mm rainfall annually or equivalent high-frequency drip irrigation.",
+        "irrigation": "Very high water requirement (15-20 liters/plant/day in winter, 25-30 liters/plant/day in summer). Drip irrigation with daily scheduling is recommended. Avoid standing water to prevent root rot.",
+        "planting": "Plant healthy sword suckers (1.5-2.0 kg) or tissue culture (TC) plantlets (45-60 days old) in 0.6m x 0.6m x 0.6m pits treated with Carbofuran / Chlorpyrifos and FYM.",
+        "spacing": "Grand Naine: 1.8m x 1.8m (3086 plants/ha) or 1.5m x 1.5m. Robusta / Dwarf Cavendish: 1.5m x 1.5m. High density paired row: 1.2m x 1.2m x 2.0m.",
+        "growth_stages": [
+            "Vegetative phase / shooting of leaves (0 to 6 months)",
+            "Shooting / Inflorescence emergence (6 to 8 months)",
+            "Bunch emergence and bract opening (8 to 9 months)",
+            "Fruit development and finger filling (9 to 11 months)",
+            "Bunch maturity and harvesting (11 to 13 months)"
+        ],
+        "fertilizer": "Grand Naine fertigation schedule: 200g N, 60g P2O5, 300g K2O per plant over 36 weeks. Apply 100% P basal, high N during vegetative phase (weeks 1-20), and switch to high Potassium (K) during bunch emergence and finger filling (weeks 21-36). Foliar spray of Potassium Sulphate (0.5%) on bunch improves finger length and luster.",
+        "pests": [
+            "Banana Pseudostem Borer (Odoiporus longicollis) — larvae tunnel into pseudostem causing jelly-like exudation and lodging.",
+            "Banana Rhizome Weevil (Cosmopolites sordidus) — tunnels inside corm weakening root anchorage.",
+            "Banana Aphid (Pentalonia nigronervosa) — vector of destructive Banana Bunchy Top Virus (BBTV)."
+        ],
+        "diseases": [
+            "Sigatoka Leaf Spot (Mycosphaerella musicola / fijiensis) — yellow/brown spindle spots coalescing into leaf blight.",
+            "Panama Wilt (Fusarium oxysporum f. sp. cubense / TR4) — vascular wilt, yellowing of lower leaves, longitudinal pseudostem splitting.",
+            "Banana Bunchy Top Virus (BBTV) — dark green 'dot-dash' streaks along secondary leaf veins, leaves become narrow, upright, and bunched at apex."
+        ],
+        "prevention": "Use virus-indexed tissue-cultured plantlets. Desucker regularly leaving only one healthy follower ratoon sucker per mother plant. Cover developing bunches with perforated blue polyethylene sleeves (skirting bags).",
+        "harvesting": "Harvest when bunch angles round off, dried floral remnants drop easily, and fingers turn light green (75-80% maturity for export/distant transit; full maturity for local market).",
+        "post_harvest": "De-hand bunches with curved knife, wash in alum/chlorinated water tank to remove latex, treat crown with Azoxystrobin (0.1%), pack in corrugated boxes with foam liners, store at 13°C-14°C at 90-95% RH."
+    },
+    "grape": {
+        "common_name": "Grape (Grapevine)",
+        "scientific_name": "Vitis vinifera",
+        "plant_type": "Perennial Deciduous Woody Vine",
+        "soil": "Well-drained sandy loam, gravelly loam, or red sandy soil with good water permeability. High sensitivity to waterlogging, salinity (EC > 1.5 dS/m), and high exchangeable sodium (ESP > 15%).",
+        "pH": "6.5 to 7.5.",
+        "climate": "Subtropical and Mediterranean dry climate. Requires hot dry summers and cool dry winters without rain during berry maturation to prevent fungal outbreaks.",
+        "temperature": "Optimum: 25°C to 35°C during vegetative growth and ripening. Extreme humidity with rain during ripening causes berry cracking and rotting.",
+        "rainfall": "500 mm to 700 mm. Strict dry period required from fruit set to harvest.",
+        "irrigation": "Drip irrigation based on pan evaporation. Foundation pruning (April): High irrigation (25-30 L/vine/day) for canopy development. Forward fruit pruning (Oct): Regulated deficit irrigation (15-20 L/vine/day) after berry set. Withhold irrigation 8-10 days before harvest to build Brix sugar levels.",
+        "planting": "Rooted cuttings grafted onto Dogridge or 110R nematode/salinity resistant rootstocks planted in 1m x 1m x 1m pits.",
+        "spacing": "Y-trellis / Bower (Pandal) system: 3.0m row-to-row, 1.8m vine-to-vine.",
+        "growth_stages": [
+            "April Back Pruning (Foundation pruning for canes)",
+            "October Forward Pruning (Fruit bud pruning)",
+            "Sprouting and Panicle emergence (Oct-Nov)",
+            "Flowering / Cap fall & fruit set (Nov-Dec)",
+            "Berry development (4-8mm stage, GA3 thinning) (Dec-Jan)",
+            "Veraison (color change / softening) (Jan-Feb)",
+            "Harvest maturity (18-20° Brix) (Feb-April)"
+        ],
+        "fertilizer": "Annual vine nutrition (Bower system): 300g N, 200g P2O5, 400g K2O per vine per year. Apply 70% N and 50% P post-April pruning; apply 30% N, 50% P, and 100% K post-October pruning. Foliar Calcium Chloride (0.3%) and Boron (0.1%) sprays prevent berry cracking and enhance shelf life.",
+        "pests": [
+            "Grape Thrips (Scirtothrips dorsalis) — scrape berries causing scab-like corky russeting.",
+            "Mealybug (Maconellicoccus hirsutus) — infests bunch clusters secreting honeydew and sooty mold.",
+            "Flea Beetle (Scelodonta strigicollis) — feeds on sprouting buds in October causing shoot blindness."
+        ],
+        "diseases": [
+            "Downy Mildew (Plasmopara viticola) — yellow oily lesions on upper leaf surface, white downy growth on lower surface.",
+            "Powdery Mildew (Uncinula necator) — ash-gray powdery coating on leaves and berries causing berry splitting.",
+            "Anthracnose / Bird's Eye Spot (Elsinoe ampelina) — dark sunken circular spots with grey centers on leaves and berries."
+        ],
+        "prevention": "Prune vines carefully to maintain open, aerated canopy. Dip bunches in GA3 (Gibberellic Acid) at 10-15 ppm at 4mm stage for elongation and thinning. Maintain strict prophylactic spray schedule before rain events.",
+        "harvesting": "Harvest when berries develop uniform cultivar color, seed turns dark brown, and TSS reaches 18-20° Brix with acidity 0.5-0.6%. Clip bunches early in morning using grape snips.",
+        "post_harvest": "Pre-cool within 4 hours to 0°C to 2°C. Place dual-release SO2 (Sulfur Dioxide) grape guard pads in ventilated boxes to prevent Botrytis gray mold. Store at 0°C with 90-95% RH."
+    },
+    "pomegranate": {
+        "common_name": "Pomegranate",
+        "scientific_name": "Punica granatum",
+        "plant_type": "Perennial Deciduous/Semi-Evergreen Shrub/Fruit Tree",
+        "soil": "Well-drained light to medium black soils, red loamy, or alluvial soils. Tolerates moderate salinity and alkaline conditions up to pH 8.0.",
+        "pH": "6.5 to 8.0.",
+        "climate": "Semi-arid dry climate with hot dry summers and mild winters. Requires dry weather during flowering and fruit ripening.",
+        "temperature": "Optimum: 25°C to 38°C. High sunshine improves fruit rind color and aril sweetness.",
+        "rainfall": "500 mm to 700 mm. Heavy rains during fruit ripening cause severe fruit cracking and bacterial blight.",
+        "irrigation": "Drip irrigation: 15-20 liters/plant/day during fruit development. Practice 'Bahar treatment' (stress withholding water for 40-50 days) before Hasta (Sept-Oct) or Ambe Bahar (Jan-Feb) to induce synchronous flowering.",
+        "planting": "Plant air-layered (goottee) or hardwood cuttings in 0.6m x 0.6m x 0.6m pits during onset of monsoon.",
+        "spacing": "4.5m x 3.0m (740 plants/ha) or 4.0m x 3.0m (833 plants/ha).",
+        "growth_stages": [
+            "Water stress period (Bahar induction)",
+            "Pruning & light irrigation resumption",
+            "Profuse vegetative flush and flowering",
+            "Fruit set and calyx thinning",
+            "Fruit enlargement and aril filling",
+            "Rind color development & maturity (135-150 days post-bloom)"
+        ],
+        "fertilizer": "Per bearing tree (5+ years): 625g N, 250g P2O5, 500g K2O along with 30 kg well-rotted FYM. Apply 50% N + full P + 50% K at bahar initiation; apply remaining 50% N and 50% K 45 days after fruit set. Spray Micronutrient mixture (Fe, Zn, B) 0.3% twice during fruit growth.",
+        "pests": [
+            "Anar Butterfly / Fruit Borer (Deudorix isocrates) — caterpillar bores into fruit making circular entry hole and causing offensive smelling internal rot.",
+            "Thrips (Scirtothrips dorsalis) — causes corky scabbing on fruit surface.",
+            "Shot Hole Borer (Xylosandrus compactus) — bores into main stem transmitting wilt fungus."
+        ],
+        "diseases": [
+            "Bacterial Blight / Telya (Xanthomonas axonopodis pv. punicae) — water-soaked oily dark spots on leaves, nodal stem cankers, and prominent oily triangular 'Y-shaped' cracked spots on fruits.",
+            "Fruit Rot / Anthracnose (Colletotrichum gloeosporioides) — sunken circular brown spots on rind.",
+            "Cercospora Leaf Spot (Cercospora punicae) — light brown spots on leaves."
+        ],
+        "prevention": "Prune infected twigs 5 cm below infection and burn immediately. Bag individual developing fruits with butter paper or non-woven bags to protect against fruit borer and bacterial blight. Follow strict orchard sanitation.",
+        "harvesting": "Harvest 135-150 days after flowering when fruit makes a metallic ringing sound on tapping, rind turns crimson red/yellowish pink, and calyx lobes curl inwards.",
+        "post_harvest": "Grade by size/weight (Super: >350g, King: 300-350g). Wash in chlorinated water (100 ppm), dry, pack in 3-4 kg boxes. Store at 6°C-7°C with 90-95% RH. Shelf life: 2 months."
+    },
+    "groundnut": {
+        "common_name": "Groundnut (Peanut)",
+        "scientific_name": "Arachis hypogaea",
+        "plant_type": "Annual Legume Oilseed Crop",
+        "soil": "Well-drained loose, friable sandy loam or light red sandy soil rich in calcium and organic matter. Compact heavy clay soils severely restrict peg penetration and pod development.",
+        "pH": "6.0 to 7.0.",
+        "climate": "Warm, sunny tropical and subtropical climate with frost-free growing season.",
+        "temperature": "Optimum: 25°C to 30°C. Temperature below 20°C delays germination and flowering.",
+        "rainfall": "500 mm to 700 mm evenly distributed throughout vegetative and pegging stages.",
+        "irrigation": "Critical irrigation stages: Flowering (25-30 DAS), Pegging (40-50 DAS — MOST CRITICAL: soil must be loose and moist for gynophore penetration), and Pod development (60-70 DAS). Avoid moisture stress during pegging.",
+        "planting": "Sow healthy certified kernels (100-120 kg/ha for bunch type; 80-90 kg/ha for spreading type) treated with Rhizobium leguminosarum + Trichoderma viride.",
+        "spacing": "Bunch varieties (e.g. TAG-24, JL-24): 30 cm x 10 cm. Spreading varieties: 45 cm x 15 cm. Sow at 4-5 cm depth.",
+        "growth_stages": [
+            "Germination & seedling emergence (0 to 10 days)",
+            "Vegetative branching (10 to 25 days)",
+            "Flowering (25 to 40 days)",
+            "Pegging & gynophore soil penetration (40 to 60 days)",
+            "Pod formation & seed filling (60 to 90 days)",
+            "Pod maturity and harvest (90 to 120 days)"
+        ],
+        "fertilizer": "NPK 25:50:0 to 25:50:20 kg/ha. CRITICAL: Apply Gypsum (Calcium Sulfate) @ 400-500 kg/ha at flowering/pegging stage (35-40 DAS) directly to the root zone. Calcium is essential for pod shell hardening and preventing 'pop' (empty seedless pods), while Sulfur boosts oil synthesis.",
+        "pests": [
+            "Leaf Miner (Aproaerema modicella) — larvae mine inside leaves making blisters and webbing leaves together.",
+            "White Grub (Holotrichia consanguinea) — subterranean grubs feed on roots causing sudden plant wilting in patches.",
+            "Aphids & Thrips — transmit Peanut Bud Necrosis Virus (PBNV)."
+        ],
+        "diseases": [
+            "Tikka Disease / Leaf Spot (Cercospora arachidicola - Early Tikka; Cercosporidium personatum - Late Tikka) — circular dark brown spots surrounded by yellow halos causing severe defoliation.",
+            "Rust (Puccinia arachidis) — orange-brown powdery pustules on lower leaf surface.",
+            "Collar Rot (Aspergillus niger) — rotting of collar region near soil level leading to seedling death."
+        ],
+        "prevention": "Rotate with non-host cereals (pearl millet, sorghum). Deep summer plowing to destroy white grub pupae. Seed treatment with Thiram + Carbendazim (2g/kg) or Trichoderma (10g/kg).",
+        "harvesting": "Harvest when 75-80% of pods show internal shell blackening/browning, foliage turns yellowish, and kernels separate freely from shell.",
+        "post_harvest": "Dry uprooted vines in field for 2-3 days, strip pods, and sun-dry pods on clean tarpaulins until moisture drops below 8-9% to prevent toxic Aflatoxin (Aspergillus flavus) development during storage."
+    },
+    "chickpea": {
+        "common_name": "Chickpea (Gram / Bengal Gram)",
+        "scientific_name": "Cicer arietinum",
+        "plant_type": "Annual Rabi Legume Pulse Crop",
+        "soil": "Well-drained deep clay loam, silt loam, or black cotton soil with good water retention capacity. Highly sensitive to waterlogging, poor aeration, and soil salinity.",
+        "pH": "6.5 to 7.8.",
+        "climate": "Cool, dry winter climate during vegetative growth, followed by warm sunny weather during seed ripening. Strict requirement for frost-free conditions during flowering.",
+        "temperature": "Optimum: 18°C to 26°C. High temperature (>32°C) or heavy fog/cloudy weather at flowering causes severe flower drop.",
+        "rainfall": "400 mm to 600 mm. Highly drought-tolerant pulse grown predominantly under residual soil moisture in Rabi.",
+        "irrigation": "Low water requirement. 1 to 2 protective irrigations: 1st at pre-flowering branching stage (30-35 DAS), and 2nd at early pod development stage (60-65 DAS). NEVER irrigate during peak flowering as it promotes excessive vegetative growth and flower drop.",
+        "planting": "Sow certified seeds (Desi: 65-75 kg/ha; Kabuli: 100-120 kg/ha) treated with Rhizobium and PSB culture at 6-8 cm depth during October to mid-November.",
+        "spacing": "Desi types: 30 cm x 10 cm. Kabuli types: 45 cm x 10 cm.",
+        "growth_stages": [
+            "Emergence & seedling stage (0 to 15 days)",
+            "Vegetative branching (15 to 40 days)",
+            "Nipping / apical shoot pinching (30-35 days for lateral branching)",
+            "Flower initiation and blooming (40 to 65 days)",
+            "Pod set & green seed filling (65 to 90 days)",
+            "Pod yellowing and maturity (90 to 115 days)"
+        ],
+        "fertilizer": "NPK 20:40:20 kg/ha with 20 kg/ha elemental Sulfur as basal. Being a nodulated legume, it fixes its own Nitrogen (60-80% of requirement). Foliar spray of 2% Urea or 1% 19:19:19 at pod filling stage boosts grain size and yield.",
+        "pests": [
+            "Gram Pod Borer (Helicoverpa armigera) — devastating green/brown caterpillar that bores into pods and eats developing seeds.",
+            "Cutworm (Agrotis ipsilon) — cuts young seedlings at soil surface during night."
+        ],
+        "diseases": [
+            "Fusarium Wilt (Fusarium oxysporum f. sp. ciceris) — drooping of upper leaves, vascular browning in split stem root, rapid plant death in patches.",
+            "Dry Root Rot (Rhizoctonia bataticola) — roots become brittle and dark black, plant dries up prematurely under moisture stress.",
+            "Ascochyta Blight (Ascochyta rabiei) — circular sunken brown spots with concentric pycnidia on leaves and pods."
+        ],
+        "prevention": "Deep summer plowing. Crop rotation with wheat, mustard, or sorghum. Practice 'Nipping' (pinching off apical top 2-3 cm shoots at 30-35 DAS) to encourage profuse lateral flowering branches.",
+        "harvesting": "Harvest when 90% of pods turn golden-yellow/brown, leaves dry and drop off, and seeds rattle inside pods.",
+        "post_harvest": "Sun-dry harvested plants on threshing floor for 3-4 days. Thresh with tractor/bullock or pulse thresher. Dry seeds to 9-10% moisture before storing in clean airtight bags with neem leaves."
+    },
+    "papaya": {
+        "common_name": "Papaya",
+        "scientific_name": "Carica papaya",
+        "plant_type": "Fast-Growing Semi-Woody Herbaceous Fruit Tree",
+        "soil": "Rich, deep, fertile sandy loam or alluvial soil with exceptional drainage. Minimum soil depth 1 meter. Extremely susceptible to 'wet feet' (waterlogging causes stem rot within 24-48 hours).",
+        "pH": "6.0 to 7.0.",
+        "climate": "Warm, sunny tropical and subtropical climate free from frost and strong winds.",
+        "temperature": "Optimum: 25°C to 35°C. Temperatures below 10°C stunt fruit growth and affect sugar accumulation.",
+        "rainfall": "1000 mm to 1500 mm well-distributed.",
+        "irrigation": "Irrigate through drip or ring basin method (never allow water to touch the main stem trunk). Irrigate every 5-6 days in winter and 2-3 days in summer. Maintain consistent soil moisture.",
+        "planting": "Raise seedlings in polybags. Transplant 45-day-old vigorous seedlings in 0.5m x 0.5m x 0.5m pits during June-Sept. For dioecious varieties, plant 2-3 seedlings per pit and rogue out excess male plants at flowering (maintain 1 male per 10 female trees). Gynodioecious varieties (Red Lady 786, Taiwan 786) are bisexual/hermaphrodite and need 1 seedling per pit.",
+        "spacing": "2.0m x 2.0m (2500 plants/ha) or 1.8m x 1.8m.",
+        "growth_stages": [
+            "Seedling & vegetative establishment (0 to 3 months)",
+            "Flower bud initiation and sex determination (3 to 4 months)",
+            "Fruit set and column enlargement (4 to 6 months)",
+            "Fruit filling and ripening (7 to 10 months)",
+            "Continuous harvesting phase (10 to 24 months)"
+        ],
+        "fertilizer": "Per plant per year: 250g N, 250g P2O5, 500g K2O applied in 6 bimonthly splits. Apply Borax (5g/plant) to prevent bumpy deformed fruits. Zinc Sulfate (0.5%) foliar spray improves chlorophyll and fruit size.",
+        "pests": [
+            "Aphids (Aphis gossypii) — primary sap-sucking vector for Papaya Ringspot Virus (PRSV).",
+            "Red Spider Mites (Tetranychus cinnabarinus) — web under leaf surfaces causing yellow speckling.",
+            "Whitefly & Mealybug — suck sap and secrete honeydew causing sooty mold."
+        ],
+        "diseases": [
+            "Papaya Ringspot Virus (PRSV) — mosaic mottling on leaves, shoestring distortion, water-soaked dark green rings on fruits and stems.",
+            "Damping-Off & Foot Rot / Collar Rot (Pythium aphanidermatum / Phytophthora nicotianae) — rotting of stem at soil level causing tree collapse.",
+            "Anthracnose (Colletotrichum gloeosporioides) — sunken circular brown spots on ripening fruit."
+        ],
+        "prevention": "Raise border barrier crops of 3-4 rows of maize or sorghum to block aphid vectors. Build 20 cm elevated mounds/ridges around trunks to prevent collar contact with irrigation water. Spray systemic insecticides and Neem oil proactively.",
+        "harvesting": "Harvest when fruit skin color changes from dark green to slight yellow at the blossom apex (color break stage). Twist gently or cut with sharp knife retaining 0.5 cm stalk.",
+        "post_harvest": "Wash, treat with Carbendazim (0.1%) dip, wrap in paper, pack in foam-cushioned ventilated cartons. Store at 10°C-12°C with 85-90% RH."
+    },
+    "turmeric": {
+        "common_name": "Turmeric (Haldi)",
+        "scientific_name": "Curcuma longa",
+        "plant_type": "Perennial Rhizomatous Cash & Spice Crop",
+        "soil": "Deep, fertile, well-drained loamy, sandy loam, or alluvial soil rich in humus and organic matter. Soil must be friable to allow unhindered underground rhizome expansion.",
+        "pH": "6.0 to 7.5.",
+        "climate": "Warm, humid tropical climate with abundant sunshine and warm temperatures during rhizome development.",
+        "temperature": "Optimum: 20°C to 35°C. High humidity (70-90%) accelerates vegetative tillering.",
+        "rainfall": "1500 mm to 2000 mm or equivalent irrigation.",
+        "irrigation": "Irrigate immediately after planting. Irrigate every 6-8 days in medium soils. Critical periods: Rhizome initiation (60-90 DAS) and Rhizome development/bulking (120-180 DAS). Withhold irrigation 15-20 days before harvest.",
+        "planting": "Plant healthy mother rhizomes or primary finger rhizomes (35-45g weight, 20-25 q/ha) treated with Quinalphos + Mancozeb on raised beds or broad bed furrows (BBF) in May-June.",
+        "spacing": "Raised beds: 30 cm row-to-row, 20 cm plant-to-plant on 1.2m wide beds.",
+        "growth_stages": [
+            "Sprouting & vegetative emergence (0 to 45 days)",
+            "Active tillering and pseudostem development (45 to 90 days)",
+            "Rhizome initiation (90 to 120 days)",
+            "Rhizome bulking & curcumin accumulation (120 to 210 days)",
+            "Foliage yellowing, drying, and harvest maturity (210 to 270 days)"
+        ],
+        "fertilizer": "NPK 150:60:150 kg/ha along with 25-30 tonnes/ha FYM. Apply full P as basal. Apply Nitrogen and Potassium in 3 splits at 30, 60, and 90 DAS along with earthing up. Apply Ferrous Sulfate (15 kg/ha) and Zinc Sulfate (25 kg/ha) to prevent interveinal chlorosis.",
+        "pests": [
+            "Shoot Borer (Conogethes punctiferalis) — caterpillar bores into pseudostem causing central leaf drying ('dead heart').",
+            "Rhizome Scale (Aspidiella hartii) — white encrustations on stored and growing rhizomes.",
+            "Thrips (Panchaetothrips indicus) — leaf rolling and silvering."
+        ],
+        "diseases": [
+            "Rhizome Rot / Soft Rot (Pythium aphanidermatum) — water-soaked soft rotting of rhizomes with foul smell, foliage turns yellow and collapses.",
+            "Leaf Spot (Colletotrichum capsici) — brown elliptical spots with grey centers on leaves.",
+            "Leaf Blotch (Taphrina maculans) — reddish-brown small spots on both leaf surfaces."
+        ],
+        "prevention": "Provide thick organic mulch (green leaves / paddy straw @ 10-12 t/ha) immediately after planting and at 45 & 90 DAS for moisture conservation and weed control. Soil drenching with Trichoderma harzianum or Copper Oxychloride for rhizome rot prevention.",
+        "harvesting": "Harvest when leaves turn yellow, dry, and wither completely (7.5 to 9 months after planting). Dig up rhizome clumps carefully without bruising using tractor diggers or manual spades.",
+        "post_harvest": "Separate mother rhizomes from finger rhizomes. Boil fingers in water for 45-60 minutes until soft (curcuma curing), sun-dry for 10-15 days to 8-10% moisture, and polish mechanically in polishing drums to impart bright yellow color."
+    },
+    "apple": {
+        "common_name": "Apple",
+        "scientific_name": "Malus domestica",
+        "plant_type": "Temperate Deciduous Fruit Tree",
+        "soil": "Deep, well-drained, fertile loamy soil rich in organic matter (depth >1.5m). Free from rocky hardpans and water stagnation.",
+        "pH": "5.5 to 6.8 (slightly acidic).",
+        "climate": "Cool temperate climate with distinct winter chilling (requires 800-1200 chilling hours below 7°C for breaking bud dormancy).",
+        "temperature": "Optimum: 21°C to 24°C during growing season. Severe frost during blossom period causes near-total fruit drop.",
+        "rainfall": "1000 mm to 1250 mm evenly distributed.",
+        "irrigation": "Critical irrigation stages: Sprouting to fruit set, fruit enlargement, and 20 days prior to harvest. Drip irrigation at 20-25 L/tree/day during fruit swelling.",
+        "planting": "Plant grafted 1-year-old whips (on M9 / MM106 rootstocks) in 1m x 1m x 1m pits filled with topsoil, 40kg FYM, and 500g SSP in Dec-Feb.",
+        "spacing": "Standard: 6m x 6m (278 trees/ha). High Density (HDP on M9): 3m x 1m (3333 trees/ha) with trellis wire support.",
+        "growth_stages": [
+            "Winter bud dormancy (Nov-Feb)",
+            "Silver tip & green tip (March)",
+            "Pink bud & full bloom (April)",
+            "Petal fall and fruit set (May)",
+            "Fruit enlargement and cell expansion (June-July)",
+            "Color development and harvesting (Aug-Oct)"
+        ],
+        "fertilizer": "Per mature bearing tree: 700g N, 350g P2O5, 700g K2O along with 40-50 kg FYM. Apply full P, full K, and 50% N in winter; top-dress remaining 50% N post-petal fall. Foliar sprays of 0.2% Borax and 0.4% Calcium Chloride prevent bitter pit and corking.",
+        "pests": [
+            "San Jose Scale (Quadraspidiotus perniciosus) — ash-gray encrustations on twigs and red rings on fruits.",
+            "Woolly Apple Aphid (Eriosoma lanigerum) — white cottony masses on branches and galls on roots.",
+            "Codling Moth (Cydia pomonella) — bores into fruit core leaving frass at calyx."
+        ],
+        "diseases": [
+            "Apple Scab (Venturia inaequalis) — olive-green velvety spots turning black and corky on leaves and fruits.",
+            "Powdery Mildew (Podosphaera leucotricha) — white powdery growth on terminal shoots causing rosette distortion.",
+            "Alternaria Leaf Blotch (Alternaria mali) — circular brown spots with purple margins on leaves causing summer defoliation."
+        ],
+        "prevention": "Spray dormant spray oil (Horticultural mineral oil @ 2%) in January to kill overwintering scale insects. Destroy fallen leaves with 5% urea spray in autumn to disrupt apple scab pseudothecia.",
+        "harvesting": "Harvest when ground color changes from green to yellow, starch conversion index reaches 3-4, and fruit separates easily with upward twist.",
+        "post_harvest": "Pre-cool immediately to 4°C. Treat with 1-MCP (1 ppm) for long storage. Store in Controlled Atmosphere (CA) at 0°C to 1°C with 1.5% O2 and 1-2% CO2 with 90-95% RH. Storage life: 6-8 months."
+    },
+    "guava": {
+        "common_name": "Guava (Amrood / Peru)",
+        "scientific_name": "Psidium guajava",
+        "plant_type": "Subtropical / Tropical Evergreen Fruit Tree",
+        "soil": "Hardy crop; performs well on deep alluvial, red loamy, or medium black soils. Tolerates moderate salinity and sodicity up to pH 8.5.",
+        "pH": "6.0 to 8.2.",
+        "climate": "Tropical and subtropical climate. Hot summers and cool frost-free winters promote high sweetness and aroma.",
+        "temperature": "Optimum: 23°C to 28°C.",
+        "rainfall": "1000 mm to 2000 mm; highly drought tolerant once established.",
+        "irrigation": "Irrigate every 8-10 days in winter, 4-6 days in summer. Drip irrigation saves 40% water. Practice Bahar water withholding in May to induce high-quality winter crop (Mrig Bahar).",
+        "planting": "Plant air-layered or grafted saplings (L-49 / Sardar, Allahabad Safeda, Taiwan Pink) in 0.75m x 0.75m x 0.75m pits in July-August.",
+        "spacing": "Traditional: 6m x 6m (278 plants/ha). High Density / Meadow Orchard: 2m x 1m (5000 plants/ha) or 3m x 2m with regular canopy topping.",
+        "growth_stages": [
+            "Vegetative shoot pruning & bahar initiation (May)",
+            "Sprouting and flower bud emergence (June-July)",
+            "Fruit set (pea to marble stage) (July-August)",
+            "Fruit development and bagging (Sept-Oct)",
+            "Winter harvest maturity (Nov-Jan)"
+        ],
+        "fertilizer": "Per bearing tree (5+ years): 500g N, 200g P2O5, 500g K2O with 25 kg FYM. Apply 50% N + full P + 50% K in June; apply remaining 50% N and 50% K in September. Spray Zinc Sulfate (0.4%) + Boron (0.2%) during flowering.",
+        "pests": [
+            "Fruit Fly (Bactrocera correcta) — oviposits in ripening fruit causing internal maggots and soft rotting.",
+            "Mealybug & Tea Mosquito Bug — suck sap from tender shoots causing corky scab on young fruits."
+        ],
+        "diseases": [
+            "Guava Wilt (Fusarium oxysporum f. sp. psidii) — yellowing and drooping of leaves, severe root necrosis, rapid tree death in alkaline soils.",
+            "Anthracnose / Fruit Canker (Pestalotiopsis psidii / Colletotrichum) — brown circular spots with raised corky margins on fruit."
+        ],
+        "prevention": "Prune Meadow Orchard trees at 60 cm height annually. Bag individual green fruits with non-woven / foam bags 40 days after fruit set. Drench root zone with Trichoderma harzianum (25g/tree) + Pseudomonas fluorescens to prevent Fusarium wilt.",
+        "harvesting": "Harvest when fruit skin color transitions from dark green to light yellowish-green. Harvest with stalks intact using hand clippers.",
+        "post_harvest": "Grade by size (A: >200g, B: 150-200g). Store at 8°C-10°C with 85-90% RH. Shelf life: 2-3 weeks."
+    },
+    "pigeonpea": {
+        "common_name": "Pigeonpea (Red Gram / Tur / Arhar)",
+        "scientific_name": "Cajanus cajan",
+        "plant_type": "Semi-Perennial / Annual Deep-Rooted Legume Pulse",
+        "soil": "Deep, well-drained medium black cotton soils, clay loam, or red sandy loam. Extremely sensitive to waterlogging at all growth stages.",
+        "pH": "6.5 to 7.8.",
+        "climate": "Warm tropical climate with sunny conditions during vegetative phase and dry sunny weather during pod filling and maturity.",
+        "temperature": "Optimum: 25°C to 35°C. Freezes easily below 10°C.",
+        "rainfall": "600 mm to 1000 mm. Highly drought-tolerant due to deep taproot system.",
+        "irrigation": "Protective irrigations at (1) Flower bud initiation (70-80 DAS) and (2) Pod filling stage (100-110 DAS) boost seed yield by 40-50%.",
+        "planting": "Sow certified seeds (12-15 kg/ha sole; 5-7 kg/ha intercropped with soybean/cotton in 4:2 or 6:1 ratio) treated with Rhizobium + Trichoderma.",
+        "spacing": "Sole crop (Wilt-resistant varieties like BDN-711, BSMR-736, Maruti): 90 cm x 20 cm or 120 cm x 30 cm on broad bed furrows (BBF).",
+        "growth_stages": [
+            "Emergence & slow early vegetative phase (0 to 45 days)",
+            "Active branching & canopy expansion (45 to 90 days)",
+            "Profuse flower bud initiation (90 to 120 days)",
+            "Pod setting & green grain filling (120 to 150 days)",
+            "Pod browning, leaf drying, and harvest maturity (150 to 180 days)"
+        ],
+        "fertilizer": "NPK 25:50:0 kg/ha along with 20 kg/ha Sulfur as basal. Fixes up to 40 kg N/ha into soil. Foliar spray of 2% DAP or 1% 19:19:19 + 0.2% Borax at 50% flowering enhances pod set and reduces flower drop.",
+        "pests": [
+            "Gram Pod Borer (Helicoverpa armigera) — feeds on flower buds and chews circular holes in pods.",
+            "Pod Fly (Melanagromyza obtusa) — maggot feeds invisibly inside grain causing damaged unmarketable seeds.",
+            "Plume Moth (Exelastis atomosa) — feeds on flower petals and tender pods."
+        ],
+        "diseases": [
+            "Fusarium Wilt (Fusarium udum) — purple-black streak on stem xylem, unilateral branch drooping and death.",
+            "Sterility Mosaic Disease (SMD / Pigeonpea green plague) — transmitted by Eriophyid mite (Aceria cajani); bushy vegetative growth, pale mosaic leaves, complete absence of flowers/pods.",
+            "Phytophthora Stem Blight (Phytophthora cajani) — water-soaked brown lesions on main stem causing stem breaking."
+        ],
+        "prevention": "Grow SMD & wilt-resistant cultivars (BSMR-736, BDN-711, ICPL-87119). Spray Fenazaquin 10% EC (1 ml/L) or Wettable Sulfur (2.5 g/L) to control vector mites. Install 10 pheromone traps/ha for Helicoverpa.",
+        "harvesting": "Harvest when 80-85% of pods turn dark brown/straw-colored and rattle when shaken.",
+        "post_harvest": "Sun-dry plants for 3-5 days, thresh with pulse thresher, dry seeds to 9-10% moisture before bagging with neem leaf layers."
+    },
+    "brinjal": {
+        "common_name": "Brinjal (Eggplant / Aubergine)",
+        "scientific_name": "Solanum melongena",
+        "plant_type": "Warm-Season Solanaceous Vegetable",
+        "soil": "Deep, fertile, well-drained sandy loam to clay loam rich in organic matter. Free from root-knot nematode infestation.",
+        "pH": "6.0 to 7.0.",
+        "climate": "Warm tropical climate with extended frost-free sunny period.",
+        "temperature": "Optimum: 22°C to 30°C.",
+        "rainfall": "Requires 600 mm to 1000 mm or regular drip irrigation.",
+        "irrigation": "Irrigate every 3-4 days in summer, 6-8 days in winter. Moisture stress at fruit set causes fruit drop and bitterness.",
+        "planting": "Transplant 30-35 day-old sturdy seedlings (300-400 g seed/ha) in raised beds during Kharif (June-July), Rabi (Sept-Oct), or Summer (Jan-Feb).",
+        "spacing": "Hybrids: 90 cm x 60 cm or 75 cm x 75 cm.",
+        "growth_stages": [
+            "Nursery & transplanting (0 to 35 days)",
+            "Vegetative branching (35 to 60 days)",
+            "Continuous flowering and fruit set (60 to 120 days)",
+            "Multiple harvest picking cycles (75 to 150 days)"
+        ],
+        "fertilizer": "NPK 100:50:50 kg/ha with 25 t/ha FYM. Apply 50% N + full P + full K as basal. Top-dress remaining Nitrogen in 2 equal splits at 30 and 60 days after transplanting.",
+        "pests": [
+            "Shoot & Fruit Borer (Leucinodes orbonalis) — caterpillar bores into growing shoots causing wilting ('dead hearts') and bores into fruits leaving frass-filled holes.",
+            "Jassids & Whiteflies — suck sap causing leaf curl, hopper burn, and transmission of Little Leaf phytoplasma.",
+            "Epilachna Beetle — grubs skeletonize leaves leaving lace-like appearance."
+        ],
+        "diseases": [
+            "Phomopsis Blight & Fruit Rot (Phomopsis vexans) — circular dark brown spots with concentric pycnidia on leaves and soft brown rotting of fruits.",
+            "Little Leaf of Brinjal (Phytoplasma) — transmitted by leafhoppers (Hishimonus phycitis); leaves become extremely small, narrow, soft, bushy with zero fruit set.",
+            "Damping-Off & Collar Rot (Pythium / Rhizoctonia) — seedling collapse at nursery level."
+        ],
+        "prevention": "Clip and destroy wilted shoot tips weekly along with inside larvae. Install 15-20 pheromone traps (Lucinlure)/ha. Spray Emamectin Benzoate 5% SG (0.4 g/L) or Chlorantraniliprole 18.5% SC (0.3 ml/L) for borer control. Rogue out Little Leaf affected plants immediately.",
+        "harvesting": "Harvest when fruits attain full cultivar size and bright glossy color before seeds harden and flesh turns spongy.",
+        "post_harvest": "Wipe with clean soft cloth, grade by size and color, pack in ventilated CFB boxes. Store at 10°C-12°C with 85-90% RH. Shelf life: 7-10 days."
+    },
+    "garlic": {
+        "common_name": "Garlic (Lasun / Lahsun)",
+        "scientific_name": "Allium sativum",
+        "plant_type": "Rabi Bulbous Cash Crop / Spice",
+        "soil": "Fertile, loose, friable, well-drained sandy loam or silt loam rich in organic matter. Compact heavy clay soils cause deformed, undersized, discolored bulbs.",
+        "pH": "6.0 to 7.5.",
+        "climate": "Cool dry winter climate during bulb initiation and vegetative phase, followed by warm sunny dry weather during bulb maturity.",
+        "temperature": "Optimum vegetative: 13°C to 24°C; Bulb development requires 20°C to 28°C with >10-12 hours photoperiod.",
+        "rainfall": "Low to medium rainfall (350-500 mm). High humidity promotes foliar blight.",
+        "irrigation": "Shallow-rooted crop requiring frequent light irrigations (every 6-8 days in medium soils). Stop irrigation strictly 10-15 days before harvest to allow outer wrapper scales to dry and cure.",
+        "planting": "Plant healthy, bold, disease-free cloves from outer rings of bulbs (500-600 kg cloves/ha) vertically with root end pointing downwards at 2-3 cm depth in October-November.",
+        "spacing": "15 cm row-to-row, 10 cm clove-to-clove on flat or raised beds.",
+        "growth_stages": [
+            "Sprouting & emergence (0 to 15 days)",
+            "Vegetative leaf production (15 to 60 days)",
+            "Bulb initiation & clove differentiation (60 to 90 days)",
+            "Bulb enlargement & allicin accumulation (90 to 125 days)",
+            "Top leaf yellowing, neck fall, and harvest maturity (125 to 140 days)"
+        ],
+        "fertilizer": "NPK 100:50:50 kg/ha with 30-40 kg/ha elemental Sulfur and 20 tonnes FYM. Sulfur is critical for garlic pungency and allicin synthesis. Apply full P, full K, full S, and 50% N at planting. Top-dress remaining Nitrogen in 2 splits at 30 and 45 DAS. Avoid applying Nitrogen after 60 DAS to prevent splitting of bulbs.",
+        "pests": [
+            "Thrips (Thrips tabaci) — scrape leaves causing silvery white streaks, leaf curling, and distortion.",
+            "Mites & Maggots — attack roots and stored bulbs."
+        ],
+        "diseases": [
+            "Purple Blotch (Alternaria porri) — purplish-brown sunken lesions on leaves causing premature foliage drying.",
+            "Stemphylium Leaf Blight (Stemphylium vesicarium) — small yellow to orange flecks expanding into elongated patches.",
+            "Basal Rot / Bulb Rot (Fusarium oxysporum) — rotting of roots and basal plate with white mycelial growth."
+        ],
+        "prevention": "Seed clove treatment with Carbendazim + Mancozeb (2g/kg). Spray Mancozeb 75% WP (2.5 g/L) or Tebuconazole 25.9% EC (1 ml/L) mixed with sticking agent. Install blue sticky traps for thrips monitoring.",
+        "harvesting": "Harvest when 60-70% of tops turn yellow, dry, and collapse (neck fall stage). Uproot plants carefully without bruising bulbs.",
+        "post_harvest": "Field cure under shade with leaves intact for 4-6 days (windrow method) until neck constricts tightly. Cut pseudo-stems leaving 2.5 cm neck. Store in dry, well-ventilated slatted wooden crates or mesh bags. Storage life: 6-8 months."
+    },
+    "watermelon": {
+        "common_name": "Watermelon (Tarbuj / Kalingad)",
+        "scientific_name": "Citrullus lanatus",
+        "plant_type": "Warm-Season Annual Cucurbitaceous Vine",
+        "soil": "Deep, fertile, well-drained sandy loam, alluvial, or riverbed soils rich in organic matter. Highly sensitive to waterlogging and soil compaction.",
+        "pH": "6.0 to 7.0.",
+        "climate": "Warm, dry sunny climate with long days and high sunshine hours. Excess rainfall during fruit development causes fungal foliar blights and reduces sweetness.",
+        "temperature": "Optimum germination: 25°C to 30°C. Optimum vegetative & fruit growth: 28°C to 35°C.",
+        "rainfall": "Low rainfall; grown predominantly with drip irrigation and silver-black plastic mulch.",
+        "irrigation": "Irrigate through drip lines daily. Critical stages: Vine running, flowering, and fruit enlargement. Reduce irrigation 7-10 days before harvest to concentrate sugars (Brix >11-12°).",
+        "planting": "Sow certified hybrid seeds (Sugar Baby, Max, Black Star @ 1.5-2.0 kg/ha) on raised beds covered with 25-micron silver-black plastic mulch in Dec-Feb.",
+        "spacing": "Raised beds 2.0m apart; 45-60 cm plant-to-plant on beds with inline drip tubing.",
+        "growth_stages": [
+            "Germination & 4-leaf stage (0 to 15 days)",
+            "Vine running and lateral branching (15 to 40 days)",
+            "Male and female flowering / bee pollination (40 to 55 days)",
+            "Fruit development & rind expansion (55 to 80 days)",
+            "Maturity and harvest (80 to 95 days)"
+        ],
+        "fertilizer": "NPK 150:80:120 kg/ha fertigated through drip lines over 10 weeks. High Phosphorus at planting, balanced NPK during vine growth, and high Potassium (0:0:50 @ 5-7 kg/ha/week) during fruit swelling. Foliar Calcium Nitrate (4g/L) and Borax (1g/L) prevent blossom end rot and fruit cracking.",
+        "pests": [
+            "Fruit Fly (Bactrocera cucurbitae) — punctures young ovaries and developing fruits causing fruit curvature, rotting, and drop.",
+            "Red Pumpkin Beetle (Aulacophora foveicollis) — feeds voraciously on cotyledons and leaves of young seedlings.",
+            "Aphids & Thrips — transmit Watermelon Mosaic Virus (WMV)."
+        ],
+        "diseases": [
+            "Downy Mildew (Pseudoperonospora cubensis) — angular bright yellow spots bounded by veins on upper leaf surface, purplish mold beneath.",
+            "Powdery Mildew (Podosphaera xanthii) — white talc-like patches on leaves and stems.",
+            "Fusarium Wilt & Gummy Stem Blight — sudden vine collapse with amber-colored gummy exudation at collar region."
+        ],
+        "prevention": "Install 15 cue-lure fruit fly traps per hectare. Use silver-black mulch to repel aphids and thrips. Avoid overhead watering.",
+        "harvesting": "Harvest when the tendril nearest to fruit stem dries completely to brown wire, the ground spot turns creamy yellow, and the fruit gives a dull hollow thud sound when tapped with knuckles.",
+        "post_harvest": "Harvest early in morning with 2 cm stem intact. Do not stack higher than 4-5 layers in transit. Store at 10°C-15°C with 85-90% RH. Shelf life: 2-3 weeks."
     }
 }
 
@@ -407,18 +850,73 @@ def get_plant_data(plant_name: str) -> Optional[Dict[str, Any]]:
     # Alias / variant mappings
     aliases = {
         "paddy": "rice",
+        "rice": "rice",
         "corn": "maize",
+        "maize": "maize",
         "pepper": "chilli",
         "capsicum": "chilli",
+        "mirchi": "chilli",
         "bhindi": "okra",
+        "okra": "okra",
         "cane": "sugarcane",
+        "sugarcane": "sugarcane",
         "aam": "mango",
         "amba": "mango",
+        "mango": "mango",
         "kanda": "onion",
+        "pyaz": "onion",
+        "onion": "onion",
         "batata": "potato",
         "aloo": "potato",
+        "potato": "potato",
         "kapas": "cotton",
-        "soyabean": "soybean"
+        "cotton": "cotton",
+        "soyabean": "soybean",
+        "soybean": "soybean",
+        "kela": "banana",
+        "keli": "banana",
+        "banana": "banana",
+        "draksh": "grape",
+        "draksha": "grape",
+        "grapes": "grape",
+        "grape": "grape",
+        "angur": "grape",
+        "dalimb": "pomegranate",
+        "anar": "pomegranate",
+        "pomegranate": "pomegranate",
+        "bhuimug": "groundnut",
+        "mungfali": "groundnut",
+        "peanut": "groundnut",
+        "groundnut": "groundnut",
+        "chana": "chickpea",
+        "harbara": "chickpea",
+        "gram": "chickpea",
+        "chickpea": "chickpea",
+        "papai": "papaya",
+        "papita": "papaya",
+        "papaya": "papaya",
+        "haldi": "turmeric",
+        "halad": "turmeric",
+        "turmeric": "turmeric",
+        "apple": "apple",
+        "safarchand": "apple",
+        "guava": "guava",
+        "amrood": "guava",
+        "peru": "guava",
+        "pigeonpea": "pigeonpea",
+        "tur": "pigeonpea",
+        "arhar": "pigeonpea",
+        "toor": "pigeonpea",
+        "brinjal": "brinjal",
+        "eggplant": "brinjal",
+        "baingan": "brinjal",
+        "vangi": "brinjal",
+        "garlic": "garlic",
+        "lasun": "garlic",
+        "lahsun": "garlic",
+        "watermelon": "watermelon",
+        "tarbuj": "watermelon",
+        "kalingad": "watermelon"
     }
     
     for alias, target in aliases.items():

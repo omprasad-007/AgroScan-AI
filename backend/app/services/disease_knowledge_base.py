@@ -126,6 +126,8 @@ DISEASE_KNOWLEDGE_BASE = {
     }
 }
 
+ALL_DISEASES = list(DISEASE_KNOWLEDGE_BASE.values())
+
 def get_crop_cultivation_info(crop_name: str) -> dict:
     for key, val in CROP_CULTIVATION_KB.items():
         if key.lower() in crop_name.lower() or crop_name.lower() in key.lower():

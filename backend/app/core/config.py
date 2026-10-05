@@ -28,16 +28,27 @@ class Settings(BaseSettings):
         "http://127.0.0.1:5173",
         "http://127.0.0.1:3000"
     ]
-    MAX_UPLOAD_SIZE_MB: int = 10
+    MAX_UPLOAD_SIZE_MB: int = 100
 
-    # External API Keys & AI Provider
+    # External Plant / Disease API Providers
     AI_PROVIDER: str = "openai"  # "openai" (OpenRouter/OpenAI) or "gemini"
     GEMINI_API_KEY: Optional[str] = None
     PLANT_ID_API_KEY: Optional[str] = None
+    PLANTNET_API_KEY: Optional[str] = None
+    PLANTIX_API_KEY: Optional[str] = None
+    AGRIO_API_KEY: Optional[str] = None
+    TAJIRI_API_KEY: Optional[str] = None
+    PLANT_HEALTH_ENGINE_API_KEY: Optional[str] = None
     PERENUAL_API_KEY: Optional[str] = None
     OPENAI_API_KEY: Optional[str] = None
     OPENROUTER_API_KEY: Optional[str] = None
     WEATHER_API_KEY: Optional[str] = None
+
+    # Leaf Validation & Multi-API Thresholds
+    LEAF_VALIDATION_THRESHOLD: float = 0.70
+    IMAGE_QUALITY_THRESHOLD: float = 0.60
+    DISEASE_CONFIDENCE_THRESHOLD: float = 0.65
+    CONSENSUS_AGREEMENT_MIN: float = 0.50
 
     # ML Config
     MODEL_TYPE: str = "demo"

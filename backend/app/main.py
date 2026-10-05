@@ -23,16 +23,34 @@ def seed_initial_data():
     try:
         # 0. Migrate SQLite columns if missing
         try:
-            with engine.connect() as conn:
-                for col_def in [
-                    "village VARCHAR", "taluka VARCHAR", "district VARCHAR",
-                    "state VARCHAR", "pincode VARCHAR", "latitude FLOAT", "longitude FLOAT"
-                ]:
-                    col_name = col_def.split()[0]
-                    try:
-                        conn.execute(Base.metadata.schema and None or engine.raw_connection().cursor().execute(f"ALTER TABLE users ADD COLUMN {col_def}"))
-                    except Exception:
-                        pass
+            raw_conn = engine.raw_connection()
+            cursor = raw_conn.cursor()
+            
+            user_cols = [
+                "village VARCHAR", "taluka VARCHAR", "district VARCHAR",
+                "state VARCHAR", "pincode VARCHAR", "latitude FLOAT", "longitude FLOAT"
+            ]
+            for col_def in user_cols:
+                try:
+                    cursor.execute(f"ALTER TABLE users ADD COLUMN {col_def}")
+                except Exception:
+                    pass
+                    
+            farm_cols = [
+                "village VARCHAR", "taluka VARCHAR", "district VARCHAR",
+                "state VARCHAR", "pincode VARCHAR", "location VARCHAR",
+                "latitude FLOAT", "longitude FLOAT", "location_source VARCHAR DEFAULT 'MANUAL'",
+                "gps_accuracy FLOAT", "crop_types VARCHAR", "area_acres FLOAT DEFAULT 1.0",
+                "irrigation_type VARCHAR DEFAULT 'Drip Irrigation'"
+            ]
+            for col_def in farm_cols:
+                try:
+                    cursor.execute(f"ALTER TABLE farms ADD COLUMN {col_def}")
+                except Exception:
+                    pass
+
+            raw_conn.commit()
+            raw_conn.close()
         except Exception:
             pass
 

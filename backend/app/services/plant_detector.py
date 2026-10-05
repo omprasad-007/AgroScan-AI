@@ -1,71 +1,25 @@
-import cv2
-import numpy as np
 from typing import Tuple, Optional
+from app.services.leaf_validator import LeafValidator
 
 class PlantDetector:
     """
-    OpenCV based Stage 1 Plant Detection & Fail-Safe Validation Engine.
-    Evaluates whether an uploaded image contains plant foliage (leaves, stems, flowers, crops, trees)
-    or non-plant content (selfies, human faces, bodies, animals, buildings, vehicles, food, documents, laptops, phones, blank images).
+    Stage 1 Plant & Leaf-Only Detection Engine.
+    Powered by LeafValidator for computer-vision based leaf and non-plant verification.
     """
 
     @classmethod
     def verify_plant_image(cls, image_bytes: bytes) -> Tuple[Optional[bool], str, str]:
         """
         Returns (is_plant: Optional[bool], status: str, message: str)
-        - Non-plant: (False, "NON_PLANT_IMAGE", "You have not scanned a leaf or plant. Please scan a clear photo of a leaf or plant.")
-        - Plant: (True, "PLANT_IMAGE", "Plant image validated successfully.")
+        - Non-plant / non-leaf: (False, status_code, message)
+        - Plant & Leaf: (True, "PLANT_IMAGE", "Leaf image validated successfully.")
         - Fail-Safe: (None, "VALIDATION_UNAVAILABLE", "We couldn't verify the image. Please try again.")
         """
-        if not image_bytes or len(image_bytes) < 100:
-            return False, "NON_PLANT_IMAGE", "You have not scanned a leaf or plant. Please scan a clear photo of a leaf or plant."
-
         try:
-            np_arr = np.frombuffer(image_bytes, np.uint8)
-            img = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
-
-            if img is None:
-                return False, "NON_PLANT_IMAGE", "You have not scanned a leaf or plant. Please scan a clear photo of a leaf or plant."
-
-            h, w, c = img.shape
-            total_pixels = h * w
-
-            # Convert BGR to HSV
-            hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-
-            # 1. Vegetation HSV Color Mask (Green + Yellowish-Green + Foliage)
-            # Hue 28 to 88 strictly captures plant chlorophyll / leaves without overlapping human skin tones (0-25)
-            lower_green = np.array([28, 40, 35])
-            upper_green = np.array([88, 255, 255])
-            green_mask = cv2.inRange(hsv, lower_green, upper_green)
-
-            # 2. Skin-tone mask (Human faces, hands, selfies, body photos)
-            lower_skin1 = np.array([0, 30, 60])
-            upper_skin1 = np.array([25, 180, 255])
-            lower_skin2 = np.array([160, 30, 60])
-            upper_skin2 = np.array([180, 180, 255])
-            skin_mask1 = cv2.inRange(hsv, lower_skin1, upper_skin1)
-            skin_mask2 = cv2.inRange(hsv, lower_skin2, upper_skin2)
-            skin_mask = cv2.bitwise_or(skin_mask1, skin_mask2)
-
-            green_pixels = np.count_nonzero(green_mask)
-            skin_pixels = np.count_nonzero(skin_mask)
-
-            green_ratio = green_pixels / total_pixels
-            skin_ratio = skin_pixels / total_pixels
-
-            # Decision Logic:
-            # Rejection 1: Skin-tone ratio > 20% (Human face / selfie / body photo)
-            if skin_ratio > 0.20 and green_ratio < 0.25:
-                return False, "NON_PLANT_IMAGE", "You have not scanned a leaf or plant. Please scan a clear photo of a leaf or plant."
-
-            # Rejection 2: Vegetation ratio < 10% (Laptop, phone, building, car, animal, food, document, screenshot, blank)
-            if green_ratio < 0.10:
-                return False, "NON_PLANT_IMAGE", "You have not scanned a leaf or plant. Please scan a clear photo of a leaf or plant."
-
-            # Valid plant foliage/crop image
-            return True, "PLANT_IMAGE", "Plant image validated successfully."
-
+            val_res = LeafValidator.validate_leaf_image(image_bytes)
+            if not val_res.usable_for_diagnosis:
+                return False, val_res.status_code, val_res.message_en
+            return True, "PLANT_IMAGE", val_res.message_en
         except Exception as e:
-            # Rule Fail-Safe: Never assume an image is a plant when validation encounters an error
             return None, "VALIDATION_UNAVAILABLE", "We couldn't verify the image. Please try again."
+

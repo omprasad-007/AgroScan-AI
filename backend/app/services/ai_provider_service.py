@@ -19,7 +19,8 @@ class AIProviderService:
         location_info: Optional[Dict[str, Any]] = None,
         weather_info: Optional[Dict[str, Any]] = None,
         language: str = "en",
-        research_mode: str = "auto"
+        research_mode: str = "auto",
+        user_id: Optional[str] = None
     ) -> str:
         payload = cls.generate_structured_research_response(
             message=message,
@@ -29,7 +30,8 @@ class AIProviderService:
             location_info=location_info,
             weather_info=weather_info,
             language=language,
-            research_mode=research_mode
+            research_mode=research_mode,
+            user_id=user_id
         )
         return payload["answer"]
 
@@ -43,7 +45,8 @@ class AIProviderService:
         location_info: Optional[Dict[str, Any]] = None,
         weather_info: Optional[Dict[str, Any]] = None,
         language: str = "en",
-        research_mode: str = "auto"
+        research_mode: str = "auto",
+        user_id: Optional[str] = None
     ) -> Dict[str, Any]:
         return AssistantService.process_message(
             message=message,
@@ -53,5 +56,6 @@ class AIProviderService:
             location_info=location_info,
             weather_info=weather_info,
             language=language,
-            research_mode=research_mode
+            research_mode=research_mode,
+            user_id=user_id
         )

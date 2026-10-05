@@ -43,7 +43,7 @@ class PlantKnowledgeService:
                 return cls._get_default_care_fallback(crop_name)
 
         except Exception as e:
-            logger.warn(f"PlantKnowledgeService exception for {crop_name}: {e}")
+            logger.warning(f"PlantKnowledgeService exception for {crop_name}: {e}")
             return cls._get_default_care_fallback(crop_name)
 
     @staticmethod
