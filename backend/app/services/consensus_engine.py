@@ -3,7 +3,7 @@ import asyncio
 import logging
 from typing import Dict, Any, List, Optional, Tuple
 from pydantic import BaseModel, Field
-from datetime import datetime
+from datetime import datetime, timezone
 
 from app.core.config import settings
 from app.services.disease_knowledge_base import get_disease_by_code, ALL_DISEASES
@@ -172,7 +172,7 @@ class MultiProviderConsensusEngine:
         cache_key = f"{img_hash}:{target_crop or 'auto'}"
         if cache_key in self._cache:
             ts, cached_result = self._cache[cache_key]
-            if (datetime.utcnow() - ts).total_seconds() < 3600:
+            if (datetime.now(timezone.utc) - ts).total_seconds() < 3600:
                 # Return isolated copy with current scan_id
                 cached_copy = cached_result.model_copy()
                 cached_copy.scan_id = scan_id
@@ -231,7 +231,7 @@ class MultiProviderConsensusEngine:
         consensus = self._fuse_evidence(valid_results, scan_id, img_hash)
         
         # Save to deterministic cache
-        self._cache[cache_key] = (datetime.utcnow(), consensus)
+        self._cache[cache_key] = (datetime.now(timezone.utc), consensus)
         return consensus
 
     def _fuse_evidence(

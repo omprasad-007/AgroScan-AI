@@ -1,11 +1,14 @@
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy import Column, String, Float, Integer, Boolean, DateTime, ForeignKey, Text, JSON
 from sqlalchemy.orm import relationship
 from app.core.database import Base
 
 def generate_uuid():
     return str(uuid.uuid4())
+
+def utc_now():
+    return datetime.now(timezone.utc)
 
 class User(Base):
     __tablename__ = "users"
@@ -26,7 +29,7 @@ class User(Base):
     latitude = Column(Float, nullable=True)
     longitude = Column(Float, nullable=True)
 
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=utc_now)
 
     farms = relationship("Farm", back_populates="owner", cascade="all, delete-orphan")
     predictions = relationship("ScanPrediction", back_populates="user", cascade="all, delete-orphan")
@@ -55,8 +58,8 @@ class Farm(Base):
     crop_types = Column(String, nullable=True)
     area_acres = Column(Float, default=1.0)
     irrigation_type = Column(String, default="Drip Irrigation")
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=utc_now)
+    updated_at = Column(DateTime, default=utc_now, onupdate=utc_now)
 
     owner = relationship("User", back_populates="farms")
     predictions = relationship("ScanPrediction", back_populates="farm")
@@ -75,7 +78,7 @@ class DiseaseInfo(Base):
     chemical_treatment = Column(Text, nullable=False)
     prevention = Column(Text, nullable=False)
     general_guidance = Column(Text, nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=utc_now)
 
     recommendations = relationship("Recommendation", back_populates="disease_info")
 
@@ -104,7 +107,7 @@ class ScanPrediction(Base):
     weather_risk_level = Column(String, default="Low")
     
     is_demo = Column(Boolean, default=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=utc_now)
 
     user = relationship("User", back_populates="predictions")
     farm = relationship("Farm", back_populates="predictions")
@@ -122,7 +125,7 @@ class Recommendation(Base):
     chemical_remedy = Column(Text, nullable=False)
     preventive_steps = Column(Text, nullable=False)
     disclaimer = Column(Text, default="Decision-support guidance only. Follow locally approved product labels.")
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=utc_now)
 
     prediction = relationship("ScanPrediction", back_populates="recommendations")
     disease_info = relationship("DiseaseInfo", back_populates="recommendations")
@@ -136,7 +139,7 @@ class WeatherRecord(Base):
     temperature_c = Column(Float, nullable=False)
     humidity_pct = Column(Float, nullable=False)
     rainfall_mm = Column(Float, default=0.0)
-    recorded_at = Column(DateTime, default=datetime.utcnow)
+    recorded_at = Column(DateTime, default=utc_now)
 
 
 class ChatSession(Base):
@@ -145,7 +148,7 @@ class ChatSession(Base):
     id = Column(String, primary_key=True, default=generate_uuid)
     user_id = Column(String, ForeignKey("users.id"), nullable=False)
     title = Column(String, default="Agronomy Chat")
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=utc_now)
 
     user = relationship("User", back_populates="chat_sessions")
     messages = relationship("ChatMessage", back_populates="session", cascade="all, delete-orphan")
@@ -158,6 +161,6 @@ class ChatMessage(Base):
     session_id = Column(String, ForeignKey("chat_sessions.id"), nullable=False)
     sender = Column(String, nullable=False)
     content = Column(Text, nullable=False)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=utc_now)
 
     session = relationship("ChatSession", back_populates="messages")

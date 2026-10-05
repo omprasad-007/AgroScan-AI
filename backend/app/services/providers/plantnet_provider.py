@@ -2,7 +2,7 @@ import time
 import httpx
 import logging
 from typing import Dict, Any, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 from app.core.config import settings
 from app.services.providers.base_provider import (
     DiseaseDetectionProvider, ProviderDiagnosisResult, PredictionCandidate
@@ -45,13 +45,13 @@ class PlantNetProvider(DiseaseDetectionProvider):
                 error="Pl@ntNet API key (PLANTNET_API_KEY) is not configured in backend environment."
             )
 
-        api_key = settings.PLANTNET_API_KEY
+        api_key = str(settings.PLANTNET_API_KEY or "")
         project = "useful"  # 'useful' covers agricultural crops and economic plants globally
 
         try:
             url = f"{self.API_BASE}/{project}?api-key={api_key}&lang={language}"
             files = [("images", ("leaf.jpg", image_bytes, "image/jpeg"))]
-            data = [("organs", "leaf")]
+            data = {"organs": "leaf"}
 
             async with httpx.AsyncClient(timeout=6.0) as client:
                 res = await client.post(url, files=files, data=data)
@@ -62,8 +62,18 @@ class PlantNetProvider(DiseaseDetectionProvider):
                     payload = res.json()
                     parsed = self._parse_response(payload, latency)
                     if parsed:
-                        self.last_success_at = datetime.utcnow()
+                        self.last_success_at = datetime.now(timezone.utc)
                         return parsed
+                    return ProviderDiagnosisResult(
+                        provider=self.name,
+                        status="error",
+                        plant="Unknown",
+                        disease="Unknown",
+                        disease_code="parse_error",
+                        confidence=0.0,
+                        latency_ms=round(latency, 1),
+                        error="Pl@ntNet response could not be parsed."
+                    )
                 elif res.status_code == 404:
                     # No species match found
                     return ProviderDiagnosisResult(

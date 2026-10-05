@@ -2,7 +2,7 @@ import os
 import time
 import logging
 from typing import Dict, Any, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 from app.core.config import settings
 from app.services.disease_knowledge_base import get_disease_by_code, ALL_DISEASES
 from app.services.providers.base_provider import (
@@ -71,7 +71,7 @@ class AgroScanLocalModelProvider(DiseaseDetectionProvider):
 
                 latency = (time.time() - t0) * 1000.0
                 self.last_latency_ms = latency
-                self.last_success_at = datetime.utcnow()
+                self.last_success_at = datetime.now(timezone.utc)
 
                 is_healthy = code == "healthy_leaf"
                 return ProviderDiagnosisResult(
@@ -126,7 +126,7 @@ class AgroScanLocalModelProvider(DiseaseDetectionProvider):
 
         latency = (time.time() - t0) * 1000.0
         self.last_latency_ms = latency
-        self.last_success_at = datetime.utcnow()
+        self.last_success_at = datetime.now(timezone.utc)
 
         return ProviderDiagnosisResult(
             provider=self.name,

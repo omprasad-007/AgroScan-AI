@@ -3,7 +3,7 @@ import base64
 import httpx
 import logging
 from typing import Dict, Any, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 from app.core.config import settings
 from app.services.providers.base_provider import (
     DiseaseDetectionProvider, ProviderDiagnosisResult, PredictionCandidate, ProviderHealthStatus
@@ -71,7 +71,7 @@ class KindwisePlantIdProvider(DiseaseDetectionProvider):
                     data = res.json()
                     parsed = self._parse_v3(data, latency)
                     if parsed:
-                        self.last_success_at = datetime.utcnow()
+                        self.last_success_at = datetime.now(timezone.utc)
                         return parsed
 
                 # 2. Fallback to v2 if v3 had non-200
@@ -88,7 +88,7 @@ class KindwisePlantIdProvider(DiseaseDetectionProvider):
                     data_v2 = res_v2.json()
                     parsed_v2 = self._parse_v2(data_v2, latency_v2)
                     if parsed_v2:
-                        self.last_success_at = datetime.utcnow()
+                        self.last_success_at = datetime.now(timezone.utc)
                         return parsed_v2
 
                 self.failure_count += 1

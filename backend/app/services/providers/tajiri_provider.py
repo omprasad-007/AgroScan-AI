@@ -2,7 +2,7 @@ import time
 import httpx
 import logging
 from typing import Dict, Any, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 from app.core.config import settings
 from app.services.providers.base_provider import (
     DiseaseDetectionProvider, ProviderDiagnosisResult, PredictionCandidate
@@ -45,7 +45,7 @@ class TajiriVisionProvider(DiseaseDetectionProvider):
                 error="Tajiri API key (TAJIRI_API_KEY) is not configured in backend environment."
             )
 
-        api_key = settings.TAJIRI_API_KEY
+        api_key = str(settings.TAJIRI_API_KEY or "")
         headers = {"Authorization": f"Bearer {api_key}"}
 
         try:
@@ -63,8 +63,18 @@ class TajiriVisionProvider(DiseaseDetectionProvider):
                     payload = res.json()
                     parsed = self._parse_response(payload, latency)
                     if parsed:
-                        self.last_success_at = datetime.utcnow()
+                        self.last_success_at = datetime.now(timezone.utc)
                         return parsed
+                    return ProviderDiagnosisResult(
+                        provider=self.name,
+                        status="error",
+                        plant="Unknown",
+                        disease="Unknown",
+                        disease_code="parse_error",
+                        confidence=0.0,
+                        latency_ms=round(latency, 1),
+                        error="Tajiri response could not be parsed."
+                    )
                 else:
                     self.failure_count += 1
                     return ProviderDiagnosisResult(
