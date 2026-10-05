@@ -45,7 +45,7 @@ class PlantNetProvider(DiseaseDetectionProvider):
                 error="Pl@ntNet API key (PLANTNET_API_KEY) is not configured in backend environment."
             )
 
-        api_key = str(settings.PLANTNET_API_KEY or "")
+        api_key = settings.PLANTNET_API_KEY or ""
         project = "useful"  # 'useful' covers agricultural crops and economic plants globally
 
         try:

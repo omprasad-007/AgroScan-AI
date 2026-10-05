@@ -45,8 +45,8 @@ class AgrioProvider(DiseaseDetectionProvider):
                 error="Agrio API key (AGRIO_API_KEY) is not configured in backend environment."
             )
 
-        api_key = str(settings.AGRIO_API_KEY or "")
-        headers = {"x-api-key": api_key}
+        api_key = settings.AGRIO_API_KEY or ""
+        headers: Dict[str, str] = {"x-api-key": api_key}
 
         try:
             files = {"file": ("leaf.jpg", image_bytes, "image/jpeg")}

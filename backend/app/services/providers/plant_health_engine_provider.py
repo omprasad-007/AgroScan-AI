@@ -45,8 +45,8 @@ class PlantHealthEngineProvider(DiseaseDetectionProvider):
                 error="PlantHealthEngine API key (PLANT_HEALTH_ENGINE_API_KEY) is not configured in backend environment."
             )
 
-        api_key = str(settings.PLANT_HEALTH_ENGINE_API_KEY or "")
-        headers = {"x-api-key": api_key}
+        api_key = settings.PLANT_HEALTH_ENGINE_API_KEY or ""
+        headers: Dict[str, str] = {"x-api-key": api_key}
 
         try:
             files = {"file": ("leaf.jpg", image_bytes, "image/jpeg")}

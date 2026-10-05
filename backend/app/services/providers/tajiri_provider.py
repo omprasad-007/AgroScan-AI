@@ -45,8 +45,8 @@ class TajiriVisionProvider(DiseaseDetectionProvider):
                 error="Tajiri API key (TAJIRI_API_KEY) is not configured in backend environment."
             )
 
-        api_key = str(settings.TAJIRI_API_KEY or "")
-        headers = {"Authorization": f"Bearer {api_key}"}
+        api_key = settings.TAJIRI_API_KEY or ""
+        headers: Dict[str, str] = {"Authorization": f"Bearer {api_key}"}
 
         try:
             files = {"image": ("leaf.jpg", image_bytes, "image/jpeg")}

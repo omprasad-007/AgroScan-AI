@@ -46,9 +46,9 @@ class KindwisePlantIdProvider(DiseaseDetectionProvider):
                 error="Kindwise API key is not configured or DEMO_MODE is active."
             )
 
-        api_key = settings.PLANT_ID_API_KEY
+        api_key = settings.PLANT_ID_API_KEY or ""
         b64_img = base64.b64encode(image_bytes).decode('utf-8')
-        headers = {"Api-Key": api_key, "Content-Type": "application/json"}
+        headers: Dict[str, str] = {"Api-Key": api_key, "Content-Type": "application/json"}
 
         lat = (location.get("latitude") or 16.58) if location else 16.58
         lon = (location.get("longitude") or 74.31) if location else 74.31
@@ -80,7 +80,8 @@ class KindwisePlantIdProvider(DiseaseDetectionProvider):
                     "modifiers": ["crops_fast", "disease_fast", "health_all"],
                     "plant_details": ["common_names", "taxonomy"]
                 }
-                res_v2 = await client.post(self.V2_API_URL, headers={"Api-Key": api_key}, json=v2_payload)
+                headers_v2: Dict[str, str] = {"Api-Key": api_key}
+                res_v2 = await client.post(self.V2_API_URL, headers=headers_v2, json=v2_payload)
                 latency_v2 = (time.time() - t0) * 1000.0
                 self.last_latency_ms = latency_v2
 

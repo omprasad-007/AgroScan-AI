@@ -45,8 +45,8 @@ class PlantixProvider(DiseaseDetectionProvider):
                 error="Plantix API key (PLANTIX_API_KEY) is not configured in backend environment."
             )
 
-        api_key = str(settings.PLANTIX_API_KEY or "")
-        headers = {
+        api_key = settings.PLANTIX_API_KEY or ""
+        headers: Dict[str, str] = {
             "Accept": "application/json",
             "Authorization": f"Bearer {api_key}"
         }
