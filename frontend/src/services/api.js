@@ -8,7 +8,7 @@ const normalizedBaseUrl = rawApiUrl.endsWith('/api/v1')
 
 const api = axios.create({
   baseURL: normalizedBaseUrl,
-  timeout: 15000,
+  timeout: 60000,
   headers: {
     'Content-Type': 'application/json',
   },

@@ -7,7 +7,7 @@ const API_BASE_URL = rawApiUrl.endsWith('/api/v1')
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 15000, // 15s request timeout
+  timeout: 60000, // 60s request timeout
   headers: {
     'Content-Type': 'application/json',
   },

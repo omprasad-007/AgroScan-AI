@@ -183,12 +183,28 @@ class MultiProviderConsensusEngine:
         if not active_providers:
             raise RuntimeError("No disease detection providers are currently available.")
 
-        # Execute Provider Calls in Parallel
+        # Execute Provider Calls in Parallel with resilient exception handling
         tasks = [
             p.diagnose(image_bytes=image_bytes, plant_name=target_crop, location=location, language=language)
             for p in active_providers
         ]
-        results: List[ProviderDiagnosisResult] = await asyncio.gather(*tasks, return_exceptions=False)
+        raw_results = await asyncio.gather(*tasks, return_exceptions=True)
+        results: List[ProviderDiagnosisResult] = []
+        for i, r in enumerate(raw_results):
+            if isinstance(r, Exception):
+                p_name = active_providers[i].name
+                logger.warning(f"Provider '{p_name}' failed during diagnosis: {r}")
+                results.append(ProviderDiagnosisResult(
+                    provider=p_name,
+                    status="error",
+                    plant="Unknown",
+                    disease="Unknown",
+                    disease_code="provider_error",
+                    confidence=0.0,
+                    error=str(r)
+                ))
+            elif isinstance(r, ProviderDiagnosisResult):
+                results.append(r)
 
         # Filter successful results
         valid_results = [r for r in results if r.status == "success"]
@@ -199,6 +215,15 @@ class MultiProviderConsensusEngine:
             if non_leaf:
                 raise ValueError(non_leaf.error or "No plant leaf detected by diagnosis providers.")
             
+            # Fallback to local baseline provider directly if all remote providers errored
+            local_p = self.providers.get("agroscan_local")
+            if local_p:
+                logger.info("All providers errored; generating diagnosis from local baseline.")
+                fallback_res = await local_p.diagnose(image_bytes=image_bytes, plant_name=target_crop, location=location, language=language)
+                if fallback_res.status == "success":
+                    valid_results = [fallback_res]
+
+        if not valid_results:
             err_details = "; ".join([f"{r.provider}: {r.error}" for r in results if r.error])
             raise RuntimeError(f"All disease detection providers failed. {err_details}")
 

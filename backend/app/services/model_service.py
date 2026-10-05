@@ -1,9 +1,21 @@
 import os
 import random
+import logging
 from abc import ABC, abstractmethod
 from typing import Dict, Any
 from app.core.config import settings
 from app.services.plant_detector import PlantDetector
+
+# Optional imports for heavy dependencies
+try:
+    import cv2  # type: ignore
+except ImportError:
+    cv2 = None
+try:
+    import tensorflow as tf  # type: ignore
+except ImportError:
+    tf = None
+logger = logging.getLogger("agroscan.model_service")
 
 class BaseDiseasePredictor(ABC):
     @abstractmethod
@@ -57,7 +69,7 @@ class DemoPredictor(BaseDiseasePredictor):
         selected = self.DEMO_CLASSES[hash_seed]
         
         low_c, high_c = selected["confidence_range"]
-        confidence = round(random.uniform(low_c, high_c), 4)
+        confidence = round(random.uniform(float(low_c), float(high_c)), 4)
 
         return {
             "is_plant": True,
@@ -85,11 +97,11 @@ class CNNPredictor(BaseDiseasePredictor):
 
     def _load_model(self):
         if self.model is None and os.path.exists(self.model_path):
-            try:
-                import tensorflow as tf
+            if tf is None:
+                logger.warning("TensorFlow not installed; cannot load model.")
+                self.model = None
+            else:
                 self.model = tf.keras.models.load_model(self.model_path)
-            except Exception as e:
-                print(f"Warning: Failed to load TensorFlow model from {self.model_path}: {e}")
 
     def predict(self, image_bytes: bytes) -> Dict[str, Any]:
         # Stage 1: Plant Verification
@@ -115,13 +127,13 @@ class CNNPredictor(BaseDiseasePredictor):
             return result
 
         try:
-            import cv2
+            if cv2 is None:
+                raise RuntimeError('OpenCV (cv2) is not installed; cannot process image for TensorFlow model.')
             import numpy as np
-
             np_arr = np.frombuffer(image_bytes, np.uint8)
-            img = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
-            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-            img = cv2.resize(img, (224, 224))
+            img = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)  # type: ignore
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)  # type: ignore
+            img = cv2.resize(img, (224, 224))  # type: ignore
             img = img.astype(np.float32) / 255.0
             img = np.expand_dims(img, axis=0)
 

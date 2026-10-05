@@ -79,7 +79,16 @@ export const AnalysisPage = () => {
         }
       } catch (err) {
         if (isMounted) {
-          const detail = err.response?.data?.detail || err.message || t('analysis.val_error_tip') || "You have not scanned a leaf or plant. Please scan a clear photo of a leaf or plant.";
+          let detail = err.response?.data?.detail;
+          if (!detail) {
+            if (err.code === 'ECONNABORTED' || err.message?.toLowerCase().includes('timeout')) {
+              detail = "Connection timed out. The server or AI models took longer than expected to respond. Please try again.";
+            } else if (err.message?.toLowerCase().includes('network error') || !err.response) {
+              detail = "Unable to connect to the backend server. Please check your internet connection or verify the backend server is running.";
+            } else {
+              detail = err.message || t('analysis.val_error_tip') || "No clear leaf was detected. Please scan a clear photo of a leaf or plant.";
+            }
+          }
           setError(detail);
         }
       }
@@ -105,6 +114,7 @@ export const AnalysisPage = () => {
   }, [currentStep, analyzedPred, error, navigate, steps]);
 
   if (error) {
+    const isTimeoutOrNetwork = error.toLowerCase().includes('timed out') || error.toLowerCase().includes('connect') || error.toLowerCase().includes('server');
     return (
       <div className="max-w-xl mx-auto py-12 px-4 space-y-6 text-center">
         <div className="glass-panel p-8 rounded-3xl border border-red-500/40 space-y-5 shadow-2xl">
@@ -113,7 +123,7 @@ export const AnalysisPage = () => {
           </div>
 
           <h2 className="text-xl font-extrabold text-white">
-            {t('analysis.val_error') || 'Validation Error'}
+            {isTimeoutOrNetwork ? 'Diagnosis Request Issue' : (t('analysis.val_error') || 'Validation Error')}
           </h2>
           
           <p className="text-xs sm:text-sm text-red-200/90 leading-relaxed bg-red-500/10 p-4 rounded-xl border border-red-500/20 font-medium">
@@ -121,7 +131,10 @@ export const AnalysisPage = () => {
           </p>
 
           <p className="text-xs text-slate-400">
-            {t('analysis.val_error_tip') || 'Ensure your photo clearly shows a leaf, stem, fruit, or plant part with good lighting.'}
+            {isTimeoutOrNetwork 
+              ? 'Please verify that the backend server is active and try scanning again.'
+              : (t('analysis.val_error_tip') || 'Ensure your photo clearly shows a leaf, stem, fruit, or plant part with good lighting.')
+            }
           </p>
 
           <div className="pt-4 flex flex-col sm:flex-row gap-3 justify-center">

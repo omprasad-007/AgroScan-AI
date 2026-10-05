@@ -53,7 +53,7 @@ class PlantNetProvider(DiseaseDetectionProvider):
             files = [("images", ("leaf.jpg", image_bytes, "image/jpeg"))]
             data = [("organs", "leaf")]
 
-            async with httpx.AsyncClient(timeout=14.0) as client:
+            async with httpx.AsyncClient(timeout=6.0) as client:
                 res = await client.post(url, files=files, data=data)
                 latency = (time.time() - t0) * 1000.0
                 self.last_latency_ms = latency

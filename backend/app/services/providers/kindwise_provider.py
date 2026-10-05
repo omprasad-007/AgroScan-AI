@@ -54,7 +54,7 @@ class KindwisePlantIdProvider(DiseaseDetectionProvider):
         lon = (location.get("longitude") or 74.31) if location else 74.31
 
         try:
-            async with httpx.AsyncClient(timeout=14.0) as client:
+            async with httpx.AsyncClient(timeout=6.0) as client:
                 # 1. Try Plant.id v3 API
                 payload_v3 = {
                     "images": [f"data:image/jpeg;base64,{b64_img}"],

@@ -62,7 +62,7 @@ class PlantixProvider(DiseaseDetectionProvider):
                 if location.get("longitude"):
                     data["longitude"] = str(location["longitude"])
 
-            async with httpx.AsyncClient(timeout=15.0) as client:
+            async with httpx.AsyncClient(timeout=6.0) as client:
                 res = await client.post(self.API_URL, headers=headers, files=files, data=data)
                 latency = (time.time() - t0) * 1000.0
                 self.last_latency_ms = latency
