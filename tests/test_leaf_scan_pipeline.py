@@ -41,7 +41,7 @@ def create_synthetic_leaf_image(is_diseased: bool = False, blurry: bool = False)
     if blurry:
         img = cv2.GaussianBlur(img, (45, 45), 0)
 
-    _, encoded = cv2.imencode(".jpg", img, [int(cv2.IMWRITE_JPEG_QUALITY), 92])
+    _, encoded = cv2.imencode(".jpg", img, [cv2.IMWRITE_JPEG_QUALITY, 92])
     return encoded.tobytes()
 
 def create_synthetic_selfie_image() -> bytes:
@@ -229,7 +229,7 @@ def test_analyze_endpoint_valid_leaf_returns_consensus_diagnostics():
     res = client.post(
         "/api/v1/predictions/analyze",
         files={"file": ("leaf.jpg", leaf_bytes, "image/jpeg")},
-        data={"temperature_c": 26.0, "humidity_pct": 82.0, "rainfall_mm": 6.0},
+        data={"temperature_c": "26.0", "humidity_pct": "82.0", "rainfall_mm": "6.0"},
         headers=headers
     )
     assert res.status_code == 200

@@ -29,8 +29,10 @@ class AgroScanLocalModelProvider(DiseaseDetectionProvider):
     def _try_load_model(self):
         if not self._model_loaded and os.path.exists(settings.MODEL_PATH):
             try:
-                import tensorflow as tf
-                self.model = tf.keras.models.load_model(settings.MODEL_PATH)
+                import importlib.util
+                if importlib.util.find_spec("tensorflow") is not None:
+                    import tensorflow as tf  # type: ignore
+                    self.model = tf.keras.models.load_model(settings.MODEL_PATH)
                 self._model_loaded = True
             except Exception as e:
                 logger.info(f"Local TensorFlow model not loaded (using internal knowledge-base classifier): {e}")
@@ -54,48 +56,49 @@ class AgroScanLocalModelProvider(DiseaseDetectionProvider):
                 import numpy as np
                 np_arr = np.frombuffer(image_bytes, np.uint8)
                 img = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
-                img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-                img = cv2.resize(img, (224, 224))
-                img = img.astype(np.float32) / 255.0
-                img = np.expand_dims(img, axis=0)
+                if img is not None:
+                    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+                    img = cv2.resize(img, (224, 224))
+                    img = img.astype(np.float32) / 255.0
+                    img = np.expand_dims(img, axis=0)
 
-                preds = self.model.predict(img)[0]
-                classes = [
-                    "tomato_early_blight", "tomato_late_blight", "tomato_yellow_leaf_curl",
-                    "potato_late_blight", "corn_common_rust", "healthy_leaf"
-                ]
-                top_idx = int(np.argmax(preds))
-                confidence = round(float(preds[top_idx]), 3)
-                code = classes[top_idx]
-                info = get_disease_by_code(code)
+                    preds = self.model.predict(img)[0]
+                    classes = [
+                        "tomato_early_blight", "tomato_late_blight", "tomato_yellow_leaf_curl",
+                        "potato_late_blight", "corn_common_rust", "healthy_leaf"
+                    ]
+                    top_idx = int(np.argmax(preds))
+                    confidence = round(float(preds[top_idx]), 3)
+                    code = classes[top_idx]
+                    info = get_disease_by_code(code)
 
-                latency = (time.time() - t0) * 1000.0
-                self.last_latency_ms = latency
-                self.last_success_at = datetime.now(timezone.utc)
+                    latency = (time.time() - t0) * 1000.0
+                    self.last_latency_ms = latency
+                    self.last_success_at = datetime.now(timezone.utc)
 
-                is_healthy = code == "healthy_leaf"
-                return ProviderDiagnosisResult(
-                    provider=self.name,
-                    status="success",
-                    plant=info["crop"],
-                    scientific_name=info.get("scientific_name", "N/A"),
-                    disease=info["disease_name"],
-                    disease_code=code,
-                    confidence=confidence,
-                    is_healthy=is_healthy,
-                    top_predictions=[
-                        PredictionCandidate(
-                            crop=info["crop"],
-                            disease_name=info["disease_name"],
-                            disease_code=code,
-                            confidence=confidence,
-                            is_healthy=is_healthy,
-                            scientific_name=info.get("scientific_name")
-                        )
-                    ],
-                    latency_ms=round(latency, 1),
-                    is_demo=False
-                )
+                    is_healthy = code == "healthy_leaf"
+                    return ProviderDiagnosisResult(
+                        provider=self.name,
+                        status="success",
+                        plant=info["crop"],
+                        scientific_name=info.get("scientific_name", "N/A"),
+                        disease=info["disease_name"],
+                        disease_code=code,
+                        confidence=confidence,
+                        is_healthy=is_healthy,
+                        top_predictions=[
+                            PredictionCandidate(
+                                crop=info["crop"],
+                                disease_name=info["disease_name"],
+                                disease_code=code,
+                                confidence=confidence,
+                                is_healthy=is_healthy,
+                                scientific_name=info.get("scientific_name")
+                            )
+                        ],
+                        latency_ms=round(latency, 1),
+                        is_demo=False
+                    )
             except Exception as e:
                 logger.warning(f"Local TF model prediction failed: {e}")
 

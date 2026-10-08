@@ -45,7 +45,7 @@ def login(user_in: UserLogin, db: Session = Depends(get_db)):
             detail="User account not found. Please create an account to get started."
         )
 
-    if not verify_password(user_in.password, user.hashed_password):
+    if not verify_password(user_in.password, str(user.hashed_password)):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect password. Please verify your password and try again."

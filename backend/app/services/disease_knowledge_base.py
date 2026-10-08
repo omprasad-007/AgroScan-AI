@@ -1,4 +1,6 @@
-CROP_CULTIVATION_KB = {
+from typing import Dict, Any, List
+
+CROP_CULTIVATION_KB: Dict[str, Dict[str, str]] = {
     "Tomato": {
         "common_name": "Tomato",
         "scientific_name": "Solanum lycopersicum",
@@ -57,7 +59,7 @@ CROP_CULTIVATION_KB = {
     }
 }
 
-DISEASE_KNOWLEDGE_BASE = {
+DISEASE_KNOWLEDGE_BASE: Dict[str, Dict[str, Any]] = {
     "tomato_late_blight": {
         "crop": "Tomato",
         "disease_name": "Tomato Late Blight",
@@ -139,7 +141,7 @@ def get_disease_by_code(code: str) -> dict:
     crop_name = info.get("crop", "General Crop")
     cult_info = get_crop_cultivation_info(crop_name)
     
-    result = dict(info)
+    result: Dict[str, Any] = dict(info)
     result["plant_info"] = {
         "common_name": cult_info["common_name"],
         "scientific_name": info.get("scientific_name") or cult_info["scientific_name"],

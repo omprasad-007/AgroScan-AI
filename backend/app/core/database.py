@@ -8,10 +8,9 @@ logger = logging.getLogger("agroscan.database")
 db_url = settings.DATABASE_URL
 
 # Fallback to SQLite if PostgreSQL driver is missing or specified as fallback
+import importlib.util
 if db_url.startswith("postgresql"):
-    try:
-        import psycopg2
-    except ImportError:
+    if importlib.util.find_spec("psycopg2") is None:
         logger.warning("psycopg2 module not found. Falling back to SQLite database at sqlite:///./agroscan.db")
         db_url = "sqlite:///./agroscan.db"
 

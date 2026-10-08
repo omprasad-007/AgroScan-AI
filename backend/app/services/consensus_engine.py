@@ -183,11 +183,26 @@ class MultiProviderConsensusEngine:
         if not active_providers:
             raise RuntimeError("No disease detection providers are currently available.")
 
-        # Execute Provider Calls in Parallel with resilient exception handling
-        tasks = [
-            p.diagnose(image_bytes=image_bytes, plant_name=target_crop, location=location, language=language)
-            for p in active_providers
-        ]
+        # Execute Provider Calls in Parallel with fast timeout and resilient exception handling
+        async def _call_with_timeout(p: DiseaseDetectionProvider) -> ProviderDiagnosisResult:
+            try:
+                return await asyncio.wait_for(
+                    p.diagnose(image_bytes=image_bytes, plant_name=target_crop, location=location, language=language),
+                    timeout=3.5
+                )
+            except asyncio.TimeoutError:
+                logger.warning(f"Provider '{p.name}' timed out after 3.5s")
+                return ProviderDiagnosisResult(
+                    provider=p.name,
+                    status="timeout",
+                    plant="Unknown",
+                    disease="Unknown",
+                    disease_code="provider_timeout",
+                    confidence=0.0,
+                    error="Provider response timed out."
+                )
+
+        tasks = [_call_with_timeout(p) for p in active_providers]
         raw_results = await asyncio.gather(*tasks, return_exceptions=True)
         results: List[ProviderDiagnosisResult] = []
         for i, r in enumerate(raw_results):

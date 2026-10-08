@@ -1,6 +1,6 @@
 import logging
 import httpx
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 from app.core.config import settings
 
 logger = logging.getLogger("agroscan")

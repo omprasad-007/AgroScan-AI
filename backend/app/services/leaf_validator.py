@@ -61,8 +61,12 @@ class LeafValidator:
             return None
         if cls._face_cascade is None:
             try:
-                cascade_path = cv2.data.haarcascades + 'haarcascade_frontalface_default.xml'
-                cls._face_cascade = cv2.CascadeClassifier(cascade_path)
+                cv2_data = getattr(cv2, "data", None)
+                if cv2_data and hasattr(cv2_data, "haarcascades"):
+                    cascade_path = getattr(cv2_data, "haarcascades", "") + 'haarcascade_frontalface_default.xml'
+                    classifier_fn = getattr(cv2, "CascadeClassifier", None)
+                    if classifier_fn:
+                        cls._face_cascade = classifier_fn(cascade_path)
             except Exception as e:
                 logger.warning(f"Failed to load OpenCV face cascade: {e}")
         return cls._face_cascade
@@ -119,14 +123,14 @@ class LeafValidator:
 
         # 5. Sharpness / Blur via Laplacian Variance
         laplacian_var = float(cv2.Laplacian(gray, cv2.CV_64F).var())  # type: ignore
-        # Sigmoid-normalized blur score: < 15 is blurry, 50+ is crisp
-        blur_score = min(1.0, laplacian_var / 80.0)
-        if laplacian_var < 8.0:
+        # Sigmoid-normalized blur score: < 10 is blurry, 40+ is crisp
+        blur_score = min(1.0, laplacian_var / 60.0)
+        if laplacian_var < 3.0:
             issues.append("Image is too blurry / out of focus.")
 
         # Calculate composite quality score (0.0 to 1.0)
-        res_factor = 1.0 if min_dim >= 250 else (min_dim / 250.0)
-        bright_factor = 1.0 - (abs(mean_brightness - 128.0) / 128.0) * 0.5
+        res_factor = 1.0 if min_dim >= 200 else (min_dim / 200.0)
+        bright_factor = 1.0 - (abs(mean_brightness - 128.0) / 128.0) * 0.4
         quality_score = round(
             float(0.40 * blur_score + 0.30 * bright_factor + 0.15 * contrast_score + 0.15 * res_factor),
             3
@@ -136,8 +140,8 @@ class LeafValidator:
         is_acceptable = (
             resolution_ok and 
             brightness_ok and 
-            laplacian_var >= 8.0 and 
-            quality_score >= (quality_threshold * 0.5)
+            laplacian_var >= 3.0 and 
+            quality_score >= (quality_threshold * 0.4)
         )
 
         return ImageQualityResult(
@@ -356,19 +360,20 @@ class LeafValidator:
         exg_ratio = float(np.count_nonzero(exg_veg_mask) / total_pixels)
 
         # Foliage HSV spectrum (Green, Olive, Chartreuse, Yellow-Green, Chlorotic Leaf Spots)
-        lower_foliage = np.array([26, 30, 25], dtype=np.uint8)
-        upper_foliage = np.array([92, 255, 255], dtype=np.uint8)
+        lower_foliage = np.array([18, 20, 20], dtype=np.uint8)
+        upper_foliage = np.array([95, 255, 255], dtype=np.uint8)
         foliage_mask = cv2.inRange(hsv, lower_foliage, upper_foliage)
         foliage_ratio = float(np.count_nonzero(foliage_mask) / total_pixels)
 
         # Diseased / Necrotic Lesion Hue Mask (Blight brown, rust orange, yellow halos on leaf)
-        lower_lesion = np.array([14, 40, 25], dtype=np.uint8)
-        upper_lesion = np.array([27, 255, 240], dtype=np.uint8)
+        lower_lesion = np.array([10, 30, 20], dtype=np.uint8)
+        upper_lesion = np.array([28, 255, 245], dtype=np.uint8)
         lesion_mask = cv2.inRange(hsv, lower_lesion, upper_lesion)
         lesion_ratio = float(np.count_nonzero(lesion_mask) / total_pixels)
 
-        # Total combined vegetative & plant leaf canopy
-        combined_leaf_mask = cv2.bitwise_or(foliage_mask, exg_veg_mask * 255)
+        # Total combined vegetative & diseased plant leaf canopy
+        combined_leaf_mask = cv2.bitwise_or(foliage_mask, lesion_mask)
+        combined_leaf_mask = cv2.bitwise_or(combined_leaf_mask, (exg_veg_mask * 255))
         leaf_coverage_ratio = float(np.count_nonzero(combined_leaf_mask) / total_pixels)
 
         # Leaf Structural & Organic Texture via Contours
@@ -506,9 +511,9 @@ class LeafValidator:
 
         # 7. VALID LEAF CONFIRMATION & SCORING
         # Leaf Confidence calculation based on organic leaf contour, vegetation index, and foliage coverage
-        conf_coverage = min(1.0, leaf_coverage_ratio / 0.30)
-        conf_contour = 0.90 if organic_leaf_count > 0 else (0.75 if primary_leaf_ratio > 0.15 else 0.60)
-        conf_spectral = min(1.0, (exg_ratio + foliage_ratio) / 0.25)
+        conf_coverage = min(1.0, leaf_coverage_ratio / 0.25)
+        conf_contour = 0.90 if organic_leaf_count > 0 else (0.75 if primary_leaf_ratio > 0.12 else 0.60)
+        conf_spectral = min(1.0, (exg_ratio + foliage_ratio + lesion_ratio) / 0.20)
         
         leaf_confidence = round(
             float(0.40 * conf_coverage + 0.35 * conf_spectral + 0.25 * conf_contour),
@@ -516,7 +521,7 @@ class LeafValidator:
         )
 
         leaf_thresh = getattr(settings, "LEAF_VALIDATION_THRESHOLD", 0.70)
-        is_leaf_valid = (leaf_confidence >= (leaf_thresh * 0.75) and leaf_coverage_ratio >= 0.08)
+        is_leaf_valid = (leaf_confidence >= (leaf_thresh * 0.70) and leaf_coverage_ratio >= 0.06)
 
         if not is_leaf_valid:
             return LeafValidationResult(
