@@ -63,8 +63,10 @@ export const AnalysisPage = () => {
         if (isMounted) {
           let detail = err.response?.data?.detail;
           if (!detail) {
-            if (err.code === 'ECONNABORTED' || err.message?.toLowerCase().includes('timeout')) {
-              detail = "Connection timed out. The server or AI models took longer than expected to respond. Please try again.";
+            if (err.response?.status === 404) {
+              detail = "Backend API service was not found (HTTP 404). Please ensure the backend web service is deployed and active on Render/cloud.";
+            } else if (err.code === 'ECONNABORTED' || err.message?.toLowerCase().includes('timeout')) {
+              detail = "Connection timed out. The cloud server or AI models took longer than expected to respond (if using Render free-tier, it may be waking up). Please try again.";
             } else if (err.message?.toLowerCase().includes('network error') || !err.response) {
               detail = "Unable to connect to the backend server. Please check your internet connection or verify the backend server is running.";
             } else {
