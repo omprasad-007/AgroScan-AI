@@ -8,12 +8,32 @@ import { useLanguage } from '../../context/LanguageContext';
 export const CameraScanner = ({ onImageCaptured, onFallbackUpload, isAnalyzing }) => {
   const { t } = useLanguage();
   const videoRef = useRef(null);
+  const nativeCameraInputRef = useRef(null);
   const [isCameraActive, setIsCameraActive] = useState(false);
   const [stream, setStream] = useState(null);
   const [facingMode, setFacingMode] = useState('environment'); // 'environment' (rear) or 'user' (front)
   const [capturedDataUrl, setCapturedDataUrl] = useState(null);
   const [capturedFile, setCapturedFile] = useState(null);
   const [errorInfo, setErrorInfo] = useState(null);
+
+  // Handle native camera or file input capture (works 100% on HTTP & mobile)
+  const handleNativeFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const dataUrl = URL.createObjectURL(file);
+      setCapturedFile(file);
+      setCapturedDataUrl(dataUrl);
+      setErrorInfo(null);
+      stopCameraStream();
+      setIsCameraActive(false);
+    }
+  };
+
+  const triggerNativeCamera = () => {
+    if (nativeCameraInputRef.current) {
+      nativeCameraInputRef.current.click();
+    }
+  };
 
   // Stop camera tracks safely
   const stopCameraStream = () => {
@@ -38,7 +58,7 @@ export const CameraScanner = ({ onImageCaptured, onFallbackUpload, isAnalyzing }
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
       setErrorInfo({
         type: 'NotSupported',
-        message: 'Browser camera API is not supported on this device or connection. HTTPS or localhost is required for camera access.'
+        message: 'Live stream viewfinder requires HTTPS or localhost. Tap "Use Phone Camera" below to use your native device camera directly.'
       });
       return;
     }
@@ -64,7 +84,7 @@ export const CameraScanner = ({ onImageCaptured, onFallbackUpload, isAnalyzing }
       console.error('Camera access error:', err);
       let msg = 'Failed to open camera.';
       if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
-        msg = t('scan.camera_denied') || 'Camera permission was denied. Please grant camera access in browser settings.';
+        msg = t('scan.camera_denied') || 'Camera permission was denied. Please grant camera access in browser settings or use the device camera button below.';
       } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
         msg = 'No camera device found on this system.';
       } else if (err.name === 'NotReadableError' || err.name === 'TrackStartError') {
@@ -130,12 +150,23 @@ export const CameraScanner = ({ onImageCaptured, onFallbackUpload, isAnalyzing }
 
   return (
     <div className="w-full space-y-4">
-      {/* 1. Camera Error Display */}
+      {/* Hidden Native Device Camera Input */}
+      <input
+        ref={nativeCameraInputRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        className="hidden"
+        onChange={handleNativeFileChange}
+      />
+
+      {/* 1. Camera Error Display with Direct Native Trigger */}
       {errorInfo && (
         <CameraError
           errorType={errorInfo.type}
           message={errorInfo.message}
           onRetry={() => startCamera(facingMode)}
+          onNativeCapture={triggerNativeCamera}
           onFallbackUpload={onFallbackUpload}
         />
       )}
@@ -188,11 +219,20 @@ export const CameraScanner = ({ onImageCaptured, onFallbackUpload, isAnalyzing }
 
             <button
               type="button"
+              onClick={triggerNativeCamera}
+              className="px-6 py-3.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-300 font-bold text-xs border border-emerald-500/30 transition flex items-center justify-center space-x-2"
+            >
+              <Camera className="w-4 h-4" />
+              <span>Use Phone Camera</span>
+            </button>
+
+            <button
+              type="button"
               onClick={onFallbackUpload}
               className="px-6 py-3.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs border border-slate-700 transition flex items-center justify-center space-x-2"
             >
               <Upload className="w-4 h-4" />
-              <span>{t('scan.tab_upload') || 'Upload From Device'}</span>
+              <span>{t('scan.tab_upload') || 'Upload Image'}</span>
             </button>
           </div>
         </div>
