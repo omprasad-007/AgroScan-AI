@@ -2,7 +2,7 @@
 
 ## Production Topology
 - **Frontend Host**: Vercel Static CDN (`https://agro-scan-ai-nine.vercel.app/`)
-- **Backend Host**: Render Cloud Server (`https://agroscan-ai-backend.onrender.com/`)
+- **Backend Host**: Render Cloud Server (`https://agroscan-ai-backend-6ppw.onrender.com/`)
 - **Database**: PostgreSQL (Render Database) or SQLite (`agroscan.db`)
 
 ---
@@ -29,7 +29,7 @@ GEMINI_API_KEY="your_production_gemini_key"
 
 ### Frontend Production Environment (`frontend/.env`)
 ```ini
-VITE_API_BASE_URL="https://agroscan-ai-backend.onrender.com/api/v1"
+VITE_API_BASE_URL="https://agroscan-ai-backend-6ppw.onrender.com/api/v1"
 VITE_FIREBASE_API_KEY="your_firebase_key"
 VITE_FIREBASE_AUTH_DOMAIN="agroscan-ai-07.firebaseapp.com"
 VITE_FIREBASE_PROJECT_ID="agroscan-ai-07"

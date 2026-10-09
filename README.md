@@ -84,7 +84,7 @@ npm run dev
 
 ### 2. Frontend Deployment (Vercel)
 - Import repository to **Vercel** with Root Directory set to `frontend/`:
-  - **Environment Variable**: `VITE_API_BASE_URL=https://agroscan-ai-backend.onrender.com/api/v1`
+  - **Environment Variable**: `VITE_API_BASE_URL=https://agroscan-ai-backend-6ppw.onrender.com/api/v1`
 
 ---
 
