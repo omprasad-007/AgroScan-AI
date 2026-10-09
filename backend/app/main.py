@@ -28,7 +28,8 @@ def seed_initial_data():
             
             user_cols = [
                 "village VARCHAR", "taluka VARCHAR", "district VARCHAR",
-                "state VARCHAR", "pincode VARCHAR", "latitude FLOAT", "longitude FLOAT"
+                "state VARCHAR", "pincode VARCHAR", "language VARCHAR DEFAULT 'en'",
+                "latitude FLOAT", "longitude FLOAT"
             ]
             for col_def in user_cols:
                 try:

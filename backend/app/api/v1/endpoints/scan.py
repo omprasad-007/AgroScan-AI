@@ -211,12 +211,13 @@ async def analyze_leaf(
     try:
         # 3. Multi-API Provider Routing & Evidence Consensus Engine
         user_location = {"latitude": 16.58, "longitude": 74.31}
+        user_lang = getattr(current_user, "language", "en") or "en"
         consensus_res: ConsensusResult = await consensus_engine.diagnose_with_consensus(
             image_bytes=contents,
             scan_id=scan_unique_id,
             target_crop=None,
             location=user_location,
-            language=current_user.language or "en"
+            language=user_lang
         )
 
         # 4. Computer Vision Lesion Severity Analysis

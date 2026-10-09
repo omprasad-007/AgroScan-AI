@@ -174,10 +174,10 @@ class LeafValidator:
                 usable_for_diagnosis=False,
                 leaf_visibility=0.0,
                 quality_metrics={},
-                status_code="EMPTY_OR_CORRUPT_IMAGE",
-                rejection_reason="The uploaded file is empty or corrupted.",
-                message_en="No clear leaf was detected in this image. Please capture a close, well-lit photo of a plant leaf.",
-                message_mr="या प्रतिमेत स्पष्टपणे पान आढळले नाही. कृपया वनस्पतीच्या पानाचा जवळून आणि स्पष्ट फोटो काढा."
+                status_code="NON_PLANT_IMAGE",
+                rejection_reason="The uploaded file is empty, corrupted, or does not contain plant leaf bytes.",
+                message_en="You have not scanned a leaf or plant. Please capture a clear, well-lit photo of a plant leaf.",
+                message_mr="या प्रतिमेत पान किंवा वनस्पती आढळली नाही. कृपया पानाचा स्पष्ट फोटो काढा."
             )
 
         # 1. PIL Image Verification
@@ -193,9 +193,9 @@ class LeafValidator:
                 usable_for_diagnosis=False,
                 leaf_visibility=0.0,
                 quality_metrics={},
-                status_code="INVALID_IMAGE_PAYLOAD",
+                status_code="NON_PLANT_IMAGE",
                 rejection_reason=f"Invalid image format or corrupted byte stream: {e}",
-                message_en="Invalid image format. Please capture or upload a valid JPEG, PNG, or WEBP leaf photo.",
+                message_en="You have not scanned a leaf or plant. Please capture or upload a valid JPEG, PNG, or WEBP leaf photo.",
                 message_mr="अवैध प्रतिमा स्वरूप. कृपया पानाचा वैध JPEG, PNG किंवा WEBP फोटो अपलोड करा."
             )
 
@@ -241,23 +241,9 @@ class LeafValidator:
                 usable_for_diagnosis=False,
                 leaf_visibility=0.0,
                 quality_metrics={},
-                status_code="DECODE_FAILED",
+                status_code="NON_PLANT_IMAGE",
                 rejection_reason="Could not decode image bytes into RGB matrix.",
-                message_en="Unable to process the image. Please scan a clear photo of a plant leaf.",
-                message_mr="प्रतिमा प्रक्रिया करता आली नाही. कृपया पानाचा स्पष्ट फोटो काढा."
-            )
-        if cv_img is None:
-            return LeafValidationResult(
-                is_plant=False,
-                is_leaf=False,
-                leaf_confidence=0.0,
-                image_quality=0.0,
-                usable_for_diagnosis=False,
-                leaf_visibility=0.0,
-                quality_metrics={},
-                status_code="DECODE_FAILED",
-                rejection_reason="Could not decode image bytes into RGB matrix.",
-                message_en="Unable to process the image. Please scan a clear photo of a plant leaf.",
+                message_en="You have not scanned a leaf or plant. Please scan a clear photo of a plant leaf.",
                 message_mr="प्रतिमा प्रक्रिया करता आली नाही. कृपया पानाचा स्पष्ट फोटो काढा."
             )
 
@@ -364,15 +350,19 @@ class LeafValidator:
         upper_foliage = np.array([95, 255, 255], dtype=np.uint8)
         foliage_mask = cv2.inRange(hsv, lower_foliage, upper_foliage)
         foliage_ratio = float(np.count_nonzero(foliage_mask) / total_pixels)
+        base_green_foliage = max(foliage_ratio, exg_ratio)
 
         # Diseased / Necrotic Lesion Hue Mask (Blight brown, rust orange, yellow halos on leaf)
+        # Note: Only include necrotic lesion mask if anchored by actual surrounding leaf vegetation
         lower_lesion = np.array([10, 30, 20], dtype=np.uint8)
         upper_lesion = np.array([28, 255, 245], dtype=np.uint8)
         lesion_mask = cv2.inRange(hsv, lower_lesion, upper_lesion)
         lesion_ratio = float(np.count_nonzero(lesion_mask) / total_pixels)
 
-        # Total combined vegetative & diseased plant leaf canopy
-        combined_leaf_mask = cv2.bitwise_or(foliage_mask, lesion_mask)
+        if base_green_foliage >= 0.03:
+            combined_leaf_mask = cv2.bitwise_or(foliage_mask, lesion_mask)
+        else:
+            combined_leaf_mask = foliage_mask
         combined_leaf_mask = cv2.bitwise_or(combined_leaf_mask, (exg_veg_mask * 255))
         leaf_coverage_ratio = float(np.count_nonzero(combined_leaf_mask) / total_pixels)
 
@@ -397,56 +387,8 @@ class LeafValidator:
 
         # 6. DECISION HEURISTICS & REJECTIONS
 
-        # Case A: Heavy Skin-Tone / Human Selfie
-        if skin_ratio > 0.22 and leaf_coverage_ratio < 0.20:
-            return LeafValidationResult(
-                is_plant=False,
-                is_leaf=False,
-                leaf_confidence=0.02,
-                image_quality=quality.quality_score,
-                usable_for_diagnosis=False,
-                leaf_visibility=0.0,
-                quality_metrics=quality_metrics_dict,
-                status_code="NON_LEAF_SELFIE",
-                rejection_reason="Image contains human skin / selfie characteristics instead of plant foliage.",
-                message_en="No clear leaf was detected in this image. Please capture a close, well-lit photo of a plant leaf.",
-                message_mr="या प्रतिमेत स्पष्टपणे पान आढळले नाही. कृपया वनस्पतीच्या पानाचा जवळून आणि स्पष्ट फोटो काढा."
-            )
-
-        # Case B: Document / Screenshot / White Page
-        if white_ratio > 0.55 and leaf_coverage_ratio < 0.12:
-            return LeafValidationResult(
-                is_plant=False,
-                is_leaf=False,
-                leaf_confidence=0.01,
-                image_quality=quality.quality_score,
-                usable_for_diagnosis=False,
-                leaf_visibility=0.0,
-                quality_metrics=quality_metrics_dict,
-                status_code="DOCUMENT_DETECTED",
-                rejection_reason="Document, screenshot, or white paper detected.",
-                message_en="The uploaded image appears to be a document or screenshot. Please capture an actual plant leaf photo.",
-                message_mr="अपलोड केलेली प्रतिमा दस्तऐवज किंवा स्क्रीनशॉट वाटत आहे. कृपया पिकाच्या पानाचा खरा फोटो काढा."
-            )
-
-        # Case C: Urban Architecture / Building / Straight Structural Grid
-        if long_line_count >= 8 and leaf_coverage_ratio < 0.12:
-            return LeafValidationResult(
-                is_plant=False,
-                is_leaf=False,
-                leaf_confidence=0.03,
-                image_quality=quality.quality_score,
-                usable_for_diagnosis=False,
-                leaf_visibility=0.0,
-                quality_metrics=quality_metrics_dict,
-                status_code="BUILDING_DETECTED",
-                rejection_reason="Building, room, vehicle, or geometric structural object detected.",
-                message_en="No leaf was detected (building or structure recognized). Please point the camera at a plant leaf.",
-                message_mr="इमारत किंवा इतर वस्तू आढळली आहे. कृपया कॅमेरा वनस्पतीच्या पानावर धरा."
-            )
-
-        # Case D: Soil-Only / Mud Without Leaves
-        if soil_ratio > 0.60 and leaf_coverage_ratio < 0.08:
+        # Case A: Soil-Only / Mud Without Leaves
+        if soil_ratio > 0.35 and base_green_foliage < 0.08 and (soil_ratio >= skin_ratio * 0.7):
             return LeafValidationResult(
                 is_plant=False,
                 is_leaf=False,
@@ -461,8 +403,24 @@ class LeafValidator:
                 message_mr="केवळ माती किंवा जमीन दिसत आहे. कृपया लक्षणे दिसणारे पिकाचे पान स्कॅन करा."
             )
 
-        # Case E: Flower / Fruit Only Without Visible Leaf
-        if flower_ratio > 0.35 and leaf_coverage_ratio < 0.08:
+        # Case B: Heavy Skin-Tone / Human Selfie
+        if (skin_ratio > 0.15 and base_green_foliage < 0.10) or (skin_ratio > 0.25 and leaf_coverage_ratio < 0.20):
+            return LeafValidationResult(
+                is_plant=False,
+                is_leaf=False,
+                leaf_confidence=0.02,
+                image_quality=quality.quality_score,
+                usable_for_diagnosis=False,
+                leaf_visibility=0.0,
+                quality_metrics=quality_metrics_dict,
+                status_code="NON_LEAF_SELFIE",
+                rejection_reason="Image contains human skin / selfie characteristics instead of plant foliage.",
+                message_en="No clear leaf was detected in this image. Please capture a close, well-lit photo of a plant leaf.",
+                message_mr="या प्रतिमेत स्पष्टपणे पान आढळले नाही. कृपया वनस्पतीच्या पानाचा जवळून आणि स्पष्ट फोटो काढा."
+            )
+
+        # Case C: Flower / Fruit Only Without Visible Leaf (Check before Document if floral is present)
+        if flower_ratio > 0.15 and base_green_foliage < 0.08:
             return LeafValidationResult(
                 is_plant=True,
                 is_leaf=False,
@@ -477,8 +435,40 @@ class LeafValidator:
                 message_mr="अ‍ॅग्रोस्कॅन रोग स्कॅनरसाठी पानाची आवश्यकता आहे. कृपया प्रादुर्भाव झालेले पान स्कॅन करा."
             )
 
+        # Case D: Document / Screenshot / White Page
+        if white_ratio > 0.60 and base_green_foliage < 0.08:
+            return LeafValidationResult(
+                is_plant=False,
+                is_leaf=False,
+                leaf_confidence=0.01,
+                image_quality=quality.quality_score,
+                usable_for_diagnosis=False,
+                leaf_visibility=0.0,
+                quality_metrics=quality_metrics_dict,
+                status_code="DOCUMENT_DETECTED",
+                rejection_reason="Document, screenshot, or white paper detected.",
+                message_en="The uploaded image appears to be a document or screenshot. Please capture an actual plant leaf photo.",
+                message_mr="अपलोड केलेली प्रतिमा दस्तऐवज किंवा स्क्रीनशॉट वाटत आहे. कृपया पिकाच्या पानाचा खरा फोटो काढा."
+            )
+
+        # Case E: Urban Architecture / Building / Straight Structural Grid
+        if long_line_count >= 8 and base_green_foliage < 0.08:
+            return LeafValidationResult(
+                is_plant=False,
+                is_leaf=False,
+                leaf_confidence=0.03,
+                image_quality=quality.quality_score,
+                usable_for_diagnosis=False,
+                leaf_visibility=0.0,
+                quality_metrics=quality_metrics_dict,
+                status_code="BUILDING_DETECTED",
+                rejection_reason="Building, room, vehicle, or geometric structural object detected.",
+                message_en="No leaf was detected (building or structure recognized). Please point the camera at a plant leaf.",
+                message_mr="इमारत किंवा इतर वस्तू आढळली आहे. कृपया कॅमेरा वनस्पतीच्या पानावर धरा."
+            )
+
         # Case F: Sky / Open Landscape
-        if sky_ratio > 0.45 and leaf_coverage_ratio < 0.10:
+        if sky_ratio > 0.45 and base_green_foliage < 0.08:
             return LeafValidationResult(
                 is_plant=False,
                 is_leaf=False,
@@ -494,7 +484,7 @@ class LeafValidator:
             )
 
         # Case G: Overall Non-Plant / Random Object
-        if leaf_coverage_ratio < 0.10 and (foliage_ratio + lesion_ratio) < 0.08:
+        if leaf_coverage_ratio < 0.10 and base_green_foliage < 0.08:
             return LeafValidationResult(
                 is_plant=False,
                 is_leaf=False,
@@ -505,8 +495,8 @@ class LeafValidator:
                 quality_metrics=quality_metrics_dict,
                 status_code="NON_PLANT_IMAGE",
                 rejection_reason="No recognizable plant or leaf structure detected in visual spectrum.",
-                message_en="No clear leaf was detected in this image. Please capture a close, well-lit photo of a plant leaf.",
-                message_mr="या प्रतिमेत स्पष्टपणे पान आढळले नाही. कृपया वनस्पतीच्या पानाचा जवळून आणि स्पष्ट फोटो काढा."
+                message_en="You have not scanned a leaf or plant. Please capture a clear, well-lit photo of a plant leaf.",
+                message_mr="या प्रतिमेत पान किंवा वनस्पती आढळली नाही. कृपया पानाचा स्पष्ट फोटो काढा."
             )
 
         # 7. VALID LEAF CONFIRMATION & SCORING

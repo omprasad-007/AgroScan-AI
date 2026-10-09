@@ -26,6 +26,7 @@ class User(Base):
     state = Column(String, nullable=True, default="Maharashtra")
     pincode = Column(String, nullable=True)
     city = Column(String, nullable=True)
+    language = Column(String, nullable=True, default="en")
     latitude = Column(Float, nullable=True)
     longitude = Column(Float, nullable=True)
 
