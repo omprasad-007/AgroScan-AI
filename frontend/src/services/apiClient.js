@@ -1,13 +1,17 @@
 import axios from 'axios';
 
-const rawApiUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || '/api/v1';
+let rawApiUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || 'https://agroscan-ai-backend-6ppw.onrender.com/api/v1';
+if (rawApiUrl && rawApiUrl.includes('agroscan-ai-backend.onrender.com') && !rawApiUrl.includes('agroscan-ai-backend-6ppw')) {
+  rawApiUrl = rawApiUrl.replace('agroscan-ai-backend.onrender.com', 'agroscan-ai-backend-6ppw.onrender.com');
+}
+
 const API_BASE_URL = rawApiUrl.endsWith('/api/v1') 
   ? rawApiUrl 
   : (rawApiUrl === '/api/v1' ? rawApiUrl : rawApiUrl.replace(/\/+$/, '') + (rawApiUrl.includes('/api') ? '' : '/api/v1'));
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 60000, // 60s request timeout
+  timeout: 90000, // 90s request timeout for cloud cold starts
   headers: {
     'Content-Type': 'application/json',
   },

@@ -20,6 +20,8 @@ export const ScanPage = () => {
   const [selectedFarmId, setSelectedFarmId] = useState('');
 
   useEffect(() => {
+    // Proactively pre-warm Render instance if it was asleep
+    api.get('/health').catch(() => {});
     api.get('/farms')
       .then(res => {
         const list = Array.isArray(res.data) ? res.data : [];

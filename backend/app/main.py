@@ -118,32 +118,6 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# Global Zero-Crash Exception Handler
-@app.exception_handler(Exception)
-async def global_exception_handler(request: Request, exc: Exception):
-    logger.error(f"Unhandled Exception on {request.method} {request.url.path}: {exc}", exc_info=True)
-    return JSONResponse(
-        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        content={
-            "detail": "An internal server error occurred while processing your request. Please try again later.",
-            "error_code": "INTERNAL_SERVER_ERROR"
-        }
-    )
-
-from fastapi.responses import JSONResponse, Response
-from collections import defaultdict
-
-# In-memory sliding window rate limiter for expensive third-party endpoints
-RATE_LIMIT_WINDOWS = defaultdict(list)
-RATE_LIMITS = {
-    "/predictions/analyze": (20, 60),    # 20 requests per 60s
-    "/api/v1/predictions/analyze": (20, 60),
-    "/api/predictions/analyze": (20, 60),
-    "/chat": (40, 60),                   # 40 requests per 60s
-    "/api/v1/chat": (40, 60),
-    "/api/chat": (40, 60)
-}
-
 # Configure Allowed Origins for CORS
 origins = list(set([
     "https://agro-scan-ai-nine.vercel.app",
@@ -155,17 +129,6 @@ origins = list(set([
 ]))
 if settings.FRONTEND_URL and settings.FRONTEND_URL not in origins:
     origins.append(settings.FRONTEND_URL)
-
-# Configure Starlette CORSMiddleware
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_origin_regex=r"^https?://.*\.vercel\.app$|^https?://(localhost|127\.0\.0\.1|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[01])\.\d+\.\d+|192\.168\.\d+\.\d+)(:\d+)?$",
-    allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH", "HEAD"],
-    allow_headers=["*"],
-    expose_headers=["*"]
-)
 
 def is_allowed_origin(origin: str) -> bool:
     if not origin:
@@ -180,6 +143,47 @@ def is_allowed_origin(origin: str) -> bool:
     if origin.endswith(".vercel.app") or ".vercel.app" in origin:
         return True
     return False
+
+# Configure Starlette CORSMiddleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_origin_regex=r"^https?://.*\.vercel\.app$|^https?://(localhost|127\.0\.0\.1|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[01])\.\d+\.\d+|192\.168\.\d+\.\d+)(:\d+)?$",
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH", "HEAD"],
+    allow_headers=["*"],
+    expose_headers=["*"]
+)
+
+# Global Zero-Crash Exception Handler with CORS Preservation
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    logger.error(f"Unhandled Exception on {request.method} {request.url.path}: {exc}", exc_info=True)
+    origin = request.headers.get("origin", "")
+    res = JSONResponse(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        content={
+            "detail": "An internal server error occurred while processing your request. Please try again later.",
+            "error_code": "INTERNAL_SERVER_ERROR"
+        }
+    )
+    if origin and is_allowed_origin(origin):
+        res.headers["Access-Control-Allow-Origin"] = origin
+        res.headers["Access-Control-Allow-Credentials"] = "true"
+    return res
+
+from collections import defaultdict
+
+# In-memory sliding window rate limiter for expensive third-party endpoints
+RATE_LIMIT_WINDOWS = defaultdict(list)
+RATE_LIMITS = {
+    "/predictions/analyze": (20, 60),    # 20 requests per 60s
+    "/api/v1/predictions/analyze": (20, 60),
+    "/api/predictions/analyze": (20, 60),
+    "/chat": (40, 60),                   # 40 requests per 60s
+    "/api/v1/chat": (40, 60),
+    "/api/chat": (40, 60)
+}
 
 # Security & Rate Limiting Middleware
 @app.middleware("http")

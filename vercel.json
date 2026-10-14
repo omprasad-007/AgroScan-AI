@@ -1,6 +1,14 @@
 {
   "rewrites": [
     {
+      "source": "/api/:path*",
+      "destination": "https://agroscan-ai-backend-6ppw.onrender.com/api/:path*"
+    },
+    {
+      "source": "/health",
+      "destination": "https://agroscan-ai-backend-6ppw.onrender.com/health"
+    },
+    {
       "source": "/((?!api/|.*\\.[\\w]+$).*)",
       "destination": "/index.html"
     }

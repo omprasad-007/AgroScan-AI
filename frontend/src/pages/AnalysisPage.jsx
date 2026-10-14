@@ -23,65 +23,78 @@ export const AnalysisPage = () => {
   const imageFile = location.state?.imageFile;
   const previewUrl = imageFile ? URL.createObjectURL(imageFile) : "https://images.unsplash.com/photo-1592417817098-8f3d6eb16431?w=600&q=80";
 
-  useEffect(() => {
-    let isMounted = true;
+  const [isRetrying, setIsRetrying] = useState(false);
+  const [retryAttempt, setRetryAttempt] = useState(0);
 
-    const runAnalysisPipeline = async () => {
-      try {
-        if (!imageFile) {
-          setTimeout(() => {
-            if (isMounted) navigate('/results/pred_001');
-          }, 800);
-          return;
-        }
+  const runAnalysisPipeline = async (isRetry = false) => {
+    try {
+      if (!imageFile) {
+        setTimeout(() => {
+          navigate('/results/pred_001');
+        }, 800);
+        return;
+      }
 
-        const formData = new FormData();
-        formData.append('file', imageFile);
+      setError(null);
+      if (isRetry) setIsRetrying(true);
 
-        // Unified High-Speed Disease Detection & Stage 1 Validation
-        const res = await api.post('/predictions/analyze', formData, {
-          headers: { 'Content-Type': 'multipart/form-data' }
-        });
+      const formData = new FormData();
+      formData.append('file', imageFile);
 
-        if (res.data) {
-          try {
-            const rawStored = localStorage.getItem('agroscan_scans_v1');
-            const currentList = rawStored ? JSON.parse(rawStored) : [];
-            const updatedList = [res.data, ...currentList.filter(item => item.id !== res.data.id)];
-            localStorage.setItem('agroscan_scans_v1', JSON.stringify(updatedList));
-            window.dispatchEvent(new Event('agroscan_scan_completed'));
-          } catch (storageErr) {
-            console.warn('LocalStorage save failed:', storageErr);
-          }
-        }
+      // Unified High-Speed Disease Detection & Stage 1 Validation
+      const res = await api.post('/predictions/analyze', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
 
-        if (isMounted) {
-          setAnalyzedPred(res.data);
-          setCurrentStep(steps.length); // Mark all steps complete
-        }
-      } catch (err) {
-        if (isMounted) {
-          let detail = err.response?.data?.detail;
-          if (!detail) {
-            if (err.response?.status === 404) {
-              detail = "Backend API service was not found (HTTP 404). Please ensure the backend web service is deployed and active on Render/cloud.";
-            } else if (err.code === 'ECONNABORTED' || err.message?.toLowerCase().includes('timeout')) {
-              detail = "Connection timed out. The cloud server or AI models took longer than expected to respond (if using Render free-tier, it may be waking up). Please try again.";
-            } else if (err.message?.toLowerCase().includes('network error') || !err.response) {
-              detail = "Unable to connect to the backend server. Please check your internet connection or verify the backend server is running.";
-            } else {
-              detail = err.message || t('analysis.val_error_tip') || "No clear leaf was detected. Please scan a clear photo of a leaf or plant.";
-            }
-          }
-          setError(detail);
+      if (res.data) {
+        try {
+          const rawStored = localStorage.getItem('agroscan_scans_v1');
+          const currentList = rawStored ? JSON.parse(rawStored) : [];
+          const updatedList = [res.data, ...currentList.filter(item => item.id !== res.data.id)];
+          localStorage.setItem('agroscan_scans_v1', JSON.stringify(updatedList));
+          window.dispatchEvent(new Event('agroscan_scan_completed'));
+        } catch (storageErr) {
+          console.warn('LocalStorage save failed:', storageErr);
         }
       }
-    };
 
+      setAnalyzedPred(res.data);
+      setCurrentStep(steps.length); // Mark all steps complete
+      setIsRetrying(false);
+    } catch (err) {
+      setIsRetrying(false);
+      let detail = err.response?.data?.detail;
+      const isNetworkOrTimeout = err.code === 'ECONNABORTED' || 
+                                err.message?.toLowerCase().includes('timeout') || 
+                                err.message?.toLowerCase().includes('network error') || 
+                                !err.response;
+
+      // Auto-retry once on network error or timeout to give sleeping Render service time to finish waking
+      if (isNetworkOrTimeout && retryAttempt === 0) {
+        setRetryAttempt(1);
+        setIsRetrying(true);
+        setTimeout(() => {
+          runAnalysisPipeline(true);
+        }, 3000);
+        return;
+      }
+
+      if (!detail) {
+        if (err.response?.status === 404) {
+          detail = "Backend API service was not found (HTTP 404). Please ensure the backend web service is deployed and active on Render/cloud.";
+        } else if (isNetworkOrTimeout) {
+          detail = "Unable to connect to the backend server. The cloud server may be waking up from sleep (Render free-tier cold start). Please click 'Retry Diagnosis' below.";
+        } else {
+          detail = err.message || t('analysis.val_error_tip') || "No clear leaf was detected. Please scan a clear photo of a leaf or plant.";
+        }
+      }
+      setError(detail);
+    }
+  };
+
+  useEffect(() => {
     runAnalysisPipeline();
-
-    return () => { isMounted = false; };
-  }, [imageFile, navigate, t]);
+  }, [imageFile]);
 
   useEffect(() => {
     let timeoutId;
@@ -97,8 +110,26 @@ export const AnalysisPage = () => {
     return () => clearTimeout(timeoutId);
   }, [currentStep, analyzedPred, error, navigate, steps]);
 
+  if (isRetrying) {
+    return (
+      <div className="max-w-xl mx-auto py-12 px-4 space-y-6 text-center">
+        <div className="glass-panel p-8 rounded-3xl border border-agri-500/40 space-y-5 shadow-2xl">
+          <div className="w-16 h-16 rounded-2xl bg-agri-500/10 text-agri-400 border border-agri-500/30 flex items-center justify-center mx-auto shadow-inner">
+            <Loader2 className="w-8 h-8 animate-spin" />
+          </div>
+          <h2 className="text-xl font-extrabold text-white">
+            Waking AI Cloud Service...
+          </h2>
+          <p className="text-xs sm:text-sm text-slate-300 leading-relaxed bg-slate-800/40 p-4 rounded-xl border border-slate-700/50">
+            Render cloud instance is spinning up. Re-connecting now, please wait...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   if (error) {
-    const isTimeoutOrNetwork = error.toLowerCase().includes('timed out') || error.toLowerCase().includes('connect') || error.toLowerCase().includes('server');
+    const isTimeoutOrNetwork = error.toLowerCase().includes('timed out') || error.toLowerCase().includes('connect') || error.toLowerCase().includes('server') || error.toLowerCase().includes('waking up');
     return (
       <div className="max-w-xl mx-auto py-12 px-4 space-y-6 text-center">
         <div className="glass-panel p-8 rounded-3xl border border-red-500/40 space-y-5 shadow-2xl">
@@ -116,19 +147,22 @@ export const AnalysisPage = () => {
 
           <p className="text-xs text-slate-400">
             {isTimeoutOrNetwork 
-              ? 'Please verify that the backend server is active and try scanning again.'
+              ? 'Please verify the backend server is active and click Retry Diagnosis.'
               : (t('analysis.val_error_tip') || 'Ensure your photo clearly shows a leaf, stem, fruit, or plant part with good lighting.')
             }
           </p>
 
           <div className="pt-4 flex flex-col sm:flex-row gap-3 justify-center">
-            <Link
-              to="/scan"
-              className="px-6 py-3 rounded-xl bg-agri-500 hover:bg-agri-400 text-slate-950 font-bold text-xs transition shadow-lg shadow-agri-500/20 inline-flex items-center justify-center space-x-2"
-            >
-              <RefreshCw className="w-4 h-4" />
-              <span>{t('analysis.scan_again') || 'Scan Again'}</span>
-            </Link>
+            {imageFile && (
+              <button
+                type="button"
+                onClick={() => runAnalysisPipeline(true)}
+                className="px-6 py-3 rounded-xl bg-agri-500 hover:bg-agri-400 text-slate-950 font-bold text-xs transition shadow-lg shadow-agri-500/20 inline-flex items-center justify-center space-x-2 cursor-pointer"
+              >
+                <RefreshCw className="w-4 h-4" />
+                <span>Retry Diagnosis</span>
+              </button>
+            )}
             <Link
               to="/scan"
               className="px-6 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs border border-slate-700 inline-flex items-center justify-center space-x-2"
