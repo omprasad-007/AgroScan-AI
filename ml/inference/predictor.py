@@ -30,16 +30,26 @@ class CustomMLPredictor:
         # Preprocess input image to (1, 224, 224, 3)
         processed_img = self.preprocessor.preprocess_image(image_bytes)
 
-        # Fallback to deterministic model service if binary file is uncompiled
+        if not os.path.exists(self.model_path) or self.model is None:
+            raise RuntimeError(
+                f"Model file {self.model_path} is not compiled. "
+                "Train or place model weights before invoking local ML inference."
+            )
+
         inference_time_ms = round((time.time() - start_time) * 1000, 2)
+        preds = self.model.predict(processed_img)[0]
+        top_idx = int(preds.argmax())
+        code = self.classes[top_idx]
+        conf = round(float(preds[top_idx]), 3)
 
         return {
             "predictor_type": "Custom Computer Vision ML Model",
             "model_path": self.model_path,
-            "crop_detected": "Tomato",
-            "disease_name": "Tomato Late Blight",
-            "disease_code": "tomato_late_blight",
-            "confidence_score": 0.942,
+            "crop_detected": code.split("_")[0].capitalize(),
+            "disease_name": code.replace("_", " ").title(),
+            "disease_code": code,
+            "confidence_score": conf,
             "inference_time_ms": inference_time_ms,
             "is_custom_ml": True
         }
+

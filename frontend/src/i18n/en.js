@@ -73,7 +73,8 @@ export const en = {
   "analysis.pipeline_tag": "AI Leaf-Only & Multi-Provider Consensus Pipeline",
   "analysis.processing_step": "Step {current} of {total}: Analyzing leaf foliage & running multi-model verification...",
   "analysis.val_error": "Leaf Validation Gate",
-  "analysis.val_error_tip": "Ensure your photo clearly shows a single plant leaf with good lighting and no background clutter.",
+  "analysis.val_error_tip": "No clear leaf was detected in this image. Please capture a well-lit, focused photograph of the affected plant leaf.",
+  "scan.leaf_rejected": "No clear leaf was detected in this image. Please capture a well-lit, focused photograph of the affected plant leaf.",
   "analysis.scan_again": "Scan Again",
   "analysis.upload_another": "Upload Another Leaf Image",
 

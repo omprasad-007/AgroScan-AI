@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useLocation } from 'react-router-dom';
 import { 
   CheckCircle2, 
   ShieldCheck, 
@@ -15,27 +15,46 @@ import api from '../services/api';
 
 export const ResultPage = () => {
   const { scanId } = useParams();
+  const location = useLocation();
   const { t, translateCrop, translateDisease, translateSeverity, formatDate } = useLanguage();
-  const [scan, setScan] = useState(null);
-  const [recommendation, setRecommendation] = useState(null);
-  const [loading, setLoading] = useState(true);
+
+  const passedPred = location.state?.prediction;
+  const isDirectMatch = passedPred && String(passedPred.id) === String(scanId);
+
+  const [scan, setScan] = useState(() => (isDirectMatch ? passedPred : null));
+  const [recommendation, setRecommendation] = useState(() => (isDirectMatch ? (passedPred.recommendation || null) : null));
+  const [loading, setLoading] = useState(() => !isDirectMatch);
   const [error, setError] = useState('');
 
   useEffect(() => {
+    // If we already have the matching current scan from navigation state, we don't need to re-fetch
+    if (isDirectMatch && scan) {
+      if (!recommendation && scan.recommendation) {
+        setRecommendation(scan.recommendation);
+      }
+      return;
+    }
+
     const fetchReport = async () => {
+      setLoading(true);
       try {
         const [scRes, recRes] = await Promise.all([
           api.get(`/predictions/${scanId}`),
           api.get(`/recommendations/${scanId}`).catch(() => ({ data: null }))
         ]);
-        setScan(scRes.data);
-        setRecommendation(recRes?.data || scRes.data?.recommendation || null);
+        if (scRes.data && String(scRes.data.id) === String(scanId)) {
+          setScan(scRes.data);
+          setRecommendation(recRes?.data || scRes.data?.recommendation || null);
+          setError('');
+        } else {
+          setError(t('result.not_found') || 'Diagnostic report not found.');
+        }
       } catch (err) {
-        // Check localStorage fallback
+        // Check localStorage fallback strictly for this exact scanId
         try {
           const raw = localStorage.getItem('agroscan_scans_v1');
           const storedList = raw ? JSON.parse(raw) : [];
-          const matched = storedList.find(item => item.id === scanId);
+          const matched = storedList.find(item => String(item.id) === String(scanId));
           if (matched) {
             setScan(matched);
             setRecommendation(matched.recommendation || null);
@@ -51,7 +70,7 @@ export const ResultPage = () => {
       }
     };
     fetchReport();
-  }, [scanId, t]);
+  }, [scanId, isDirectMatch]);
 
   if (loading) {
     return (

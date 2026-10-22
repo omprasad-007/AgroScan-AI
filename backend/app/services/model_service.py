@@ -65,11 +65,14 @@ class DemoPredictor(BaseDiseasePredictor):
             }
 
         # Stage 2: Plant Disease Analysis
-        hash_seed = len(image_bytes) % len(self.DEMO_CLASSES)
+        import hashlib
+        img_sha = hashlib.sha256(image_bytes).hexdigest()
+        hash_seed = int(img_sha[:8], 16) % len(self.DEMO_CLASSES)
         selected = self.DEMO_CLASSES[hash_seed]
         
         low_c, high_c = selected["confidence_range"]
-        confidence = round(random.uniform(float(low_c), float(high_c)), 4)
+        conf_seed = (int(img_sha[8:12], 16) % 1000) / 1000.0
+        confidence = round(float(low_c) + conf_seed * (float(high_c) - float(low_c)), 4)
 
         return {
             "is_plant": True,

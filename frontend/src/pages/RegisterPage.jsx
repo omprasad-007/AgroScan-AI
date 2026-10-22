@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { UserPlus, AlertCircle } from 'lucide-react';
@@ -8,6 +8,10 @@ export const RegisterPage = () => {
   const { register } = useAuth();
   const { lang, setLang, t } = useLanguage();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const searchParams = new URLSearchParams(location.search);
+  const redirectTarget = searchParams.get('redirect') || '/dashboard';
 
   const [formData, setFormData] = useState({
     fullName: '',
@@ -49,7 +53,7 @@ export const RegisterPage = () => {
         setLang(formData.preferredLanguage);
       }
       await register(formData.email.trim(), formData.password, formData.fullName.trim());
-      navigate('/dashboard');
+      navigate(redirectTarget, { replace: true });
     } catch (err) {
       setError(err.message || t('login.err_failed') || 'Registration failed. Email may already be registered.');
     } finally {

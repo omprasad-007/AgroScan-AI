@@ -186,9 +186,11 @@ async def analyze_leaf(
     val_res: LeafValidationResult = LeafValidator.validate_leaf_image(contents)
     if not val_res.usable_for_diagnosis or not val_res.is_leaf:
         logger.info(f"Scan rejected at Leaf Gate: status={val_res.status_code}, reason={val_res.rejection_reason}")
+        user_lang = getattr(current_user, "language", "en") or "en"
+        rejection_msg = val_res.message_mr if user_lang == "mr" else val_res.message_en
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=val_res.message_en
+            detail=rejection_msg
         )
 
     # Sanitize input environmental parameters
@@ -305,6 +307,13 @@ async def analyze_leaf(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(val_err)
+        )
+    except RuntimeError as r_err:
+        logger.warning(f"Disease detection provider failure: {r_err}")
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=str(r_err)
         )
     except Exception as e:
         logger.error(f"Error analyzing leaf image for user {current_user.id}: {e}", exc_info=True)

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { Sparkles, CheckCircle2, Loader2, AlertCircle, RefreshCw, Upload } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
@@ -26,25 +26,48 @@ export const AnalysisPage = () => {
   const [isRetrying, setIsRetrying] = useState(false);
   const [retryAttempt, setRetryAttempt] = useState(0);
 
+  const activeScanIdRef = useRef(null);
+  const abortControllerRef = useRef(null);
+
   const runAnalysisPipeline = async (isRetry = false) => {
+    if (!imageFile) {
+      navigate('/scan', { replace: true });
+      return;
+    }
+
+    // Cancel any previous pending scan request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    const abortController = new AbortController();
+    abortControllerRef.current = abortController;
+
+    // Unique Client Scan Transaction ID
+    const scanRequestId = `scan_tx_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+    activeScanIdRef.current = scanRequestId;
+
+    setError(null);
+    setAnalyzedPred(null);
+    setCurrentStep(0);
+    if (isRetry) setIsRetrying(true);
+
     try {
-      if (!imageFile) {
-        setTimeout(() => {
-          navigate('/results/pred_001');
-        }, 800);
-        return;
-      }
-
-      setError(null);
-      if (isRetry) setIsRetrying(true);
-
       const formData = new FormData();
       formData.append('file', imageFile);
+      if (location.state?.farmId) {
+        formData.append('farm_id', location.state.farmId);
+      }
 
-      // Unified High-Speed Disease Detection & Stage 1 Validation
+      // Unified High-Speed Disease Detection & Stage 1 Validation Gate
       const res = await api.post('/predictions/analyze', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
+        headers: { 'Content-Type': 'multipart/form-data' },
+        signal: abortController.signal
       });
+
+      // Discard stale response if a newer scan transaction was dispatched
+      if (activeScanIdRef.current !== scanRequestId) {
+        return;
+      }
 
       if (res.data) {
         try {
@@ -62,6 +85,15 @@ export const AnalysisPage = () => {
       setCurrentStep(steps.length); // Mark all steps complete
       setIsRetrying(false);
     } catch (err) {
+      // Ignore manual aborts from new scan triggers
+      if (err.name === 'CanceledError' || err.name === 'AbortError' || api.isCancel?.(err)) {
+        return;
+      }
+
+      if (activeScanIdRef.current !== scanRequestId) {
+        return;
+      }
+
       setIsRetrying(false);
       let detail = err.response?.data?.detail;
       const isNetworkOrTimeout = err.code === 'ECONNABORTED' || 
@@ -69,7 +101,7 @@ export const AnalysisPage = () => {
                                 err.message?.toLowerCase().includes('network error') || 
                                 !err.response;
 
-      // Auto-retry once on network error or timeout to give sleeping Render service time to finish waking
+      // Auto-retry once on network error or timeout to give sleeping cloud service time to finish waking
       if (isNetworkOrTimeout && retryAttempt === 0) {
         setRetryAttempt(1);
         setIsRetrying(true);
@@ -85,7 +117,7 @@ export const AnalysisPage = () => {
         } else if (isNetworkOrTimeout) {
           detail = "Unable to connect to the backend server. The cloud server may be waking up from sleep (Render free-tier cold start). Please click 'Retry Diagnosis' below.";
         } else {
-          detail = err.message || t('analysis.val_error_tip') || "No clear leaf was detected. Please scan a clear photo of a leaf or plant.";
+          detail = t('scan.leaf_rejected') || t('analysis.val_error_tip') || "No clear leaf was detected in this image. Please capture a well-lit, focused photograph of the affected plant leaf.";
         }
       }
       setError(detail);
@@ -94,6 +126,11 @@ export const AnalysisPage = () => {
 
   useEffect(() => {
     runAnalysisPipeline();
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
   }, [imageFile]);
 
   useEffect(() => {
@@ -104,7 +141,10 @@ export const AnalysisPage = () => {
       }, steps[currentStep].duration);
     } else if (!error && analyzedPred) {
       timeoutId = setTimeout(() => {
-        navigate(`/results/${analyzedPred.id}`, { state: { prediction: analyzedPred } });
+        navigate(`/results/${analyzedPred.id}`, { 
+          state: { prediction: analyzedPred, scanId: analyzedPred.id },
+          replace: true 
+        });
       }, 300);
     }
     return () => clearTimeout(timeoutId);

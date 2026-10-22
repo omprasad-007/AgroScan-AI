@@ -53,7 +53,7 @@ apiClient.interceptors.response.use(
     } else if (status >= 500) {
       console.error("Server error encountered:", detail || error.message);
     } else if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
-      console.warn("API Request timed out after 15 seconds.");
+      console.warn("API Request timed out after 90 seconds.");
     }
 
     return Promise.reject(error);

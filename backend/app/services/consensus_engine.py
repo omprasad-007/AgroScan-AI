@@ -15,7 +15,7 @@ from app.services.providers.plantnet_provider import PlantNetProvider
 from app.services.providers.plantix_provider import PlantixProvider
 from app.services.providers.agrio_provider import AgrioProvider
 from app.services.providers.tajiri_provider import TajiriVisionProvider
-from app.services.providers.plant_health_engine_provider import PlantHealthEngineProvider
+from app.services.providers.openrouter_vision_provider import OpenRouterVisionProvider
 from app.services.providers.local_model_provider import AgroScanLocalModelProvider
 
 logger = logging.getLogger("agroscan")
@@ -103,12 +103,12 @@ class MultiProviderConsensusEngine:
     def __init__(self):
         # Register all available provider instances
         self.providers: Dict[str, DiseaseDetectionProvider] = {
+            "openrouter_vision": OpenRouterVisionProvider(),
             "kindwise": KindwisePlantIdProvider(),
             "plantnet": PlantNetProvider(),
             "plantix": PlantixProvider(),
             "agrio": AgrioProvider(),
             "tajiri": TajiriVisionProvider(),
-            "plant_health_engine": PlantHealthEngineProvider(),
             "agroscan_local": AgroScanLocalModelProvider()
         }
         # In-memory deterministic cache: hash -> (timestamp, ConsensusResult)
@@ -139,18 +139,19 @@ class MultiProviderConsensusEngine:
 
     def select_active_providers(self, target_crop: Optional[str] = None) -> List[DiseaseDetectionProvider]:
         """
-        Selects 2 to 4 appropriate providers based on availability, health, and cost control.
+        Selects active, healthy disease detection providers with valid credentials.
+        Never invokes unavailable or uncompiled providers.
         """
         active = []
-        # Priority 1: Configured External Cloud Providers
-        for p_name in ["kindwise", "plantnet", "plantix", "agrio", "plant_health_engine", "tajiri"]:
+        # Priority 1: Configured External Cloud & Vision AI Providers
+        for p_name in ["openrouter_vision", "kindwise", "plantnet", "plantix", "agrio", "tajiri"]:
             p = self.providers.get(p_name)
             if p and p.is_available():
                 active.append(p)
 
-        # Priority 2: Always include Local Vision Engine for multi-source consensus
+        # Priority 2: Local Vision Engine (only if neural net binary is loaded or in explicit DEMO_MODE)
         local_p = self.providers.get("agroscan_local")
-        if local_p:
+        if local_p and local_p.is_available():
             active.append(local_p)
 
         return active
@@ -165,33 +166,37 @@ class MultiProviderConsensusEngine:
     ) -> ConsensusResult:
         """
         Executes parallel multi-provider routing, normalizes responses, and calculates cross-provider consensus.
+        Never fabricates hardcoded diseases or manufactures false consensus when APIs fail.
         """
         img_hash = self.calculate_image_hash(image_bytes)
-
-        # Check deterministic cache (valid for 1 hour for identical image hash)
-        cache_key = f"{img_hash}:{target_crop or 'auto'}"
-        if cache_key in self._cache:
-            ts, cached_result = self._cache[cache_key]
-            if (datetime.now(timezone.utc) - ts).total_seconds() < 3600:
-                # Return isolated copy with current scan_id
-                cached_copy = cached_result.model_copy()
-                cached_copy.scan_id = scan_id
-                return cached_copy
 
         # Select candidate providers
         active_providers = self.select_active_providers(target_crop)
         if not active_providers:
-            raise RuntimeError("No disease detection providers are currently available.")
+            raise RuntimeError(
+                "No disease detection providers are currently configured or available. "
+                "Please configure valid API credentials in the backend environment."
+            )
 
-        # Execute Provider Calls in Parallel with fast timeout and resilient exception handling
+        # Cache key binds image hash, target crop, and active provider set
+        prov_sig = ",".join(sorted(p.name for p in active_providers))
+        cache_key = f"{img_hash}:{target_crop or 'auto'}:{prov_sig}"
+        if cache_key in self._cache:
+            ts, cached_result = self._cache[cache_key]
+            if (datetime.now(timezone.utc) - ts).total_seconds() < 3600:
+                cached_copy = cached_result.model_copy()
+                cached_copy.scan_id = scan_id
+                return cached_copy
+
+        # Execute Provider Calls in Parallel with 8.0s timeout
         async def _call_with_timeout(p: DiseaseDetectionProvider) -> ProviderDiagnosisResult:
             try:
                 return await asyncio.wait_for(
                     p.diagnose(image_bytes=image_bytes, plant_name=target_crop, location=location, language=language),
-                    timeout=3.5
+                    timeout=8.0
                 )
             except asyncio.TimeoutError:
-                logger.warning(f"Provider '{p.name}' timed out after 3.5s")
+                logger.warning(f"Provider '{p.name}' timed out after 8.0s")
                 return ProviderDiagnosisResult(
                     provider=p.name,
                     status="timeout",
@@ -229,24 +234,17 @@ class MultiProviderConsensusEngine:
             non_leaf = next((r for r in results if r.status == "non_leaf_detected"), None)
             if non_leaf:
                 raise ValueError(non_leaf.error or "No plant leaf detected by diagnosis providers.")
-            
-            # Fallback to local baseline provider directly if all remote providers errored
-            local_p = self.providers.get("agroscan_local")
-            if local_p:
-                logger.info("All providers errored; generating diagnosis from local baseline.")
-                fallback_res = await local_p.diagnose(image_bytes=image_bytes, plant_name=target_crop, location=location, language=language)
-                if fallback_res.status == "success":
-                    valid_results = [fallback_res]
 
-        if not valid_results:
             err_details = "; ".join([f"{r.provider}: {r.error}" for r in results if r.error])
-            raise RuntimeError(f"All disease detection providers failed. {err_details}")
+            raise RuntimeError(f"All disease detection providers failed or returned errors. {err_details}")
 
         # Perform Multi-API Evidence Fusion
         consensus = self._fuse_evidence(valid_results, scan_id, img_hash)
         
-        # Save to deterministic cache
-        self._cache[cache_key] = (datetime.now(timezone.utc), consensus)
+        # Save to deterministic cache only for successful non-conflicting predictions
+        if consensus.agreement_level != "LOW_CONFLICTING" and consensus.confidence >= 0.50:
+            self._cache[cache_key] = (datetime.now(timezone.utc), consensus)
+
         return consensus
 
     def _fuse_evidence(

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { Leaf, LogIn, AlertCircle } from 'lucide-react';
@@ -8,11 +8,15 @@ export const LoginPage = () => {
   const { login } = useAuth();
   const { t } = useLanguage();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  const searchParams = new URLSearchParams(location.search);
+  const redirectTarget = searchParams.get('redirect') || '/dashboard';
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -25,7 +29,7 @@ export const LoginPage = () => {
 
     try {
       await login(email.trim(), password);
-      navigate('/dashboard');
+      navigate(redirectTarget, { replace: true });
     } catch (err) {
       setError(err.message || t('login.err_failed') || 'Login failed. Please verify email & password.');
     } finally {
