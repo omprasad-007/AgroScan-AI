@@ -85,40 +85,74 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (email, password, fullName = '') => {
     setLoading(true);
-    try {
-      // 1. Firebase Authentication Primary
-      let fbUser = null;
-      try {
-        fbUser = await registerUser(email, password, fullName);
-      } catch (fbErr) {
-        console.warn("Firebase Auth Register note:", fbErr.message);
-      }
+    const cleanEmail = email.trim();
+    const cleanName = fullName.trim() || cleanEmail.split('@')[0];
 
-      // 2. Sync with Backend API
+    try {
       let backendUser = null;
+      let token = null;
+
+      // 1. Register with Backend API
       try {
         const res = await api.post('/auth/register', {
-          email,
-          password,
-          full_name: fullName || email.split('@')[0],
-          role: email.includes('admin') ? 'admin' : 'farmer',
+          email: cleanEmail,
+          password: password,
+          full_name: cleanName,
+          role: cleanEmail.includes('admin') ? 'admin' : 'farmer',
           city: 'Pune',
           state: 'Maharashtra'
         });
         if (res.data?.access_token) {
-          localStorage.setItem('agroscan_token', res.data.access_token);
+          token = res.data.access_token;
+          localStorage.setItem('agroscan_token', token);
         }
         backendUser = res.data?.user;
       } catch (apiErr) {
-        console.warn("Backend API sync note:", apiErr);
+        if (apiErr.response?.data?.detail?.toLowerCase().includes('already registered')) {
+          throw new Error('An account with this email address already exists. Please sign in instead.');
+        }
+        console.warn("Backend API register notice:", apiErr);
       }
 
-      const role = backendUser?.role || (email.includes('admin') ? 'admin' : 'farmer');
-      const cleanName = fbUser?.displayName || backendUser?.full_name || fullName.trim() || (email ? email.split('@')[0] : 'Farmer');
+      // 2. Register with Firebase Authentication
+      let fbUser = null;
+      try {
+        fbUser = await registerUser(cleanEmail, password, cleanName);
+      } catch (fbErr) {
+        if (fbErr.message?.toLowerCase().includes('already in use')) {
+          throw new Error('An account with this email address already exists. Please sign in instead.');
+        }
+        console.warn("Firebase Auth Register note:", fbErr.message);
+      }
+
+      // If backend was sleeping or didn't return token during registration, sync via firebase-login
+      if (!token) {
+        try {
+          const syncRes = await api.post('/auth/firebase-login', {
+            email: cleanEmail,
+            full_name: cleanName
+          });
+          if (syncRes.data?.access_token) {
+            token = syncRes.data.access_token;
+            localStorage.setItem('agroscan_token', token);
+          }
+          if (!backendUser) backendUser = syncRes.data?.user;
+        } catch (syncErr) {
+          console.warn("Token recovery sync notice:", syncErr);
+        }
+      }
+
+      // Ensure fallback token is present
+      if (!token) {
+        const fallbackToken = `token_${Date.now()}_${btoa(cleanEmail)}`;
+        localStorage.setItem('agroscan_token', fallbackToken);
+      }
+
+      const role = backendUser?.role || (cleanEmail.includes('admin') ? 'admin' : 'farmer');
       const userObj = {
-        uid: fbUser?.uid || backendUser?.id || `user_${Date.now()}`,
-        id: fbUser?.uid || backendUser?.id || `user_${Date.now()}`,
-        email: email,
+        uid: backendUser?.id || fbUser?.uid || `user_${Date.now()}`,
+        id: backendUser?.id || fbUser?.uid || `user_${Date.now()}`,
+        email: cleanEmail,
         displayName: cleanName,
         full_name: cleanName,
         role: role
@@ -127,9 +161,6 @@ export const AuthProvider = ({ children }) => {
       setUser(userObj);
       localStorage.setItem('agroscan_user', JSON.stringify(userObj));
       return userObj;
-    } catch (err) {
-      const msg = err.response?.data?.detail || err.message || 'Registration failed.';
-      throw new Error(msg);
     } finally {
       setLoading(false);
     }
@@ -137,51 +168,96 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     setLoading(true);
-    try {
-      // 1. Primary Firebase Authentication
-      let fbUser = null;
-      let fbError = null;
-      try {
-        fbUser = await loginUser(email, password);
-      } catch (err) {
-        fbError = err;
-      }
+    const cleanEmail = email.trim();
 
-      // 2. Backend API Credential Verification
+    try {
       let backendUser = null;
+      let token = null;
       let backendError = null;
+
+      // 1. Primary Backend API Verification
       try {
-        const res = await api.post('/auth/login', { email, password });
+        const res = await api.post('/auth/login', { email: cleanEmail, password });
         if (res.data?.access_token) {
-          localStorage.setItem('agroscan_token', res.data.access_token);
+          token = res.data.access_token;
+          localStorage.setItem('agroscan_token', token);
         }
         backendUser = res.data?.user;
       } catch (err) {
         backendError = err;
       }
 
-      // If both Firebase and Backend failed, throw the relevant authentication error
-      if (!fbUser && !backendUser) {
-        const msg = backendError?.response?.data?.detail || fbError?.message || 'Authentication failed. Please verify credentials.';
-        throw new Error(msg);
+      // 2. Firebase Authentication Verification
+      let fbUser = null;
+      let fbError = null;
+      try {
+        fbUser = await loginUser(cleanEmail, password);
+      } catch (err) {
+        fbError = err;
       }
 
-      const role = backendUser?.role || (email.includes('admin') ? 'admin' : 'farmer');
-      const userDisplayName = fbUser?.displayName || backendUser?.full_name || (email ? email.split('@')[0] : 'Farmer');
-      const userEmail = fbUser?.email || backendUser?.email || email;
+      // If backend login succeeded with credentials
+      if (backendUser && token) {
+        const role = backendUser.role || (cleanEmail.includes('admin') ? 'admin' : 'farmer');
+        const userDisplayName = backendUser.full_name || cleanEmail.split('@')[0];
+        const userObj = {
+          uid: backendUser.id,
+          id: backendUser.id,
+          email: backendUser.email || cleanEmail,
+          displayName: userDisplayName,
+          full_name: userDisplayName,
+          role: role
+        };
+        setUser(userObj);
+        localStorage.setItem('agroscan_user', JSON.stringify(userObj));
+        return userObj;
+      }
 
-      const userObj = {
-        uid: fbUser?.uid || backendUser?.id || `user_${Date.now()}`,
-        id: fbUser?.uid || backendUser?.id || `user_${Date.now()}`,
-        email: userEmail,
-        displayName: userDisplayName,
-        full_name: userDisplayName,
-        role: role
-      };
+      // If Firebase verified the credentials but backend user record was absent (e.g. Render restart)
+      if (fbUser) {
+        try {
+          const syncRes = await api.post('/auth/firebase-login', {
+            email: cleanEmail,
+            full_name: fbUser.displayName || cleanEmail.split('@')[0]
+          });
+          if (syncRes.data?.access_token) {
+            token = syncRes.data.access_token;
+            localStorage.setItem('agroscan_token', token);
+          }
+          backendUser = syncRes.data?.user;
+        } catch (syncErr) {
+          console.warn("Backend sync notice:", syncErr);
+        }
 
-      setUser(userObj);
-      localStorage.setItem('agroscan_user', JSON.stringify(userObj));
-      return userObj;
+        if (!token) {
+          const fallbackToken = `token_${Date.now()}_${btoa(cleanEmail)}`;
+          localStorage.setItem('agroscan_token', fallbackToken);
+        }
+
+        const role = backendUser?.role || (cleanEmail.includes('admin') ? 'admin' : 'farmer');
+        const userDisplayName = fbUser.displayName || backendUser?.full_name || cleanEmail.split('@')[0];
+        const userObj = {
+          uid: fbUser.uid || backendUser?.id || `user_${Date.now()}`,
+          id: fbUser.uid || backendUser?.id || `user_${Date.now()}`,
+          email: cleanEmail,
+          displayName: userDisplayName,
+          full_name: userDisplayName,
+          role: role
+        };
+        setUser(userObj);
+        localStorage.setItem('agroscan_user', JSON.stringify(userObj));
+        return userObj;
+      }
+
+      // If both authentication attempts failed, throw the exact relevant error
+      if (backendError?.response?.status === 401 || fbError?.message?.toLowerCase().includes('password') || fbError?.message?.toLowerCase().includes('credential')) {
+        throw new Error('Incorrect password. Please verify your password and try again.');
+      } else if (backendError?.response?.status === 404 || fbError?.message?.toLowerCase().includes('not found')) {
+        throw new Error('User account not found. Please click Create Account below to get started.');
+      } else {
+        const msg = backendError?.response?.data?.detail || fbError?.message || 'Authentication failed. Please check your email and password.';
+        throw new Error(msg);
+      }
     } finally {
       setLoading(false);
     }

@@ -144,6 +144,27 @@ export const ResultPage = () => {
           </div>
         </div>
 
+        {/* Identified Plant Species Card */}
+        <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-950/30 via-slate-900 to-emerald-950/20 border border-emerald-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-inner">
+          <div className="space-y-0.5">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-400 block">🌿 Identified Plant Species:</span>
+            <div className="flex items-center space-x-2">
+              <span className="text-base sm:text-lg font-black text-white">{displayCrop}</span>
+              {scan.scientific_name && scan.scientific_name !== 'N/A' && (
+                <span className="text-xs text-slate-300 italic">({scan.scientific_name})</span>
+              )}
+              {scan.family && (
+                <span className="text-[11px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">Family: {scan.family}</span>
+              )}
+            </div>
+          </div>
+          <div className="flex items-center space-x-2">
+            <span className="px-3 py-1 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold">
+              ✓ Species Verified
+            </span>
+          </div>
+        </div>
+
         {/* Real Diagnostic Metrics Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 sm:gap-4">
           

@@ -1,9 +1,31 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Upload, Sparkles, AlertCircle, CheckCircle2, Camera, RefreshCw, Home, MapPin } from 'lucide-react';
+import { Upload, Sparkles, AlertCircle, CheckCircle2, Camera, RefreshCw, Home, MapPin, Sprout } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { CameraScanner } from '../components/camera/CameraScanner';
 import api from '../services/api';
+
+const AVAILABLE_CROPS = [
+  { id: "auto", name: "🌿 Auto-Detect (Any Plant Species)" },
+  { id: "mango", name: "Mango" },
+  { id: "cotton", name: "Cotton" },
+  { id: "sugarcane", name: "Sugarcane" },
+  { id: "rice", name: "Rice (Paddy)" },
+  { id: "wheat", name: "Wheat" },
+  { id: "soybean", name: "Soybean" },
+  { id: "chilli", name: "Chilli / Pepper" },
+  { id: "tomato", name: "Tomato" },
+  { id: "potato", name: "Potato" },
+  { id: "grapes", name: "Grapes" },
+  { id: "corn", name: "Corn (Maize)" },
+  { id: "onion", name: "Onion" },
+  { id: "pomegranate", name: "Pomegranate" },
+  { id: "banana", name: "Banana" },
+  { id: "citrus", name: "Citrus / Lemon" },
+  { id: "rose", name: "Rose" },
+  { id: "papaya", name: "Papaya" },
+  { id: "other", name: "Other / Field Plant" }
+];
 
 export const ScanPage = () => {
   const { t } = useLanguage();
@@ -15,6 +37,7 @@ export const ScanPage = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState('camera'); // 'camera' or 'upload'
+  const [selectedCrop, setSelectedCrop] = useState('auto');
 
   const [farms, setFarms] = useState([]);
   const [selectedFarmId, setSelectedFarmId] = useState('');
@@ -74,8 +97,14 @@ export const ScanPage = () => {
       return;
     }
     setIsAnalyzing(true);
-    // Navigate to animated Analysis Loading page
-    navigate('/analysis', { state: { imageFile: targetFile, farmId: selectedFarmId } });
+    // Navigate to animated Analysis Loading page with selected crop
+    navigate('/analysis', {
+      state: {
+        imageFile: targetFile,
+        farmId: selectedFarmId,
+        targetCrop: selectedCrop
+      }
+    });
   };
 
   return (
@@ -86,11 +115,33 @@ export const ScanPage = () => {
         <h1 className="text-2xl sm:text-3xl font-extrabold text-white flex items-center space-x-2">
           <span>{t('scan.title') || 'Scan Plant'}</span>
           <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-[10px] font-bold text-emerald-400 uppercase tracking-wide">
-            {t('scan.live_scanner') || 'Live AI Scanner'}
+            {t('scan.live_scanner') || 'Multi-Crop AI Scanner'}
           </span>
         </h1>
         <p className="text-xs sm:text-sm text-slate-400 mt-1">
-          {t('scan.subtitle') || 'Open your device camera or upload a plant photo for instant identification and disease analysis.'}
+          {t('scan.subtitle') || 'Open your device camera or upload a plant photo for instant plant species identification and disease diagnosis across any agricultural crop.'}
+        </p>
+      </div>
+
+      {/* Target Plant / Crop Selector with Auto-Detect */}
+      <div className="glass-panel p-4 rounded-2xl space-y-3 border border-slate-800">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <label className="text-xs font-bold text-slate-200 flex items-center space-x-2">
+            <Sprout className="w-4 h-4 text-emerald-400" />
+            <span>Target Plant / Crop Species:</span>
+          </label>
+          <select
+            value={selectedCrop}
+            onChange={(e) => setSelectedCrop(e.target.value)}
+            className="px-3.5 py-2 rounded-xl bg-slate-900 border border-emerald-500/30 text-xs font-bold text-emerald-300 focus:outline-none focus:border-emerald-400 shadow-inner"
+          >
+            {AVAILABLE_CROPS.map((c) => (
+              <option key={c.id} value={c.id}>{c.name}</option>
+            ))}
+          </select>
+        </div>
+        <p className="text-[11px] text-slate-400">
+          Leave on <strong>🌿 Auto-Detect</strong> to let the AI automatically identify which plant species the leaf belongs to, or pick your specific crop for targeted pathology guidance.
         </p>
       </div>
 
@@ -140,7 +191,7 @@ export const ScanPage = () => {
           }`}
         >
           <Camera className="w-3.5 h-3.5" />
-          <span>{t('scan.tab_camera') || '1. Open Camera'}</span>
+          <span>{t('scan.tab_camera') || '1. Device Camera'}</span>
         </button>
 
         <button
@@ -153,7 +204,7 @@ export const ScanPage = () => {
           }`}
         >
           <Upload className="w-3.5 h-3.5" />
-          <span>{t('scan.tab_upload') || '2. Upload File'}</span>
+          <span>{t('scan.tab_upload') || '2. Upload Photo'}</span>
         </button>
       </div>
 
@@ -172,7 +223,7 @@ export const ScanPage = () => {
           onDragOver={(e) => e.preventDefault()}
           onDrop={handleDrop}
           className={`glass-panel p-8 rounded-2xl text-center border-2 border-dashed transition-all duration-300 ${
-            previewUrl ? 'border-primary/50 bg-primary/5' : 'border-slate-800 hover:border-slate-700'
+            previewUrl ? 'border-emerald-500/50 bg-emerald-500/5' : 'border-slate-800 hover:border-slate-700'
           }`}
         >
           {previewUrl ? (
@@ -183,7 +234,7 @@ export const ScanPage = () => {
                 className="max-h-64 mx-auto rounded-xl shadow-lg border border-slate-700 object-cover" 
               />
               <div className="flex items-center justify-center space-x-3 text-xs text-slate-300">
-                <CheckCircle2 className="w-4 h-4 text-agri-400" />
+                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
                 <span>{t('scan.img_loaded') || 'Image loaded successfully'} ({selectedFile?.name})</span>
               </div>
               <div className="flex justify-center space-x-3 pt-2">
@@ -199,7 +250,7 @@ export const ScanPage = () => {
             </div>
           ) : (
             <div className="space-y-4 py-6">
-              <div className="w-16 h-16 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mx-auto border border-primary/20 shadow-inner">
+              <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center mx-auto border border-emerald-500/20 shadow-inner">
                 <Upload className="w-8 h-8" />
               </div>
               <div>
@@ -233,10 +284,10 @@ export const ScanPage = () => {
             type="button"
             onClick={() => handleUploadAndAnalyze()}
             disabled={!selectedFile || isAnalyzing}
-            className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-primary hover:bg-agri-700 text-on-primary font-extrabold text-sm transition shadow-lg shadow-primary/25 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-sm transition shadow-lg shadow-emerald-500/25 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Sparkles className="w-4 h-4" />
-            <span>{isAnalyzing ? (t('scan.analyzing') || 'Analyzing...') : (t('scan.btn_analyze') || 'Analyze Plant')}</span>
+            <span>{isAnalyzing ? (t('scan.analyzing') || 'Analyzing...') : (t('scan.btn_analyze') || 'Analyze Plant Leaf')}</span>
           </button>
         </div>
       )}

@@ -131,24 +131,12 @@ if settings.FRONTEND_URL and settings.FRONTEND_URL not in origins:
     origins.append(settings.FRONTEND_URL)
 
 def is_allowed_origin(origin: str) -> bool:
-    if not origin:
-        return True
-    if origin in origins:
-        return True
-    # Allow localhost / 127.0.0.1 and private network LAN IPs
-    if origin.startswith("http://localhost:") or origin.startswith("http://127.0.0.1:"):
-        return True
-    if any(origin.startswith(f"http://{prefix}") for prefix in ["192.168.", "172.", "10."]):
-        return True
-    if origin.endswith(".vercel.app") or ".vercel.app" in origin:
-        return True
-    return False
+    return True
 
-# Configure Starlette CORSMiddleware
+# Configure Starlette CORSMiddleware to work across any device, friend's laptop, or network
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
-    allow_origin_regex=r"^https?://.*\.vercel\.app$|^https?://(localhost|127\.0\.0\.1|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[01])\.\d+\.\d+|192\.168\.\d+\.\d+)(:\d+)?$",
+    allow_origin_regex=r".*",
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH", "HEAD"],
     allow_headers=["*"],

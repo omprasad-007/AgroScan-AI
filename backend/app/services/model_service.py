@@ -37,18 +37,9 @@ class BaseDiseasePredictor(ABC):
 
 class DemoPredictor(BaseDiseasePredictor):
     """
-    Deterministic Mock Inference Predictor for DEMO_MODE.
-    Performs Stage 1 Plant Verification before generating demo inferences.
+    Multi-Species Plant Botanical Predictor for DEMO_MODE.
+    Performs Stage 1 Plant Verification and botanical species identification.
     """
-    DEMO_CLASSES = [
-        {"crop": "Tomato", "disease_name": "Tomato Late Blight", "disease_code": "tomato_late_blight", "confidence_range": (0.88, 0.97)},
-        {"crop": "Tomato", "disease_name": "Tomato Early Blight", "disease_code": "tomato_early_blight", "confidence_range": (0.85, 0.95)},
-        {"crop": "Tomato", "disease_name": "Tomato Yellow Leaf Curl Virus", "disease_code": "tomato_yellow_leaf_curl", "confidence_range": (0.89, 0.98)},
-        {"crop": "Potato", "disease_name": "Potato Late Blight", "disease_code": "potato_late_blight", "confidence_range": (0.86, 0.96)},
-        {"crop": "Corn (Maize)", "disease_name": "Corn Common Rust", "disease_code": "corn_common_rust", "confidence_range": (0.87, 0.94)},
-        {"crop": "General Crop", "disease_name": "Healthy Leaf (No Disease)", "disease_code": "healthy_leaf", "confidence_range": (0.94, 0.99)},
-    ]
-
     def predict(self, image_bytes: bytes) -> Dict[str, Any]:
         # Stage 1: Plant Verification
         is_plant, status, reason = PlantDetector.verify_plant_image(image_bytes)
@@ -64,23 +55,18 @@ class DemoPredictor(BaseDiseasePredictor):
                 "error_message": reason
             }
 
-        # Stage 2: Plant Disease Analysis
-        import hashlib
-        img_sha = hashlib.sha256(image_bytes).hexdigest()
-        hash_seed = int(img_sha[:8], 16) % len(self.DEMO_CLASSES)
-        selected = self.DEMO_CLASSES[hash_seed]
-        
-        low_c, high_c = selected["confidence_range"]
-        conf_seed = (int(img_sha[8:12], 16) % 1000) / 1000.0
-        confidence = round(float(low_c) + conf_seed * (float(high_c) - float(low_c)), 4)
+        # Stage 2: Multi-Species Plant Botanical Morphology Analysis
+        from app.services.plant_species_classifier import PlantSpeciesClassifier
+        res = PlantSpeciesClassifier.identify_species(image_bytes)
 
         return {
             "is_plant": True,
             "status": "PLANT_IMAGE",
-            "crop": selected["crop"],
-            "disease_name": selected["disease_name"],
-            "disease_code": selected["disease_code"],
-            "confidence": confidence,
+            "crop": res["crop"],
+            "scientific_name": res["scientific_name"],
+            "disease_name": res["disease_name"],
+            "disease_code": res["disease_code"],
+            "confidence": res["confidence"],
             "is_demo": True
         }
 

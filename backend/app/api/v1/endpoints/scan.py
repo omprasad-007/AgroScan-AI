@@ -140,6 +140,7 @@ def format_prediction_response(
 async def analyze_leaf(
     file: UploadFile = File(...),
     farm_id: Optional[str] = Form(None),
+    target_crop: Optional[str] = Form(None),
     temperature_c: float = Form(24.0),
     humidity_pct: float = Form(78.0),
     rainfall_mm: float = Form(5.0),
@@ -217,7 +218,7 @@ async def analyze_leaf(
         consensus_res: ConsensusResult = await consensus_engine.diagnose_with_consensus(
             image_bytes=contents,
             scan_id=scan_unique_id,
-            target_crop=None,
+            target_crop=target_crop,
             location=user_location,
             language=user_lang
         )

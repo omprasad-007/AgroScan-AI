@@ -19,9 +19,9 @@ export const LoginPage = () => {
   const redirectTarget = searchParams.get('redirect') || '/dashboard';
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     if (!email || !password) {
-      setError(t('login.err_required') || 'Please enter both email and password.');
+      setError(t('login.err_required') || 'Please enter both your email and password.');
       return;
     }
     setLoading(true);
@@ -31,24 +31,24 @@ export const LoginPage = () => {
       await login(email.trim(), password);
       navigate(redirectTarget, { replace: true });
     } catch (err) {
-      setError(err.message || t('login.err_failed') || 'Login failed. Please verify email & password.');
+      setError(err.message || t('login.err_failed') || 'Login failed. Please verify your email & password.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="max-w-md mx-auto py-12 space-y-6">
-      <div className="glass-panel p-8 rounded-2xl space-y-6">
+    <div className="max-w-md mx-auto py-12 px-4 space-y-6">
+      <div className="glass-panel p-6 sm:p-8 rounded-3xl space-y-6 border border-slate-800 shadow-2xl">
         
         {/* Header */}
         <div className="text-center space-y-2">
-          <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center mx-auto border border-primary/20">
+          <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center mx-auto border border-emerald-500/20 shadow-inner">
             <Leaf className="w-6 h-6" />
           </div>
-          <h1 className="text-2xl font-bold text-white">{t('login.title') || 'Sign In to AgroScan AI'}</h1>
+          <h1 className="text-2xl font-extrabold text-white tracking-tight">{t('login.title') || 'Sign In to AgroScan AI'}</h1>
           <p className="text-xs text-slate-400">
-            {t('login.subtitle') || 'Access AgroScan AI disease monitoring & crop health tools'}
+            {t('login.subtitle') || 'Enter your email and password to access plant health diagnostics'}
           </p>
         </div>
 
@@ -58,7 +58,7 @@ export const LoginPage = () => {
               <AlertCircle className="w-4 h-4 shrink-0 text-red-400" />
               <span className="font-semibold">{error}</span>
             </div>
-            {(error.toLowerCase().includes('not found') || error.toLowerCase().includes('create an account')) && (
+            {(error.toLowerCase().includes('not found') || error.toLowerCase().includes('create an account') || error.toLowerCase().includes('register')) && (
               <div className="pt-2 border-t border-red-500/20 flex items-center justify-between">
                 <span className="text-[11px] text-slate-300">{t('login.no_account') || "Don't have an account yet?"}</span>
                 <Link
@@ -72,10 +72,10 @@ export const LoginPage = () => {
           </div>
         )}
 
-        {/* Login Form */}
+        {/* Regular Login Form for User Credentials */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1.5">
+            <label className="block text-xs font-semibold text-slate-300 mb-1.5">
               {t('login.email') || 'Email Address'}
             </label>
             <input
@@ -83,14 +83,15 @@ export const LoginPage = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="name@gmail.com"
-              className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-primary"
+              className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500"
               required
+              autoComplete="email"
             />
           </div>
 
           <div>
             <div className="flex justify-between items-center mb-1.5">
-              <label className="text-xs font-medium text-slate-300">
+              <label className="text-xs font-semibold text-slate-300">
                 {t('login.password') || 'Password'}
               </label>
               <Link to="/forgot-password" className="text-xs text-agri-400 hover:underline">
@@ -102,15 +103,16 @@ export const LoginPage = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-primary"
+              className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500"
               required
+              autoComplete="current-password"
             />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs transition shadow-lg shadow-emerald-500/20 flex items-center justify-center space-x-2 disabled:opacity-50"
+            className="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs transition shadow-lg shadow-emerald-500/20 flex items-center justify-center space-x-2 disabled:opacity-50 cursor-pointer"
           >
             <LogIn className="w-4 h-4" />
             <span>{loading ? (t('login.signing_in') || 'Signing In...') : (t('login.submit') || 'Sign In')}</span>
@@ -120,7 +122,7 @@ export const LoginPage = () => {
         <div className="text-center pt-2">
           <p className="text-xs text-slate-400">
             {t('login.no_account') || "Don't have an account?"}{' '}
-            <Link to="/register" className="text-agri-400 hover:underline font-semibold">
+            <Link to="/register" className="text-emerald-400 hover:underline font-bold">
               {t('login.create_account') || 'Create Account'}
             </Link>
           </p>
