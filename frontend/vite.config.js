@@ -26,8 +26,7 @@ export default defineConfig({
           'react-vendor': ['react', 'react-dom'],
           'router-vendor': ['react-router-dom'],
           'charts-vendor': ['recharts'],
-          'icons-vendor': ['lucide-react'],
-          'firebase-vendor': ['firebase/app', 'firebase/auth']
+          'icons-vendor': ['lucide-react']
         }
       }
     }
