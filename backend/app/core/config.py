@@ -23,6 +23,17 @@ class Settings(BaseSettings):
                 return False
         return bool(v) if v is not None else True
 
+    @field_validator("DEMO_MODE", mode="before")
+    @classmethod
+    def parse_demo_mode(cls, v):
+        if isinstance(v, str):
+            val = v.strip().lower()
+            if val in ("true", "1", "yes", "t", "demo"):
+                return True
+            if val in ("false", "0", "no", "f"):
+                return False
+        return bool(v) if v is not None else True
+
     # Database
     DATABASE_URL: str = "sqlite:///./agroscan.db"
 

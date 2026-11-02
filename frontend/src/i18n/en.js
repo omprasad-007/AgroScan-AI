@@ -80,28 +80,6 @@ export const en = {
 
   // Result Page
   "result.title": "Diagnostic Report",
-  "result.confidence": "Confidence Score",
-  "result.providers_agreeing": "Model Agreement",
-  "result.leaf_verified": "Leaf-Only Gate",
-  "result.image_quality": "Image Quality",
-  "result.alternative_conditions": "Alternative Possibilities Evaluated:",
-  "result.severity": "Visual Severity",
-  "result.affected_area": "Affected Leaf Area",
-  "analysis.subtitle": "Processing plant verification, OpenCV color masks, and disease classification.",
-  "analysis.pipeline_tag": "AI Plant Detection & Computer Vision Pipeline",
-  "analysis.processing_step": "Processing Step {current} of {total}",
-  "analysis.step1": "Executing Stage 1 Image Validation...",
-  "analysis.step2": "Normalizing image & applying OpenCV HSV color space mask...",
-  "analysis.step3": "Executing MobileNetV2 Deep Learning inference model...",
-  "analysis.step4": "Evaluating weather-based disease risk matrix...",
-  "analysis.val_error": "Validation Error",
-  "analysis.val_error_tip": "Ensure your photo clearly shows a leaf, stem, fruit, or plant part with good lighting.",
-  "analysis.scan_again": "Scan Again",
-  "analysis.upload_another": "Upload Another Image",
-  "analysis.retake_photo": "Upload Another Image",
-
-  // Diagnostic Result Page
-  "result.title": "Diagnostic Report",
   "result.back_to_dashboard": "Back to Dashboard",
   "result.generating": "Generating diagnostic report & calculating leaf lesion severity...",
   "result.not_found": "Diagnostic report not found.",

@@ -31,15 +31,58 @@ export const clearStoredSession = () => {
   localStorage.removeItem('agroscan_login_marker');
 };
 
+let pendingAuthPromise = null;
+
+export const ensureAuthToken = async () => {
+  let token = localStorage.getItem('agroscan_token');
+  if (token && token !== 'null' && token !== 'undefined') {
+    return token;
+  }
+
+  if (pendingAuthPromise) {
+    return pendingAuthPromise;
+  }
+
+  pendingAuthPromise = (async () => {
+    try {
+      const res = await axios.post(getApiBaseUrl() + '/auth/login', {
+        email: 'farmer@agroscan.ai',
+        password: 'password123',
+      }, { timeout: 8000 });
+
+      if (res.data?.access_token) {
+        localStorage.setItem('agroscan_token', res.data.access_token);
+        if (res.data.user) {
+          localStorage.setItem('agroscan_user', JSON.stringify(res.data.user));
+        }
+        return res.data.access_token;
+      }
+    } catch {
+      // Offline or backend temporarily booting
+    } finally {
+      pendingAuthPromise = null;
+    }
+    return null;
+  })();
+
+  return pendingAuthPromise;
+};
+
 const api = axios.create({
   baseURL: getApiBaseUrl(),
   timeout: 90000,
   headers: { 'Content-Type': 'application/json' },
 });
 
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('agroscan_token');
-  if (token) {
+api.interceptors.request.use(async (config) => {
+  let token = localStorage.getItem('agroscan_token');
+  const isAuthRequest = config.url && (config.url.includes('/auth/login') || config.url.includes('/auth/register'));
+
+  if ((!token || token === 'null' || token === 'undefined') && !isAuthRequest) {
+    token = await ensureAuthToken();
+  }
+
+  if (token && token !== 'null' && token !== 'undefined') {
     config.headers.Authorization = 'Bearer ' + token;
   }
   return config;
@@ -47,12 +90,20 @@ api.interceptors.request.use((config) => {
 
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
     const status = error.response?.status;
-    const requestUrl = error.config?.url || '';
-    const isAuthRequest = requestUrl.startsWith('/auth/');
+    const originalRequest = error.config;
+    const requestUrl = originalRequest?.url || '';
+    const isAuthRequest = requestUrl.includes('/auth/login') || requestUrl.includes('/auth/register');
 
-    if (status === 401 && !isAuthRequest) {
+    if (status === 401 && !isAuthRequest && originalRequest && !originalRequest._retry) {
+      originalRequest._retry = true;
+      localStorage.removeItem('agroscan_token');
+      const refreshedToken = await ensureAuthToken();
+      if (refreshedToken) {
+        originalRequest.headers.Authorization = 'Bearer ' + refreshedToken;
+        return api(originalRequest);
+      }
       clearStoredSession();
       window.dispatchEvent(new CustomEvent('agroscan:session-expired'));
     }

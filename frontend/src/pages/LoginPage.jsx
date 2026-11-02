@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
-import { Leaf, LogIn, AlertCircle } from 'lucide-react';
+import { Leaf, LogIn, AlertCircle, Sparkles } from 'lucide-react';
 
 export const LoginPage = () => {
   const { login } = useAuth();
@@ -118,6 +118,35 @@ export const LoginPage = () => {
             <span>{loading ? (t('login.signing_in') || 'Signing In...') : (t('login.submit') || 'Sign In')}</span>
           </button>
         </form>
+
+        {/* 1-Click Demo Login for Presentations and Evaluator Laptops */}
+        <div className="pt-2 border-t border-slate-800/80 space-y-2">
+          <button
+            type="button"
+            onClick={async () => {
+              setEmail('farmer@agroscan.ai');
+              setPassword('password123');
+              setLoading(true);
+              setError('');
+              try {
+                await login('farmer@agroscan.ai', 'password123');
+                navigate(redirectTarget, { replace: true });
+              } catch (err) {
+                setError(err.message || 'Demo login failed. Please retry.');
+              } finally {
+                setLoading(false);
+              }
+            }}
+            disabled={loading}
+            className="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-emerald-500/40 text-emerald-300 font-bold text-xs transition flex items-center justify-center space-x-2 cursor-pointer shadow-md"
+          >
+            <Sparkles className="w-4 h-4 text-emerald-400" />
+            <span>1-Click Demo Login (Presentation Mode)</span>
+          </button>
+          <p className="text-[10px] text-center text-slate-400">
+            Pre-configured Account: <span className="text-slate-300 font-mono">farmer@agroscan.ai</span> / <span className="text-slate-300 font-mono">password123</span>
+          </p>
+        </div>
 
         <div className="text-center pt-2">
           <p className="text-xs text-slate-400">
