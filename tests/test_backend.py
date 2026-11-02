@@ -309,5 +309,37 @@ def test_assistant_scan_dispute_and_negation():
     assert ("नाही" in res["answer"] or "not" in res["answer"].lower())
 
 
+def test_assistant_plant_identification_and_disputed_scan():
+    """CRITICAL REGRESSION TEST: Turn 1 disputes Mango, Turn 2 asks 'it must analyze leaf of which plant'.
+    Assistant must recognize PLANT_IDENTIFICATION, NOT hallucinate Mango crop care, and list supported crops."""
+    from app.services.assistant.assistant_service import AssistantService
+    from app.services.intent_service import AgriculturalIntent
+
+    scan_ctx = {
+        "valid_plant_image": True,
+        "crop_detected": "Mango",
+        "disease_name": "Mango Powdery Mildew"
+    }
+    history = [
+        {"role": "user", "content": "it is not mango leaf"},
+        {"role": "assistant", "content": "We noted that this leaf is not from Mango."}
+    ]
+
+    res = AssistantService.process_message(
+        message="it must analyze leaf of which plant",
+        scan_context=scan_ctx,
+        conversation_history=history,
+        language="en"
+    )
+    assert res["intent"] == AgriculturalIntent.PLANT_IDENTIFICATION
+    # Must NOT give the broken generic Mango advice
+    assert "Regarding your query ('it is not mango leaf')" not in res["answer"]
+    assert "For optimal Mango health and productivity" not in res["answer"]
+    # Must mention leaf morphology / computer vision and supported crops
+    ans_lower = res["answer"].lower()
+    assert ("morphology" in ans_lower or "aspect ratio" in ans_lower or "venation" in ans_lower or "leaf" in ans_lower)
+    assert any(c in ans_lower for c in ["tomato", "cotton", "soybean", "chilli", "wheat", "rice"])
+
+
 
 

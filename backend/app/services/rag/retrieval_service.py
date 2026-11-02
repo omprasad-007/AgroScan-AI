@@ -47,6 +47,7 @@ class RetrievalService:
             AgriculturalIntent.PEST_MANAGEMENT: "pest control IPM sticky traps biological management",
             AgriculturalIntent.WEATHER_DISEASE_RISK: "weather humidity disease outbreak risk spore germination",
             AgriculturalIntent.WEATHER: "weather temperature rainfall humidity forecast",
+            AgriculturalIntent.PLANT_IDENTIFICATION: "botanical plant species identification leaf morphology venation shape",
             AgriculturalIntent.SCAN_EXPLANATION: "diagnostic scan confidence leaf symptoms visual analysis",
             AgriculturalIntent.GENERAL_AGRICULTURE: "agronomy principles farming practices crop physiology"
         }
@@ -131,6 +132,14 @@ class RetrievalService:
             elif intent == AgriculturalIntent.WEATHER_DISEASE_RISK:
                 grounding_facts.append(f"Weather Favorability: {disease_info['favorable_conditions']}")
                 grounding_facts.append(f"Spread Risk: {disease_info['spread_conditions']}")
+
+        if intent == AgriculturalIntent.PLANT_IDENTIFICATION:
+            grounding_facts.append(
+                "BOTANICAL PLANT & SPECIES IDENTIFICATION ENGINE:\n"
+                "- Leaf Morphology Metrics: Aspect ratio, solidity, perimeter-to-area, margin serration, venation architecture (parallel monocot vs netted dicot).\n"
+                "- Supported Crops: Tomato, Potato, Chilli, Cotton, Soybean, Mango, Rice (Paddy), Wheat, Maize, Grapes, Citrus/Lemon, Banana, Pomegranate, Sugarcane, Onion.\n"
+                "- Diagnostic Protocol: If vision classification disputes occur due to shadow or angle, specify crop name or rescan high-resolution leaf close-up."
+            )
 
         # Vector semantic fallback if facts are empty
         if not grounding_facts:

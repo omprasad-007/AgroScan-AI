@@ -142,11 +142,23 @@ class AgriRAGService:
                 grounding_facts.append(f"Organic Management: {disease_info['biological_control']}")
                 grounding_facts.append(f"Chemical Management: {disease_info['chemical_management']}")
 
+        # 4. Botanical Plant & Species Identification Grounding
+        if intent == AgriculturalIntent.PLANT_IDENTIFICATION:
+            grounding_facts.append(
+                "BOTANICAL LEAF IDENTIFICATION ENGINE:\n"
+                "- Feature extraction: Aspect ratio (length-to-width), contour solidity, leaf margin (serrated vs smooth), and venation (parallel monocot vs netted dicot).\n"
+                "- Supported Crops Catalog: Tomato, Potato, Chilli, Cotton, Soybean, Mango, Rice (Paddy), Wheat, Maize, Grapes, Citrus/Lemon, Banana, Pomegranate, Sugarcane, Onion.\n"
+                "- Vision guidelines: Clear single-leaf photos in uniform natural lighting yield highest identification accuracy; obscured margins or shadows may cause morphological overlap."
+            )
+
         return {
             "intent": intent,
             "plant_name": plant_name,
             "disease_name": disease_name,
             "context_source": context_source,
+            "is_scan_dispute": ctx_meta.get("is_scan_dispute", False),
+            "disputed_plant": ctx_meta.get("disputed_plant"),
+            "disputed_disease": ctx_meta.get("disputed_disease"),
             "plant_info": plant_info,
             "disease_info": disease_info,
             "general_concept": general_concept,

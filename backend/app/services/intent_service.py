@@ -56,6 +56,17 @@ class IntentService:
             ]
         ),
 
+        # Plant & Species Identification
+        (
+            AgriculturalIntent.PLANT_IDENTIFICATION,
+            [
+                r"\b(?:which plant|what plant|identify plant|name of the plant|which crop|what crop|name of the crop|which tree|which leaf|what leaf|leaf of which plant|which plant is this|what plant is this|which species|analyze leaf of which plant)\b",
+                r"\b(?:identify|recognize|classify|detect|analyze|tell me).*(?:which plant|which crop|species|what leaf|what crop)\b",
+                r"\b(?:leaf of which|plant of which|which plant)\b",
+                r"(?:कोणते पीक|कोणत्या पिकाचे|कोणती वनस्पती|कोणत्या झाडाचे|कोणते झाड|हे पान कशाचे|पिकाची ओळख|वनस्पती ओळखा)"
+            ]
+        ),
+
         # Scan & Image Explanation & Dispute/Recheck
         (
             AgriculturalIntent.SCAN_EXPLANATION,
@@ -475,6 +486,20 @@ class IntentService:
         )
         scan_plant = (scan_context.get("crop_detected") or scan_context.get("plantName")) if scan_context else None
 
+        # Check if conversation history has already disputed this plant or scan
+        if not disputed_plant and scan_plant and conversation_history:
+            for turn in reversed(conversation_history[-6:]):
+                h_text = turn.get("content", "")
+                h_detail = cls.extract_entities_detail(h_text)
+                h_disp_p = h_detail.get("disputed_plant")
+                if h_disp_p and (h_disp_p.lower() in scan_plant.lower() or scan_plant.lower() in h_disp_p.lower()):
+                    disputed_plant = scan_plant
+                    break
+                h_clean = h_text.lower()
+                if ("not " + scan_plant.lower()) in h_clean or ("wrong" in h_clean and scan_plant.lower() in h_clean):
+                    disputed_plant = scan_plant
+                    break
+
         q_clean = query.lower()
         is_recheck_or_dispute = any(w in q_clean for w in ["recheck", "rechake", "rescan", "wrong", "not a", "not an", "is not", "चुकीचे", "पुन्हा तपासा", "नाही"])
         is_disputing_scan_plant = bool(
@@ -486,7 +511,8 @@ class IntentService:
 
         if is_disputing_scan_plant:
             context_source = "user_scan_dispute"
-            intent = AgriculturalIntent.SCAN_EXPLANATION
+            if intent not in [AgriculturalIntent.PLANT_IDENTIFICATION]:
+                intent = AgriculturalIntent.SCAN_EXPLANATION
             if not resolved_plant:
                 resolved_plant = None
                 resolved_disease = None
@@ -494,7 +520,7 @@ class IntentService:
                 disputed_plant = scan_plant
         else:
             # If query has no plant, check active scan context
-            if not resolved_plant and has_valid_scan and scan_context:
+            if not resolved_plant and has_valid_scan and scan_context and (not disputed_plant or disputed_plant.lower() not in (scan_plant or "").lower()):
                 resolved_plant = scan_plant
                 context_source = "scan"
 
@@ -538,21 +564,13 @@ class IntentService:
                     if h_disease and h_disease != disputed_disease:
                         resolved_disease = h_disease
                         break
-            if has_valid_scan and scan_context and scan_context.get("disease_name"):
-                resolved_disease = scan_context.get("disease_name")
-            elif conversation_history:
-                for turn in reversed(conversation_history[-4:]):
-                    hist_text = turn.get("content", "")
-                    _, h_disease = cls.extract_entities(hist_text)
-                    if h_disease:
-                        resolved_disease = h_disease
-                        break
 
         # If intent is purely agronomic (Irrigation, Fertilizer, Soil, Harvesting, Sowing),
         # DO NOT inject or prioritize disease context
         if intent in [
             AgriculturalIntent.IRRIGATION,
             AgriculturalIntent.FERTILIZER,
+            AgriculturalIntent.NUTRITION,
             AgriculturalIntent.SOIL,
             AgriculturalIntent.HARVESTING,
             AgriculturalIntent.PLANTING,
@@ -565,5 +583,8 @@ class IntentService:
             "plant": resolved_plant,
             "disease": resolved_disease,
             "context_source": context_source,
+            "is_scan_dispute": is_disputing_scan_plant,
+            "disputed_plant": disputed_plant or (scan_plant if is_disputing_scan_plant else None),
+            "disputed_disease": disputed_disease,
             "raw_query": query
         }

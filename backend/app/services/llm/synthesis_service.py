@@ -70,6 +70,17 @@ class SynthesisService:
                 f"- Absolutely DO NOT claim the plant is {disp_crop}, and do NOT give cultivation, disease, or fertilizer advice for {disp_crop}."
             ])
 
+        if intent == AgriculturalIntent.PLANT_IDENTIFICATION:
+            lines.extend([
+                "",
+                "PLANT & SPECIES IDENTIFICATION INSTRUCTIONS:",
+                "- The user is asking what plant/crop leaf this is, or asking which plants AgroScan AI can analyze.",
+                "- Clarify that AgroScan AI identifies crops through Computer Vision and Botanical Leaf Morphology: aspect ratio, solidity, contour margins, and venation (parallel vs netted).",
+                "- List key supported agricultural crops: Tomato, Potato, Chilli, Cotton, Soybean, Mango, Rice (Paddy), Wheat, Maize, Grapes, Citrus/Lemon, Banana, Pomegranate, Sugarcane, Onion.",
+                "- If the user had disputed a prior misclassification (e.g. Mango), reaffirm that leaves with similar oblong geometry or solidity can occasionally overlap in low light or partial angles.",
+                "- Guide the user to either tell you the exact crop name in chat, or rescan a clean, well-lit close-up photo showing clear leaf margins and veins."
+            ])
+
         if evidence_text:
             lines.append(f"\n{evidence_text}")
 
@@ -143,6 +154,37 @@ class SynthesisService:
                 f"📌 **Recommended Next Steps:**\n"
                 f"1. **Specify Your Actual Crop:** Tell us which crop or plant this is (e.g. Chilli, Cotton, Soybean, Mango, Brinjal) so we can provide exact agronomic guidance.\n"
                 f"2. **Rescan with a Clear Photo:** Take a well-lit, focused close-up photo of the leaf from the Scan page for re-analysis."
+            )
+
+        # 2b. Plant & Species Identification (e.g. "it must analyze leaf of which plant", "which plant leaf is this?")
+        if intent == AgriculturalIntent.PLANT_IDENTIFICATION:
+            if is_mr:
+                return (
+                    "🌿 **AgroScan AI वनस्पती व पीक ओळख (Plant Species Analysis):**\n\n"
+                    "AgroScan AI संगणकीय दृष्टी (Computer Vision) आणि **पानांच्या भौमितिक संरचनेवरून (Leaf Morphology)** पिकाची अचूक ओळख पटवते:\n"
+                    "• **आकार व गुणोत्तर (Aspect Ratio & Solidity):** पानाच्या लांबी-रुंदीचे गुणोत्तर आणि पानाच्या कडांचे अखंडत्व.\n"
+                    "• **शिरांचे जाळे (Venation):** समांतर शिरा (एकदल पिके उदा. ऊस, मका, गहू, भात) किंवा जाळीदार शिरा (द्विदल पिके उदा. टोमॅटो, कापूस, सोयाबीन, मिरची, आंबा).\n"
+                    "• **कडांची रचना (Leaf Margins):** दंतूर (serrated) किंवा गुळगुळीत (entire) कडा.\n\n"
+                    "🌱 **AgroScan AI द्वारे तपासली जाणारी प्रमुख पिके (Supported Crops):**\n"
+                    "1. **भाजीपाला पिके:** टोमॅटो (Tomato), बटाटा (Potato), मिरची (Chilli), कांदा (Onion), वांगी (Brinjal).\n"
+                    "2. **फळबागा:** आंबा (Mango), डाळिंब (Pomegranate), द्राक्षे (Grapes), केळी (Banana), लिंबूवर्गीय (Citrus/Lemon).\n"
+                    "3. **तृणधान्ये व नगदी पिके:** कापूस (Cotton), सोयाबीन (Soybean), गहू (Wheat), भात (Rice), मका (Maize), ऊस (Sugarcane).\n\n"
+                    "📌 **अचूक विश्लेषणासाठी पुढील कृती:**\n"
+                    "जर एखाद्या पानाच्या आकारात साम्य असल्यामुळे स्कॅनमध्ये चुकीचे पीक नोंदवले गेले असेल, तर कृपया आपल्या पिकाचे नाव चॅटमध्ये सांगा किंवा 'स्कॅन' पानावरून पानाच्या शिरा व कडा स्पष्ट दिसणारा चांगल्या प्रकाशातील क्लोज-अप फोटो पुन्हा अपलोड करा."
+                )
+            return (
+                "🌿 **AgroScan AI Plant Species & Leaf Identification:**\n\n"
+                "AgroScan AI identifies agricultural crops using **Computer Vision & Botanical Leaf Morphology**:\n"
+                "• **Aspect Ratio & Solidity:** Analyzes the length-to-width ratio and leaf contour density.\n"
+                "• **Venation Architecture:** Identifies parallel venation (monocots like Sugarcane, Maize, Rice, Wheat) vs. reticulate net-like venation (dicots like Tomato, Cotton, Soybean, Chilli, Mango).\n"
+                "• **Margin & Surface Profile:** Evaluates serrated vs. smooth leaf margins and chlorophyll chromaticity.\n\n"
+                "🌱 **Supported Crops in AgroScan AI Catalog:**\n"
+                "1. **Vegetable Crops:** Tomato, Potato, Chilli / Pepper, Onion, Brinjal.\n"
+                "2. **Fruit Orchards:** Mango, Pomegranate, Grapes, Banana, Citrus / Lemon.\n"
+                "3. **Field & Cash Crops:** Cotton, Soybean, Wheat, Rice (Paddy), Corn (Maize), Sugarcane.\n\n"
+                "📌 **How to Proceed:**\n"
+                "• If a scan previously misclassified your leaf due to geometric similarity (e.g. oblong lanceolate leaf shape), tell us your **actual crop name** in this chat for immediate targeted agronomic solutions.\n"
+                "• Or capture a well-lit, focused close-up photo showing clear leaf margins and venation from the **Scan** page for re-analysis."
             )
 
         # 3. Comparative Pathology: Early Blight vs Late Blight

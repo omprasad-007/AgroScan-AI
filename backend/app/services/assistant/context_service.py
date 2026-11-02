@@ -45,6 +45,20 @@ class ContextService:
         disputed_disease = ent_detail.get("disputed_disease")
         scan_plant = (scan_context.get("crop_detected") or scan_context.get("plantName")) if scan_context else None
 
+        # Check if conversation history has already disputed this plant or scan
+        if not disputed_plant and scan_plant and conversation_history:
+            for turn in reversed(conversation_history[-6:]):
+                h_text = turn.get("content", "")
+                h_detail = IntentService.extract_entities_detail(h_text)
+                h_disp_p = h_detail.get("disputed_plant")
+                if h_disp_p and (h_disp_p.lower() in scan_plant.lower() or scan_plant.lower() in h_disp_p.lower()):
+                    disputed_plant = scan_plant
+                    break
+                h_clean = h_text.lower()
+                if ("not " + scan_plant.lower()) in h_clean or ("wrong" in h_clean and scan_plant.lower() in h_clean):
+                    disputed_plant = scan_plant
+                    break
+
         q_clean = query.lower()
         is_recheck_or_dispute = any(w in q_clean for w in ["recheck", "rechake", "rescan", "wrong", "not a", "not an", "is not", "चुकीचे", "पुन्हा तपासा", "नाही"])
         is_disputing_scan_plant = bool(
@@ -58,11 +72,12 @@ class ContextService:
             resolved_plant = q_plant
             resolved_disease = q_disease
             context_source = "user_scan_dispute"
-            intent = AgriculturalIntent.SCAN_EXPLANATION
+            if intent not in [AgriculturalIntent.PLANT_IDENTIFICATION]:
+                intent = AgriculturalIntent.SCAN_EXPLANATION
             has_valid_scan = False
         else:
             # 1. Resolve Plant from Real Scan Context if not in query
-            if not resolved_plant and has_valid_scan and scan_context:
+            if not resolved_plant and has_valid_scan and scan_context and (not disputed_plant or disputed_plant.lower() not in (scan_plant or "").lower()):
                 resolved_plant = scan_plant
                 context_source = "scan"
 
