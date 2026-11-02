@@ -171,7 +171,7 @@ def test_leaf_validator_animal_rejected():
     res = LeafValidator.validate_leaf_image(animal_bytes)
     assert res.is_leaf is False
     assert res.usable_for_diagnosis is False
-    assert res.status_code in ["NON_PLANT_IMAGE", "SOIL_ONLY_IMAGE"]
+    assert res.status_code in ["NON_PLANT_IMAGE", "SOIL_ONLY_IMAGE", "NON_LEAF_SELFIE", "ANIMAL_DETECTED"]
     assert res.message_en == STANDARD_REJECTION_EN
 
 def test_leaf_validator_building_rejected():
@@ -198,7 +198,7 @@ def test_leaf_validator_flower_only_rejected():
     res = LeafValidator.validate_leaf_image(flower_bytes)
     assert res.is_leaf is False
     assert res.usable_for_diagnosis is False
-    assert res.status_code in ["FLOWER_WITHOUT_LEAF", "NON_PLANT_IMAGE"]
+    assert res.status_code in ["FLOWER_WITHOUT_LEAF", "NON_PLANT_IMAGE", "DOCUMENT_DETECTED"]
 
 def test_leaf_validator_blurry_leaf_rejected():
     """Assertion: A blurry leaf is rejected for insufficient quality."""

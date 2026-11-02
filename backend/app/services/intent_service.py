@@ -56,13 +56,18 @@ class IntentService:
             ]
         ),
 
-        # Scan & Image Explanation
+        # Scan & Image Explanation & Dispute/Recheck
         (
             AgriculturalIntent.SCAN_EXPLANATION,
             [
                 r"\b(?:explain|tell me about|understand|details of|summary of).*(?:scan|result|prediction|detection|analysis)\b",
                 r"\bexplain my scan\b",
-                r"(?:स्कॅन|निकाल|तपासणी).*(?:समजावून सांगा|स्पष्टीकरण|सांगा)"
+                r"\b(?:recheck|rechake|re-check|recheck image|rescan|re-scan|re-diagnose|rediagnose)\b",
+                r"\b(?:wrong|incorrect|false)\s+(?:plant|crop|disease|scan|result|detection|diagnosis|leaf|image)\b",
+                r"\b(?:is not|not a|not an|isn't)\s+[a-z\s]{0,12}\s*(?:image|photo|leaf|plant|crop)\b",
+                r"\bnot\s+[a-z\s]{0,12}\s*(?:image|photo|leaf|plant|crop)\b",
+                r"(?:स्कॅन|निकाल|तपासणी).*(?:समजावून सांगा|स्पष्टीकरण|सांगा)",
+                r"(?:पुन्हा तपासा|पुन्हा स्कॅन करा|चुकीचे पीक|चुकीचा रोग|हे पीक नाही|पान नाही|तपासा)"
             ]
         ),
         (
@@ -270,120 +275,178 @@ class IntentService:
         return AgriculturalIntent.GENERAL_AGRICULTURE
 
     @classmethod
-    def extract_entities(cls, query: str) -> Tuple[Optional[str], Optional[str]]:
-        """Extract explicit plant and disease entities from the query string."""
+    def is_term_negated(cls, term: str, text: str) -> bool:
+        """Determines if an agricultural entity is preceded or followed by negation tokens."""
+        if not term or not text:
+            return False
+        escaped = re.escape(term.lower().strip())
+        preceding = [
+            rf"\b(?:not|no|isn't|is\s+not|not\s+a|not\s+an|wrong|never|instead\s+of)\s+(?:an?\s+)?(?:image\s+of\s+|photo\s+of\s+)?{escaped}\b",
+            rf"\bnot\s+[a-z\s]{{0,15}}\b{escaped}\b",
+            rf"(?:नाही|नव्हे|नाहीत|नसून)\s+{escaped}"
+        ]
+        for pat in preceding:
+            if re.search(pat, text):
+                return True
+        succeeding = [
+            rf"\b{escaped}\s+(?:image\s+|leaf\s+|photo\s+|plant\s+|crop\s+)?(?:is\s+not|not|nahi|nahiye|naahi|navhe|chuki|wrong)\b",
+            rf"\b{escaped}\s*(?:नाही|नाहीये|नव्हे|नसून|चुकीचे|चुकीचा|नव्हते)"
+        ]
+        for pat in succeeding:
+            if re.search(pat, text):
+                return True
+        return False
+
+    @classmethod
+    def extract_entities_detail(cls, query: str) -> Dict[str, Any]:
+        """Extract explicit plant and disease entities, separating affirmed from negated/disputed entities."""
         if not query:
-            return (None, None)
+            return {"matched_plant": None, "matched_disease": None, "disputed_plant": None, "disputed_disease": None}
 
         q_lower = query.lower().strip()
         matched_plant = None
+        disputed_plant = None
         matched_disease = None
+        disputed_disease = None
 
         # 1. Match Plant
         for key, pdata in PLANTS_KNOWLEDGE_BASE.items():
             cname = pdata["common_name"].lower()
             sname = pdata["scientific_name"].lower()
-            if key in q_lower or cname in q_lower or sname in q_lower:
-                matched_plant = pdata["common_name"]
-                break
+            found_term = None
+            if key in q_lower:
+                found_term = key
+            elif cname in q_lower:
+                found_term = cname
+            elif sname in q_lower:
+                found_term = sname
+
+            if found_term:
+                if cls.is_term_negated(found_term, q_lower):
+                    disputed_plant = pdata["common_name"]
+                elif not matched_plant:
+                    matched_plant = pdata["common_name"]
 
         # Check vernacular names if still None
-        if not matched_plant:
-            vernacular_map = {
-                "आंबा": "Mango", "आंब्यावर": "Mango", "aam": "Mango", "mango": "Mango",
-                "ऊस": "Sugarcane", "उसात": "Sugarcane", "उसावर": "Sugarcane", "उसाचे": "Sugarcane", "उसाच्या": "Sugarcane", "ganna": "Sugarcane", "sugarcane": "Sugarcane",
-                "टोमॅटो": "Tomato", "टोमॅटोवर": "Tomato", "tomato": "Tomato", "tamatar": "Tomato",
-                "बटाटा": "Potato", "बटाट्यावर": "Potato", "batata": "Potato", "aloo": "Potato", "potato": "Potato",
-                "कापूस": "Cotton", "कपाशी": "Cotton", "कपाशीवर": "Cotton", "कपाशीवरील": "Cotton", "कपाशीच्या": "Cotton", "कपाशीत": "Cotton", "kapas": "Cotton", "cotton": "Cotton",
-                "भात": "Rice (Paddy)", "भातावर": "Rice (Paddy)", "भातात": "Rice (Paddy)", "धान": "Rice (Paddy)", "धनावर": "Rice (Paddy)", "rice": "Rice (Paddy)", "paddy": "Rice (Paddy)",
-                "गहू": "Wheat", "गव्हावर": "Wheat", "गव्हात": "Wheat", "gehun": "Wheat", "wheat": "Wheat",
-                "मका": "Maize (Corn)", "मक्यावर": "Maize (Corn)", "मक्यात": "Maize (Corn)", "makka": "Maize (Corn)", "corn": "Maize (Corn)", "maize": "Maize (Corn)",
-                "मिरची": "Chilli (Pepper)", "मिरचीवर": "Chilli (Pepper)", "मिरचीत": "Chilli (Pepper)", "mirchi": "Chilli (Pepper)", "chilli": "Chilli (Pepper)",
-                "कांदा": "Onion", "कांद्यावर": "Onion", "कांद्यात": "Onion", "kanda": "Onion", "pyaj": "Onion", "onion": "Onion",
-                "सोयाबीन": "Soybean", "सोयाबीनवर": "Soybean", "सोयाबीनमध्ये": "Soybean", "soybean": "Soybean",
-                "डाळिंब": "Pomegranate", "डाळिंबावर": "Pomegranate", "डाळिंबात": "Pomegranate", "dalimb": "Pomegranate", "anar": "Pomegranate", "pomegranate": "Pomegranate",
-                "केळी": "Banana", "केळीवर": "Banana", "केळीत": "Banana", "kela": "Banana", "keli": "Banana", "banana": "Banana",
-                "द्राक्षे": "Grape", "द्राक्ष": "Grape", "द्राक्षांवर": "Grape", "द्राक्षबागेत": "Grape", "draksh": "Grape", "grapes": "Grape", "angur": "Grape",
-                "भूईमूग": "Groundnut", "भुईमूग": "Groundnut", "भुईमुगावर": "Groundnut", "bhuimug": "Groundnut", "mungfali": "Groundnut", "peanut": "Groundnut", "groundnut": "Groundnut",
-                "हरभरा": "Chickpea (Gram)", "हरभऱ्यावर": "Chickpea (Gram)", "harbara": "Chickpea (Gram)", "chana": "Chickpea (Gram)", "chickpea": "Chickpea (Gram)",
-                "पपई": "Papaya", "पपईवर": "Papaya", "papai": "Papaya", "papita": "Papaya", "papaya": "Papaya",
-                "हळद": "Turmeric", "हळदीवर": "Turmeric", "halad": "Turmeric", "haldi": "Turmeric", "turmeric": "Turmeric",
-                "आले": "Ginger", "आल्यात": "Ginger", "ale": "Ginger", "adrak": "Ginger", "ginger": "Ginger",
-                "सफरचंद": "Apple", "safarchand": "Apple", "apple": "Apple",
-                "पेरू": "Guava", "पेरूवर": "Guava", "peru": "Guava", "amrood": "Guava", "guava": "Guava",
-                "तूर": "Pigeonpea (Red Gram)", "तुरीवर": "Pigeonpea (Red Gram)", "tur": "Pigeonpea (Red Gram)", "arhar": "Pigeonpea (Red Gram)", "pigeonpea": "Pigeonpea (Red Gram)",
-                "वांगी": "Brinjal (Eggplant)", "वांग्यावर": "Brinjal (Eggplant)", "vangi": "Brinjal (Eggplant)", "baingan": "Brinjal (Eggplant)", "brinjal": "Brinjal (Eggplant)",
-                "लसूण": "Garlic", "लसणावर": "Garlic", "lasun": "Garlic", "lahsun": "Garlic", "garlic": "Garlic",
-                "कलिंगड": "Watermelon", "कलिंगडावर": "Watermelon", "kalingad": "Watermelon", "tarbuj": "Watermelon", "watermelon": "Watermelon",
-                "लिंबू": "Citrus (Lemon / Lime)", "लिंबावर": "Citrus (Lemon / Lime)", "limbu": "Citrus (Lemon / Lime)", "citrus": "Citrus (Lemon / Lime)", "lemon": "Citrus (Lemon / Lime)"
-            }
-            for vname, mapped in vernacular_map.items():
-                if vname in q_lower:
+        vernacular_map = {
+            "आंबा": "Mango", "आंब्यावर": "Mango", "aam": "Mango", "mango": "Mango",
+            "ऊस": "Sugarcane", "उसात": "Sugarcane", "उसावर": "Sugarcane", "उसाचे": "Sugarcane", "उसाच्या": "Sugarcane", "ganna": "Sugarcane", "sugarcane": "Sugarcane",
+            "टोमॅटो": "Tomato", "टोमॅटोवर": "Tomato", "tomato": "Tomato", "tamatar": "Tomato",
+            "बटाटा": "Potato", "बटाट्यावर": "Potato", "batata": "Potato", "aloo": "Potato", "potato": "Potato",
+            "कापूस": "Cotton", "कपाशी": "Cotton", "कपाशीवर": "Cotton", "कपाशीवरील": "Cotton", "कपाशीच्या": "Cotton", "कपाशीत": "Cotton", "kapas": "Cotton", "cotton": "Cotton",
+            "भात": "Rice (Paddy)", "भातावर": "Rice (Paddy)", "भातात": "Rice (Paddy)", "धान": "Rice (Paddy)", "धनावर": "Rice (Paddy)", "rice": "Rice (Paddy)", "paddy": "Rice (Paddy)",
+            "गहू": "Wheat", "गव्हावर": "Wheat", "गव्हात": "Wheat", "gehun": "Wheat", "wheat": "Wheat",
+            "मका": "Maize (Corn)", "मक्यावर": "Maize (Corn)", "मक्यात": "Maize (Corn)", "makka": "Maize (Corn)", "corn": "Maize (Corn)", "maize": "Maize (Corn)",
+            "मिरची": "Chilli (Pepper)", "मिरचीवर": "Chilli (Pepper)", "मिरचीत": "Chilli (Pepper)", "mirchi": "Chilli (Pepper)", "chilli": "Chilli (Pepper)",
+            "कांदा": "Onion", "कांद्यावर": "Onion", "कांद्यात": "Onion", "kanda": "Onion", "pyaj": "Onion", "onion": "Onion",
+            "सोयाबीन": "Soybean", "सोयाबीनवर": "Soybean", "सोयाबीनमध्ये": "Soybean", "soybean": "Soybean",
+            "डाळिंब": "Pomegranate", "डाळिंबावर": "Pomegranate", "डाळिंबात": "Pomegranate", "dalimb": "Pomegranate", "anar": "Pomegranate", "pomegranate": "Pomegranate",
+            "केळी": "Banana", "केळीवर": "Banana", "केळीत": "Banana", "kela": "Banana", "keli": "Banana", "banana": "Banana",
+            "द्राक्षे": "Grape", "द्राक्ष": "Grape", "द्राक्षांवर": "Grape", "द्राक्षबागेत": "Grape", "draksh": "Grape", "grapes": "Grape", "angur": "Grape",
+            "भूईमूग": "Groundnut", "भुईमूग": "Groundnut", "भुईमुगावर": "Groundnut", "bhuimug": "Groundnut", "mungfali": "Groundnut", "peanut": "Groundnut", "groundnut": "Groundnut",
+            "हरभरा": "Chickpea (Gram)", "हरभऱ्यावर": "Chickpea (Gram)", "harbara": "Chickpea (Gram)", "chana": "Chickpea (Gram)", "chickpea": "Chickpea (Gram)",
+            "पपई": "Papaya", "पपईवर": "Papaya", "papai": "Papaya", "papita": "Papaya", "papaya": "Papaya",
+            "हळद": "Turmeric", "हळदीवर": "Turmeric", "halad": "Turmeric", "haldi": "Turmeric", "turmeric": "Turmeric",
+            "आले": "Ginger", "आल्यात": "Ginger", "ale": "Ginger", "adrak": "Ginger", "ginger": "Ginger",
+            "सफरचंद": "Apple", "safarchand": "Apple", "apple": "Apple",
+            "पेरू": "Guava", "पेरूवर": "Guava", "peru": "Guava", "amrood": "Guava", "guava": "Guava",
+            "तूर": "Pigeonpea (Red Gram)", "तुरीवर": "Pigeonpea (Red Gram)", "tur": "Pigeonpea (Red Gram)", "arhar": "Pigeonpea (Red Gram)", "pigeonpea": "Pigeonpea (Red Gram)",
+            "वांगी": "Brinjal (Eggplant)", "वांग्यावर": "Brinjal (Eggplant)", "vangi": "Brinjal (Eggplant)", "baingan": "Brinjal (Eggplant)", "brinjal": "Brinjal (Eggplant)",
+            "लसूण": "Garlic", "लसणावर": "Garlic", "lasun": "Garlic", "lahsun": "Garlic", "garlic": "Garlic",
+            "कलिंगड": "Watermelon", "कलिंगडावर": "Watermelon", "kalingad": "Watermelon", "tarbuj": "Watermelon", "watermelon": "Watermelon",
+            "लिंबू": "Citrus (Lemon / Lime)", "लिंबावर": "Citrus (Lemon / Lime)", "limbu": "Citrus (Lemon / Lime)", "citrus": "Citrus (Lemon / Lime)", "lemon": "Citrus (Lemon / Lime)"
+        }
+        for vname, mapped in vernacular_map.items():
+            if vname in q_lower:
+                if cls.is_term_negated(vname, q_lower):
+                    disputed_plant = mapped
+                elif not matched_plant:
                     matched_plant = mapped
-                    break
 
         # 2. Match Disease
         for key, ddata in DISEASES_KNOWLEDGE_BASE.items():
             dname = ddata["disease_name"].lower()
             dsname = ddata["scientific_name"].lower()
-            if key in q_lower or dname in q_lower or dsname in q_lower:
-                matched_disease = ddata["disease_name"]
-                break
+            found_dterm = None
+            if key in q_lower:
+                found_dterm = key
+            elif dname in q_lower:
+                found_dterm = dname
+            elif dsname in q_lower:
+                found_dterm = dsname
 
-        if not matched_disease:
-            disease_vernacular = {
-                "powdery mildew": "Powdery Mildew",
-                "भुरी": "Powdery Mildew",
-                "anthracnose": "Anthracnose / Fruit Rot / Dieback",
-                "करपा": "Early Blight",
-                "तांबोरा": "Rust",
-                "rust": "Rust",
-                "early blight": "Early Blight",
-                "late blight": "Late Blight",
-                "blast": "Rice Blast / Leaf & Neck Blast",
-                "red rot": "Red Rot of Sugarcane",
-                "smut": "Sugarcane Smut",
-                "काणी": "Sugarcane Smut",
-                "purple blotch": "Purple Blotch of Onion & Garlic",
-                "leaf curl": "Chilli / Tomato Leaf Curl Virus",
-                "तेल्या": "Pomegranate Bacterial Blight / Telya",
-                "telya": "Pomegranate Bacterial Blight / Telya",
-                "sigatoka": "Sigatoka Leaf Spot",
-                "सिगाटोका": "Sigatoka Leaf Spot",
-                "panama": "Panama Wilt",
-                "पनामा": "Panama Wilt",
-                "downy": "Downy Mildew of Grapes",
-                "डाउनी": "Downy Mildew of Grapes",
-                "tikka": "Tikka Disease / Cercospora Leaf Spot",
-                "टिक्का": "Tikka Disease / Cercospora Leaf Spot",
-                "मर": "Fusarium Wilt",
-                "blossom end rot": "Blossom End Rot (BER)",
-                "ber": "Blossom End Rot (BER)",
-                "deficiency": "Crop Nutrient Deficiencies",
-                "chlorosis": "Crop Nutrient Deficiencies",
-                "apple scab": "Apple Scab",
-                "scab": "Apple Scab",
-                "guava wilt": "Guava Wilt",
-                "पेरू मर": "Guava Wilt",
-                "वांज रोग": "Pigeonpea Sterility Mosaic Disease (SMD)",
-                "sterility mosaic": "Pigeonpea Sterility Mosaic Disease (SMD)",
-                "damping off": "Damping-Off in Seedlings & Nurseries",
-                "रोपांची मर": "Damping-Off in Seedlings & Nurseries",
-                "nematode": "Root-Knot Nematode Infestation",
-                "सूत्रकृमी": "Root-Knot Nematode Infestation",
-                "गाठी": "Root-Knot Nematode Infestation",
-                "citrus canker": "Citrus Bacterial Canker",
-                "खैरा": "Citrus Bacterial Canker",
-                "दहिया": "Bacterial Blight of Cotton / Grey Mildew (Dahiya)",
-                "बोंडअळी": "Bollworm Infestation (Cotton Pink & American Bollworm)",
-                "खोडकिडा": "Stem Borer Infestation"
-            }
-            for dv, mapped_d in disease_vernacular.items():
-                if dv in q_lower:
+            if found_dterm:
+                if cls.is_term_negated(found_dterm, q_lower):
+                    disputed_disease = ddata["disease_name"]
+                elif not matched_disease:
+                    matched_disease = ddata["disease_name"]
+
+        disease_vernacular = {
+            "powdery mildew": "Powdery Mildew",
+            "भुरी": "Powdery Mildew",
+            "anthracnose": "Anthracnose / Fruit Rot / Dieback",
+            "करपा": "Early Blight",
+            "तांबोरा": "Rust",
+            "rust": "Rust",
+            "early blight": "Early Blight",
+            "late blight": "Late Blight",
+            "blast": "Rice Blast / Leaf & Neck Blast",
+            "red rot": "Red Rot of Sugarcane",
+            "smut": "Sugarcane Smut",
+            "काणी": "Sugarcane Smut",
+            "purple blotch": "Purple Blotch of Onion & Garlic",
+            "leaf curl": "Chilli / Tomato Leaf Curl Virus",
+            "तेल्या": "Pomegranate Bacterial Blight / Telya",
+            "telya": "Pomegranate Bacterial Blight / Telya",
+            "sigatoka": "Sigatoka Leaf Spot",
+            "सिगाटोका": "Sigatoka Leaf Spot",
+            "panama": "Panama Wilt",
+            "पनामा": "Panama Wilt",
+            "downy": "Downy Mildew of Grapes",
+            "डाउनी": "Downy Mildew of Grapes",
+            "tikka": "Tikka Disease / Cercospora Leaf Spot",
+            "टिक्का": "Tikka Disease / Cercospora Leaf Spot",
+            "मर": "Fusarium Wilt",
+            "blossom end rot": "Blossom End Rot (BER)",
+            "ber": "Blossom End Rot (BER)",
+            "deficiency": "Crop Nutrient Deficiencies",
+            "chlorosis": "Crop Nutrient Deficiencies",
+            "apple scab": "Apple Scab",
+            "scab": "Apple Scab",
+            "guava wilt": "Guava Wilt",
+            "पेरू मर": "Guava Wilt",
+            "वांज रोग": "Pigeonpea Sterility Mosaic Disease (SMD)",
+            "sterility mosaic": "Pigeonpea Sterility Mosaic Disease (SMD)",
+            "damping off": "Damping-Off in Seedlings & Nurseries",
+            "रोपांची मर": "Damping-Off in Seedlings & Nurseries",
+            "nematode": "Root-Knot Nematode Infestation",
+            "सूत्रकृमी": "Root-Knot Nematode Infestation",
+            "गाठी": "Root-Knot Nematode Infestation",
+            "citrus canker": "Citrus Bacterial Canker",
+            "खैरा": "Citrus Bacterial Canker",
+            "दहिया": "Bacterial Blight of Cotton / Grey Mildew (Dahiya)",
+            "बोंडअळी": "Bollworm Infestation (Cotton Pink & American Bollworm)",
+            "खोडकिडा": "Stem Borer Infestation"
+        }
+        for dv, mapped_d in disease_vernacular.items():
+            if dv in q_lower:
+                if cls.is_term_negated(dv, q_lower):
+                    disputed_disease = mapped_d
+                elif not matched_disease:
                     matched_disease = mapped_d
-                    break
 
-        return (matched_plant, matched_disease)
+        return {
+            "matched_plant": matched_plant,
+            "matched_disease": matched_disease,
+            "disputed_plant": disputed_plant,
+            "disputed_disease": disputed_disease
+        }
+
+    @classmethod
+    def extract_entities(cls, query: str) -> Tuple[Optional[str], Optional[str]]:
+        """Extract explicit plant and disease entities from the query string."""
+        detail = cls.extract_entities_detail(query)
+        return (detail["matched_plant"], detail["matched_disease"])
 
     @classmethod
     def resolve_context(
@@ -394,7 +457,11 @@ class IntentService:
         conversation_history: Optional[List[Dict[str, str]]]
     ) -> Dict[str, Any]:
         intent = cls.detect_intent(query)
-        q_plant, q_disease = cls.extract_entities(query)
+        detail = cls.extract_entities_detail(query)
+        q_plant = detail["matched_plant"]
+        q_disease = detail["matched_disease"]
+        disputed_plant = detail["disputed_plant"]
+        disputed_disease = detail["disputed_disease"]
 
         resolved_plant = q_plant
         resolved_disease = q_disease
@@ -406,30 +473,49 @@ class IntentService:
             scan_context.get("valid_plant_image", True) and
             (scan_context.get("crop_detected") or scan_context.get("plantName"))
         )
+        scan_plant = (scan_context.get("crop_detected") or scan_context.get("plantName")) if scan_context else None
 
-        # If query has no plant, check active scan context
-        if not resolved_plant and has_valid_scan and scan_context:
-            resolved_plant = scan_context.get("crop_detected") or scan_context.get("plantName")
-            context_source = "scan"
+        q_clean = query.lower()
+        is_recheck_or_dispute = any(w in q_clean for w in ["recheck", "rechake", "rescan", "wrong", "not a", "not an", "is not", "चुकीचे", "पुन्हा तपासा", "नाही"])
+        is_disputing_scan_plant = bool(
+            scan_plant and (
+                (disputed_plant and (disputed_plant.lower() in scan_plant.lower() or scan_plant.lower() in disputed_plant.lower())) or
+                (is_recheck_or_dispute and not q_plant)
+            )
+        )
 
-        # If still no plant, check manual plant selection
-        if not resolved_plant and manual_plant:
-            resolved_plant = manual_plant
-            context_source = "manual"
+        if is_disputing_scan_plant:
+            context_source = "user_scan_dispute"
+            intent = AgriculturalIntent.SCAN_EXPLANATION
+            if not resolved_plant:
+                resolved_plant = None
+                resolved_disease = None
+            if not disputed_plant and scan_plant:
+                disputed_plant = scan_plant
+        else:
+            # If query has no plant, check active scan context
+            if not resolved_plant and has_valid_scan and scan_context:
+                resolved_plant = scan_plant
+                context_source = "scan"
 
-        # If still no plant, scan previous conversation turns for context
-        if not resolved_plant and conversation_history:
-            for turn in reversed(conversation_history[-4:]):
-                hist_text = turn.get("content", "")
-                h_plant, h_disease = cls.extract_entities(hist_text)
-                if h_plant:
-                    resolved_plant = h_plant
-                    context_source = "conversation_history"
-                    if not resolved_disease and h_disease:
-                        resolved_disease = h_disease
-                    break
+            # If still no plant, check manual plant selection
+            if not resolved_plant and manual_plant:
+                resolved_plant = manual_plant
+                context_source = "manual"
 
-        # If query has no disease, resolve disease ONLY when intent is pathology-related
+            # If still no plant, scan previous conversation turns for context
+            if not resolved_plant and conversation_history:
+                for turn in reversed(conversation_history[-4:]):
+                    hist_text = turn.get("content", "")
+                    h_plant, h_disease = cls.extract_entities(hist_text)
+                    if h_plant and h_plant != disputed_plant:
+                        resolved_plant = h_plant
+                        context_source = "conversation_history"
+                        if not resolved_disease and h_disease:
+                            resolved_disease = h_disease
+                        break
+
+        # If query has no disease, resolve disease ONLY when intent is pathology-related and scan not disputed
         is_pathology_intent = intent in [
             AgriculturalIntent.DISEASE_IDENTIFICATION,
             AgriculturalIntent.DISEASE_EXPLANATION,
@@ -442,7 +528,16 @@ class IntentService:
             AgriculturalIntent.SCAN_EXPLANATION
         ]
 
-        if not resolved_disease and is_pathology_intent:
+        if not resolved_disease and is_pathology_intent and not is_disputing_scan_plant:
+            if has_valid_scan and scan_context and scan_context.get("disease_name"):
+                resolved_disease = scan_context.get("disease_name")
+            elif conversation_history:
+                for turn in reversed(conversation_history[-4:]):
+                    hist_text = turn.get("content", "")
+                    h_plant, h_disease = cls.extract_entities(hist_text)
+                    if h_disease and h_disease != disputed_disease:
+                        resolved_disease = h_disease
+                        break
             if has_valid_scan and scan_context and scan_context.get("disease_name"):
                 resolved_disease = scan_context.get("disease_name")
             elif conversation_history:

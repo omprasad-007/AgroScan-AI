@@ -98,6 +98,7 @@ export const en = {
   "analysis.val_error_tip": "Ensure your photo clearly shows a leaf, stem, fruit, or plant part with good lighting.",
   "analysis.scan_again": "Scan Again",
   "analysis.upload_another": "Upload Another Image",
+  "analysis.retake_photo": "Upload Another Image",
 
   // Diagnostic Result Page
   "result.title": "Diagnostic Report",

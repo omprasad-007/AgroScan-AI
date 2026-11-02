@@ -40,25 +40,46 @@ class ContextService:
         resolved_disease = q_disease
         context_source = "query" if q_plant else "none"
 
-        # 1. Resolve Plant from Real Scan Context if not in query
-        if not resolved_plant and has_valid_scan and scan_context:
-            resolved_plant = scan_context.get("crop_detected") or scan_context.get("plantName")
-            context_source = "scan"
+        ent_detail = IntentService.extract_entities_detail(query)
+        disputed_plant = ent_detail.get("disputed_plant")
+        disputed_disease = ent_detail.get("disputed_disease")
+        scan_plant = (scan_context.get("crop_detected") or scan_context.get("plantName")) if scan_context else None
 
-        # 2. Resolve Plant from Manual selection if still not found
-        if not resolved_plant and manual_plant:
-            resolved_plant = manual_plant
-            context_source = "manual"
+        q_clean = query.lower()
+        is_recheck_or_dispute = any(w in q_clean for w in ["recheck", "rechake", "rescan", "wrong", "not a", "not an", "is not", "चुकीचे", "पुन्हा तपासा", "नाही"])
+        is_disputing_scan_plant = bool(
+            scan_plant and (
+                (disputed_plant and (disputed_plant.lower() in scan_plant.lower() or scan_plant.lower() in disputed_plant.lower())) or
+                (is_recheck_or_dispute and not q_plant)
+            )
+        )
 
-        # 3. Resolve Plant from Conversation History if still not found
-        if not resolved_plant and conversation_history:
-            for turn in reversed(conversation_history[-4:]):
-                hist_text = turn.get("content", "")
-                h_p, _ = IntentService.extract_entities(hist_text)
-                if h_p:
-                    resolved_plant = h_p
-                    context_source = "conversation_history"
-                    break
+        if is_disputing_scan_plant:
+            resolved_plant = q_plant
+            resolved_disease = q_disease
+            context_source = "user_scan_dispute"
+            intent = AgriculturalIntent.SCAN_EXPLANATION
+            has_valid_scan = False
+        else:
+            # 1. Resolve Plant from Real Scan Context if not in query
+            if not resolved_plant and has_valid_scan and scan_context:
+                resolved_plant = scan_plant
+                context_source = "scan"
+
+            # 2. Resolve Plant from Manual selection if still not found
+            if not resolved_plant and manual_plant:
+                resolved_plant = manual_plant
+                context_source = "manual"
+
+            # 3. Resolve Plant from Conversation History if still not found
+            if not resolved_plant and conversation_history:
+                for turn in reversed(conversation_history[-4:]):
+                    hist_text = turn.get("content", "")
+                    h_p, _ = IntentService.extract_entities(hist_text)
+                    if h_p and h_p != disputed_plant:
+                        resolved_plant = h_p
+                        context_source = "conversation_history"
+                        break
 
         # 4. Disease resolution (STRICT INTENT ISOLATION)
         # Only attach disease if query asks about disease OR is diagnostic/symptom/treatment/spread
@@ -75,14 +96,14 @@ class ContextService:
             AgriculturalIntent.CONFIDENCE_EXPLANATION
         ]
 
-        if not resolved_disease and is_pathology_intent:
+        if not resolved_disease and is_pathology_intent and not is_disputing_scan_plant:
             if has_valid_scan and scan_context and scan_context.get("disease_name"):
                 resolved_disease = scan_context.get("disease_name")
             elif conversation_history:
                 for turn in reversed(conversation_history[-4:]):
                     hist_text = turn.get("content", "")
                     _, h_d = IntentService.extract_entities(hist_text)
-                    if h_d:
+                    if h_d and h_d != disputed_disease:
                         resolved_disease = h_d
                         break
 
@@ -105,6 +126,9 @@ class ContextService:
             "disease_name": resolved_disease,
             "context_source": context_source,
             "has_valid_scan": has_valid_scan and context_source == "scan",
+            "is_scan_dispute": is_disputing_scan_plant,
+            "disputed_plant": disputed_plant or (scan_plant if is_disputing_scan_plant else None),
+            "disputed_disease": disputed_disease,
             "is_manual": bool(manual_plant) and context_source == "manual",
             "location": location_info
         }

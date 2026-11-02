@@ -1,17 +1,15 @@
 [tool.pyrefly]
-venv = ".venv"
-search_paths = [
-    "backend",
-    "backend/app",
-    ".venv/Lib/site-packages"
-]
-source_roots = [
+search-path = [
     "backend",
     "backend/app"
 ]
-project_roots = [
-    "backend"
+site-package-path = [
+    ".venv/Lib/site-packages"
 ]
+site-packages-path = [
+    ".venv/Lib/site-packages"
+]
+python-interpreter-path = ".venv/Scripts/python.exe"
 
 [tool.pyright]
 venvPath = "."

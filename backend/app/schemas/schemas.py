@@ -174,6 +174,7 @@ class PredictionResponse(BaseModel):
     humidity_pct: Optional[float] = None
     rainfall_mm: Optional[float] = None
     is_demo: Optional[bool] = False
+    is_guest: Optional[bool] = False
     created_at: Optional[datetime] = None
 
     # Multi-API Consensus & Leaf Validation Extensions

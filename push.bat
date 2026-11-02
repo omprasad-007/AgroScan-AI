@@ -15,9 +15,9 @@ if %ERRORLEVEL% neq 0 (
 
 echo.
 echo 2. Committing changes...
-git commit -m "feat: multi-species plant AI identification, self-credential auth, and multi-device compatibility"
+git commit -m "feat: zero-failure plant diagnosis, multi-species leaf identification, and auto-credential recovery"
 if %ERRORLEVEL% neq 0 (
-    echo [NOTE] No new changes to commit or commit completed.
+    echo [NOTE] Working tree clean or already committed.
 )
 
 echo.

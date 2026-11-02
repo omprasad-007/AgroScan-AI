@@ -1,73 +1,63 @@
+"""Authentication dependencies for protected and optional-session API routes."""
+
+from typing import Optional
+
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
+
 from app.core.database import get_db
 from app.core.security import decode_access_token
 from app.models.all_models import User
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 
-def get_current_user(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)) -> User:
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login", auto_error=False)
+
+
+def get_optional_current_user(
+    db: Session = Depends(get_db),
+    token: Optional[str] = Depends(oauth2_scheme),
+) -> Optional[User]:
+    """Return the verified user for a valid token, otherwise treat the request as a guest.
+
+    This dependency is used only by public features, such as a one-off diagnosis.
+    Protected routes must use get_current_user below.
+    """
+    if not token:
+        return None
+
     payload = decode_access_token(token)
-    if payload is None:
-        if token and token.startswith("token_"):
-            try:
-                import base64
-                parts = token.split("_")
-                email = base64.b64decode(parts[2]).decode("utf-8")
-                user = db.query(User).filter(User.email == email).first()
-                if not user:
-                    from app.core.security import get_password_hash
-                    user = User(
-                        email=email,
-                        full_name=email.split("@")[0].title(),
-                        hashed_password=get_password_hash("client_token_pass"),
-                        role="admin" if "admin" in email else "farmer",
-                        city="Pune",
-                        state="Maharashtra"
-                    )
-                    db.add(user)
-                    db.commit()
-                    db.refresh(user)
-                return user
-            except Exception:
-                pass
-        raise credentials_exception
+    if not payload:
+        return None
+
     user_id = payload.get("sub")
     if not user_id:
-        raise credentials_exception
-    user = db.query(User).filter(User.id == str(user_id)).first()
-    if user is None:
-        email = payload.get("email")
-        if email:
-            user = db.query(User).filter(User.email == str(email)).first()
-            if user is None:
-                from app.core.security import get_password_hash
-                user = User(
-                    id=str(user_id),
-                    email=str(email),
-                    full_name=payload.get("name") or "Farmer User",
-                    hashed_password=get_password_hash("auto_provisioned_user"),
-                    role=payload.get("role", "farmer"),
-                    city="Pune",
-                    state="Maharashtra"
-                )
-                db.add(user)
-                db.commit()
-                db.refresh(user)
-    if user is None:
-        raise credentials_exception
-    return user
+        return None
+
+    return db.query(User).filter(User.id == str(user_id)).first()
+
+
+def get_current_user(
+    current_user: Optional[User] = Depends(get_optional_current_user),
+) -> User:
+    """Require a valid, verified session for private data and account actions."""
+    if not current_user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail={
+                "code": "AUTH_SESSION_EXPIRED",
+                "message": "Your session has expired. Please sign in again.",
+            },
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    return current_user
+
 
 def get_admin_user(current_user: User = Depends(get_current_user)) -> User:
+    """Require administrator privileges for access."""
     if current_user.role != "admin":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Admin privileges required"
+            detail="Admin privileges required",
         )
     return current_user

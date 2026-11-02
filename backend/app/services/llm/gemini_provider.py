@@ -1,6 +1,6 @@
 """
 AgroScan AI — Gemini Provider
-Client interface for Google Gemini 1.5 Flash and Gemini 2.5 Flash.
+Client interface for Google Gemini API models (3.5-flash-lite, 3.5-flash, 3.1-flash-lite).
 """
 
 import logging
@@ -13,8 +13,11 @@ logger = logging.getLogger("agroscan")
 class GeminiProvider:
     """Invokes Google Gemini API with system instructions and conversation context."""
 
-    GEMINI_15_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
-    GEMINI_25_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent"
+    MODELS = [
+        "gemini-3.5-flash-lite",
+        "gemini-3.5-flash",
+        "gemini-3.1-flash-lite"
+    ]
 
     @classmethod
     def generate(
@@ -43,22 +46,25 @@ class GeminiProvider:
             },
             "generationConfig": {
                 "temperature": 0.3,
-                "maxOutputTokens": 750
+                "maxOutputTokens": 600
             }
         }
 
-        for url in [cls.GEMINI_15_URL, cls.GEMINI_25_URL]:
+        for model in cls.MODELS:
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
             try:
-                with httpx.Client(timeout=12.0) as client:
-                    res = client.post(f"{url}?key={api_key}", json=payload)
+                with httpx.Client(timeout=14.0) as client:
+                    res = client.post(url, json=payload)
                     if res.status_code == 200:
                         data = res.json()
                         candidates = data.get("candidates", [])
                         if candidates:
                             parts = candidates[0].get("content", {}).get("parts", [])
                             if parts and "text" in parts[0]:
-                                return (parts[0]["text"].strip(), True)
+                                text = parts[0]["text"].strip()
+                                if text:
+                                    return (text, True)
             except Exception as e:
-                logger.warning(f"Gemini call error ({url}): {e}")
+                logger.warning(f"Gemini call error ({model}): {e}")
 
         return ("", False)

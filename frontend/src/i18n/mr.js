@@ -81,6 +81,7 @@ export const mr = {
   "scan.leaf_rejected": "या प्रतिमेत स्पष्टपणे पान आढळले नाही. कृपया बाधित पानाचा पुरेशा प्रकाशात आणि स्पष्टपणे फोटो काढा.",
   "analysis.scan_again": "पुन्हा स्कॅन करा",
   "analysis.upload_another": "दुसरी प्रतिमा अपलोड करा",
+  "analysis.retake_photo": "दुसरी प्रतिमा अपलोड करा",
 
   // Diagnostic Result Page
   "result.title": "निदान अहवाल",

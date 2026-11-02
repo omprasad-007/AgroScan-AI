@@ -119,7 +119,7 @@ def test_plant_verification_detector():
     is_plant, status, reason = PlantDetector.verify_plant_image(blank_bytes)
     assert is_plant is False
     assert status == "NON_PLANT_IMAGE"
-    assert "You have not scanned a leaf or plant." in reason
+    assert "No clear leaf was detected" in reason or "You have not scanned a leaf or plant." in reason
 
 def test_validate_image_endpoint():
     # Test non-plant image validation endpoint
@@ -131,7 +131,7 @@ def test_validate_image_endpoint():
     data = response.json()
     assert data["is_plant"] is False
     assert data["status"] == "NON_PLANT_IMAGE"
-    assert "You have not scanned a leaf or plant." in data["message"]
+    assert "No clear leaf was detected" in data["message"] or "You have not scanned a leaf or plant." in data["message"]
 
 def test_plant_search_catalog():
     response = client.get("/api/v1/plants/search?q=mango")
@@ -283,6 +283,31 @@ def test_user_profile_location_persistence():
     me_res = client.get("/api/v1/auth/me", headers=headers)
     assert me_res.status_code == 200
     assert me_res.json()["village"] == "Baramati"
+
+
+def test_assistant_scan_dispute_and_negation():
+    from app.services.assistant.assistant_service import AssistantService
+    from app.services.intent_service import AgriculturalIntent
+
+    query = "it is not tomato image rechake"
+    scan_ctx = {
+        "valid_plant_image": True,
+        "crop_detected": "Tomato",
+        "disease_name": "Early Blight"
+    }
+
+    res = AssistantService.process_message(
+        message=query,
+        scan_context=scan_ctx,
+        language="mr"
+    )
+    assert res["intent"] == AgriculturalIntent.SCAN_EXPLANATION
+    # Must NOT produce the broken generic template echoing the query
+    assert "तुमच्या प्रश्नानुसार ('it is not tomato image rechake')" not in res["answer"]
+    # Must acknowledge that it is not Tomato and ask for the correct plant or rescan
+    assert "टोमॅटो" in res["answer"]
+    assert ("नाही" in res["answer"] or "not" in res["answer"].lower())
+
 
 
 

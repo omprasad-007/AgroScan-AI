@@ -1,6 +1,7 @@
 import os
-from pydantic_settings import BaseSettings
 from typing import Optional
+from pydantic import field_validator
+from pydantic_settings import BaseSettings
 
 _BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -10,6 +11,17 @@ class Settings(BaseSettings):
     DEBUG: bool = True
     PORT: int = 8000
     DEMO_MODE: bool = False
+
+    @field_validator("DEBUG", mode="before")
+    @classmethod
+    def parse_debug(cls, v):
+        if isinstance(v, str):
+            val = v.strip().lower()
+            if val in ("true", "1", "yes", "t", "dev", "development", "debug"):
+                return True
+            if val in ("false", "0", "no", "f", "release", "prod", "production"):
+                return False
+        return bool(v) if v is not None else True
 
     # Database
     DATABASE_URL: str = "sqlite:///./agroscan.db"

@@ -20,8 +20,8 @@ class GeminiVisionProvider(DiseaseDetectionProvider):
     or any plant in the world), botanical scientific name, family, and pathological health state.
     """
 
-    GEMINI_15_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
-    GEMINI_20_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent"
+    GEMINI_35_LITE_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent"
+    GEMINI_35_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent"
 
     def __init__(self):
         super().__init__(name="gemini_vision", display_name="Google Gemini Vision AI")
@@ -102,7 +102,7 @@ class GeminiVisionProvider(DiseaseDetectionProvider):
             }
         }
 
-        urls_to_try = [self.GEMINI_15_URL, self.GEMINI_20_URL]
+        urls_to_try = [self.GEMINI_35_LITE_URL, self.GEMINI_35_URL]
         last_error = ""
 
         for url in urls_to_try:

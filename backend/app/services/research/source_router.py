@@ -5,7 +5,7 @@ Prevents unbounded queries across irrelevant databases.
 """
 
 from typing import List, Optional
-from app.services.intent_service import AgriculturalIntent
+from app.services.intent_service import IntentService, AgriculturalIntent
 
 class SourceRouter:
     """Selects targeted agricultural research categories according to intent and crop/disease entities."""
@@ -44,7 +44,12 @@ class SourceRouter:
                 categories.extend(["sugarcane_red_rot_pathology", "sugarcane_agronomy_fertilizer_water"])
 
         # 3. Tomato / Potato / Solanaceous
-        elif any(w in p_clean or w in q_lower for w in ["tomato", "potato", "टोमॅटो", "बटाटा", "blight", "करपा", "spot"]):
+        elif any(w in p_clean for w in ["tomato", "potato", "टोमॅटो", "बटाटा"]) or (
+            any(w in q_lower for w in ["tomato", "potato", "टोमॅटो", "बटाटा", "blight", "करपा", "spot"])
+            and not IntentService.is_term_negated("tomato", q_lower)
+            and not IntentService.is_term_negated("potato", q_lower)
+            and intent != AgriculturalIntent.SCAN_EXPLANATION
+        ):
             categories.append("tomato_potato_blights_pathology")
 
         # 4. Cotton

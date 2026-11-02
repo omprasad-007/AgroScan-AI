@@ -1,19 +1,19 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { 
-  Sprout, 
-  Scan, 
-  ShieldAlert, 
-  Bot, 
-  ArrowRight, 
-  CheckCircle2, 
-  Globe, 
-  MapPin, 
-  History, 
-  ChevronRight, 
-  MessageSquare, 
-  Sparkles, 
-  Menu, 
+import {
+  Sprout,
+  Scan,
+  ShieldAlert,
+  Bot,
+  ArrowRight,
+  CheckCircle2,
+  Globe,
+  MapPin,
+  History,
+  ChevronRight,
+  MessageSquare,
+  Sparkles,
+  Menu,
   X,
   FileCheck,
   Zap,
@@ -27,14 +27,8 @@ export const LandingPage = () => {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const handleScanClick = () => navigate('/scan');
 
-  const handleScanClick = () => {
-    if (isAuthenticated) {
-      navigate('/scan');
-    } else {
-      navigate('/login?redirect=/scan');
-    }
-  };
 
   const scrollToSection = (id) => {
     setMobileMenuOpen(false);
@@ -46,12 +40,12 @@ export const LandingPage = () => {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col justify-between selection:bg-emerald-500 selection:text-slate-950">
-      
+
       {/* 1. Header Navigation — Sticky on scroll */}
       <header className="sticky top-0 z-50 bg-slate-950/85 backdrop-blur-md border-b border-slate-800/80">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 sm:h-20">
-            
+
             {/* Logo */}
             <Link to="/" className="flex items-center space-x-3 group">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 via-emerald-500 to-emerald-400 flex items-center justify-center shadow-lg shadow-emerald-500/20 group-hover:scale-105 transition-transform">
@@ -69,20 +63,20 @@ export const LandingPage = () => {
 
             {/* Desktop Nav Links */}
             <nav className="hidden md:flex items-center space-x-8 text-sm font-semibold text-slate-300">
-              <button 
-                onClick={() => scrollToSection('how-it-works')} 
+              <button
+                onClick={() => scrollToSection('how-it-works')}
                 className="hover:text-emerald-400 transition cursor-pointer"
               >
                 {lang === 'mr' ? 'हे कसे कार्य करते' : 'How it Works'}
               </button>
-              <button 
-                onClick={() => scrollToSection('features')} 
+              <button
+                onClick={() => scrollToSection('features')}
                 className="hover:text-emerald-400 transition cursor-pointer"
               >
                 {lang === 'mr' ? 'वैशिष्ट्ये' : 'Features'}
               </button>
-              <button 
-                onClick={() => scrollToSection('ai-preview')} 
+              <button
+                onClick={() => scrollToSection('ai-preview')}
                 className="hover:text-emerald-400 transition cursor-pointer"
               >
                 {lang === 'mr' ? 'AI सहाय्यक' : 'AI Assistant'}
@@ -188,9 +182,9 @@ export const LandingPage = () => {
       {/* 2. Hero Section */}
       <section className="relative overflow-hidden pt-12 sm:pt-20 pb-16 sm:pb-24">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-gradient-to-b from-emerald-500/15 via-emerald-600/5 to-transparent blur-3xl pointer-events-none" />
-        
+
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-          
+
           <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold mb-8 shadow-inner">
             <Sparkles className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
             <span>{lang === 'mr' ? 'कृत्रिम बुद्धिमत्ता आधारित पीक आरोग्य प्लॅटफॉर्म' : 'AI-Powered Plant Disease Diagnostic Platform'}</span>
@@ -236,7 +230,7 @@ export const LandingPage = () => {
           {/* Hero Visual Mockup — Scan Result Screen */}
           <div className="mt-14 max-w-4xl mx-auto relative rounded-3xl p-3 sm:p-4 bg-slate-900/80 border border-slate-800 shadow-2xl backdrop-blur-xl">
             <div className="rounded-2xl overflow-hidden bg-slate-950 p-6 sm:p-8 text-left border border-slate-800 space-y-6">
-              
+
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800/80 pb-4">
                 <div className="flex items-center space-x-3">
                   <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center font-extrabold text-xl shrink-0">
@@ -282,7 +276,7 @@ export const LandingPage = () => {
       {/* 4. How It Works (4-Step Visual Workflow) */}
       <section id="how-it-works" className="py-16 sm:py-24 bg-slate-900/50 border-y border-slate-900 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          
+
           <div className="text-center max-w-2xl mx-auto mb-16">
             <span className="text-xs font-extrabold text-emerald-400 uppercase tracking-widest">Simple Step-by-Step</span>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-white mt-2">
@@ -294,7 +288,7 @@ export const LandingPage = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 relative">
-            
+
             {/* Step 1 */}
             <div className="glass-panel p-6 rounded-2xl border border-slate-800 relative space-y-4">
               <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 font-extrabold flex items-center justify-center border border-emerald-500/20 text-sm">
@@ -346,7 +340,7 @@ export const LandingPage = () => {
       {/* 5. Features Grid (6 Core Cards) */}
       <section id="features" className="py-16 sm:py-24 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          
+
           <div className="text-center max-w-2xl mx-auto mb-16">
             <span className="text-xs font-extrabold text-emerald-400 uppercase tracking-widest">Platform Capabilities</span>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-white mt-2">
@@ -355,7 +349,7 @@ export const LandingPage = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            
+
             {/* Card 1 */}
             <div className="glass-panel p-6 rounded-2xl border border-slate-800 hover:border-emerald-500/30 transition">
               <div className="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center mb-4 border border-emerald-500/20">
@@ -429,7 +423,7 @@ export const LandingPage = () => {
       {/* 6. AI Assistant Interactive Chat Preview */}
       <section id="ai-preview" className="py-16 sm:py-24 bg-slate-900/50 border-t border-slate-900">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          
+
           <div className="text-center max-w-2xl mx-auto mb-12">
             <span className="text-xs font-extrabold text-emerald-400 uppercase tracking-widest">Interactive AI Agronomist</span>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-white mt-2">
@@ -441,7 +435,7 @@ export const LandingPage = () => {
           </div>
 
           <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-slate-800 shadow-2xl space-y-4">
-            
+
             {/* User Bubble */}
             <div className="flex items-start justify-end space-x-3">
               <div className="bg-emerald-500 text-slate-950 p-4 rounded-2xl rounded-tr-none text-xs sm:text-sm font-semibold max-w-md">
@@ -485,7 +479,7 @@ export const LandingPage = () => {
       {/* 7. Footer */}
       <footer className="border-t border-slate-900 bg-slate-950 py-12 text-slate-400 text-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-6">
-          
+
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
               <Sprout className="w-5 h-5" />

@@ -57,7 +57,7 @@ class SecondaryProvider:
                         "model": model_name,
                         "messages": messages,
                         "temperature": 0.3,
-                        "max_tokens": 750
+                        "max_tokens": 380
                     }
                 )
                 if res.status_code == 200:

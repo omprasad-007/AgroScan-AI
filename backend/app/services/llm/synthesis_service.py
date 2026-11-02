@@ -57,6 +57,19 @@ class SynthesisService:
         if disease_name:
             lines.append(f"RELEVANT DISEASE: {disease_name}")
 
+        is_dispute = rag_data.get("is_scan_dispute") or context_source == "user_scan_dispute"
+        if is_dispute:
+            disp_crop = rag_data.get("disputed_plant") or "Tomato"
+            lines.extend([
+                "",
+                "IMPORTANT - SCAN DISPUTE / CROP RECHECK INSTRUCTION:",
+                f"- The user states that their leaf/image is NOT {disp_crop} and is asking to recheck or re-identify.",
+                f"- Politely and respectfully acknowledge their feedback (e.g. 'Thank you for pointing this out. We acknowledge this image is not {disp_crop}.').",
+                "- Briefly explain that camera angles, lighting conditions, or visual similarities in leaf margins can sometimes cause automated vision models to misclassify leaves.",
+                "- Ask the farmer to provide the actual name of their crop (e.g. Chilli, Cotton, Soybean, Mango, Brinjal), or guide them to re-scan a clean, well-lit close-up photo of the leaf from the Scan page.",
+                f"- Absolutely DO NOT claim the plant is {disp_crop}, and do NOT give cultivation, disease, or fertilizer advice for {disp_crop}."
+            ])
+
         if evidence_text:
             lines.append(f"\n{evidence_text}")
 
@@ -107,7 +120,32 @@ class SynthesisService:
                 else "Hello! I am AgroScan AI Agronomist. Ask me any question regarding your crops, soil, fertilizers, or disease management."
             )
 
-        # 2. Comparative Pathology: Early Blight vs Late Blight
+        # 2. Scan Dispute / Recheck / Crop Disagreement
+        is_dispute = rag_data.get("is_scan_dispute") or any(
+            w in q_clean for w in [
+                "recheck", "rechake", "rescan", "wrong plant", "wrong crop", "not tomato", "not a", "not an",
+                "is not", "पुन्हा तपासा", "पुन्हा स्कॅन करा", "चुकीचे पीक", "हे पीक नाही", "नाही"
+            ]
+        )
+        if is_dispute and intent == AgriculturalIntent.SCAN_EXPLANATION:
+            disp = rag_data.get("disputed_plant") or ("टोमॅटो" if is_mr else "Tomato")
+            if is_mr:
+                return (
+                    f"🌾 **AgroScan AI कृषी सल्लागार:**\n\n"
+                    f"आपल्या सूचनेबद्दल धन्यवाद. ही प्रतिमा {disp} पिकाची नाही हे आम्ही नोंदवले आहे. पानाचा कोन, प्रकाश किंवा सावलीमुळे स्वयंचलित स्कॅनमध्ये ओळखण्यात तफावत होऊ शकते.\n\n"
+                    f"📌 **पुढील योग्य कृती:**\n"
+                    f"1. **आपल्या पिकाचे नाव सांगा:** हे पान कोणत्या पिकाचे आहे (उदा. मिरची, कापूस, सोयाबीन, वांगी, आंबा) ते चॅटमध्ये सांगा, जेणेकरून आम्ही योग्य व अचूक सल्ला देऊ शकू.\n"
+                    f"2. **पुन्हा स्पष्ट फोटो स्कॅन करा:** चांगल्या नैसर्गिक प्रकाशात, पानाच्या अगदी जवळून (Close-up) स्पष्ट फोटो 'स्कॅन' पर्यायातून पुन्हा अपलोड करा."
+                )
+            return (
+                f"🌾 **AgroScan AI Agronomist:**\n\n"
+                f"Thank you for pointing this out. We noted that this leaf is not from {disp}. Automated computer vision scans can occasionally misclassify foliage due to camera angle, lighting, or visual similarities in leaf margins.\n\n"
+                f"📌 **Recommended Next Steps:**\n"
+                f"1. **Specify Your Actual Crop:** Tell us which crop or plant this is (e.g. Chilli, Cotton, Soybean, Mango, Brinjal) so we can provide exact agronomic guidance.\n"
+                f"2. **Rescan with a Clear Photo:** Take a well-lit, focused close-up photo of the leaf from the Scan page for re-analysis."
+            )
+
+        # 3. Comparative Pathology: Early Blight vs Late Blight
         if ("difference" in q_clean or "तुलना" in q_clean or "फरक" in q_clean) and "early" in q_clean and "late" in q_clean:
             return (
                 "🔬 **करपा रोगांचे प्रकार व तुलना (Early Blight vs. Late Blight):**\n\n"
@@ -461,7 +499,11 @@ class SynthesisService:
                     f"- **Cultural Prevention:** {plant_info.get('prevention', 'Clean cultivation and regular scouting.')}"
                 )
 
-        # 17. Default Question-Targeted Agronomy Response
+        # 17. Default Agronomy Decision-Support Response
         if is_mr:
-            return f"🌾 **AgroScan AI कृषी सल्लागार ({plant_name}):**\n\nतुमच्या प्रश्नानुसार ('{question}'), योग्य मशागत, पाण्याचा निचरा आणि संतुलित खत व्यवस्थापन आवश्यक आहे. अधिक सविस्तर मार्गदर्शनासाठी पिकाचे किंवा रोगाचे नाव नमूद करा."
-        return f"🌾 **AgroScan AI Agronomist ({plant_name}):**\n\nRegarding your query ('{question}'): For optimal {plant_name} health and productivity, ensure balanced nutrition, proper irrigation intervals, and active monitoring."
+            if plant_name and plant_name not in ["Crop", "General"]:
+                return f"🌾 **AgroScan AI कृषी सल्लागार ({plant_name}):**\n\n{plant_name} पिकाच्या निरोगी वाढीसाठी योग्य मशागत, पाण्याचा निचरा आणि संतुलित अन्नद्रव्य व्यवस्थापन आवश्यक आहे. विशिष्ट समस्या, कीड किंवा रोगाविषयी तपशील विचारू शकता."
+            return "🌾 **AgroScan AI कृषी सल्लागार:**\n\nआपल्या शेतीविषयक प्रश्नासाठी, कृपया पिकाचे नाव आणि लक्षणे नमूद करा जेणेकरून आम्ही अचूक शास्त्रीय सल्ला देऊ शकू."
+        if plant_name and plant_name not in ["Crop", "General"]:
+            return f"🌾 **AgroScan AI Agronomist ({plant_name}):**\n\nFor optimal {plant_name} health and yield, maintain balanced nutrition, appropriate irrigation intervals, and regular scouting. Feel free to describe any specific leaf or growth symptoms."
+        return "🌾 **AgroScan AI Agronomist:**\n\nPlease mention your specific crop name and symptoms so we can provide tailored agronomic recommendations."

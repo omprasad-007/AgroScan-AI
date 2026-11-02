@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Upload, Sparkles, AlertCircle, CheckCircle2, Camera, RefreshCw, Home, MapPin, Sprout } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import { useAuth } from '../context/AuthContext';
 import { CameraScanner } from '../components/camera/CameraScanner';
 import api from '../services/api';
 
@@ -30,6 +31,7 @@ const AVAILABLE_CROPS = [
 export const ScanPage = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
+    const { isAuthenticated } = useAuth();
   const fileInputRef = useRef(null);
 
   const [selectedFile, setSelectedFile] = useState(null);
@@ -42,17 +44,22 @@ export const ScanPage = () => {
   const [farms, setFarms] = useState([]);
   const [selectedFarmId, setSelectedFarmId] = useState('');
 
-  useEffect(() => {
-    // Proactively pre-warm Render instance if it was asleep
+    useEffect(() => {
     api.get('/health').catch(() => {});
+    if (!isAuthenticated) {
+      setFarms([]);
+      setSelectedFarmId('');
+      return;
+    }
+
     api.get('/farms')
-      .then(res => {
+      .then((res) => {
         const list = Array.isArray(res.data) ? res.data : [];
         setFarms(list);
         if (list.length > 0) setSelectedFarmId(list[0].id);
       })
       .catch(() => setFarms([]));
-  }, []);
+  }, [isAuthenticated]);
 
   const selectedFarm = farms.find(f => f.id === selectedFarmId);
 
