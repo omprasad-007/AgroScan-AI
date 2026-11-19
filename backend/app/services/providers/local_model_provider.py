@@ -60,7 +60,7 @@ class AgroScanLocalModelProvider(DiseaseDetectionProvider):
         base.supported_crops = [
             "apple", "blueberry", "cherry", "corn", "grape", "orange",
             "peach", "pepper", "potato", "raspberry", "soybean",
-            "squash", "strawberry", "tomato"
+            "squash", "strawberry", "tomato", "cotton", "rice", "sugarcane", "wheat"
         ]
         return base
 

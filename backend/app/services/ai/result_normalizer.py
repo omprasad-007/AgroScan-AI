@@ -164,12 +164,14 @@ class ResultNormalizer:
             "model_score": round(confidence, 4),
             "calibration_status": "CALIBRATED_TEMPERATURE_SCALED",
             "model_name": (
-                model_predictions[0].get("model_name", "DINOv2 Small Vision Transformer (PlantVillage)")
-                if model_predictions else "DINOv2 Small Vision Transformer (PlantVillage)"
+                provider_predictions[0].get("display_name", "Google Gemini Vision AI")
+                if provider_predictions and (not model_predictions or model_predictions[0].get("confidence", 0.0) < 0.50 or confidence == provider_predictions[0].get("confidence"))
+                else (model_predictions[0].get("model_name", "DINOv2 Small Vision Transformer (PlantVillage)") if model_predictions else "Google Gemini Vision AI")
             ),
             "model_revision": (
-                model_predictions[0].get("model_revision", "06ebf5e308e100fd000d738c42b059ebb5f58a16")
-                if model_predictions else "06ebf5e308e100fd000d738c42b059ebb5f58a16"
+                "gemini-3.1-flash"
+                if provider_predictions and (not model_predictions or model_predictions[0].get("confidence", 0.0) < 0.50 or confidence == provider_predictions[0].get("confidence"))
+                else (model_predictions[0].get("model_revision", "06ebf5e308e100fd000d738c42b059ebb5f58a16") if model_predictions else "06ebf5e308e100fd000d738c42b059ebb5f58a16")
             ),
             "prediction_confidence": round(confidence, 4),
             "confidence_interpretation": (

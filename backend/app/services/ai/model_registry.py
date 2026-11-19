@@ -87,6 +87,13 @@ class ModelRegistry:
             architecture="Dinov2ForImageClassification",
             size_mb=85.0,
             classes_count=38
+        ),
+        "sanjeevani-04/indian-crop-disease-mobilenetv2": ModelMetadata(
+            repo_id="sanjeevani-04/indian-crop-disease-mobilenetv2",
+            display_name="Indian Crop Disease MobileNetV2",
+            architecture="MobileNetV2ForImageClassification",
+            size_mb=9.5,
+            classes_count=35
         )
     }
 
@@ -141,7 +148,12 @@ class ModelRegistry:
 
         # Check for verified local model weights directory (offline priority)
         base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-        repo_subfolder = "plant-disease-dinov2-small" if "dinov2" in repo_id else "plantvillage-mobilenetv2"
+        if "indian" in repo_id or "sanjeevani" in repo_id:
+            repo_subfolder = "indian-crop-disease-mobilenetv2"
+        elif "dinov2" in repo_id:
+            repo_subfolder = "plant-disease-dinov2-small"
+        else:
+            repo_subfolder = "plantvillage-mobilenetv2"
         local_model_candidates = [
             os.path.join(base_dir, "backend", "models", repo_subfolder),
             os.path.join(base_dir, "models", repo_subfolder),

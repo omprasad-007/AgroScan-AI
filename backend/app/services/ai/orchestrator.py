@@ -105,7 +105,7 @@ class HybridPredictionOrchestrator:
         # Local Hugging Face Inference
         hf_success = False
         try:
-            hf_res = HuggingFaceInferenceService.predict(image_bytes)
+            hf_res = HuggingFaceInferenceService.predict(image_bytes, target_crop=target_crop)
             if hf_res and hf_res.get("status") == "success":
                 model_predictions.append(hf_res)
                 hf_success = True
@@ -149,16 +149,23 @@ class HybridPredictionOrchestrator:
         agreement_status, consensus_score, uncertainty_note = ConfidenceCalibrator.evaluate_model_agreement(all_sources)
 
         # Select primary candidate
-        primary = model_predictions[0] if model_predictions else provider_predictions[0]
+        primary = model_predictions[0] if model_predictions else (provider_predictions[0] if provider_predictions else {})
 
-        # Check if an external multimodal provider identified an Indian crop not in local PlantVillage weights
+        # Fallback to Gemini Vision if:
+        # 1. Local model failed or is UNCERTAIN (confidence < 0.50)
+        # 2. Gemini identified a crop matching user's selected non-PlantVillage crop (e.g. Mango, Sugarcane, Cotton, Rice)
         if provider_predictions:
             ext_top = provider_predictions[0]
-            ext_crop = ext_top.get("plant")
-            if ext_crop and crop_profile and ext_crop.lower() in crop_profile.common_name.lower():
-                # External provider matches user's specific crop
+            ext_crop = ext_top.get("plant", "")
+            local_conf = float(model_predictions[0].get("confidence", 0.0)) if model_predictions else 0.0
+            ext_conf = float(ext_top.get("confidence", 0.0))
+
+            if not hf_success or local_conf < getattr(settings, "MODERATE_CONFIDENCE_THRESHOLD", 0.50):
                 primary = ext_top
-            elif not hf_success:
+                logger.info(f"Local model uncertain ({local_conf:.2f}); seamlessly falling back to Gemini Vision ({ext_conf:.2f} - {ext_crop})")
+            elif ext_crop and crop_profile and ext_crop.lower() in crop_profile.common_name.lower():
+                primary = ext_top
+            elif target_crop and target_crop.lower() not in ["auto", "crop", "general"] and ext_crop.lower() in target_crop.lower():
                 primary = ext_top
 
         plant_name = primary.get("crop") or primary.get("plant") or (crop_profile.common_name if crop_profile else "Plant")
@@ -217,7 +224,7 @@ class HybridPredictionOrchestrator:
     async def _safe_provider_call(self, provider: Any, image_bytes: bytes, target_crop: Optional[str], location: Optional[Dict[str, Any]], language: str) -> Dict[str, Any]:
         """Calls an external provider with a strict timeout and wraps result safely."""
         try:
-            timeout_sec = getattr(settings, "HF_INFERENCE_TIMEOUT", 6.0)
+            timeout_sec = 25.0
             res = await asyncio.wait_for(
                 provider.diagnose(image_bytes=image_bytes, plant_name=target_crop, location=location, language=language),
                 timeout=timeout_sec

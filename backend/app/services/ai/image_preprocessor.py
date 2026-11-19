@@ -7,7 +7,7 @@ color normalization, and PyTorch tensor preparation for computer vision inferenc
 import io
 import logging
 from typing import Tuple, Dict, Any, Optional
-from PIL import Image
+from PIL import Image, ImageOps
 import numpy as np
 
 logger = logging.getLogger("agroscan.ai.preprocessor")
@@ -64,7 +64,9 @@ class ImagePreprocessor:
             raise ImagePreprocessingError(f"Corrupt or invalid image stream: {err}")
 
         try:
-            pil_image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
+            raw_pil = Image.open(io.BytesIO(image_bytes))
+            pil_image = ImageOps.exif_transpose(raw_pil)
+            pil_image = pil_image.convert("RGB")
         except Exception as err:
             raise ImagePreprocessingError(f"Failed to rasterize RGB pixels: {err}")
 

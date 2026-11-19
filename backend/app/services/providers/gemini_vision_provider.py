@@ -20,8 +20,11 @@ class GeminiVisionProvider(DiseaseDetectionProvider):
     or any plant in the world), botanical scientific name, family, and pathological health state.
     """
 
-    GEMINI_35_LITE_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent"
-    GEMINI_35_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent"
+    GEMINI_MODELS = [
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent",
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent",
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent"
+    ]
 
     def __init__(self):
         super().__init__(name="gemini_vision", display_name="Google Gemini Vision AI")
@@ -54,32 +57,24 @@ class GeminiVisionProvider(DiseaseDetectionProvider):
         b64_img = base64.b64encode(image_bytes).decode("utf-8")
 
         prompt = (
-            "You are a world-class plant taxonomist and agricultural pathologist.\n"
-            "Examine this plant leaf/foliage image with high scientific precision.\n"
-            "Tasks:\n"
-            "1. IDENTIFY THE EXACT PLANT SPECIES (e.g. Mango, Sugarcane, Cotton, Soybean, Tomato, Potato, Rice, Wheat, Chilli, Onion, Pomegranate, Banana, Grapes, Maize/Corn, Turmeric, Ginger, Groundnut, Rose, Papaya, Lemon, Apple, etc.). Do NOT assume Tomato or Potato unless it actually is.\n"
-            "2. Determine botanical Latin scientific name and plant family.\n"
-            "3. Diagnose whether the leaf is Healthy or identify the specific disease/pest (e.g. Anthracnose, Powdery Mildew, Early Blight, Late Blight, Bacterial Blight, Rust, Leaf Curl, etc.).\n"
-            "4. Return a STRICT JSON object ONLY (no markdown backticks, no code fence, raw JSON text):\n"
+            "You are an expert agricultural botanist and plant pathologist.\n"
+            "Examine this plant/crop leaf or foliage image with high scientific precision.\n"
+            "Identify the exact plant species, botanical scientific name, and specific disease (or Healthy).\n"
+            "Return STRICT JSON ONLY (no markdown fences, raw JSON):\n"
             "{\n"
             '  "is_plant": true,\n'
-            '  "is_leaf": true,\n'
-            '  "plant": "Exact identified plant species name",\n'
+            '  "plant": "Exact crop name (e.g. Mango, Rice, Cotton, Sugarcane, Tomato, Potato, Corn, Wheat, Chilli, etc.)",\n'
             '  "scientific_name": "Botanical Latin name",\n'
-            '  "family": "Botanical family name",\n'
             '  "disease": "Specific disease name or \'Healthy Leaf (No Disease Detected)\'",\n'
             '  "disease_code": "snake_case_disease_code",\n'
-            '  "confidence": 0.94,\n'
+            '  "confidence": 0.95,\n'
             '  "is_healthy": false,\n'
-            '  "symptoms": "Brief description of visible leaf features and symptoms",\n'
-            '  "alternatives": [\n'
-            '     {"disease": "Alternative Diagnosis", "disease_code": "alt_code", "confidence": 0.12}\n'
-            "  ]\n"
+            '  "symptoms": "Brief description of visible symptoms"\n'
             "}\n"
         )
 
         if plant_name and plant_name not in ["Crop", "General", "General Crop", "Unknown", "auto", "Auto-Detect"]:
-            prompt += f"\nUser Context: The farmer indicates this leaf is from a '{plant_name}' plant. Verify this species or diagnose appropriately."
+            prompt += f"\nNote: The farmer indicates this may be a '{plant_name}' crop."
 
         payload = {
             "contents": [
@@ -88,8 +83,8 @@ class GeminiVisionProvider(DiseaseDetectionProvider):
                     "parts": [
                         {"text": prompt},
                         {
-                            "inlineData": {
-                                "mimeType": "image/jpeg",
+                            "inline_data": {
+                                "mime_type": "image/jpeg",
                                 "data": b64_img
                             }
                         }
@@ -97,17 +92,17 @@ class GeminiVisionProvider(DiseaseDetectionProvider):
                 }
             ],
             "generationConfig": {
-                "temperature": 0.2,
-                "maxOutputTokens": 600
+                "temperature": 0.1,
+                "maxOutputTokens": 300
             }
         }
 
-        urls_to_try = [self.GEMINI_35_LITE_URL, self.GEMINI_35_URL]
+        urls_to_try = self.GEMINI_MODELS
         last_error = ""
 
         for url in urls_to_try:
             try:
-                async with httpx.AsyncClient(timeout=8.0) as client:
+                async with httpx.AsyncClient(timeout=25.0) as client:
                     res = await client.post(f"{url}?key={api_key}", json=payload)
                     latency = (time.time() - t0) * 1000.0
                     self.last_latency_ms = latency
@@ -127,7 +122,7 @@ class GeminiVisionProvider(DiseaseDetectionProvider):
                                 raw_text = "\n".join(lines).strip()
 
                             parsed = json.loads(raw_text)
-                            if parsed.get("is_leaf") is False or parsed.get("is_plant") is False:
+                            if parsed.get("is_plant") is False:
                                 return ProviderDiagnosisResult(
                                     provider=self.name,
                                     status="non_leaf_detected",
@@ -136,7 +131,7 @@ class GeminiVisionProvider(DiseaseDetectionProvider):
                                     disease_code="non_plant",
                                     confidence=0.0,
                                     latency_ms=round(latency, 1),
-                                    error="Gemini Vision detected this image is not a plant leaf."
+                                    error="Gemini Vision detected this image is not a plant."
                                 )
 
                             plant = parsed.get("plant", "General Crop").strip().title()

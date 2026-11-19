@@ -90,7 +90,7 @@ class CropRegistry:
             family="Poaceae",
             aliases=["maize", "makka", "makkai", "makai", "sweet corn"],
             support_status=CropSupportStatus.SUPPORTED,
-            supported_model_ids=["neghani/plantvillage-mobilenetv2", "rodynaemad/plant-disease-dinov2-small"],
+            supported_model_ids=["neghani/plantvillage-mobilenetv2", "sanjeevani-04/indian-crop-disease-mobilenetv2", "rodynaemad/plant-disease-dinov2-small"],
             supported_diseases=["corn_cercospora_leaf_spot", "corn_common_rust", "corn_northern_leaf_blight", "healthy_leaf"],
             supported_providers=["kindwise", "gemini_vision", "openrouter_vision", "agroscan_local"],
             limitations="Severe moisture stress can produce necrosis resembling northern leaf blight.",
@@ -157,10 +157,10 @@ class CropRegistry:
             scientific_name="Saccharum officinarum",
             family="Poaceae",
             aliases=["ganna", "us", "serum"],
-            support_status=CropSupportStatus.PARTIALLY_SUPPORTED,
-            supported_model_ids=[],
-            supported_diseases=["sugarcane_red_rot", "sugarcane_smut", "sugarcane_rust", "healthy_leaf"],
-            supported_providers=["gemini_vision", "kindwise", "openrouter_vision"],
+            support_status=CropSupportStatus.SUPPORTED,
+            supported_model_ids=["sanjeevani-04/indian-crop-disease-mobilenetv2"],
+            supported_diseases=["sugarcane_red_rot", "sugarcane_mosaic", "sugarcane_red_rust", "sugarcane_yellow_rust", "healthy_leaf"],
+            supported_providers=["agroscan_local", "gemini_vision", "kindwise", "openrouter_vision"],
             limitations="Internal stalk red rot requires splitting the cane for conclusive agronomic confirmation.",
             knowledge_base_ref="sugarcane"
         ),
@@ -170,11 +170,14 @@ class CropRegistry:
             scientific_name="Gossypium hirsutum",
             family="Malvaceae",
             aliases=["kapas", "kappas", "rui"],
-            support_status=CropSupportStatus.PARTIALLY_SUPPORTED,
-            supported_model_ids=[],
-            supported_diseases=["cotton_bacterial_blight", "cotton_leaf_curl", "cotton_alternaria_leaf_spot", "healthy_leaf"],
-            supported_providers=["gemini_vision", "kindwise", "openrouter_vision"],
-            limitations="Requires multimodal external vision adapter; local PlantVillage model lacks cotton classes.",
+            support_status=CropSupportStatus.SUPPORTED,
+            supported_model_ids=["sanjeevani-04/indian-crop-disease-mobilenetv2"],
+            supported_diseases=[
+                "cotton_anthracnose", "cotton_bacterial_blight", "cotton_leaf_curl",
+                "cotton_wilt", "cotton_bollrot", "cotton_bollworm", "cotton_thrips", "healthy_leaf"
+            ],
+            supported_providers=["agroscan_local", "gemini_vision", "kindwise", "openrouter_vision"],
+            limitations="Early stage sucking pest damage should be cross-verified with leaf undersurface scouting.",
             knowledge_base_ref="cotton"
         ),
         "rice": CropProfile(
@@ -183,11 +186,11 @@ class CropRegistry:
             scientific_name="Oryza sativa",
             family="Poaceae",
             aliases=["paddy", "dhan", "bhat", "tandul", "chawal"],
-            support_status=CropSupportStatus.PARTIALLY_SUPPORTED,
-            supported_model_ids=[],
-            supported_diseases=["rice_blast", "rice_brown_spot", "rice_bacterial_blight", "healthy_leaf"],
-            supported_providers=["gemini_vision", "kindwise", "openrouter_vision"],
-            limitations="Leaf blast spindle lesions evaluated via multimodal vision; local 38-class weights lack rice.",
+            support_status=CropSupportStatus.SUPPORTED,
+            supported_model_ids=["sanjeevani-04/indian-crop-disease-mobilenetv2"],
+            supported_diseases=["rice_blast", "rice_brown_spot", "rice_bacterial_blight", "rice_tungro", "healthy_leaf"],
+            supported_providers=["agroscan_local", "gemini_vision", "kindwise", "openrouter_vision"],
+            limitations="Leaf blast spindle lesions should be distinguished from zinc deficiency brown speckling.",
             knowledge_base_ref="rice"
         ),
         "wheat": CropProfile(
@@ -196,10 +199,13 @@ class CropRegistry:
             scientific_name="Triticum aestivum",
             family="Poaceae",
             aliases=["gehun", "gahu"],
-            support_status=CropSupportStatus.PARTIALLY_SUPPORTED,
-            supported_model_ids=[],
-            supported_diseases=["wheat_yellow_rust", "wheat_brown_rust", "wheat_leaf_blight", "healthy_leaf"],
-            supported_providers=["gemini_vision", "kindwise", "openrouter_vision"],
+            support_status=CropSupportStatus.SUPPORTED,
+            supported_model_ids=["sanjeevani-04/indian-crop-disease-mobilenetv2"],
+            supported_diseases=[
+                "wheat_black_rust", "wheat_brown_rust", "wheat_yellow_rust",
+                "wheat_leaf_blight", "wheat_powdery_mildew", "wheat_scab", "wheat_flag_smut", "healthy_leaf"
+            ],
+            supported_providers=["agroscan_local", "gemini_vision", "kindwise", "openrouter_vision"],
             limitations="Rust pustule differentiation benefits from high-magnification macro photography.",
             knowledge_base_ref="wheat"
         ),

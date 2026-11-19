@@ -78,8 +78,9 @@ class Settings(BaseSettings):
     MODEL_PATH: str = "../ml/models/plant_disease_model_v1.h5"
     MODEL_CACHE_DIR: str = os.path.join(_BASE_DIR, "models_cache")
     DEFAULT_LOCAL_MODEL: str = "rodynaemad/plant-disease-dinov2-small"
-    SECONDARY_LOCAL_MODEL: str = "neghani/plantvillage-mobilenetv2"
-    HF_INFERENCE_TIMEOUT: float = 8.0
+    SECONDARY_LOCAL_MODEL: str = "sanjeevani-04/indian-crop-disease-mobilenetv2"
+    TERTIARY_LOCAL_MODEL: str = "neghani/plantvillage-mobilenetv2"
+    HF_INFERENCE_TIMEOUT: float = 15.0
     LOCAL_INFERENCE_ENABLED: bool = True
     CONFIDENCE_CALIBRATION_TEMPERATURE: float = 0.8845
     HIGH_CONFIDENCE_THRESHOLD: float = 0.70
