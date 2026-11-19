@@ -1,41 +1,73 @@
 import React from 'react';
+import { CheckCircle2, AlertTriangle, ShieldCheck, HelpCircle } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 
 export const SeverityBadge = ({ level }) => {
   const { translateSeverity } = useLanguage();
-  const styles = {
-    Healthy: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30',
-    Mild: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30',
-    Moderate: 'bg-orange-500/10 text-orange-400 border-orange-500/30',
-    Severe: 'bg-red-500/10 text-red-400 border-red-500/30'
-  };
+  const normalized = String(level || 'Mild').toLowerCase();
 
-  const style = styles[level] || styles.Mild;
+  let style = 'bg-agro-lime/10 text-agro-lime border-agro-lime/30';
+  let Icon = AlertTriangle;
+
+  if (normalized.includes('healthy')) {
+    style = 'bg-agro-primary/10 text-agro-primary border-agro-primary/30';
+    Icon = ShieldCheck;
+  } else if (normalized.includes('mild')) {
+    style = 'bg-agro-lime/15 text-agro-lime border-agro-lime/30';
+    Icon = AlertTriangle;
+  } else if (normalized.includes('moderate')) {
+    style = 'bg-agro-amber/15 text-agro-amber border-agro-amber/35';
+    Icon = AlertTriangle;
+  } else if (normalized.includes('severe')) {
+    style = 'bg-agro-terracotta/15 text-agro-terracotta border-agro-terracotta/40';
+    Icon = AlertTriangle;
+  }
+
   const label = translateSeverity ? translateSeverity(level) : level;
 
   return (
-    <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold border ${style}`}>
-      <span className="w-1.5 h-1.5 rounded-full bg-current mr-1.5 animate-pulse" />
-      {label}
+    <span
+      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border ${style}`}
+      role="status"
+      aria-label={`Severity: ${label}`}
+    >
+      <Icon className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+      <span>{label}</span>
     </span>
   );
 };
 
 export const WeatherRiskBadge = ({ level }) => {
   const { translateRisk } = useLanguage();
-  const styles = {
-    Low: 'bg-blue-500/10 text-blue-400 border-blue-500/30',
-    Medium: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30',
-    High: 'bg-orange-500/10 text-orange-400 border-orange-500/30',
-    Critical: 'bg-red-500/10 text-red-400 border-red-500/30'
-  };
+  const normalized = String(level || 'Low').toLowerCase();
 
-  const style = styles[level] || styles.Medium;
+  let style = 'bg-agro-primary/10 text-agro-primary border-agro-primary/30';
+  let Icon = CheckCircle2;
+
+  if (normalized.includes('low') || normalized.includes('none')) {
+    style = 'bg-agro-primary/10 text-agro-primary border-agro-primary/30';
+    Icon = CheckCircle2;
+  } else if (normalized.includes('medium') || normalized.includes('moderate')) {
+    style = 'bg-agro-amber/15 text-agro-amber border-agro-amber/35';
+    Icon = AlertTriangle;
+  } else if (normalized.includes('high')) {
+    style = 'bg-agro-terracotta/15 text-agro-terracotta border-agro-terracotta/40';
+    Icon = AlertTriangle;
+  } else if (normalized.includes('critical')) {
+    style = 'bg-agro-terracotta/25 text-agro-terracottaLight border-agro-terracotta/50 font-bold';
+    Icon = AlertTriangle;
+  }
+
   const label = translateRisk ? translateRisk(level) : `${level} Risk`;
 
   return (
-    <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold border ${style}`}>
-      {label}
+    <span
+      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border ${style}`}
+      role="status"
+      aria-label={`Weather Risk: ${label}`}
+    >
+      <Icon className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+      <span>{label}</span>
     </span>
   );
 };

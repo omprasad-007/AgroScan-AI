@@ -3,94 +3,185 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    color-scheme: dark light;
+  }
+
   body {
-    @apply min-h-screen font-sans transition-colors duration-300;
+    @apply min-h-screen font-sans antialiased text-agro-cream bg-agro-bg;
+  }
+
+  ::selection {
+    background-color: rgba(47, 191, 113, 0.25);
+    color: #A6D85A;
+  }
+
+  /* Accessible outline & focus */
+  :focus-visible {
+    outline: 2px solid #2FBF71;
+    outline-offset: 2px;
   }
 }
 
+/* Dark Mode Global Background & Base */
 html.dark body {
-  @apply bg-slate-950 text-slate-100;
+  background-color: #101510;
+  color: #FAF7EF;
 }
 
+/* Light Mode Global Background & Base (Warm Cream / Sage - Never blue) */
 html.light body {
-  @apply bg-emerald-50/40 text-slate-900;
+  background-color: #FAF7F0;
+  color: #1A231A;
 }
 
-/* Glassmorphic Stitch UI styling for Dark Mode */
-html.dark .glass-panel {
-  background: rgba(15, 23, 42, 0.75);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+/* -------------------------------------------------------------
+ * Elevated Organic Surfaces & Panels
+ * ----------------------------------------------------------- */
+.agro-panel,
+.glass-panel {
+  background-color: #182018;
+  border: 1px solid #263326;
+  border-radius: 1rem;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.45);
 }
 
-/* Glassmorphic Stitch UI styling for Light Mode */
+.agro-panel-hover,
+.glass-panel-hover {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.agro-panel-hover:hover,
+.glass-panel-hover:hover {
+  background-color: #202B20;
+  border-color: #344734;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.55);
+}
+
+/* Light Mode Surface Overrides */
+html.light .agro-panel,
 html.light .glass-panel {
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(16, 185, 129, 0.15);
-  box-shadow: 0 10px 30px -10px rgba(16, 185, 129, 0.08);
+  background-color: #FFFFFF;
+  border: 1px solid #DDD8CB;
+  box-shadow: 0 4px 16px -2px rgba(24, 32, 24, 0.05);
 }
 
-html.dark .glass-panel-hover:hover {
-  background: rgba(30, 41, 59, 0.85);
-  border-color: rgba(46, 125, 50, 0.3);
-  transform: translateY(-2px);
-  box-shadow: 0 10px 30px -10px rgba(46, 125, 50, 0.15);
-}
-
+html.light .agro-panel-hover:hover,
 html.light .glass-panel-hover:hover {
-  background: #ffffff;
-  border-color: rgba(16, 185, 129, 0.4);
+  background-color: #F8F5EC;
+  border-color: #C8C2B3;
   transform: translateY(-2px);
-  box-shadow: 0 10px 30px -10px rgba(16, 185, 129, 0.2);
+  box-shadow: 0 8px 20px -4px rgba(24, 32, 24, 0.09);
 }
 
-/* Text & Input color overrides for Light Mode */
+/* -------------------------------------------------------------
+ * Light Mode Typography & Surfaces
+ * ----------------------------------------------------------- */
 html.light .text-white {
-  color: #0f172a !important;
+  color: #1A231A !important;
 }
 
-html.light .text-slate-400 {
-  color: #475569 !important;
+html.light .text-slate-100 {
+  color: #1A231A !important;
+}
+
+html.light .text-slate-200 {
+  color: #263326 !important;
 }
 
 html.light .text-slate-300 {
-  color: #334155 !important;
+  color: #404F40 !important;
 }
 
-html.light .bg-slate-900 {
-  background-color: #f1f5f9 !important;
-  border-color: #cbd5e1 !important;
-  color: #0f172a !important;
+html.light .text-slate-400 {
+  color: #636D61 !important;
+}
+
+html.light .text-slate-500 {
+  color: #7B8579 !important;
 }
 
 html.light .bg-slate-950 {
-  background-color: #f8fafc !important;
+  background-color: #FAF7F0 !important;
+}
+
+html.light .bg-slate-900 {
+  background-color: #FFFFFF !important;
+}
+
+html.light .bg-slate-900\/60,
+html.light .bg-slate-900\/70,
+html.light .bg-slate-900\/80,
+html.light .bg-slate-900\/90 {
+  background-color: #F8F5EC !important;
 }
 
 html.light .bg-slate-800 {
-  background-color: #e2e8f0 !important;
-  color: #0f172a !important;
+  background-color: #EDE8DC !important;
+  color: #1A231A !important;
+}
+
+html.light .bg-slate-800\/80,
+html.light .bg-slate-800\/70,
+html.light .bg-slate-800\/60 {
+  background-color: #E6E1D4 !important;
 }
 
 html.light .border-slate-800 {
-  border-color: #cbd5e1 !important;
+  border-color: #DDD8CB !important;
 }
 
-/* Custom Scrollbars */
+html.light .border-slate-700 {
+  border-color: #C8C2B3 !important;
+}
+
+/* -------------------------------------------------------------
+ * Interactive Primary Buttons & Touch Feedback
+ * ----------------------------------------------------------- */
+.btn-agro-primary {
+  @apply inline-flex items-center justify-center font-bold transition-all duration-150 rounded-xl bg-agro-primary hover:bg-agro-primaryHover text-agro-bg active:scale-[0.98] shadow-md shadow-agro-primary/20 disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.btn-agro-secondary {
+  @apply inline-flex items-center justify-center font-semibold transition-all duration-150 rounded-xl bg-agro-surface hover:bg-agro-hover border border-agro-border text-agro-cream active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+/* -------------------------------------------------------------
+ * Custom Organic Scrollbars
+ * ----------------------------------------------------------- */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
 html.dark ::-webkit-scrollbar-track {
-  background: #0f172a;
+  background: #101510;
 }
 html.dark ::-webkit-scrollbar-thumb {
-  background: #334155;
-  border-radius: 4px;
+  background: #273527;
+  border-radius: 9999px;
 }
+html.dark ::-webkit-scrollbar-thumb:hover {
+  background: #344734;
+}
+
 html.light ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: #FAF7F0;
 }
 html.light ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 4px;
+  background: #C8C2B3;
+  border-radius: 9999px;
+}
+
+/* -------------------------------------------------------------
+ * Reduced Motion Support
+ * ----------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

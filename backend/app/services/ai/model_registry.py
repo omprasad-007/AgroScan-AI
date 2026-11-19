@@ -141,10 +141,11 @@ class ModelRegistry:
 
         # Check for verified local model weights directory (offline priority)
         base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+        repo_subfolder = "plant-disease-dinov2-small" if "dinov2" in repo_id else "plantvillage-mobilenetv2"
         local_model_candidates = [
-            os.path.join(base_dir, "backend", "models", "plantvillage-mobilenetv2"),
-            os.path.join(base_dir, "models", "plantvillage-mobilenetv2"),
-            os.path.abspath("backend/models/plantvillage-mobilenetv2")
+            os.path.join(base_dir, "backend", "models", repo_subfolder),
+            os.path.join(base_dir, "models", repo_subfolder),
+            os.path.abspath(f"backend/models/{repo_subfolder}")
         ]
         local_model_dir = None
         for cand in local_model_candidates:
@@ -152,10 +153,10 @@ class ModelRegistry:
                 local_model_dir = cand
                 break
 
-        if repo_id == "neghani/plantvillage-mobilenetv2" and local_model_dir:
+        if local_model_dir:
             model_target = local_model_dir
             local_files_only = True
-            logger.info(f"Loading local MobileNetV2 from verified directory: {local_model_dir} (offline mode)")
+            logger.info(f"Loading local weights for '{repo_id}' from verified directory: {local_model_dir} (offline mode)")
         else:
             model_target = repo_id
             local_files_only = False

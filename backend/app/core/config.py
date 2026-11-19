@@ -77,8 +77,8 @@ class Settings(BaseSettings):
     MODEL_TYPE: str = "huggingface"
     MODEL_PATH: str = "../ml/models/plant_disease_model_v1.h5"
     MODEL_CACHE_DIR: str = os.path.join(_BASE_DIR, "models_cache")
-    DEFAULT_LOCAL_MODEL: str = "neghani/plantvillage-mobilenetv2"
-    SECONDARY_LOCAL_MODEL: str = "rodynaemad/plant-disease-dinov2-small"
+    DEFAULT_LOCAL_MODEL: str = "rodynaemad/plant-disease-dinov2-small"
+    SECONDARY_LOCAL_MODEL: str = "neghani/plantvillage-mobilenetv2"
     HF_INFERENCE_TIMEOUT: float = 8.0
     LOCAL_INFERENCE_ENABLED: bool = True
     CONFIDENCE_CALIBRATION_TEMPERATURE: float = 0.8845

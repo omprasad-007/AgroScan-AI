@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { CloudSun, HelpCircle, MapPin, RefreshCw, Navigation, Search, CheckCircle2 } from 'lucide-react';
+import { CloudSun, HelpCircle, MapPin, Navigation, Search, CheckCircle2, ShieldCheck, Thermometer, Droplets, CloudRain } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { WeatherRiskBadge } from '../components/common/Badge';
 import { detectLocalWeather, fetchCityWeather } from '../services/weather';
@@ -92,39 +92,41 @@ export const WeatherRiskPage = () => {
       
       {/* Header */}
       <div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-white flex items-center space-x-2">
-          <span>{t('weather.title') || 'Weather Outbreak Risk Simulator'}</span>
-          <span className="px-2.5 py-0.5 rounded-full bg-agri-500/10 border border-agri-500/30 text-[10px] font-bold text-agri-400 uppercase tracking-wide">
+        <div className="flex items-center space-x-2">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-agro-cream tracking-tight">
+            {t('weather.title') || 'Weather Outbreak Risk Simulator'}
+          </h1>
+          <span className="px-2.5 py-0.5 rounded-full bg-agro-primary/10 border border-agro-primary/30 text-[10px] font-bold text-agro-primary uppercase tracking-wide">
             {t('weather.decision_engine') || 'Scientific Decision Engine'}
           </span>
-        </h1>
-        <p className="text-xs sm:text-sm text-slate-400 mt-1">
+        </div>
+        <p className="text-xs sm:text-sm text-agro-muted mt-1">
           {t('weather.subtitle') || 'Evaluate ambient weather parameters against crop-specific pathogen germination thresholds to forecast outbreak probability and explain WHY.'}
         </p>
       </div>
 
       {/* Live Farm Weather & GPS Microclimate Detector Card */}
-      <div className="glass-panel p-5 rounded-2xl border border-slate-800 bg-gradient-to-r from-slate-900/90 via-slate-900/60 to-emerald-950/20 space-y-4">
+      <div className="agro-panel p-5 rounded-2xl space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-agro-primary/10 border border-agro-primary/25 flex items-center justify-center text-agro-primary shrink-0">
               <MapPin className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center space-x-2">
-                <span className="text-sm font-extrabold text-white">
-                  {weatherMeta?.location ? `📍 ${weatherMeta.location}` : 'Detecting Farm Location...'}
+                <span className="text-sm font-extrabold text-agro-cream">
+                  {weatherMeta?.location ? weatherMeta.location : 'Detecting Farm Location...'}
                 </span>
                 <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${
                   weatherMeta?.isGpsDetected
-                    ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
-                    : 'bg-cyan-500/15 text-cyan-300 border border-cyan-500/30'
+                    ? 'bg-agro-primary/15 text-agro-primary border border-agro-primary/30'
+                    : 'bg-agro-lime/15 text-agro-lime border border-agro-lime/30'
                 }`}>
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping mr-1.5" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-agro-primary animate-ping mr-1.5" />
                   {weatherMeta?.isGpsDetected ? 'Device GPS Microclimate' : 'District Microclimate'}
                 </span>
               </div>
-              <p className="text-xs text-slate-400 mt-0.5">
+              <p className="text-xs text-agro-muted mt-0.5">
                 {weatherMeta?.condition || 'Clear sky'} • {temp}°C • {humidity}% Humidity • {rainfall}mm Rain
               </p>
             </div>
@@ -135,7 +137,7 @@ export const WeatherRiskPage = () => {
               type="button"
               onClick={() => handleDetectLocation(true)}
               disabled={detectingGps}
-              className="inline-flex items-center space-x-1.5 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-emerald-500/30 text-xs font-semibold transition disabled:opacity-50"
+              className="inline-flex items-center space-x-1.5 px-3 py-2 rounded-xl bg-agro-surface hover:bg-agro-hover text-agro-primary border border-agro-primary/30 text-xs font-semibold transition disabled:opacity-50"
             >
               <Navigation className={`w-3.5 h-3.5 ${detectingGps ? 'animate-spin' : ''}`} />
               <span>{detectingGps ? 'Detecting GPS...' : 'Detect Farm GPS'}</span>
@@ -144,21 +146,21 @@ export const WeatherRiskPage = () => {
         </div>
 
         {/* Quick Search Alternative City or Village */}
-        <form onSubmit={handleCitySearch} className="flex items-center gap-2 pt-2 border-t border-slate-800/80">
+        <form onSubmit={handleCitySearch} className="flex items-center gap-2 pt-2 border-t border-agro-border/70">
           <div className="relative flex-1">
-            <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-agro-muted" />
             <input
               type="text"
               value={cityInput}
               onChange={(e) => setCityInput(e.target.value)}
               placeholder="Search other district or village (e.g. Kolhapur, Solapur, Nashik)..."
-              className="w-full pl-8 pr-3 py-1.5 rounded-xl bg-slate-950/70 border border-slate-800 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-emerald-500"
+              className="w-full pl-8 pr-3 py-1.5 rounded-xl bg-agro-bg border border-agro-border text-xs text-agro-cream placeholder-agro-muted/60 focus:outline-none focus:border-agro-primary focus:ring-1 focus:ring-agro-primary transition"
             />
           </div>
           <button
             type="submit"
             disabled={detectingGps || !cityInput.trim()}
-            className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition disabled:opacity-40"
+            className="px-3 py-1.5 rounded-xl bg-agro-surface hover:bg-agro-hover text-agro-cream text-xs font-semibold border border-agro-border transition disabled:opacity-40"
           >
             Search
           </button>
@@ -168,20 +170,20 @@ export const WeatherRiskPage = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
         {/* Input Controls */}
-        <form onSubmit={handleEvaluate} className="glass-panel p-6 rounded-2xl space-y-4">
-          <h3 className="text-sm font-bold text-white flex items-center space-x-2">
-            <CloudSun className="w-4 h-4 text-agri-400" />
+        <form onSubmit={handleEvaluate} className="agro-panel p-6 rounded-2xl space-y-4">
+          <h3 className="text-sm font-bold text-agro-cream flex items-center space-x-2">
+            <CloudSun className="w-4 h-4 text-agro-primary" />
             <span>{t('weather.card_params') || 'Weather & Crop Parameters'}</span>
           </h3>
 
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1">
+            <label className="block text-xs font-medium text-agro-muted mb-1.5">
               {t('weather.target_crop') || 'Target Crop'}
             </label>
             <select
               value={crop}
               onChange={(e) => setCrop(e.target.value)}
-              className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-200 focus:outline-none focus:border-agri-500 font-semibold"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-agro-bg border border-agro-border text-xs text-agro-cream focus:outline-none focus:border-agro-primary focus:ring-1 focus:ring-agro-primary font-semibold transition cursor-pointer"
             >
               {availableCrops.map((c) => (
                 <option key={c} value={c}>{translateCrop(c)}</option>
@@ -190,9 +192,12 @@ export const WeatherRiskPage = () => {
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1 flex justify-between">
-              <span>{t('weather.temp') || 'Ambient Temperature (°C)'}</span>
-              <strong className="text-agri-400">{temp}°C</strong>
+            <label className="text-xs font-medium text-agro-muted mb-1.5 flex justify-between">
+              <span className="flex items-center space-x-1.5">
+                <Thermometer className="w-3.5 h-3.5 text-agro-primary" />
+                <span>{t('weather.temp') || 'Ambient Temperature (°C)'}</span>
+              </span>
+              <strong className="text-agro-primary font-mono">{temp}°C</strong>
             </label>
             <input
               type="range"
@@ -201,14 +206,17 @@ export const WeatherRiskPage = () => {
               step="0.5"
               value={temp}
               onChange={(e) => setTemp(e.target.value)}
-              className="w-full accent-agri-500"
+              className="w-full accent-agro-primary cursor-pointer"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1 flex justify-between">
-              <span>{t('weather.humidity') || 'Relative Humidity (%)'}</span>
-              <strong className="text-agri-400">{humidity}%</strong>
+            <label className="text-xs font-medium text-agro-muted mb-1.5 flex justify-between">
+              <span className="flex items-center space-x-1.5">
+                <Droplets className="w-3.5 h-3.5 text-agro-lime" />
+                <span>{t('weather.humidity') || 'Relative Humidity (%)'}</span>
+              </span>
+              <strong className="text-agro-lime font-mono">{humidity}%</strong>
             </label>
             <input
               type="range"
@@ -217,14 +225,17 @@ export const WeatherRiskPage = () => {
               step="1"
               value={humidity}
               onChange={(e) => setHumidity(e.target.value)}
-              className="w-full accent-agri-500"
+              className="w-full accent-agro-primary cursor-pointer"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1 flex justify-between">
-              <span>{t('weather.rainfall') || '24h Rainfall (mm)'}</span>
-              <strong className="text-agri-400">{rainfall} mm</strong>
+            <label className="text-xs font-medium text-agro-muted mb-1.5 flex justify-between">
+              <span className="flex items-center space-x-1.5">
+                <CloudRain className="w-3.5 h-3.5 text-agro-amber" />
+                <span>{t('weather.rainfall') || '24h Rainfall (mm)'}</span>
+              </span>
+              <strong className="text-agro-amber font-mono">{rainfall} mm</strong>
             </label>
             <input
               type="range"
@@ -233,60 +244,61 @@ export const WeatherRiskPage = () => {
               step="1"
               value={rainfall}
               onChange={(e) => setRainfall(e.target.value)}
-              className="w-full accent-agri-500"
+              className="w-full accent-agro-primary cursor-pointer"
             />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 rounded-xl bg-agri-500 hover:bg-agri-400 text-slate-950 font-extrabold text-xs transition shadow-lg shadow-agri-500/20"
+            className="w-full py-3 rounded-xl bg-agro-primary hover:bg-agro-primary-hover text-agro-bg font-extrabold text-xs transition shadow-lg shadow-agro-primary/20 flex items-center justify-center space-x-2"
           >
-            {loading ? (t('weather.simulating') || 'Evaluating Model...') : (t('weather.simulate_btn') || 'Calculate Outbreak Risk')}
+            <ShieldCheck className="w-4 h-4" />
+            <span>{loading ? (t('weather.simulating') || 'Evaluating Model...') : (t('weather.simulate_btn') || 'Calculate Outbreak Risk')}</span>
           </button>
         </form>
 
         {/* Risk Output & Scientific "Explain WHY" Display */}
-        <div className="glass-panel p-6 rounded-2xl flex flex-col justify-between space-y-4">
+        <div className="agro-panel p-6 rounded-2xl flex flex-col justify-between space-y-4">
           {riskResult ? (
             <div className="space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div className="flex items-center justify-between border-b border-agro-border pb-3">
                 <div>
-                  <span className="text-xs text-slate-400 block">{t('weather.outbreak_risk') || 'Outbreak Risk Index'}</span>
-                  <span className="text-[10px] text-slate-500 font-mono">Target: {riskResult.pathogen}</span>
+                  <span className="text-xs text-agro-muted block">{t('weather.outbreak_risk') || 'Outbreak Risk Index'}</span>
+                  <span className="text-[11px] text-agro-cream font-mono font-medium">Target: {riskResult.pathogen}</span>
                 </div>
                 <WeatherRiskBadge level={riskResult.risk_level} />
               </div>
 
-              <div className="text-center py-2 bg-slate-900/60 rounded-xl border border-slate-800">
-                <span className="text-4xl font-extrabold text-white">{riskResult.risk_score}</span>
-                <span className="text-xs text-slate-400 block mt-0.5">
+              <div className="text-center py-3 bg-agro-surface rounded-xl border border-agro-border">
+                <span className="text-4xl font-extrabold text-agro-cream font-mono">{riskResult.risk_score}</span>
+                <span className="text-xs text-agro-muted block mt-0.5">
                   {lang === 'mr' ? '१०० पैकी जोखीम गुण' : 'out of 100 Risk Score'}
                 </span>
               </div>
 
               {/* Scientific "Explain WHY" Breakdown */}
-              <div className="bg-slate-900/80 p-4 rounded-xl border border-slate-800 space-y-2">
-                <div className="flex items-center space-x-1.5 text-xs font-bold text-agri-400 border-b border-slate-800 pb-2">
+              <div className="bg-agro-surface p-4 rounded-xl border border-agro-border space-y-2">
+                <div className="flex items-center space-x-1.5 text-xs font-bold text-agro-primary border-b border-agro-border pb-2">
                   <HelpCircle className="w-4 h-4" />
                   <span>{t('weather.why_this_risk') || 'Scientific Breakdown — Explain WHY'}</span>
                 </div>
-                <ul className="space-y-2 text-xs text-slate-300 pt-1">
+                <ul className="space-y-2 text-xs text-agro-cream/90 pt-1">
                   {(riskResult.contributing_factors || []).map((f, i) => (
                     <li key={i} className="flex items-start space-x-2 leading-relaxed">
-                      <span className="text-agri-400 font-bold shrink-0">•</span>
+                      <span className="text-agro-primary font-bold shrink-0">•</span>
                       <span>{f}</span>
                     </li>
                   ))}
                 </ul>
               </div>
 
-              <p className="text-xs text-amber-200 bg-amber-500/10 p-3.5 rounded-xl border border-amber-500/20 leading-relaxed font-medium">
+              <div className="text-xs text-agro-amber bg-agro-amber/10 p-3.5 rounded-xl border border-agro-amber/30 leading-relaxed font-medium">
                 {riskResult.advice}
-              </p>
+              </div>
             </div>
           ) : (
-            <div className="text-center py-16 text-slate-500 text-xs">
+            <div className="text-center py-16 text-agro-muted text-xs">
               {lang === 'mr' 
                 ? 'पीक निवडा, हवामान घटक समायोजित करा आणि रोग प्रादुर्भावाचा वैज्ञानिक अंदाज पाहण्यासाठी "रोग प्रादुर्भाव धोका तपासा" वर क्लिक करा.'
                 : 'Select a crop, adjust parameters, and click "Calculate Outbreak Risk" to view scientific pathogen transmission forecasts.'
@@ -294,7 +306,7 @@ export const WeatherRiskPage = () => {
             </div>
           )}
 
-          <p className="text-[11px] text-slate-500 italic pt-3 border-t border-slate-800">
+          <p className="text-[11px] text-agro-muted/70 italic pt-3 border-t border-agro-border">
             {lang === 'mr'
               ? 'टीप: तापमान, सापेक्ष आर्द्रता आणि पाऊस या घटकांवर आधारित पारदर्शक ७-टप्प्यांची मूल्यांकन प्रणाली.'
               : 'Note: Transparent 7-stage risk evaluation pipeline based on temperature, relative humidity, and rainfall germination thresholds.'

@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { CameraPreview } from './CameraPreview';
 import { ImagePreview } from './ImagePreview';
 import { CameraError } from './CameraError';
-import { Camera, Upload, Smartphone } from 'lucide-react';
+import { Camera, Upload, Smartphone, ScanLine, SunMedium, Maximize2 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 
 export const CameraScanner = ({ onImageCaptured, onFallbackUpload, isAnalyzing }) => {
@@ -34,7 +34,7 @@ export const CameraScanner = ({ onImageCaptured, onFallbackUpload, isAnalyzing }
     }
   };
 
-  // Handle native camera or file input capture (works 100% on any mobile or desktop browser)
+  // Handle native camera or file input capture
   const handleNativeFileChange = (e) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -71,7 +71,7 @@ export const CameraScanner = ({ onImageCaptured, onFallbackUpload, isAnalyzing }
     };
   }, [stream]);
 
-  // Start browser camera stream with progressive fallback for mobile and low-spec webcams
+  // Start browser camera stream
   const startCamera = async (targetFacingMode = facingMode) => {
     setErrorInfo(null);
     stopCameraStream();
@@ -79,14 +79,13 @@ export const CameraScanner = ({ onImageCaptured, onFallbackUpload, isAnalyzing }
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
       setErrorInfo({
         type: 'NotSupported',
-        message: 'Live browser viewfinder requires HTTPS or localhost. Tap "Use Device Camera" below to use your native phone/laptop camera.'
+        message: 'Live browser viewfinder requires HTTPS or camera permission. Tap "Use Device Camera" below.'
       });
       return;
     }
 
     let mediaStream = null;
 
-    // Attempt 1: High-definition ideal rear camera
     try {
       mediaStream = await navigator.mediaDevices.getUserMedia({
         video: {
@@ -97,14 +96,12 @@ export const CameraScanner = ({ onImageCaptured, onFallbackUpload, isAnalyzing }
         audio: false
       });
     } catch (err1) {
-      // Attempt 2: Flexible basic constraint (guaranteed to work across older phones & tablets)
       try {
         mediaStream = await navigator.mediaDevices.getUserMedia({
           video: { facingMode: targetFacingMode },
           audio: false
         });
       } catch (err2) {
-        // Attempt 3: Any video device available
         try {
           mediaStream = await navigator.mediaDevices.getUserMedia({
             video: true,
@@ -112,9 +109,9 @@ export const CameraScanner = ({ onImageCaptured, onFallbackUpload, isAnalyzing }
           });
         } catch (err3) {
           console.error('All camera access attempts failed:', err3);
-          let msg = 'Failed to open camera.';
+          let msg = 'Failed to access camera.';
           if (err3.name === 'NotAllowedError' || err3.name === 'PermissionDeniedError') {
-            msg = t('scan.camera_denied') || 'Camera permission was denied. Please grant camera access in browser settings or tap "Use Device Camera" below.';
+            msg = t('scan.camera_denied') || 'Camera permission was denied. Please grant camera access in browser settings or use the upload tab.';
           } else if (err3.name === 'NotFoundError' || err3.name === 'DevicesNotFoundError') {
             msg = 'No camera found on this device.';
           } else if (err3.name === 'NotReadableError' || err3.name === 'TrackStartError') {
@@ -138,13 +135,11 @@ export const CameraScanner = ({ onImageCaptured, onFallbackUpload, isAnalyzing }
     }
   };
 
-  // Switch between Rear/Front Camera
   const handleSwitchCamera = () => {
     const nextMode = facingMode === 'environment' ? 'user' : 'environment';
     startCamera(nextMode);
   };
 
-  // Capture canvas snapshot frame from video feed
   const handleCapturePhoto = () => {
     if (!videoRef.current) return;
     const video = videoRef.current;
@@ -171,26 +166,22 @@ export const CameraScanner = ({ onImageCaptured, onFallbackUpload, isAnalyzing }
       }
     }, 'image/jpeg', 0.92);
 
-    // Stop live stream after capture
     stopCameraStream();
     setIsCameraActive(false);
   };
 
-  // Retake photo
   const handleRetake = () => {
     setCapturedDataUrl(null);
     setCapturedFile(null);
     startCamera(facingMode);
   };
 
-  // Close camera modal / inline view
   const handleCloseCamera = () => {
     stopCameraStream();
     setIsCameraActive(false);
     setErrorInfo(null);
   };
 
-  // Confirm photo usage and start analysis
   const handleUsePhoto = () => {
     if (!capturedDataUrl) return;
     let target = capturedFile;
@@ -204,7 +195,7 @@ export const CameraScanner = ({ onImageCaptured, onFallbackUpload, isAnalyzing }
 
   return (
     <div className="w-full space-y-4">
-      {/* Hidden Native Device Camera Input (100% works on Android, iOS Safari, Windows, Mac) */}
+      {/* Hidden Native Device Camera Input */}
       <input
         ref={nativeCameraInputRef}
         type="file"
@@ -214,7 +205,7 @@ export const CameraScanner = ({ onImageCaptured, onFallbackUpload, isAnalyzing }
         onChange={handleNativeFileChange}
       />
 
-      {/* 1. Camera Error Display with Direct Native Trigger */}
+      {/* 1. Camera Error Display */}
       {errorInfo && (
         <CameraError
           errorType={errorInfo.type}
@@ -225,7 +216,7 @@ export const CameraScanner = ({ onImageCaptured, onFallbackUpload, isAnalyzing }
         />
       )}
 
-      {/* 2. Captured Image Preview & AI Confirmation */}
+      {/* 2. Captured Image Preview */}
       {capturedDataUrl && !isCameraActive && (
         <ImagePreview
           imageUrl={capturedDataUrl}
@@ -249,44 +240,58 @@ export const CameraScanner = ({ onImageCaptured, onFallbackUpload, isAnalyzing }
 
       {/* 4. Primary Standby Camera Action Card */}
       {!isCameraActive && !capturedDataUrl && !errorInfo && (
-        <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-emerald-950/40 via-slate-900 to-slate-950 border border-emerald-500/30 text-center space-y-4 shadow-2xl">
-          <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto shadow-inner">
-            <Camera className="w-8 h-8" />
+        <div className="p-6 sm:p-8 rounded-3xl bg-agro-card border border-agro-border text-center space-y-5 shadow-xl">
+          <div className="w-16 h-16 rounded-2xl bg-agro-primary/10 border border-agro-primary/25 text-agro-primary flex items-center justify-center mx-auto shadow-sm">
+            <Camera className="w-8 h-8" aria-hidden="true" />
           </div>
 
           <div className="space-y-1">
-            <h3 className="text-lg font-extrabold text-slate-100">{t('scan.title') || 'Live Camera Leaf Scanner'}</h3>
-            <p className="text-xs text-slate-400 max-w-md mx-auto">
-              {t('scan.subtitle') || 'Capture a clear photo of the plant leaf using your phone camera or laptop webcam for instant identification and health analysis.'}
+            <h3 className="text-lg font-extrabold text-agro-cream">
+              {t('scan.camera_card_title') || 'Capture a Clear Leaf Photograph'}
+            </h3>
+            <p className="text-xs text-agro-muted max-w-md mx-auto leading-relaxed">
+              {t('scan.camera_card_description') || 'Position the camera 10–20 cm above the affected leaf in bright, even daylight.'}
             </p>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
+          <div className="grid grid-cols-3 gap-2.5 rounded-2xl border border-agro-border bg-agro-surface/60 p-3.5 text-left max-w-lg mx-auto">
+            <div className="min-w-0">
+              <SunMedium className="mb-1 h-4 w-4 text-agro-lime" aria-hidden="true" />
+              <span className="block text-[11px] font-semibold text-agro-cream">
+                {t('scan.tip_light_short') || 'Even Daylight'}
+              </span>
+            </div>
+            <div className="min-w-0">
+              <ScanLine className="mb-1 h-4 w-4 text-agro-lime" aria-hidden="true" />
+              <span className="block text-[11px] font-semibold text-agro-cream">
+                {t('scan.tip_sharp_short') || 'Sharp Focus'}
+              </span>
+            </div>
+            <div className="min-w-0">
+              <Maximize2 className="mb-1 h-4 w-4 text-agro-lime" aria-hidden="true" />
+              <span className="block text-[11px] font-semibold text-agro-cream">
+                {t('scan.tip_frame_short') || 'Fills Frame'}
+              </span>
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2 max-w-md mx-auto">
             <button
               type="button"
               onClick={() => startCamera('environment')}
-              className="px-6 py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs uppercase tracking-wider transition shadow-lg shadow-emerald-500/30 flex items-center justify-center space-x-2"
+              className="flex-1 px-6 py-3.5 rounded-xl bg-agro-primary hover:bg-agro-primaryHover text-agro-bg font-extrabold text-xs transition shadow-md shadow-agro-primary/25 flex items-center justify-center gap-2 active:scale-[0.98]"
             >
-              <Camera className="w-4 h-4" />
-              <span>{t('scan.camera_start') || 'Open Camera Scanner'}</span>
+              <Camera className="w-4 h-4" aria-hidden="true" />
+              <span>{t('scan.camera_start') || 'Open Live Camera'}</span>
             </button>
 
             <button
               type="button"
               onClick={triggerNativeCamera}
-              className="px-5 py-3.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-300 font-bold text-xs border border-emerald-500/30 transition flex items-center justify-center space-x-2 shadow-sm"
+              className="px-5 py-3.5 rounded-xl bg-agro-surface hover:bg-agro-hover text-agro-cream font-bold text-xs border border-agro-border transition flex items-center justify-center gap-2 active:scale-[0.98]"
             >
-              <Smartphone className="w-4 h-4 text-emerald-400" />
+              <Smartphone className="w-4 h-4 text-agro-lime" aria-hidden="true" />
               <span>Use Device Camera</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={onFallbackUpload}
-              className="px-5 py-3.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs border border-slate-700 transition flex items-center justify-center space-x-2"
-            >
-              <Upload className="w-4 h-4" />
-              <span>{t('scan.tab_upload') || 'Upload Photo'}</span>
             </button>
           </div>
         </div>

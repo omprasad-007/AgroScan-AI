@@ -163,8 +163,14 @@ class ResultNormalizer:
             "confidence": round(confidence, 4),
             "model_score": round(confidence, 4),
             "calibration_status": "CALIBRATED_TEMPERATURE_SCALED",
-            "model_name": "MobileNetV2 (PlantVillage v1.1)",
-            "model_revision": "v1.1",
+            "model_name": (
+                model_predictions[0].get("model_name", "DINOv2 Small Vision Transformer (PlantVillage)")
+                if model_predictions else "DINOv2 Small Vision Transformer (PlantVillage)"
+            ),
+            "model_revision": (
+                model_predictions[0].get("model_revision", "06ebf5e308e100fd000d738c42b059ebb5f58a16")
+                if model_predictions else "06ebf5e308e100fd000d738c42b059ebb5f58a16"
+            ),
             "prediction_confidence": round(confidence, 4),
             "confidence_interpretation": (
                 "HIGH_CONFIDENCE" if confidence >= 0.70

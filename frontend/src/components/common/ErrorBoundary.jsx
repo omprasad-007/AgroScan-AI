@@ -1,4 +1,5 @@
 import React from 'react';
+import { AlertTriangle, RotateCcw, Home } from 'lucide-react';
 
 export class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -36,47 +37,41 @@ export class ErrorBoundary extends React.Component {
       const isMarathi = typeof window !== 'undefined' && localStorage.getItem('agroscan_language') === 'mr';
 
       return (
-        <div className="min-h-screen flex items-center justify-center bg-slate-950 p-6 text-slate-100 font-sans">
-          <div className="max-w-md w-full bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-2xl text-center space-y-6">
-            <div className="w-16 h-16 bg-red-500/10 border border-red-500/20 rounded-full flex items-center justify-center mx-auto text-red-400">
-              <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-              </svg>
+        <div className="min-h-screen flex items-center justify-center bg-agro-bg p-6 text-agro-cream font-sans">
+          <div className="max-w-md w-full bg-agro-card border border-agro-border rounded-3xl p-6 sm:p-8 shadow-2xl text-center space-y-6">
+            <div className="w-16 h-16 bg-agro-terracotta/15 border border-agro-terracotta/30 rounded-2xl flex items-center justify-center mx-auto text-agro-terracotta">
+              <AlertTriangle className="w-8 h-8" aria-hidden="true" />
             </div>
             
-            <div>
-              <h2 className="text-xl font-bold text-slate-100">
-                {isMarathi ? 'सत्र सुरक्षितपणे पुनर्प्राप्त केले' : 'Session Recovered'}
-              </h2>
-              <p className="text-slate-400 text-xs sm:text-sm mt-2">
+            <div className="space-y-2">
+              <h1 className="text-xl font-extrabold text-agro-cream">
+                {isMarathi ? 'सत्र सुरक्षितपणे पुनर्प्राप्त केले' : 'Interface Recovery'}
+              </h1>
+              <p className="text-agro-muted text-xs sm:text-sm leading-relaxed">
                 {isMarathi
                   ? 'AgroScan AI ने ॲप्लिकेशन सुरक्षित ठेवले आहे. पुन्हा लोड करण्यासाठी खालील बटण दाबा.'
-                  : 'AgroScan AI protected your application from a session error. Tap below to reload or reset session.'
+                  : 'AgroScan AI encountered a render notice. You can safely reload or return to the dashboard.'
                 }
               </p>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
               <button
-                onClick={this.handleReset}
-                className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-xl transition border border-slate-700"
-              >
-                {isMarathi ? 'पुन्हा प्रयत्न करा' : 'Try Again'}
-              </button>
-              <button
+                type="button"
                 onClick={this.handleReload}
-                className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl transition shadow-lg shadow-emerald-900/30"
+                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-agro-primary hover:bg-agro-primaryHover text-agro-bg text-xs font-bold transition shadow-md"
               >
-                {isMarathi ? 'ॲप पुन्हा लोड करा' : 'Reload App'}
+                <RotateCcw className="w-3.5 h-3.5" aria-hidden="true" />
+                <span>{isMarathi ? 'पुन्हा लोड करा' : 'Reload Page'}</span>
               </button>
-            </div>
-
-            <div className="pt-2 border-t border-slate-800">
+              
               <button
+                type="button"
                 onClick={this.handleClearStorage}
-                className="text-xs text-slate-400 hover:text-red-400 underline transition"
+                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-agro-surface hover:bg-agro-hover border border-agro-border text-agro-muted hover:text-agro-cream text-xs font-semibold transition"
               >
-                {isMarathi ? 'कॅशे साफ करा आणि रीसेट करा' : 'Clear Cache & Reset Session'}
+                <Home className="w-3.5 h-3.5" aria-hidden="true" />
+                <span>{isMarathi ? 'मुख्यपृष्ठावर जा' : 'Reset to Home'}</span>
               </button>
             </div>
           </div>

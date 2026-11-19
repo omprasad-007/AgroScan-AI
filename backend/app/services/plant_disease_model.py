@@ -63,12 +63,30 @@ logger = logging.getLogger("agroscan.model")
 
 # Standard paths
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-LOCAL_MODEL_DIR = os.path.join(BASE_DIR, "backend", "models", "plantvillage-mobilenetv2")
-if not os.path.exists(LOCAL_MODEL_DIR):
-    # Fallback if working directory is already inside backend/
-    ALT_DIR = os.path.join(BASE_DIR, "models", "plantvillage-mobilenetv2")
-    if os.path.exists(ALT_DIR):
-        LOCAL_MODEL_DIR = ALT_DIR
+
+# Candidate model directories (DINOv2 has priority for real-world field accuracy; MobileNetV2 fallback)
+DINO_DIR = os.path.join(BASE_DIR, "backend", "models", "plant-disease-dinov2-small")
+if not os.path.exists(DINO_DIR):
+    DINO_DIR = os.path.join(BASE_DIR, "models", "plant-disease-dinov2-small")
+
+MOBILENET_DIR = os.path.join(BASE_DIR, "backend", "models", "plantvillage-mobilenetv2")
+if not os.path.exists(MOBILENET_DIR):
+    MOBILENET_DIR = os.path.join(BASE_DIR, "models", "plantvillage-mobilenetv2")
+
+if os.path.exists(os.path.join(DINO_DIR, "model.safetensors")):
+    LOCAL_MODEL_DIR = DINO_DIR
+    DEFAULT_MODEL_NAME = "DINOv2 Small Vision Transformer (PlantVillage)"
+    DEFAULT_MODEL_REVISION = "06ebf5e308e100fd000d738c42b059ebb5f58a16"
+    DEFAULT_COMMIT_SHA = "06ebf5e308e100fd000d738c42b059ebb5f58a16"
+    DEFAULT_TEMPERATURE = 1.0
+    DEFAULT_REPO_ID = "rodynaemad/plant-disease-dinov2-small"
+else:
+    LOCAL_MODEL_DIR = MOBILENET_DIR
+    DEFAULT_MODEL_NAME = "MobileNetV2 (PlantVillage v1.1)"
+    DEFAULT_MODEL_REVISION = "v1.1"
+    DEFAULT_COMMIT_SHA = "77e6d262dca53b818f7ad1d67088700754515639"
+    DEFAULT_TEMPERATURE = 0.8845188130635788
+    DEFAULT_REPO_ID = "neghani/plantvillage-mobilenetv2"
 
 MANIFEST_PATH = os.path.join(os.path.dirname(LOCAL_MODEL_DIR), "model_manifest.json")
 
@@ -103,9 +121,9 @@ class ModelPredictionResult(BaseModel):
     uncertainty_note: Optional[str] = None
     crop_support_status: str
     latency_ms: float
-    model_name: str = "MobileNetV2 (PlantVillage v1.1)"
-    model_revision: str = "v1.1"
-    commit_sha: str = "77e6d262dca53b818f7ad1d67088700754515639"
+    model_name: str = DEFAULT_MODEL_NAME
+    model_revision: str = DEFAULT_MODEL_REVISION
+    commit_sha: str = DEFAULT_COMMIT_SHA
     device: str = "cpu"
 
 
@@ -134,12 +152,16 @@ class PlantDiseaseModelService:
         self.processor = None
         self.id2label: Dict[str, str] = {}
         self.label2id: Dict[str, int] = {}
-        self.temperature: float = 0.8845188130635788  # From calibration.json
-        self.threshold: float = 0.50                  # From threshold.json
+        self.temperature: float = DEFAULT_TEMPERATURE
+        self.threshold: float = 0.50
         self.manifest: Dict[str, Any] = {}
         self.is_loaded: bool = False
         self.load_error: Optional[str] = None
         self.load_duration_ms: float = 0.0
+        self.model_name: str = DEFAULT_MODEL_NAME
+        self.model_revision: str = DEFAULT_MODEL_REVISION
+        self.commit_sha: str = DEFAULT_COMMIT_SHA
+        self.repo_id: str = DEFAULT_REPO_ID
 
         # Attempt safe initial loading (loads JSON metadata only, zero torch dependency)
         self._load_metadata()
@@ -402,11 +424,14 @@ class PlantDiseaseModelService:
                     is_healthy=False,
                     is_uncertain=True,
                     uncertainty_note=(
-                        f"Crop '{target_crop.capitalize()}' is not present in MobileNetV2 PlantVillage weights. "
+                        f"Crop '{target_crop.capitalize()}' is not present in local {self.model_name} PlantVillage weights. "
                         f"AgroScan AI avoids coercing unsupported crops into nearest visual matches."
                     ),
                     crop_support_status=CropSupportStatus.UNSUPPORTED.value,
                     latency_ms=latency,
+                    model_name=self.model_name,
+                    model_revision=self.model_revision,
+                    commit_sha=self.commit_sha,
                     device=str(self.device)
                 )
 
@@ -441,24 +466,30 @@ class PlantDiseaseModelService:
             uncertainty_note=uncertainty_note,
             crop_support_status=crop_support_status,
             latency_ms=latency,
+            model_name=self.model_name,
+            model_revision=self.model_revision,
+            commit_sha=self.commit_sha,
             device=str(self.device)
         )
 
     def get_model_metadata(self) -> Dict[str, Any]:
         """Returns verified model metadata, architecture, revision, and parameters."""
         num_params = sum(p.numel() for p in self.model.parameters()) if self.model else 2272550
+        safetensors_path = os.path.join(self.model_dir, "model.safetensors")
+        weights_size = os.path.getsize(safetensors_path) if os.path.exists(safetensors_path) else 88365280
+        arch_name = self.model.__class__.__name__ if self.model else ("Dinov2ForImageClassification" if "dinov2" in self.model_dir else "MobileNetV2ForImageClassification")
         return {
-            "repository_id": "neghani/plantvillage-mobilenetv2",
-            "model_name": "MobileNetV2 (PlantVillage v1.1)",
-            "architecture": "MobileNetV2ForImageClassification",
-            "base_model": "google/mobilenet_v2_1.0_224",
+            "repository_id": self.repo_id,
+            "model_name": self.model_name,
+            "architecture": arch_name,
+            "base_model": "facebook/dinov2-small" if "dinov2" in self.model_dir else "google/mobilenet_v2_1.0_224",
             "task": "image-classification",
-            "revision": "v1.1",
-            "immutable_commit_sha": "77e6d262dca53b818f7ad1d67088700754515639",
-            "license": "Apache-2.0",
+            "revision": self.model_revision,
+            "immutable_commit_sha": self.commit_sha,
+            "license": "CC-BY-SA-4.0" if "dinov2" in self.model_dir else "Apache-2.0",
             "local_dir": self.model_dir,
             "weights_format": "safetensors",
-            "weights_size_bytes": 9264680,
+            "weights_size_bytes": weights_size,
             "num_parameters": num_params,
             "num_classes": len(self.id2label) if self.id2label else 38,
             "crops_covered_count": 14,

@@ -127,13 +127,18 @@ class HuggingFaceInferenceService:
 
         top_pred = candidates[0]
 
+        is_dino = "dinov2" in chosen_model_id
+        display_model_name = "DINOv2 Small Vision Transformer (PlantVillage)" if is_dino else "MobileNetV2 (PlantVillage v1.1)"
+        display_revision = "06ebf5e308e100fd000d738c42b059ebb5f58a16" if is_dino else "v1.1"
+        display_sha = "06ebf5e308e100fd000d738c42b059ebb5f58a16" if is_dino else "77e6d262dca53b818f7ad1d67088700754515639"
+
         return {
             "status": "success",
-            "provider_name": "AgroScan Local Hugging Face Engine",
+            "provider_name": "AgroScan Local Vision Engine",
             "model_id": chosen_model_id,
-            "model_name": "MobileNetV2 (PlantVillage v1.1)",
-            "model_revision": "v1.1",
-            "commit_sha": "77e6d262dca53b818f7ad1d67088700754515639",
+            "model_name": display_model_name,
+            "model_revision": display_revision,
+            "commit_sha": display_sha,
             "device": str(device),
             "crop": top_pred["crop"],
             "disease_name": top_pred["disease_name"],

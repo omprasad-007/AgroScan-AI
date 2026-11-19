@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Bot, Send, Download, Sparkles } from 'lucide-react';
+import { Bot, Send, Download, Sparkles, BookOpen } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import api from '../../services/api';
 
@@ -173,22 +173,22 @@ export const AIAssistantPanel = ({ scanData, predictionId, autoOpen = true }) =>
   };
 
   return (
-    <div className="glass-panel rounded-2xl border border-slate-800 shadow-2xl overflow-hidden flex flex-col">
+    <div className="agro-panel rounded-2xl border border-agro-border shadow-2xl overflow-hidden flex flex-col">
       
       {/* Panel Header */}
-      <div className="bg-slate-900/90 border-b border-slate-800 p-4 flex items-center justify-between">
+      <div className="bg-agro-surface/90 border-b border-agro-border p-4 flex items-center justify-between">
         <div className="flex items-center space-x-2.5">
-          <div className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30">
+          <div className="w-8 h-8 rounded-lg bg-agro-primary/20 text-agro-primary flex items-center justify-center border border-agro-primary/30">
             <Bot className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="text-sm font-bold text-white flex items-center space-x-2">
+            <h3 className="text-sm font-bold text-agro-cream flex items-center space-x-2">
               <span>{t('assistant.title') || 'AgroScan AI Agronomist'}</span>
-              <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 text-[10px] uppercase font-bold">
+              <span className="px-2 py-0.5 rounded-full bg-agro-primary/10 text-agro-primary text-[10px] uppercase font-bold border border-agro-primary/20">
                 {lang === 'mr' ? 'थेट AI' : 'Live AI'}
               </span>
             </h3>
-            <p className="text-[11px] text-slate-400">
+            <p className="text-[11px] text-agro-muted">
               {lang === 'mr' ? 'भारतीय शेतकऱ्यांसाठी संदर्भयुक्त कृषी मार्गदर्शन' : 'Contextual guidance for Indian smallholder farmers'}
             </p>
           </div>
@@ -200,26 +200,26 @@ export const AIAssistantPanel = ({ scanData, predictionId, autoOpen = true }) =>
             type="button"
             onClick={handleExportChat}
             disabled={messages.length === 0}
-            className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold border border-slate-700 flex items-center space-x-1.5 transition disabled:opacity-50"
+            className="px-3 py-1.5 rounded-lg bg-agro-surface hover:bg-agro-hover text-agro-cream text-xs font-bold border border-agro-border flex items-center space-x-1.5 transition disabled:opacity-50"
             title="Export full chat transcript as Markdown (.md)"
           >
-            <Download className="w-3.5 h-3.5 text-emerald-400" />
+            <Download className="w-3.5 h-3.5 text-agro-primary" />
             <span>{lang === 'mr' ? 'संवाद जतन करा' : 'Export Chat'}</span>
           </button>
 
           {/* Language Toggle */}
-          <div className="flex bg-slate-950 rounded-lg p-1 border border-slate-800 text-[11px] font-bold">
+          <div className="flex bg-agro-bg rounded-lg p-1 border border-agro-border text-[11px] font-bold">
             <button
               type="button"
               onClick={() => setLang('en')}
-              className={`px-2 py-0.5 rounded transition ${lang === 'en' ? 'bg-emerald-500 text-slate-950 font-bold' : 'text-slate-400'}`}
+              className={`px-2 py-0.5 rounded transition ${lang === 'en' ? 'bg-agro-primary text-agro-bg font-bold' : 'text-agro-muted hover:text-agro-cream'}`}
             >
               EN
             </button>
             <button
               type="button"
               onClick={() => setLang('mr')}
-              className={`px-2 py-0.5 rounded transition ${lang === 'mr' ? 'bg-emerald-500 text-slate-950 font-bold' : 'text-slate-400'}`}
+              className={`px-2 py-0.5 rounded transition ${lang === 'mr' ? 'bg-agro-primary text-agro-bg font-bold' : 'text-agro-muted hover:text-agro-cream'}`}
             >
               मराठी
             </button>
@@ -228,11 +228,11 @@ export const AIAssistantPanel = ({ scanData, predictionId, autoOpen = true }) =>
       </div>
 
       {/* Messages Feed */}
-      <div className="p-4 space-y-4 max-h-96 overflow-y-auto bg-slate-950/40">
+      <div className="p-4 space-y-4 max-h-96 overflow-y-auto bg-agro-bg/50">
         {messages.map((msg, i) => (
           <div key={i} className={`flex gap-3 max-w-[90%] ${msg.sender === 'user' ? 'ml-auto justify-end' : ''}`}>
             {msg.sender === 'assistant' && (
-              <div className="w-7 h-7 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-500/30">
+              <div className="w-7 h-7 rounded-full bg-agro-primary/20 text-agro-primary flex items-center justify-center shrink-0 border border-agro-primary/30">
                 <Bot className="w-4 h-4" />
               </div>
             )}
@@ -240,17 +240,17 @@ export const AIAssistantPanel = ({ scanData, predictionId, autoOpen = true }) =>
               <div
                 className={`p-3.5 rounded-2xl text-xs sm:text-sm leading-relaxed ${
                   msg.sender === 'user'
-                    ? 'bg-emerald-500 text-slate-950 font-semibold rounded-tr-none'
-                    : 'bg-slate-900 border border-slate-800 text-slate-200 rounded-tl-none'
+                    ? 'bg-agro-primary text-agro-bg font-semibold rounded-tr-none shadow-md shadow-agro-primary/15'
+                    : 'bg-agro-card border border-agro-border text-agro-cream rounded-tl-none'
                 }`}
               >
                 <p className="whitespace-pre-wrap">{msg.content}</p>
 
                 {/* Multi-Source Research Citations */}
                 {msg.sender === 'assistant' && msg.sources && msg.sources.length > 0 && (
-                  <div className="mt-2.5 pt-2 border-t border-slate-800 space-y-1.5">
-                    <span className="text-[10px] font-bold text-emerald-400 flex items-center gap-1">
-                      <span>📚</span>
+                  <div className="mt-2.5 pt-2 border-t border-agro-border space-y-1.5">
+                    <span className="text-[10px] font-bold text-agro-primary flex items-center gap-1.5">
+                      <BookOpen className="w-3 h-3" />
                       <span>{lang === 'mr' ? 'तपासलेले संदर्भ (Sources):' : 'Verified Evidence & Sources:'}</span>
                     </span>
                     <div className="flex flex-col gap-1">
@@ -260,7 +260,7 @@ export const AIAssistantPanel = ({ scanData, predictionId, autoOpen = true }) =>
                           href={src.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-[10px] text-slate-400 hover:text-emerald-300 underline truncate"
+                          className="text-[10px] text-agro-muted hover:text-agro-primary underline truncate transition"
                         >
                           • [{src.source}] {src.title}
                         </a>
@@ -273,7 +273,7 @@ export const AIAssistantPanel = ({ scanData, predictionId, autoOpen = true }) =>
           </div>
         ))}
         {loading && (
-          <div className="flex items-center space-x-2 text-xs text-emerald-400 font-semibold animate-pulse">
+          <div className="flex items-center space-x-2 text-xs text-agro-primary font-semibold animate-pulse">
             <Sparkles className="w-4 h-4 animate-spin" />
             <span>{t('assistant.thinking') || 'Thinking...'}</span>
           </div>
@@ -282,14 +282,14 @@ export const AIAssistantPanel = ({ scanData, predictionId, autoOpen = true }) =>
       </div>
 
       {/* Quick Replies & Input */}
-      <div className="p-3 bg-slate-900 border-t border-slate-800 space-y-2">
+      <div className="p-3 bg-agro-surface border-t border-agro-border space-y-2">
         <div className="flex overflow-x-auto gap-2 pb-1 hide-scrollbar">
           {getQuickReplies().map((qr, idx) => (
             <button
               key={idx}
               type="button"
               onClick={() => handleSendMessage(qr)}
-              className="whitespace-nowrap px-3 py-1 bg-slate-950 border border-slate-800 rounded-full text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition shrink-0"
+              className="whitespace-nowrap px-3 py-1 bg-agro-bg border border-agro-border rounded-full text-xs font-medium text-agro-muted hover:bg-agro-hover hover:text-agro-cream transition shrink-0"
             >
               {qr}
             </button>
@@ -302,12 +302,12 @@ export const AIAssistantPanel = ({ scanData, predictionId, autoOpen = true }) =>
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder={t('assistant.placeholder_input') || (lang === 'mr' ? "पिकांबद्दल काहीही विचारा..." : "Ask AgroScan AI about crop care, dosage, or remedies...")}
-            className="flex-1 h-10 px-3.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none focus:border-emerald-500 placeholder:text-slate-500"
+            className="flex-1 h-10 px-3.5 rounded-xl bg-agro-bg border border-agro-border text-xs text-agro-cream focus:outline-none focus:border-agro-primary focus:ring-1 focus:ring-agro-primary placeholder:text-agro-muted/60 transition"
           />
           <button
             type="submit"
             disabled={!input.trim() || loading}
-            className="px-4 h-10 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs flex items-center justify-center shrink-0 disabled:opacity-50"
+            className="px-4 h-10 rounded-xl bg-agro-primary hover:bg-agro-primary-hover text-agro-bg font-bold text-xs flex items-center justify-center shrink-0 disabled:opacity-50 transition shadow-md shadow-agro-primary/20"
           >
             <Send className="w-4 h-4" />
           </button>

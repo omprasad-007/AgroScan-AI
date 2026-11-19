@@ -8,9 +8,9 @@ export const ProtectedRoute = ({ children, adminOnly = false }) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-950 text-slate-100 p-4">
-        <Loader2 className="w-10 h-10 text-primary animate-spin mb-3" />
-        <p className="text-xs font-semibold text-slate-400">Synchronizing authentication session...</p>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-agro-bg text-agro-cream p-4">
+        <Loader2 className="w-10 h-10 text-agro-primary animate-spin mb-3" aria-hidden="true" />
+        <p className="text-xs font-semibold text-agro-muted">Synchronizing farmer workspace...</p>
       </div>
     );
   }

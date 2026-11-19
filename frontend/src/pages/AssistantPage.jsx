@@ -14,7 +14,7 @@ const FARMER_FAQ_CATEGORIES = {
   mr: [
     {
       id: 'disease',
-      label: '🌿 रोग व उपचार',
+      label: 'रोग व उपचार',
       questions: [
         'करपा (Blight) रोगावर कोणती फवारणी करावी?',
         'पानांवरील पिवळे व काळे डाग कसे दूर करावेत?',
@@ -24,7 +24,7 @@ const FARMER_FAQ_CATEGORIES = {
     },
     {
       id: 'organic',
-      label: '🧪 सेंद्रिय कीटकनाशक',
+      label: 'सेंद्रिय कीटकनाशक',
       questions: [
         'निंबोळी अर्क (Neem Oil) फवारणीचे योग्य प्रमाण किती?',
         'दशपर्णी अर्क घरच्या घरी कसा तयार करावा?',
@@ -34,7 +34,7 @@ const FARMER_FAQ_CATEGORIES = {
     },
     {
       id: 'irrigation',
-      label: '💧 पाणी व खते',
+      label: 'पाणी व खते',
       questions: [
         'पिकाला ठिबक सिंचनाने पाणी देण्याचे योग्य वेळापत्रक काय?',
         'उत्पादन वाढवण्यासाठी कोणती सेंद्रिय खते उत्तम?',
@@ -44,7 +44,7 @@ const FARMER_FAQ_CATEGORIES = {
     },
     {
       id: 'pests',
-      label: '🌦️ कीड व हवामान',
+      label: 'कीड व हवामान',
       questions: [
         'ढगाळ व दमट हवामानात बुरशीचा प्रादुर्भाव कसा टाळावा?',
         'पांढरी माशी आणि मावा किडीवर त्वरित सेंद्रिय उपाय काय?',
@@ -56,7 +56,7 @@ const FARMER_FAQ_CATEGORIES = {
   en: [
     {
       id: 'disease',
-      label: '🌿 Disease & Cure',
+      label: 'Disease & Cure',
       questions: [
         'What is the best treatment for early/late blight?',
         'How to cure yellow and black spots on leaves?',
@@ -66,7 +66,7 @@ const FARMER_FAQ_CATEGORIES = {
     },
     {
       id: 'organic',
-      label: '🧪 Organic Sprays',
+      label: 'Organic Sprays',
       questions: [
         'What is the correct dosage for Neem Oil spray (ppm)?',
         'How to prepare homemade Dashaparni bio-pesticide?',
@@ -76,7 +76,7 @@ const FARMER_FAQ_CATEGORIES = {
     },
     {
       id: 'irrigation',
-      label: '💧 Water & Nutrition',
+      label: 'Water & Nutrition',
       questions: [
         'What is the optimal drip irrigation schedule for this crop?',
         'Which organic fertilizers boost flowering and yield?',
@@ -86,7 +86,7 @@ const FARMER_FAQ_CATEGORIES = {
     },
     {
       id: 'pests',
-      label: '🌦️ Weather & Pests',
+      label: 'Weather & Pests',
       questions: [
         'How to protect crops against fungal outbreaks during high humidity?',
         'What is the quickest organic remedy for aphids & whiteflies?',
@@ -727,28 +727,28 @@ export const AssistantPage = () => {
   const currentCategoryObj = activeCategories.find(c => c.id === activeFaqTab) || activeCategories[0];
 
   return (
-    <div className="max-w-4xl mx-auto flex flex-col h-[calc(100vh-5.5rem)] relative overflow-hidden glass-panel rounded-2xl border border-slate-800 shadow-2xl bg-slate-950/60">
+    <div className="max-w-4xl mx-auto flex flex-col h-[calc(100vh-5.5rem)] relative overflow-hidden agro-panel rounded-2xl border border-agro-border shadow-2xl">
       
       {/* Context Header */}
-      <div className="bg-slate-900/95 border-b border-slate-800 p-3.5 shrink-0 shadow-md z-10 space-y-2.5">
+      <div className="bg-agro-surface/95 border-b border-agro-border p-3.5 shrink-0 shadow-md z-10 space-y-2.5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
           <div className="flex items-center space-x-2.5">
-            <div className="w-8 h-8 rounded-xl bg-agri-500/20 border border-agri-500/40 flex items-center justify-center text-agri-400">
+            <div className="w-8 h-8 rounded-xl bg-agro-primary/20 border border-agro-primary/30 flex items-center justify-center text-agro-primary">
               <Bot className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center space-x-2">
-                <h2 className="text-sm sm:text-base font-bold text-white leading-tight">
+                <h2 className="text-sm sm:text-base font-bold text-agro-cream leading-tight">
                   {lang === 'mr' ? 'AgroScan AI कृषी सल्लागार' : 'AgroScan AI Agronomist'}
                 </h2>
                 {isOfflineMode && (
-                  <span className="px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-[10px] font-bold text-amber-400 flex items-center space-x-1">
+                  <span className="px-2 py-0.5 rounded-full bg-agro-amber/15 border border-agro-amber/30 text-[10px] font-bold text-agro-amber flex items-center space-x-1">
                     <Zap className="w-3 h-3" />
                     <span>{lang === 'mr' ? 'थेट सल्ला' : 'Instant Mode'}</span>
                   </span>
                 )}
               </div>
-              <p className="text-[11px] text-slate-400">
+              <p className="text-[11px] text-agro-muted">
                 {contextMode === 'scan' 
                   ? (lang === 'mr' ? 'स्कॅन केलेल्या पिकावर आधारित प्रश्न विचारा' : 'Consulting for active scanned crop')
                   : contextMode === 'manual'
@@ -763,10 +763,10 @@ export const AssistantPage = () => {
             <button
               type="button"
               onClick={handleStartNewChat}
-              className="px-2.5 py-1.5 rounded-xl bg-agri-500/20 hover:bg-agri-500/30 text-agri-400 border border-agri-500/40 text-xs font-bold flex items-center space-x-1.5 transition shadow-sm"
+              className="px-2.5 py-1.5 rounded-xl bg-agro-primary/15 hover:bg-agro-primary/25 text-agro-primary border border-agro-primary/30 text-xs font-bold flex items-center space-x-1.5 transition shadow-sm"
               title={lang === 'mr' ? 'नवीन संवाद सुरू करा' : 'Start a fresh new advisory chat'}
             >
-              <Plus className="w-3.5 h-3.5 text-agri-400" />
+              <Plus className="w-3.5 h-3.5 text-agro-primary" />
               <span className="hidden sm:inline">{lang === 'mr' ? 'नवीन संवाद' : 'New Chat'}</span>
             </button>
 
@@ -777,13 +777,13 @@ export const AssistantPage = () => {
                 fetchPastSessions();
                 setShowHistoryDrawer(true);
               }}
-              className="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 border border-slate-700 flex items-center space-x-1.5 transition relative"
+              className="px-2.5 py-1.5 rounded-xl bg-agro-surface hover:bg-agro-hover text-xs font-bold text-agro-cream border border-agro-border flex items-center space-x-1.5 transition relative"
               title={lang === 'mr' ? 'मागील संवाद इतिहास पहा' : 'View past chat history'}
             >
-              <History className="w-3.5 h-3.5 text-slate-400" />
+              <History className="w-3.5 h-3.5 text-agro-muted" />
               <span className="hidden sm:inline">{lang === 'mr' ? 'इतिहास' : 'History'}</span>
               {pastSessions.length > 0 && (
-                <span className="px-1.5 py-0.2 rounded-full bg-agri-500/20 text-agri-400 text-[10px] font-mono font-bold">
+                <span className="px-1.5 py-0.2 rounded-full bg-agro-primary/20 text-agro-primary text-[10px] font-mono font-bold">
                   {pastSessions.length}
                 </span>
               )}
@@ -810,30 +810,30 @@ export const AssistantPage = () => {
                 document.body.removeChild(link);
               }}
               disabled={messages.length <= 1}
-              className="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 border border-slate-700 flex items-center space-x-1.5 transition disabled:opacity-40"
+              className="px-2.5 py-1.5 rounded-xl bg-agro-surface hover:bg-agro-hover text-xs font-bold text-agro-cream border border-agro-border flex items-center space-x-1.5 transition disabled:opacity-40"
               title="Export conversation history"
             >
-              <Download className="w-3.5 h-3.5" />
+              <Download className="w-3.5 h-3.5 text-agro-primary" />
               <span className="hidden sm:inline">{lang === 'mr' ? 'जतन करा' : 'Export'}</span>
             </button>
 
             <button
               type="button"
               onClick={() => setShowSearchModal(true)}
-              className="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 border border-slate-700 flex items-center space-x-1.5 transition"
+              className="px-2.5 py-1.5 rounded-xl bg-agro-surface hover:bg-agro-hover text-xs font-bold text-agro-cream border border-agro-border flex items-center space-x-1.5 transition"
             >
-              <Sprout className="w-3.5 h-3.5 text-agri-400" />
+              <Sprout className="w-3.5 h-3.5 text-agro-primary" />
               <span className="hidden sm:inline">{t('assistant.change_plant') || 'Change Plant'}</span>
               <span className="sm:hidden">{lang === 'mr' ? 'पीक' : 'Crop'}</span>
             </button>
 
             {/* Language Switch */}
-            <div className="flex bg-slate-950 rounded-xl p-1 border border-slate-800 text-xs font-bold">
+            <div className="flex bg-agro-bg rounded-xl p-1 border border-agro-border text-xs font-bold">
               <button
                 type="button"
                 onClick={() => setLang('en')}
                 className={`px-2.5 py-1 rounded-lg transition ${
-                  lang === 'en' ? 'bg-agri-500 text-slate-950 shadow font-bold' : 'text-slate-400 hover:text-slate-200'
+                  lang === 'en' ? 'bg-agro-primary text-agro-bg shadow font-bold' : 'text-agro-muted hover:text-agro-cream'
                 }`}
               >
                 EN
@@ -842,7 +842,7 @@ export const AssistantPage = () => {
                 type="button"
                 onClick={() => setLang('mr')}
                 className={`px-2.5 py-1 rounded-lg transition ${
-                  lang === 'mr' ? 'bg-agri-500 text-slate-950 shadow font-bold' : 'text-slate-400 hover:text-slate-200'
+                  lang === 'mr' ? 'bg-agro-primary text-agro-bg shadow font-bold' : 'text-agro-muted hover:text-agro-cream'
                 }`}
               >
                 मराठी
@@ -853,17 +853,19 @@ export const AssistantPage = () => {
 
         {/* Active Scan Context Bar */}
         {contextMode === 'scan' && scanData && (
-          <div className="bg-slate-950 p-2.5 rounded-xl border border-slate-800 flex flex-wrap items-center justify-between gap-2 text-xs">
+          <div className="bg-agro-bg p-2.5 rounded-xl border border-agro-border flex flex-wrap items-center justify-between gap-2 text-xs">
             <div className="flex items-center space-x-3">
-              <span className="text-white font-bold">
-                🌱 {lang === 'mr' ? 'स्कॅन केलेले पीक' : 'Scanned Crop'}: {translateCrop(scanData.crop_detected)}
+              <span className="text-agro-cream font-bold flex items-center space-x-1">
+                <Sprout className="w-3.5 h-3.5 text-agro-primary mr-1" />
+                <span>{lang === 'mr' ? 'स्कॅन केलेले पीक' : 'Scanned Crop'}: {translateCrop(scanData.crop_detected)}</span>
               </span>
-              <span className="text-slate-600">|</span>
-              <span className="text-amber-400 font-semibold">
-                🦠 {lang === 'mr' ? 'आढळलेला रोग' : 'Detected'}: {translateDisease(scanData.disease_name)}
+              <span className="text-agro-muted">|</span>
+              <span className="text-agro-amber font-semibold flex items-center space-x-1">
+                <ShieldCheck className="w-3.5 h-3.5 mr-1" />
+                <span>{lang === 'mr' ? 'आढळलेला रोग' : 'Detected'}: {translateDisease(scanData.disease_name)}</span>
               </span>
             </div>
-            <span className="text-agri-400 font-mono font-bold">
+            <span className="text-agro-primary font-mono font-bold">
               {t('result.confidence') || 'Confidence'}: {Math.round((scanData.confidence_score || 0.95) * 100)}%
             </span>
           </div>
@@ -871,11 +873,12 @@ export const AssistantPage = () => {
 
         {/* Active Manual Plant Context Bar */}
         {contextMode === 'manual' && selectedPlant && (
-          <div className="bg-slate-950 p-2.5 rounded-xl border border-slate-800 flex items-center justify-between text-xs">
-            <span className="text-white font-bold">
-              🌱 {lang === 'mr' ? 'निवडलेले पीक मार्गदर्शन' : 'Active Crop Guidance'}: {translateCrop(selectedPlant)}
+          <div className="bg-agro-bg p-2.5 rounded-xl border border-agro-border flex items-center justify-between text-xs">
+            <span className="text-agro-cream font-bold flex items-center space-x-1.5">
+              <Sprout className="w-3.5 h-3.5 text-agro-primary" />
+              <span>{lang === 'mr' ? 'निवडलेले पीक मार्गदर्शन' : 'Active Crop Guidance'}: {translateCrop(selectedPlant)}</span>
             </span>
-            <span className="text-slate-400 text-[11px] italic">
+            <span className="text-agro-muted text-[11px] italic">
               {lang === 'mr' ? 'पीक निगा व खत मार्गदर्शन' : 'Crop cultivation & disease care'}
             </span>
           </div>
@@ -890,22 +893,22 @@ export const AssistantPage = () => {
             className={`flex gap-3 max-w-[92%] sm:max-w-[85%] ${msg.sender === 'user' ? 'ml-auto justify-end' : ''}`}
           >
             {msg.sender === 'assistant' && (
-              <div className="w-8 h-8 rounded-full bg-agri-500/20 text-agri-400 flex items-center justify-center shrink-0 border border-agri-500/40 mt-1">
+              <div className="w-8 h-8 rounded-full bg-agro-primary/20 text-agro-primary flex items-center justify-center shrink-0 border border-agro-primary/40 mt-1">
                 <Bot className="w-4 h-4" />
               </div>
             )}
 
             <div className={`flex flex-col gap-1 ${msg.sender === 'user' ? 'items-end' : ''}`}>
               <div className="flex items-center space-x-2">
-                <span className="text-[11px] font-medium text-slate-400">
-                  {msg.sender === 'user' ? (lang === 'mr' ? '👨‍🌾 तुम्ही (शेतकरी)' : '👨‍🌾 You (Farmer)') : (lang === 'mr' ? '🌾 AgroScan AI सल्लागार' : '🌾 AgroScan Advisor')}
+                <span className="text-[11px] font-medium text-agro-muted">
+                  {msg.sender === 'user' ? (lang === 'mr' ? 'तुम्ही (शेतकरी)' : 'You (Farmer)') : (lang === 'mr' ? 'AgroScan AI सल्लागार' : 'AgroScan Advisor')}
                 </span>
                 {msg.sender === 'assistant' && (
                   <button
                     type="button"
                     onClick={() => speakMessage(msg.content, idx)}
-                    className={`p-1 rounded-lg hover:bg-slate-800 transition text-xs ${
-                      speakingMsgIdx === idx ? 'text-agri-400 animate-pulse' : 'text-slate-500 hover:text-slate-300'
+                    className={`p-1 rounded-lg hover:bg-agro-surface transition text-xs ${
+                      speakingMsgIdx === idx ? 'text-agro-primary animate-pulse' : 'text-agro-muted hover:text-agro-cream'
                     }`}
                     title={lang === 'mr' ? 'सल्ला ऐका (Audio)' : 'Listen to advisory'}
                   >
@@ -917,23 +920,23 @@ export const AssistantPage = () => {
               <div
                 className={`p-4 rounded-2xl text-xs sm:text-sm leading-relaxed ${
                   msg.sender === 'user'
-                    ? 'bg-agri-500 text-slate-950 font-semibold rounded-tr-none shadow-lg shadow-agri-500/20'
-                    : 'bg-slate-900/95 border border-slate-800 text-slate-200 rounded-tl-none shadow-sm'
+                    ? 'bg-agro-primary text-agro-bg font-semibold rounded-tr-none shadow-md shadow-agro-primary/20'
+                    : 'bg-agro-card border border-agro-border text-agro-cream rounded-tl-none shadow-sm'
                 }`}
               >
                 <p className="whitespace-pre-wrap">{msg.content}</p>
 
                 {/* Multi-Source Research Citations & Evidence Panel */}
                 {msg.sender === 'assistant' && msg.sources && msg.sources.length > 0 && (
-                  <div className="mt-3.5 pt-3 border-t border-slate-800/80 space-y-2">
+                  <div className="mt-3.5 pt-3 border-t border-agro-border space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className="text-[11px] font-bold text-agri-400 flex items-center gap-1.5">
-                        <span>📚</span>
+                      <span className="text-[11px] font-bold text-agro-primary flex items-center gap-1.5">
+                        <BookOpen className="w-3.5 h-3.5" />
                         <span>{lang === 'mr' ? 'तपासलेले कृषी संशोधन व संदर्भ (Sources):' : 'Verified Agricultural Research & Sources:'}</span>
                       </span>
                       {msg.source_agreement && (
-                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-agri-500/15 text-agri-300 border border-agri-500/30 font-semibold">
-                          {msg.source_agreement === 'high' ? '✅ High Consensus' : '🔍 Multi-Source Verified'}
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-agro-primary/15 text-agro-primary border border-agro-primary/30 font-semibold">
+                          {msg.source_agreement === 'high' ? 'High Consensus' : 'Multi-Source Verified'}
                         </span>
                       )}
                     </div>
@@ -945,19 +948,19 @@ export const AssistantPage = () => {
                           href={src.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex flex-col p-2 rounded-xl bg-slate-950/80 border border-slate-800/90 hover:border-agri-500/50 hover:bg-slate-950 transition group"
+                          className="flex flex-col p-2.5 rounded-xl bg-agro-surface/80 border border-agro-border hover:border-agro-primary/50 transition group"
                         >
                           <div className="flex items-center justify-between gap-1 mb-0.5">
-                            <span className="text-[10px] font-bold text-slate-400 group-hover:text-agri-400 truncate">
+                            <span className="text-[10px] font-bold text-agro-muted group-hover:text-agro-primary truncate">
                               {src.source}
                             </span>
                             {src.trust_score && (
-                              <span className="text-[9px] font-mono text-emerald-400 bg-emerald-950/60 px-1 rounded border border-emerald-800/40">
+                              <span className="text-[9px] font-mono text-agro-primary bg-agro-primary/10 px-1.5 py-0.5 rounded border border-agro-primary/20 font-bold">
                                 {Math.round(src.trust_score * 100)}% Trust
                               </span>
                             )}
                           </div>
-                          <span className="text-[11px] text-slate-300 font-medium line-clamp-1 group-hover:text-white">
+                          <span className="text-[11px] text-agro-cream font-medium line-clamp-1 group-hover:text-agro-lime transition">
                             {src.title}
                           </span>
                         </a>
@@ -969,7 +972,7 @@ export const AssistantPage = () => {
             </div>
 
             {msg.sender === 'user' && (
-              <div className="w-8 h-8 rounded-full bg-slate-800 text-slate-300 flex items-center justify-center shrink-0 border border-slate-700 mt-1">
+              <div className="w-8 h-8 rounded-full bg-agro-surface text-agro-cream flex items-center justify-center shrink-0 border border-agro-border mt-1">
                 <User className="w-4 h-4" />
               </div>
             )}
@@ -978,12 +981,12 @@ export const AssistantPage = () => {
 
         {/* Progressive Multi-Source Research Indicator */}
         {loading && (
-          <div className="flex gap-3 items-center p-2 text-xs text-agri-400 font-semibold">
-            <div className="w-8 h-8 rounded-full bg-agri-500/20 text-agri-400 flex items-center justify-center shrink-0 border border-agri-500/40">
-              <Loader2 className="w-4 h-4 animate-spin text-agri-400" />
+          <div className="flex gap-3 items-center p-2 text-xs text-agro-primary font-semibold">
+            <div className="w-8 h-8 rounded-full bg-agro-primary/20 text-agro-primary flex items-center justify-center shrink-0 border border-agro-primary/40">
+              <Loader2 className="w-4 h-4 animate-spin text-agro-primary" />
             </div>
-            <div className="bg-slate-900/90 border border-slate-800 p-3 rounded-2xl text-slate-300 flex items-center space-x-2.5 shadow-lg">
-              <span className="inline-block w-2 h-2 rounded-full bg-agri-400 animate-ping mr-0.5"></span>
+            <div className="bg-agro-card border border-agro-border p-3 rounded-2xl text-agro-cream flex items-center space-x-2.5 shadow-lg">
+              <span className="inline-block w-2 h-2 rounded-full bg-agro-primary animate-ping mr-0.5"></span>
               <span className="text-xs">
                 {researchStage || (lang === 'mr' ? 'FAO, ICAR व कृषी डेटाबेस शोधत आहे...' : 'Consulting FAO, ICAR & agricultural research databases...')}
               </span>
@@ -993,16 +996,16 @@ export const AssistantPage = () => {
 
         {/* Error / Retry Banner */}
         {chatError && (
-          <div className="p-3.5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-300 text-xs flex items-center justify-between">
+          <div className="p-3.5 rounded-xl bg-agro-terracotta/15 border border-agro-terracotta/30 text-agro-cream text-xs flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />
+              <AlertCircle className="w-4 h-4 text-agro-terracotta shrink-0" />
               <span>{chatError}</span>
             </div>
             {lastFailedMessage && (
               <button
                 type="button"
                 onClick={handleRetry}
-                className="px-3 py-1 bg-red-500/20 hover:bg-red-500/30 text-red-200 rounded-lg font-bold flex items-center space-x-1 transition"
+                className="px-3 py-1 bg-agro-terracotta/20 hover:bg-agro-terracotta/30 text-agro-cream rounded-lg font-bold flex items-center space-x-1 transition"
               >
                 <RotateCcw className="w-3 h-3" />
                 <span>{t('assistant.retry') || 'Retry'}</span>
@@ -1015,14 +1018,14 @@ export const AssistantPage = () => {
       </div>
 
       {/* Bottom Interactive Typing & Question Container (Fixed at bottom) */}
-      <div className="absolute bottom-0 w-full bg-slate-900/98 backdrop-blur-md border-t border-slate-800 p-3 shadow-2xl z-20 space-y-2.5">
+      <div className="absolute bottom-0 w-full bg-agro-card/95 backdrop-blur-md border-t border-agro-border p-3 shadow-2xl z-20 space-y-2.5">
         
         {/* Curated Farmer FAQ Category Tabs */}
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-slate-400 flex items-center space-x-1">
-              <HelpCircle className="w-3 h-3 text-agri-400" />
-              <span>{lang === 'mr' ? 'शेतकऱ्यांनी विचारलेले मुख्य प्रश्न (क्लिक करा):' : 'Frequently Asked Questions by Farmers:'}</span>
+            <span className="text-[11px] font-bold text-agro-muted flex items-center space-x-1.5">
+              <HelpCircle className="w-3.5 h-3.5 text-agro-primary" />
+              <span>{lang === 'mr' ? 'शेतकऱ्यांनी विचारलेले मुख्य प्रश्न:' : 'Frequently Asked Questions by Farmers:'}</span>
             </span>
 
             {/* Category Selectors */}
@@ -1034,8 +1037,8 @@ export const AssistantPage = () => {
                   onClick={() => setActiveFaqTab(cat.id)}
                   className={`px-2 py-0.5 rounded-lg text-[10px] font-bold transition whitespace-nowrap ${
                     activeFaqTab === cat.id
-                      ? 'bg-agri-500/20 text-agri-400 border border-agri-500/40'
-                      : 'text-slate-400 hover:text-slate-200'
+                      ? 'bg-agro-primary/20 text-agro-primary border border-agro-primary/40'
+                      : 'text-agro-muted hover:text-agro-cream'
                   }`}
                 >
                   {cat.label}
@@ -1052,9 +1055,9 @@ export const AssistantPage = () => {
                 type="button"
                 disabled={loading}
                 onClick={() => sendMessage(qr)}
-                className="whitespace-nowrap px-3 py-1.5 bg-slate-950 border border-slate-800 hover:border-agri-500/50 rounded-xl text-xs font-semibold text-slate-300 hover:text-white transition shrink-0 disabled:opacity-50 flex items-center space-x-1.5 shadow-sm"
+                className="whitespace-nowrap px-3 py-1.5 bg-agro-surface border border-agro-border hover:border-agro-primary/50 rounded-xl text-xs font-semibold text-agro-cream/90 hover:text-agro-cream transition shrink-0 disabled:opacity-50 flex items-center space-x-1.5 shadow-sm"
               >
-                <span>💬</span>
+                <MessageSquare className="w-3 h-3 text-agro-primary" />
                 <span>{qr}</span>
               </button>
             ))}
@@ -1072,22 +1075,22 @@ export const AssistantPage = () => {
               onChange={(e) => setInput(e.target.value)}
               placeholder={
                 isListening
-                  ? (lang === 'mr' ? '🎙️ ऐकत आहे... बोला...' : '🎙️ Listening... speak now...')
+                  ? (lang === 'mr' ? 'ऐकत आहे... बोला...' : 'Listening... speak now...')
                   : loading 
                   ? (lang === 'mr' ? 'AI सल्लागार उत्तर लिहीत आहे...' : 'AI is writing advice...') 
                   : (lang === 'mr' ? 'येथे तुमचा प्रश्न विचारा (उदा. करपा रोगावर काय उपाय करावा?)...' : 'Type your farming question (e.g. How to cure leaf blight?)...')
               }
-              className={`w-full h-12 pl-4 pr-10 rounded-xl bg-slate-950 border text-xs sm:text-sm text-white focus:outline-none placeholder:text-slate-500 disabled:opacity-50 transition shadow-inner ${
+              className={`w-full h-12 pl-4 pr-10 rounded-xl bg-agro-bg border text-xs sm:text-sm text-agro-cream focus:outline-none placeholder:text-agro-muted/60 disabled:opacity-50 transition shadow-inner ${
                 isListening 
-                  ? 'border-red-500 ring-2 ring-red-500/30' 
-                  : 'border-slate-700 focus:border-agri-500 focus:ring-1 focus:ring-agri-500/30'
+                  ? 'border-agro-terracotta ring-2 ring-agro-terracotta/30' 
+                  : 'border-agro-border focus:border-agro-primary focus:ring-1 focus:ring-agro-primary'
               }`}
             />
             {input.length > 0 && !loading && (
               <button
                 type="button"
                 onClick={() => setInput('')}
-                className="absolute right-3 text-slate-500 hover:text-slate-300 transition"
+                className="absolute right-3 text-agro-muted hover:text-agro-cream transition"
                 title="Clear text"
               >
                 <X className="w-4 h-4" />
@@ -1102,23 +1105,23 @@ export const AssistantPage = () => {
             disabled={loading}
             className={`w-12 h-12 rounded-xl border flex items-center justify-center font-bold transition shrink-0 ${
               isListening
-                ? 'bg-red-500 text-white border-red-400 animate-pulse'
-                : 'bg-slate-950 hover:bg-slate-800 text-slate-300 border-slate-700'
+                ? 'bg-agro-terracotta text-white border-agro-terracotta animate-pulse'
+                : 'bg-agro-surface hover:bg-agro-hover text-agro-cream border-agro-border'
             }`}
             title={lang === 'mr' ? 'बोलून प्रश्न विचारा (Voice typing)' : 'Speak question (Voice input)'}
           >
-            {isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5 text-agri-400" />}
+            {isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5 text-agro-primary" />}
           </button>
 
           {/* Send Question Button */}
           <button
             type="submit"
             disabled={!input.trim() || loading}
-            className="h-12 px-4 sm:px-5 rounded-xl bg-agri-500 hover:bg-agri-400 text-slate-950 flex items-center justify-center font-bold text-xs sm:text-sm shadow-lg shadow-agri-500/20 shrink-0 disabled:opacity-50 transition space-x-1.5"
+            className="h-12 px-4 sm:px-5 rounded-xl bg-agro-primary hover:bg-agro-primary-hover text-agro-bg flex items-center justify-center font-bold text-xs sm:text-sm shadow-lg shadow-agro-primary/20 shrink-0 disabled:opacity-50 transition space-x-1.5"
             aria-label="Send Question"
           >
             {loading ? (
-              <Loader2 className="w-4 h-4 animate-spin text-slate-950" />
+              <Loader2 className="w-4 h-4 animate-spin text-agro-bg" />
             ) : (
               <>
                 <span className="hidden sm:inline">{lang === 'mr' ? 'विचारा' : 'Ask'}</span>
@@ -1131,27 +1134,27 @@ export const AssistantPage = () => {
 
       {/* Plant Search & Change Modal */}
       {showSearchModal && (
-        <div className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="glass-panel p-6 rounded-2xl max-w-md w-full space-y-4 border border-slate-700 bg-slate-900/95 shadow-2xl">
+        <div className="fixed inset-0 z-50 bg-agro-bg/85 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="agro-panel p-6 rounded-2xl max-w-md w-full space-y-4 border border-agro-border shadow-2xl">
             <div className="flex justify-between items-center">
-              <h3 className="text-base font-bold text-white flex items-center space-x-2">
-                <Sprout className="w-4 h-4 text-agri-400" />
+              <h3 className="text-base font-bold text-agro-cream flex items-center space-x-2">
+                <Sprout className="w-4 h-4 text-agro-primary" />
                 <span>{t('assistant.type_select_plant') || 'Select Crop for Advisory'}</span>
               </h3>
-              <button onClick={() => setShowSearchModal(false)} className="text-slate-400 hover:text-white" aria-label="Close plant modal">
+              <button onClick={() => setShowSearchModal(false)} className="text-agro-muted hover:text-agro-cream" aria-label="Close plant modal">
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             <div className="relative">
-              <div className="flex items-center space-x-2 bg-slate-950 px-3.5 py-2.5 rounded-xl border border-slate-800 text-xs">
-                <Search className="w-4 h-4 text-slate-500 shrink-0" />
+              <div className="flex items-center space-x-2 bg-agro-bg px-3.5 py-2.5 rounded-xl border border-agro-border text-xs">
+                <Search className="w-4 h-4 text-agro-muted shrink-0" />
                 <input
                   type="text"
                   value={plantSearch}
                   onChange={(e) => setPlantSearch(e.target.value)}
                   placeholder={t('assistant.search_placeholder') || "Search crop (e.g. Mango, Tomato, Sugarcane, Rice...)"}
-                  className="bg-transparent text-slate-200 w-full focus:outline-none placeholder:text-slate-600"
+                  className="bg-transparent text-agro-cream w-full focus:outline-none placeholder:text-agro-muted/60"
                   autoFocus
                 />
               </div>
@@ -1175,13 +1178,13 @@ export const AssistantPage = () => {
                   key={p.name}
                   type="button"
                   onClick={() => handleSelectManualPlant(p.name)}
-                  className="w-full text-left px-3.5 py-2.5 rounded-xl hover:bg-slate-800 flex items-center justify-between text-xs text-slate-200 transition border border-transparent hover:border-slate-700"
+                  className="w-full text-left px-3.5 py-2.5 rounded-xl hover:bg-agro-surface flex items-center justify-between text-xs text-agro-cream transition border border-transparent hover:border-agro-border"
                 >
                   <div className="flex items-center space-x-2">
-                    <Sprout className="w-4 h-4 text-agri-400 shrink-0" />
+                    <Sprout className="w-4 h-4 text-agro-primary shrink-0" />
                     <span className="font-semibold">{translateCrop(p.name)}</span>
                   </div>
-                  <span className="text-[11px] text-slate-500 italic">{p.scientific_name}</span>
+                  <span className="text-[11px] text-agro-muted italic">{p.scientific_name}</span>
                 </button>
               ))}
             </div>
@@ -1191,20 +1194,20 @@ export const AssistantPage = () => {
 
       {/* Past Chat History Slide-Over Drawer */}
       {showHistoryDrawer && (
-        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex justify-end transition-opacity">
-          <div className="w-full max-w-md h-full bg-slate-900 border-l border-slate-800 flex flex-col shadow-2xl animate-in slide-in-from-right duration-200">
+        <div className="fixed inset-0 z-50 bg-agro-bg/80 backdrop-blur-sm flex justify-end transition-opacity">
+          <div className="w-full max-w-md h-full bg-agro-card border-l border-agro-border flex flex-col shadow-2xl animate-in slide-in-from-right duration-200">
             
             {/* Drawer Header */}
-            <div className="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/70">
+            <div className="p-4 border-b border-agro-border flex items-center justify-between bg-agro-surface">
               <div className="flex items-center space-x-2.5">
-                <div className="w-8 h-8 rounded-xl bg-agri-500/20 border border-agri-500/40 flex items-center justify-center text-agri-400">
+                <div className="w-8 h-8 rounded-xl bg-agro-primary/20 border border-agro-primary/40 flex items-center justify-center text-agro-primary">
                   <History className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-white leading-tight">
+                  <h3 className="text-sm font-bold text-agro-cream leading-tight">
                     {lang === 'mr' ? 'मागील कृषी संवाद इतिहास' : 'Past Consultations'}
                   </h3>
-                  <p className="text-[11px] text-slate-400">
+                  <p className="text-[11px] text-agro-muted">
                     {lang === 'mr' ? `${pastSessions.length} जतन केलेले संवाद` : `${pastSessions.length} saved consultations`}
                   </p>
                 </div>
@@ -1213,7 +1216,7 @@ export const AssistantPage = () => {
               <button
                 type="button"
                 onClick={() => setShowHistoryDrawer(false)}
-                className="w-8 h-8 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition"
+                className="w-8 h-8 rounded-xl bg-agro-surface hover:bg-agro-hover text-agro-muted hover:text-agro-cream flex items-center justify-center transition border border-agro-border"
                 aria-label="Close history drawer"
               >
                 <X className="w-4 h-4" />
@@ -1221,11 +1224,11 @@ export const AssistantPage = () => {
             </div>
 
             {/* Quick Action: Start New Chat */}
-            <div className="p-3 border-b border-slate-800/80 bg-slate-950/40 space-y-2">
+            <div className="p-3 border-b border-agro-border bg-agro-surface/60 space-y-2">
               <button
                 type="button"
                 onClick={handleStartNewChat}
-                className="w-full py-2.5 px-3.5 rounded-xl bg-agri-500 hover:bg-agri-400 text-slate-950 font-bold text-xs flex items-center justify-center space-x-2 transition shadow-lg shadow-agri-500/15"
+                className="w-full py-2.5 px-3.5 rounded-xl bg-agro-primary hover:bg-agro-primary-hover text-agro-bg font-bold text-xs flex items-center justify-center space-x-2 transition shadow-md shadow-agro-primary/15"
               >
                 <Plus className="w-4 h-4" />
                 <span>{lang === 'mr' ? '+ नवीन कृषी संवाद सुरू करा' : '+ Start New Advisory Chat'}</span>
@@ -1234,19 +1237,19 @@ export const AssistantPage = () => {
               {/* History Search Filter */}
               {pastSessions.length > 3 && (
                 <div className="relative">
-                  <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-2.5" />
+                  <Search className="w-3.5 h-3.5 text-agro-muted absolute left-3 top-2.5" />
                   <input
                     type="text"
                     value={historySearch}
                     onChange={(e) => setHistorySearch(e.target.value)}
                     placeholder={lang === 'mr' ? 'इतिहास शोधा (उदा. करपा, ऊस, खत)...' : 'Search past topics...'}
-                    className="w-full pl-8 pr-3 py-1.5 rounded-lg bg-slate-950 border border-slate-800 text-xs text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-agri-500"
+                    className="w-full pl-8 pr-3 py-1.5 rounded-lg bg-agro-bg border border-agro-border text-xs text-agro-cream placeholder:text-agro-muted/60 focus:outline-none focus:border-agro-primary"
                   />
                   {historySearch && (
                     <button
                       type="button"
                       onClick={() => setHistorySearch('')}
-                      className="absolute right-2.5 top-2 text-slate-500 hover:text-slate-300 text-xs"
+                      className="absolute right-2.5 top-2 text-agro-muted hover:text-agro-cream text-xs"
                     >
                       <X className="w-3.5 h-3.5" />
                     </button>
@@ -1258,14 +1261,14 @@ export const AssistantPage = () => {
             {/* Past Sessions List */}
             <div className="flex-1 overflow-y-auto p-3 space-y-2">
               {loadingHistory ? (
-                <div className="p-8 text-center text-xs text-slate-400 space-y-2">
-                  <Loader2 className="w-6 h-6 animate-spin mx-auto text-agri-400" />
+                <div className="p-8 text-center text-xs text-agro-muted space-y-2">
+                  <Loader2 className="w-6 h-6 animate-spin mx-auto text-agro-primary" />
                   <p>{lang === 'mr' ? 'इतिहास लोड होत आहे...' : 'Loading past chats...'}</p>
                 </div>
               ) : pastSessions.length === 0 ? (
-                <div className="p-8 text-center text-slate-500 text-xs space-y-2">
-                  <MessageSquare className="w-8 h-8 mx-auto text-slate-600 opacity-60" />
-                  <p className="font-semibold text-slate-400">
+                <div className="p-8 text-center text-agro-muted text-xs space-y-2">
+                  <MessageSquare className="w-8 h-8 mx-auto text-agro-muted/60" />
+                  <p className="font-semibold text-agro-cream">
                     {lang === 'mr' ? 'कोणताही मागील संवाद सापडला नाही' : 'No past conversations found'}
                   </p>
                   <p className="text-[11px]">
@@ -1288,18 +1291,18 @@ export const AssistantPage = () => {
                         onClick={() => handleSelectSession(s)}
                         className={`group p-3 rounded-xl border transition cursor-pointer relative ${
                           isActive
-                            ? 'bg-agri-500/10 border-agri-500/50 shadow-md shadow-agri-500/5'
-                            : 'bg-slate-950/70 border-slate-800 hover:border-slate-700 hover:bg-slate-950'
+                            ? 'bg-agro-primary/10 border-agro-primary/50 shadow-md shadow-agro-primary/5'
+                            : 'bg-agro-surface border-agro-border hover:border-agro-primary/40 hover:bg-agro-hover'
                         }`}
                       >
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex items-center space-x-2 flex-1 min-w-0">
                             {isActive ? (
-                              <span className="w-2 h-2 rounded-full bg-agri-400 shrink-0 animate-pulse" />
+                              <span className="w-2 h-2 rounded-full bg-agro-primary shrink-0 animate-pulse" />
                             ) : (
-                              <MessageSquare className="w-3.5 h-3.5 text-slate-500 shrink-0 group-hover:text-agri-400" />
+                              <MessageSquare className="w-3.5 h-3.5 text-agro-muted shrink-0 group-hover:text-agro-primary" />
                             )}
-                            <h4 className="text-xs font-bold text-slate-200 group-hover:text-white truncate">
+                            <h4 className="text-xs font-bold text-agro-cream truncate">
                               {s.title || 'AgroScan Advisory'}
                             </h4>
                           </div>
@@ -1308,7 +1311,7 @@ export const AssistantPage = () => {
                             <button
                               type="button"
                               onClick={(e) => handleDeleteSession(s.id, e)}
-                              className="p-1 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition opacity-70 group-hover:opacity-100"
+                              className="p-1 rounded-lg text-agro-muted hover:text-agro-terracotta hover:bg-agro-terracotta/10 transition opacity-70 group-hover:opacity-100"
                               title={lang === 'mr' ? 'संवाद हटवा' : 'Delete chat session'}
                             >
                               <Trash2 className="w-3.5 h-3.5" />
@@ -1317,18 +1320,18 @@ export const AssistantPage = () => {
                         </div>
 
                         {s.last_message && (
-                          <p className="text-[11px] text-slate-400 line-clamp-2 mt-1.5 pl-4 leading-relaxed">
+                          <p className="text-[11px] text-agro-muted line-clamp-2 mt-1.5 pl-4 leading-relaxed">
                             {s.last_message}
                           </p>
                         )}
 
-                        <div className="flex items-center justify-between text-[10px] text-slate-500 mt-2 pl-4">
+                        <div className="flex items-center justify-between text-[10px] text-agro-muted mt-2 pl-4">
                           <span className="flex items-center space-x-1">
                             <Clock className="w-3 h-3" />
                             <span>{dateDisplay || 'Recent'}</span>
                           </span>
                           {s.message_count > 0 && (
-                            <span className="px-1.5 py-0.5 rounded bg-slate-900 border border-slate-800 font-mono">
+                            <span className="px-1.5 py-0.5 rounded bg-agro-bg border border-agro-border font-mono">
                               {s.message_count} {lang === 'mr' ? 'संदेश' : 'msgs'}
                             </span>
                           )}
@@ -1340,9 +1343,9 @@ export const AssistantPage = () => {
             </div>
 
             {/* Drawer Footer */}
-            <div className="p-3 border-t border-slate-800 bg-slate-950/90 text-center">
-              <span className="text-[11px] text-slate-500 flex items-center justify-center space-x-1">
-                <ShieldCheck className="w-3.5 h-3.5 text-agri-400" />
+            <div className="p-3 border-t border-agro-border bg-agro-surface text-center">
+              <span className="text-[11px] text-agro-muted flex items-center justify-center space-x-1">
+                <ShieldCheck className="w-3.5 h-3.5 text-agro-primary" />
                 <span>{lang === 'mr' ? 'तुमचा संवाद सुरक्षितपणे जतन केला जातो' : 'All consultations securely backed up'}</span>
               </span>
             </div>

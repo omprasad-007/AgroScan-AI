@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { 
-  Scan, 
+  ScanLine, 
   CheckCircle2, 
   AlertTriangle, 
   CloudSun, 
@@ -58,19 +58,17 @@ export const DashboardPage = () => {
 
       // 2. Fetch from backend API
       let backendScans = [];
-      let backendAnalytics = null;
       try {
         const [anRes, scRes] = await Promise.all([
           api.get('/analytics/dashboard').catch(() => ({ data: null })),
           api.get('/predictions/history?limit=20').catch(() => ({ data: [] }))
         ]);
-        backendAnalytics = anRes?.data || null;
         backendScans = Array.isArray(scRes?.data) ? scRes.data : [];
       } catch (err) {
         console.warn('Backend dashboard fetch notice:', err);
       }
 
-      // 3. Deduplicate and merge scans (localStorage takes precedence for newly analyzed offline/client items)
+      // 3. Deduplicate and merge scans
       const mergedMap = new Map();
       localScans.forEach(s => { if (s && s.id) mergedMap.set(s.id, s); });
       backendScans.forEach(s => { if (s && s.id && !mergedMap.has(s.id)) mergedMap.set(s.id, s); });
@@ -118,16 +116,13 @@ export const DashboardPage = () => {
         }, 0);
         const avgConf = total > 0 ? (confSum / total) : 0;
 
-        // Determine overall risk
         const risks = allScans.map(s => s.weather_risk_level || s.risk || 'Low');
         let topRisk = 'Low';
-        if (risks.includes('High') || risks.includes('high')) topRisk = 'High';
-        else if (risks.includes('Moderate') || risks.includes('moderate')) topRisk = 'Moderate';
+        if (risks.includes('Critical')) topRisk = 'Critical';
+        else if (risks.includes('High')) topRisk = 'High';
+        else if (risks.includes('Moderate') || risks.includes('Medium')) topRisk = 'Moderate';
 
-        const latestScan = allScans[0];
-        const latestCrop = latestScan.crop_detected || latestScan.plant || 'Crop';
-        const latestDisease = latestScan.disease_name || latestScan.disease || 'Analyzed';
-
+        const latest = allScans[0];
         setAnalytics({
           total_predictions: total,
           healthy_count: healthy,
@@ -135,9 +130,9 @@ export const DashboardPage = () => {
           average_confidence: avgConf,
           weather_risk_summary: {
             overall_risk_level: topRisk,
-            current_temp: latestScan.ambient_temp_c || 26.5,
-            current_humidity: latestScan.humidity_pct || 75.0,
-            alert: `Latest scan: ${latestCrop} (${latestDisease}) — Risk evaluated based on farm microclimate.`
+            current_temp: latest.ambient_temp_c || 26.5,
+            current_humidity: latest.humidity_pct || 65.0,
+            alert: `Active monitoring for ${latest.crop_detected || latest.plant || 'Crops'} (${latest.disease_name || latest.disease || 'General Health'}).`
           }
         });
         setRecentScans(allScans.slice(0, 5));
@@ -152,7 +147,6 @@ export const DashboardPage = () => {
   useEffect(() => {
     refreshDashboardData();
 
-    // Listen to custom scan completion and storage events
     const handleScanEvent = () => refreshDashboardData();
     window.addEventListener('agroscan_scan_completed', handleScanEvent);
     window.addEventListener('storage', handleScanEvent);
@@ -202,35 +196,37 @@ export const DashboardPage = () => {
       
       {/* Welcome Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white">
-            {t('dashboard.title')} — {user?.full_name || user?.email?.split('@')[0] || t('header.role_farmer')} 👋
+        <div className="space-y-1">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-agro-cream tracking-tight">
+            {t('dashboard.title')} — {user?.full_name || user?.email?.split('@')[0] || t('header.role_farmer')}
           </h1>
-          <p className="text-xs sm:text-sm text-slate-400 mt-1 flex items-center space-x-2">
-            <span className="text-emerald-400 font-semibold">{user?.email || 'farmer@agroscan.ai'}</span>
+          <p className="text-xs sm:text-sm text-agro-muted flex items-center gap-2">
+            <span className="text-agro-primary font-semibold">{user?.email || 'farmer@agroscan.ai'}</span>
             <span>•</span>
             <span>{t('dashboard.subtitle')}</span>
           </p>
         </div>
 
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center gap-2.5">
           {!isBlank && (
             <button
+              type="button"
               onClick={() => setShowResetModal(true)}
-              className="inline-flex items-center space-x-1.5 px-3.5 py-2.5 rounded-xl bg-slate-800/80 hover:bg-red-500/20 text-slate-300 hover:text-red-400 border border-slate-700/60 hover:border-red-500/30 text-xs font-semibold transition"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-agro-surface hover:bg-agro-terracotta/15 text-agro-muted hover:text-agro-terracotta border border-agro-border hover:border-agro-terracotta/30 text-xs font-semibold transition"
               title={t('dashboard.reset_data')}
             >
-              <RotateCcw className="w-3.5 h-3.5" />
+              <RotateCcw className="w-3.5 h-3.5" aria-hidden="true" />
               <span>{t('dashboard.reset_data')}</span>
             </button>
           )}
 
+          {/* Strong Primary CTA: Scan Leaf Now */}
           <Link
             to="/scan"
-            className="inline-flex items-center justify-center space-x-2 px-5 py-2.5 rounded-xl bg-agri-500 hover:bg-agri-400 text-slate-950 font-bold text-sm transition shadow-lg shadow-agri-500/20 shrink-0"
+            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-agro-primary hover:bg-agro-primaryHover text-agro-bg font-extrabold text-sm transition shadow-lg shadow-agro-primary/25 active:scale-[0.98] shrink-0"
           >
-            <Scan className="w-4 h-4" />
-            <span>{t('dashboard.quick_scan')}</span>
+            <ScanLine className="w-4 h-4 shrink-0" aria-hidden="true" />
+            <span>{t('dashboard.quick_scan') || 'Scan Leaf Now'}</span>
           </Link>
         </div>
       </div>
@@ -239,17 +235,17 @@ export const DashboardPage = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         
         {/* Total Scans Card */}
-        <div className="glass-panel p-5 rounded-2xl border border-slate-800/80">
+        <div className="agro-panel p-5 rounded-2xl border border-agro-border">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-400">{t('dashboard.card_total')}</span>
-            <div className="p-2 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20">
-              <Activity className="w-4 h-4" />
+            <span className="text-xs font-medium text-agro-muted">{t('dashboard.card_total')}</span>
+            <div className="p-2 rounded-xl bg-agro-primary/10 text-agro-primary border border-agro-primary/25">
+              <Activity className="w-4 h-4" aria-hidden="true" />
             </div>
           </div>
           <div className="mt-3 flex items-baseline justify-between">
-            <span className="text-3xl font-extrabold text-white">{analytics.total_predictions}</span>
+            <span className="text-3xl font-extrabold text-agro-cream">{analytics.total_predictions}</span>
             {analytics.total_predictions > 0 && (
-              <span className="text-[11px] font-mono text-slate-400">
+              <span className="text-[11px] font-mono text-agro-lime">
                 Avg: {Math.round(analytics.average_confidence * 100)}%
               </span>
             )}
@@ -257,17 +253,17 @@ export const DashboardPage = () => {
         </div>
 
         {/* Healthy Crops Card */}
-        <div className="glass-panel p-5 rounded-2xl border border-slate-800/80">
+        <div className="agro-panel p-5 rounded-2xl border border-agro-border">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-400">{t('dashboard.card_healthy')}</span>
-            <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-              <CheckCircle2 className="w-4 h-4" />
+            <span className="text-xs font-medium text-agro-muted">{t('dashboard.card_healthy')}</span>
+            <div className="p-2 rounded-xl bg-agro-primary/15 text-agro-primary border border-agro-primary/30">
+              <ShieldCheck className="w-4 h-4" aria-hidden="true" />
             </div>
           </div>
           <div className="mt-3 flex items-baseline justify-between">
-            <span className="text-3xl font-extrabold text-emerald-400">{analytics.healthy_count}</span>
+            <span className="text-3xl font-extrabold text-agro-primary">{analytics.healthy_count}</span>
             {analytics.total_predictions > 0 && (
-              <span className="text-[11px] font-semibold text-emerald-400/80">
+              <span className="text-[11px] font-semibold text-agro-lime">
                 {Math.round((analytics.healthy_count / analytics.total_predictions) * 100)}%
               </span>
             )}
@@ -275,17 +271,17 @@ export const DashboardPage = () => {
         </div>
 
         {/* Diseased Crops Card */}
-        <div className="glass-panel p-5 rounded-2xl border border-slate-800/80">
+        <div className="agro-panel p-5 rounded-2xl border border-agro-border">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-400">{t('dashboard.card_diseased')}</span>
-            <div className="p-2 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20">
-              <AlertTriangle className="w-4 h-4" />
+            <span className="text-xs font-medium text-agro-muted">{t('dashboard.card_diseased')}</span>
+            <div className="p-2 rounded-xl bg-agro-amber/15 text-agro-amber border border-agro-amber/30">
+              <AlertTriangle className="w-4 h-4" aria-hidden="true" />
             </div>
           </div>
           <div className="mt-3 flex items-baseline justify-between">
-            <span className="text-3xl font-extrabold text-amber-400">{analytics.diseased_count}</span>
+            <span className="text-3xl font-extrabold text-agro-amber">{analytics.diseased_count}</span>
             {analytics.total_predictions > 0 && (
-              <span className="text-[11px] font-semibold text-amber-400/80">
+              <span className="text-[11px] font-semibold text-agro-amber">
                 {Math.round((analytics.diseased_count / analytics.total_predictions) * 100)}%
               </span>
             )}
@@ -293,16 +289,16 @@ export const DashboardPage = () => {
         </div>
 
         {/* Outbreak Risk Card */}
-        <div className="glass-panel p-5 rounded-2xl border border-slate-800/80">
+        <div className="agro-panel p-5 rounded-2xl border border-agro-border">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-400">{t('dashboard.card_risk')}</span>
-            <div className="p-2 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20">
-              <TrendingUp className="w-4 h-4" />
+            <span className="text-xs font-medium text-agro-muted">{t('dashboard.card_risk')}</span>
+            <div className="p-2 rounded-xl bg-agro-lime/15 text-agro-lime border border-agro-lime/30">
+              <TrendingUp className="w-4 h-4" aria-hidden="true" />
             </div>
           </div>
           <div className="mt-3 flex items-center">
             {isBlank ? (
-              <span className="px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 text-slate-400 text-xs font-semibold">
+              <span className="px-2.5 py-1 rounded-lg bg-agro-surface border border-agro-border text-agro-muted text-xs font-semibold">
                 No Outbreak Active
               </span>
             ) : (
@@ -315,28 +311,28 @@ export const DashboardPage = () => {
 
       {/* If Blank: Show Hero Blank State Banner */}
       {isBlank && (
-        <div className="glass-panel p-8 rounded-3xl border border-emerald-500/20 bg-gradient-to-r from-emerald-950/30 via-slate-900 to-slate-900 shadow-xl relative overflow-hidden">
+        <div className="agro-panel p-8 rounded-3xl border border-agro-primary/30 bg-gradient-to-r from-agro-card via-agro-surface/60 to-agro-card shadow-xl relative overflow-hidden">
           <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="space-y-3 text-center md:text-left max-w-xl">
-              <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold">
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>Real-time Local Storage & Diagnostics Active</span>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-agro-primary/10 border border-agro-primary/30 text-agro-primary text-xs font-bold">
+                <Sparkles className="w-3.5 h-3.5" aria-hidden="true" />
+                <span>Ready for Crop Diagnosis</span>
               </div>
-              <h2 className="text-xl sm:text-2xl font-black text-white">
-                {t('dashboard.empty_title') || 'Dashboard is Blank — Ready for Your First Scan'}
+              <h2 className="text-xl sm:text-2xl font-extrabold text-agro-cream">
+                Protect your crops with real-time AI pathology
               </h2>
-              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                {t('dashboard.blank_desc')}
+              <p className="text-xs sm:text-sm text-agro-muted leading-relaxed">
+                {analytics.weather_risk_summary?.alert}
               </p>
             </div>
 
             <Link
               to="/scan"
-              className="inline-flex items-center space-x-2.5 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-agri-400 text-slate-950 font-black text-sm transition hover:scale-105 shadow-xl shadow-emerald-500/20 shrink-0"
+              className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-2xl bg-agro-primary hover:bg-agro-primaryHover text-agro-bg font-extrabold text-sm transition shadow-lg shadow-agro-primary/25 shrink-0 active:scale-[0.98]"
             >
-              <Leaf className="w-4 h-4" />
+              <Leaf className="w-4 h-4" aria-hidden="true" />
               <span>{t('dashboard.blank_cta')}</span>
-              <ArrowRight className="w-4 h-4" />
+              <ArrowRight className="w-4 h-4" aria-hidden="true" />
             </Link>
           </div>
         </div>
@@ -346,91 +342,91 @@ export const DashboardPage = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Weather Risk Card */}
-        <div className="glass-panel p-6 rounded-2xl lg:col-span-1 flex flex-col justify-between border border-slate-800/80">
+        <div className="agro-panel p-6 rounded-3xl lg:col-span-1 flex flex-col justify-between border border-agro-border">
           <div>
             <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center space-x-2">
-                <CloudSun className="w-5 h-5 text-agri-400" />
-                <h3 className="text-base font-bold text-white">{t('nav.weather')}</h3>
+              <div className="flex items-center gap-2">
+                <CloudSun className="w-5 h-5 text-agro-lime" aria-hidden="true" />
+                <h3 className="text-base font-bold text-agro-cream">{t('nav.weather')}</h3>
               </div>
               <WeatherRiskBadge level={analytics.weather_risk_summary?.overall_risk_level || 'Low'} />
             </div>
 
             {/* Local Farm Weather Location */}
             {localWeather && (
-              <div className="mb-3 px-3 py-2 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
-                <div className="flex items-center space-x-2 text-xs">
-                  <MapPin className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                  <span className="font-bold text-slate-200 truncate max-w-[140px]">
+              <div className="mb-3 px-3 py-2 rounded-xl bg-agro-surface border border-agro-border flex items-center justify-between">
+                <div className="flex items-center gap-2 text-xs">
+                  <MapPin className="w-3.5 h-3.5 text-agro-primary shrink-0" aria-hidden="true" />
+                  <span className="font-bold text-agro-cream truncate max-w-[140px]">
                     {localWeather.location}
                   </span>
                 </div>
-                <span className="inline-flex items-center text-[10px] text-emerald-400 font-semibold">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse mr-1" />
+                <span className="inline-flex items-center text-[10px] text-agro-lime font-semibold">
+                  <span className="w-1.5 h-1.5 rounded-full bg-agro-primary animate-pulse mr-1" />
                   {localWeather.isGpsDetected ? 'Live GPS' : 'District'}
                 </span>
               </div>
             )}
 
-            <div className="bg-slate-900/60 p-4 rounded-xl border border-slate-800 space-y-3 mb-4">
-              <div className="flex justify-between text-xs text-slate-300">
+            <div className="bg-agro-surface/60 p-4 rounded-xl border border-agro-border space-y-3 mb-4">
+              <div className="flex justify-between text-xs text-agro-muted">
                 <span>{t('dashboard.temperature') || 'Temperature'}</span>
-                <span className="font-semibold">{localWeather?.temperature_c ?? analytics.weather_risk_summary?.current_temp ?? 26.5}°C</span>
+                <span className="font-bold text-agro-cream">{localWeather?.temperature_c ?? analytics.weather_risk_summary?.current_temp ?? 26.5}°C</span>
               </div>
-              <div className="flex justify-between text-xs text-slate-300">
+              <div className="flex justify-between text-xs text-agro-muted">
                 <span>{t('dashboard.humidity') || 'Humidity'}</span>
-                <span className="font-semibold">{localWeather?.humidity_pct ?? analytics.weather_risk_summary?.current_humidity ?? 65.0}%</span>
+                <span className="font-bold text-agro-cream">{localWeather?.humidity_pct ?? analytics.weather_risk_summary?.current_humidity ?? 65.0}%</span>
               </div>
               {localWeather?.condition && (
-                <div className="flex justify-between text-xs text-slate-300 pt-1 border-t border-slate-800/80">
+                <div className="flex justify-between text-xs text-agro-muted pt-1 border-t border-agro-border">
                   <span>Conditions</span>
-                  <span className="text-emerald-400 font-medium">{localWeather.condition}</span>
+                  <span className="text-agro-lime font-semibold">{localWeather.condition}</span>
                 </div>
               )}
             </div>
 
-            <p className="text-xs text-slate-300 leading-relaxed bg-slate-900/40 p-3 rounded-xl border border-slate-800">
+            <p className="text-xs text-agro-muted leading-relaxed bg-agro-surface/30 p-3 rounded-xl border border-agro-border">
               {analytics.weather_risk_summary?.alert || t('dashboard.empty_msg')}
             </p>
           </div>
 
           <Link
             to="/weather"
-            className="mt-6 flex items-center justify-center space-x-2 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 transition"
+            className="mt-6 inline-flex items-center justify-center gap-2 py-2.5 rounded-xl bg-agro-surface hover:bg-agro-hover border border-agro-border text-xs font-semibold text-agro-cream transition"
           >
             <span>{t('history.view_report') || 'Full Risk Forecast'}</span>
-            <ArrowRight className="w-3.5 h-3.5" />
+            <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
           </Link>
         </div>
 
         {/* Recent Scans Table */}
-        <div className="glass-panel p-6 rounded-2xl lg:col-span-2 border border-slate-800/80">
+        <div className="agro-panel p-6 rounded-3xl lg:col-span-2 border border-agro-border">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-base font-bold text-white">{t('dashboard.recent_scans') || t('nav.history')}</h3>
+            <h3 className="text-base font-bold text-agro-cream">{t('dashboard.recent_scans') || t('nav.history')}</h3>
             {recentScans.length > 0 && (
-              <Link to="/history" className="text-xs text-agri-400 hover:underline flex items-center space-x-1">
+              <Link to="/history" className="text-xs text-agro-primary hover:underline inline-flex items-center gap-1 font-semibold">
                 <span>{t('dashboard.view_all') || 'View All'}</span>
-                <ArrowRight className="w-3.5 h-3.5" />
+                <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
               </Link>
             )}
           </div>
 
           {recentScans.length === 0 ? (
             <div className="text-center py-12 px-4 space-y-3">
-              <div className="w-12 h-12 rounded-2xl bg-slate-900 border border-slate-800 text-slate-500 flex items-center justify-center mx-auto">
-                <Scan className="w-6 h-6" />
+              <div className="w-12 h-12 rounded-2xl bg-agro-surface border border-agro-border text-agro-muted flex items-center justify-center mx-auto">
+                <ScanLine className="w-6 h-6" aria-hidden="true" />
               </div>
-              <p className="text-slate-400 text-xs font-semibold">
+              <p className="text-agro-cream text-xs font-bold">
                 {t('dashboard.empty_title') || 'No scans recorded yet'}
               </p>
-              <p className="text-slate-500 text-[11px] max-w-sm mx-auto">
+              <p className="text-agro-muted text-[11px] max-w-sm mx-auto">
                 {t('dashboard.empty_msg') || 'Scan a plant leaf to start tracking disease outbreak risk and health metrics.'}
               </p>
               <Link
                 to="/scan"
-                className="inline-flex items-center space-x-2 mt-2 px-4 py-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-semibold transition"
+                className="inline-flex items-center gap-2 mt-2 px-4 py-2.5 rounded-xl bg-agro-primary hover:bg-agro-primaryHover text-agro-bg text-xs font-bold transition shadow-sm"
               >
-                <Leaf className="w-3.5 h-3.5" />
+                <Leaf className="w-3.5 h-3.5" aria-hidden="true" />
                 <span>{t('dashboard.blank_cta')}</span>
               </Link>
             </div>
@@ -438,7 +434,7 @@ export const DashboardPage = () => {
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
                 <thead>
-                  <tr className="border-b border-slate-800 text-slate-400 font-semibold">
+                  <tr className="border-b border-agro-border text-agro-muted font-bold">
                     <th className="py-2.5 px-3">{t('history.col_crop') || 'Crop'}</th>
                     <th className="py-2.5 px-3">{t('history.col_disease') || 'Detected Disease'}</th>
                     <th className="py-2.5 px-3">{t('history.col_severity') || 'Severity'}</th>
@@ -446,25 +442,25 @@ export const DashboardPage = () => {
                     <th className="py-2.5 px-3 text-right">{t('history.col_report') || 'Action'}</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-800/60">
+                <tbody className="divide-y divide-agro-border">
                   {recentScans.map((scan) => (
-                    <tr key={scan.id} className="hover:bg-slate-800/30 transition">
-                      <td className="py-3 px-3 font-semibold text-white">
+                    <tr key={scan.id} className="hover:bg-agro-surface/50 transition-colors">
+                      <td className="py-3 px-3 font-bold text-agro-cream">
                         {translateCrop(scan.crop_detected || scan.plant)}
                       </td>
-                      <td className="py-3 px-3 text-slate-300">
+                      <td className="py-3 px-3 text-agro-muted">
                         {translateDisease(scan.disease_name || scan.disease)}
                       </td>
                       <td className="py-3 px-3">
                         <SeverityBadge level={scan.severity_level || scan.severity} />
                       </td>
-                      <td className="py-3 px-3 font-mono text-agri-400">
+                      <td className="py-3 px-3 font-mono text-agro-primary font-bold">
                         {(((Number(scan.confidence_score ?? scan.confidence)) || 0.9) * 100).toFixed(1)}%
                       </td>
                       <td className="py-3 px-3 text-right">
                         <Link
                           to={`/results/${scan.id}`}
-                          className="text-xs font-semibold text-agri-400 hover:underline"
+                          className="text-xs font-bold text-agro-primary hover:underline"
                         >
                           {t('history.view_report') || 'View Report'}
                         </Link>
@@ -481,27 +477,29 @@ export const DashboardPage = () => {
 
       {/* Reset Confirmation Modal */}
       {showResetModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fade-in">
-          <div className="glass-panel max-w-md w-full p-6 rounded-3xl border border-red-500/30 space-y-4 shadow-2xl">
-            <div className="flex items-center space-x-3 text-red-400">
-              <div className="p-2 rounded-xl bg-red-500/10 border border-red-500/20">
-                <AlertTriangle className="w-5 h-5" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-agro-bg/80 backdrop-blur-sm animate-fade-in">
+          <div className="agro-panel max-w-md w-full p-6 sm:p-7 rounded-3xl border border-agro-terracotta/40 space-y-4 shadow-2xl">
+            <div className="flex items-center gap-3 text-agro-terracotta">
+              <div className="p-2.5 rounded-xl bg-agro-terracotta/15 border border-agro-terracotta/30">
+                <AlertTriangle className="w-5 h-5" aria-hidden="true" />
               </div>
-              <h3 className="text-base font-bold text-white">{t('dashboard.reset_data')}</h3>
+              <h3 className="text-base font-bold text-agro-cream">{t('dashboard.reset_data')}</h3>
             </div>
-            <p className="text-xs text-slate-300 leading-relaxed">
-              {t('dashboard.reset_confirm')}
+            <p className="text-xs text-agro-muted leading-relaxed">
+              {t('dashboard.reset_confirm') || 'Are you sure you want to clear scan records? The dashboard will return to a fresh blank state.'}
             </p>
-            <div className="flex items-center justify-end space-x-3 pt-2">
+            <div className="flex items-center justify-end gap-3 pt-2">
               <button
+                type="button"
                 onClick={() => setShowResetModal(false)}
-                className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300 transition"
+                className="px-4 py-2.5 rounded-xl bg-agro-surface hover:bg-agro-hover border border-agro-border text-xs font-semibold text-agro-muted hover:text-agro-cream transition"
               >
                 Cancel
               </button>
               <button
+                type="button"
                 onClick={handleResetData}
-                className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-xs font-bold text-white transition shadow-lg shadow-red-600/20"
+                className="px-4 py-2.5 rounded-xl bg-agro-terracotta hover:bg-agro-terracottaDark text-xs font-bold text-agro-cream transition shadow-md"
               >
                 Confirm Reset (Clear)
               </button>

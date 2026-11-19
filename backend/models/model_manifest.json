@@ -385,5 +385,61 @@
       "size_bytes": 477,
       "sha256": "c36b7559c3daa3d4d924aa2782c545593486962c106e83c073d4434691d9affb"
     }
+  },
+  "primary_active_model": {
+    "repository_id": "rodynaemad/plant-disease-dinov2-small",
+    "selected_revision": "06ebf5e308e100fd000d738c42b059ebb5f58a16",
+    "immutable_commit_sha": "06ebf5e308e100fd000d738c42b059ebb5f58a16",
+    "model_architecture": "Dinov2ForImageClassification",
+    "base_model": "facebook/dinov2-small",
+    "task": "image-classification",
+    "license": "CC-BY-SA-4.0",
+    "download_date": "2026-11-19T18:25:16Z",
+    "model_directory": "backend/models/plant-disease-dinov2-small",
+    "weights_size_bytes": 88368584,
+    "label_count": 38,
+    "files": {
+      "calibration.json": {
+        "size_bytes": 247,
+        "sha256": "b8afa40ac1d359007bc8077ffd5143c629125f0dfbaf8b42f5abe5a2ba2293f0"
+      },
+      "config.json": {
+        "size_bytes": 3943,
+        "sha256": "d25b5b7e0d596e35cde57d24f82f0c041b0c4568cc90ec281d92cba56f78a1fd"
+      },
+      "model.safetensors": {
+        "size_bytes": 88368584,
+        "sha256": "faf2ac7e365aabcbfaf5cb31abf8c18b6f7f36355fc03edd6edee2c0a3afd6a4"
+      },
+      "preprocessor_config.json": {
+        "size_bytes": 463,
+        "sha256": "b80c65122baf0c280beb8e3f48e52447f60be990411122fda205e779191b4738"
+      },
+      "README.md": {
+        "size_bytes": 6943,
+        "sha256": "5b08dca0041174449568ccd19e26318fcdbc6343a3413f1b7b9f80d4a707c189"
+      },
+      "threshold.json": {
+        "size_bytes": 234,
+        "sha256": "492d1ecd9c33e23699e6c05169f0674030c7cc47eb2024e70331fb126fb4805a"
+      }
+    },
+    "calibration": {
+      "temperature": 1.0,
+      "method": "temperature_scaling",
+      "threshold": 0.5
+    },
+    "performance": {
+      "cpu_latency_ms": 103.29,
+      "accuracy_reported": "98.86%",
+      "f1_score": "98.49%"
+    }
+  },
+  "fallback_model": {
+    "repository_id": "neghani/plantvillage-mobilenetv2",
+    "selected_revision": "v1.1",
+    "immutable_commit_sha": "77e6d262dca53b818f7ad1d67088700754515639",
+    "model_architecture": "MobileNetV2ForImageClassification",
+    "model_directory": "backend/models/plantvillage-mobilenetv2"
   }
 }

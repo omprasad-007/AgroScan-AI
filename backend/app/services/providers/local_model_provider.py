@@ -40,7 +40,7 @@ class AgroScanLocalModelProvider(DiseaseDetectionProvider):
     """
 
     def __init__(self):
-        super().__init__(name="agroscan_local", display_name="AgroScan Local Vision Engine (MobileNetV2)")
+        super().__init__(name="agroscan_local", display_name="AgroScan Local Vision Engine")
         self.model_service = local_model_service
 
     def is_available(self) -> bool:
@@ -50,8 +50,10 @@ class AgroScanLocalModelProvider(DiseaseDetectionProvider):
     def get_health_status(self) -> ProviderHealthStatus:
         base = super().get_health_status()
         meta = self.model_service.get_model_metadata()
+        model_name = meta.get("model_name", "Vision Transformer")
+        base.display_name = f"AgroScan Local Vision Engine ({model_name})"
         base.notes = (
-            f"MobileNetV2 ({meta.get('revision', 'v1.1')}) - "
+            f"{model_name} ({meta.get('revision', 'latest')[:10]}) - "
             f"Loaded: {meta.get('is_loaded')}, Classes: {meta.get('num_classes', 38)}, "
             f"Device: {meta.get('device', 'cpu')}"
         )
