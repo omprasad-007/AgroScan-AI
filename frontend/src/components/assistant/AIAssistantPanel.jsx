@@ -240,16 +240,16 @@ export const AIAssistantPanel = ({ scanData, predictionId, autoOpen = true }) =>
               <div
                 className={`p-3.5 rounded-2xl text-xs sm:text-sm leading-relaxed ${
                   msg.sender === 'user'
-                    ? 'bg-agro-primary text-agro-bg font-semibold rounded-tr-none shadow-md shadow-agro-primary/15'
-                    : 'bg-agro-card border border-agro-border text-agro-cream rounded-tl-none'
+                    ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-semibold rounded-tr-none shadow-md shadow-emerald-500/20'
+                    : 'bg-slate-900/90 dark:bg-slate-900/90 light:bg-white border border-slate-800 dark:border-white/[0.08] light:border-slate-200 text-slate-100 dark:text-slate-100 light:text-slate-800 rounded-tl-none shadow-sm'
                 }`}
               >
                 <p className="whitespace-pre-wrap">{msg.content}</p>
 
                 {/* Multi-Source Research Citations */}
                 {msg.sender === 'assistant' && msg.sources && msg.sources.length > 0 && (
-                  <div className="mt-2.5 pt-2 border-t border-agro-border space-y-1.5">
-                    <span className="text-[10px] font-bold text-agro-primary flex items-center gap-1.5">
+                  <div className="mt-2.5 pt-2 border-t border-slate-800 dark:border-white/[0.08] light:border-slate-200 space-y-1.5">
+                    <span className="text-[10px] font-bold text-emerald-400 dark:text-emerald-400 light:text-emerald-600 flex items-center gap-1.5">
                       <BookOpen className="w-3 h-3" />
                       <span>{lang === 'mr' ? 'तपासलेले संदर्भ (Sources):' : 'Verified Evidence & Sources:'}</span>
                     </span>
@@ -260,7 +260,7 @@ export const AIAssistantPanel = ({ scanData, predictionId, autoOpen = true }) =>
                           href={src.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-[10px] text-agro-muted hover:text-agro-primary underline truncate transition"
+                          className="text-[10px] text-slate-400 dark:text-slate-400 light:text-slate-600 hover:text-emerald-400 dark:hover:text-emerald-400 light:hover:text-emerald-600 underline truncate transition"
                         >
                           • [{src.source}] {src.title}
                         </a>

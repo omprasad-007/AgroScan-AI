@@ -180,8 +180,7 @@ class ModelRegistry:
             processor = AutoImageProcessor.from_pretrained(
                 model_target,
                 cache_dir=cache_dir if not local_files_only else None,
-                local_files_only=local_files_only,
-                use_fast=True
+                local_files_only=local_files_only
             )
             model = AutoModelForImageClassification.from_pretrained(
                 model_target,

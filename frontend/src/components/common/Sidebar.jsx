@@ -33,7 +33,7 @@ export const Sidebar = () => {
   }
 
   return (
-    <aside className="w-64 bg-agro-card border-r border-agro-border shrink-0 hidden md:block min-h-[calc(100vh-4rem)] p-4 flex flex-col justify-between">
+    <aside className="w-64 bg-slate-900/70 dark:bg-slate-950/70 light:bg-white/80 backdrop-blur-xl border-r border-slate-800/80 dark:border-white/[0.08] light:border-slate-200/90 shrink-0 hidden md:block min-h-[calc(100vh-4rem)] p-4 flex flex-col justify-between transition-colors duration-300">
       <nav className="space-y-1.5" aria-label="Main navigation">
         {links.map((link) => {
           const Icon = link.icon;
@@ -45,16 +45,16 @@ export const Sidebar = () => {
               to={link.to}
               className={({ isActive }) => {
                 if (isPrimary) {
-                  return `flex items-center justify-between px-3.5 py-3 rounded-xl font-bold text-sm transition-all duration-200 mb-2 ${
+                  return `flex items-center justify-between px-3.5 py-3 rounded-xl font-bold text-sm transition-all duration-200 mb-2.5 ${
                     isActive
-                      ? 'bg-agro-primary text-agro-bg shadow-md shadow-agro-primary/25 ring-2 ring-agro-primary/50'
-                      : 'bg-agro-primary/15 text-agro-primary hover:bg-agro-primary hover:text-agro-bg border border-agro-primary/30 shadow-sm'
+                      ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 shadow-lg shadow-emerald-500/25 ring-2 ring-emerald-400/50'
+                      : 'bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500 hover:text-slate-950 border border-emerald-500/30 shadow-sm'
                   }`;
                 }
                 return `flex items-center space-x-3 px-3.5 py-2.5 rounded-xl font-medium text-sm transition-all duration-150 ${
                   isActive
-                    ? 'bg-agro-surface text-agro-cream font-bold border border-agro-borderStrong shadow-sm'
-                    : 'text-agro-muted hover:text-agro-cream hover:bg-agro-surface border border-transparent'
+                    ? 'bg-slate-800/90 dark:bg-slate-800/90 light:bg-slate-100 text-white dark:text-white light:text-slate-900 font-bold border border-slate-700/80 dark:border-slate-700 light:border-slate-300 shadow-sm'
+                    : 'text-slate-400 hover:text-white dark:hover:text-white light:hover:text-slate-900 hover:bg-slate-800/50 dark:hover:bg-slate-800/50 light:hover:bg-slate-100 border border-transparent'
                 }`;
               }}
             >
@@ -66,7 +66,7 @@ export const Sidebar = () => {
                   </div>
                   {isPrimary && (
                     <span className={`text-[10px] uppercase tracking-wider font-extrabold px-1.5 py-0.5 rounded-md ${
-                      isActive ? 'bg-agro-bg text-agro-primary' : 'bg-agro-primary/20 text-agro-primary'
+                      isActive ? 'bg-slate-950 text-emerald-400' : 'bg-emerald-500/20 text-emerald-400'
                     }`}>
                       Live
                     </span>
@@ -79,12 +79,12 @@ export const Sidebar = () => {
       </nav>
 
       {/* Helpful Quick Prompt Card */}
-      <div className="mt-6 p-3.5 rounded-2xl bg-agro-surface/60 border border-agro-border space-y-2">
-        <div className="flex items-center gap-2 text-xs font-bold text-agro-lime">
-          <Sparkles className="w-3.5 h-3.5" aria-hidden="true" />
+      <div className="mt-6 p-4 rounded-2xl glass-card space-y-2">
+        <div className="flex items-center gap-2 text-xs font-bold text-emerald-400">
+          <Sparkles className="w-4 h-4 text-emerald-400" aria-hidden="true" />
           <span>Multi-Crop Vision AI</span>
         </div>
-        <p className="text-[11px] text-agro-muted leading-relaxed">
+        <p className="text-[11px] text-slate-400 leading-relaxed">
           Capture close-up leaf photos with natural daylight for highest diagnostic accuracy.
         </p>
       </div>

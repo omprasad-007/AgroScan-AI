@@ -8,175 +8,271 @@
   }
 
   body {
-    @apply min-h-screen font-sans antialiased text-agro-cream bg-agro-bg;
+    @apply min-h-screen font-sans antialiased text-slate-100 bg-slate-950 transition-colors duration-300;
   }
 
   ::selection {
-    background-color: rgba(47, 191, 113, 0.25);
-    color: #A6D85A;
+    background-color: rgba(16, 185, 129, 0.25);
+    color: #10B981;
   }
 
   /* Accessible outline & focus */
   :focus-visible {
-    outline: 2px solid #2FBF71;
+    outline: 2px solid #10B981;
     outline-offset: 2px;
   }
 }
 
-/* Dark Mode Global Background & Base */
+/* =============================================================
+ * DARK MODE: Modern Obsidian Tech with Subtle Ambient Mesh
+ * =========================================================== */
 html.dark body {
-  background-color: #101510;
-  color: #FAF7EF;
+  background-color: #0B0F17;
+  color: #F8FAFC;
+  background-image: 
+    radial-gradient(at 15% 10%, rgba(16, 185, 129, 0.08) 0px, transparent 40%),
+    radial-gradient(at 85% 20%, rgba(6, 182, 212, 0.06) 0px, transparent 40%),
+    radial-gradient(at 50% 90%, rgba(16, 185, 129, 0.05) 0px, transparent 50%);
+  background-attachment: fixed;
 }
 
-/* Light Mode Global Background & Base (Warm Cream / Sage - Never blue) */
+/* =============================================================
+ * LIGHT MODE: Ultra-Clean, Luminous White & Slate Architecture
+ * =========================================================== */
 html.light body {
-  background-color: #FAF7F0;
-  color: #1A231A;
+  background-color: #F8FAFC;
+  color: #0F172A;
+  background-image: 
+    radial-gradient(at 10% 10%, rgba(16, 185, 129, 0.05) 0px, transparent 40%),
+    radial-gradient(at 90% 15%, rgba(14, 165, 233, 0.04) 0px, transparent 40%);
+  background-attachment: fixed;
 }
 
-/* -------------------------------------------------------------
- * Elevated Organic Surfaces & Panels
- * ----------------------------------------------------------- */
+/* =============================================================
+ * GLASSMORPHISM & SOLID MORPHING SURFACES
+ * =========================================================== */
+
+/* Dark Mode Glassmorphic Card */
 .agro-panel,
-.glass-panel {
-  background-color: #182018;
-  border: 1px solid #263326;
-  border-radius: 1rem;
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.45);
+.glass-panel,
+.glass-card {
+  background: rgba(17, 24, 39, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1.25rem;
+  box-shadow: 
+    0 8px 32px 0 rgba(0, 0, 0, 0.37),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.07);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+.agro-panel:hover,
+.glass-panel:hover,
+.glass-card:hover {
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+/* Light Mode Glassmorphic Card (Pure White with Subtle Floating Depth) */
+html.light .agro-panel,
+html.light .glass-panel,
+html.light .glass-card {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(226, 232, 240, 0.85);
+  box-shadow: 
+    0 10px 30px -4px rgba(15, 23, 42, 0.06),
+    0 2px 6px -1px rgba(15, 23, 42, 0.03),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.95);
+}
+
+html.light .agro-panel:hover,
+html.light .glass-panel:hover,
+html.light .glass-card:hover {
+  border-color: #CBD5E1;
+  box-shadow: 
+    0 16px 36px -4px rgba(15, 23, 42, 0.09),
+    0 4px 12px -2px rgba(15, 23, 42, 0.04);
+}
+
+/* Interactive Hover Lift */
 .agro-panel-hover,
 .glass-panel-hover {
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .agro-panel-hover:hover,
 .glass-panel-hover:hover {
-  background-color: #202B20;
-  border-color: #344734;
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.55);
-}
-
-/* Light Mode Surface Overrides */
-html.light .agro-panel,
-html.light .glass-panel {
-  background-color: #FFFFFF;
-  border: 1px solid #DDD8CB;
-  box-shadow: 0 4px 16px -2px rgba(24, 32, 24, 0.05);
+  border-color: rgba(16, 185, 129, 0.35);
+  box-shadow: 0 16px 40px -6px rgba(0, 0, 0, 0.5);
 }
 
 html.light .agro-panel-hover:hover,
 html.light .glass-panel-hover:hover {
-  background-color: #F8F5EC;
-  border-color: #C8C2B3;
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px -4px rgba(24, 32, 24, 0.09);
+  border-color: #94A3B8;
+  box-shadow: 0 16px 40px -6px rgba(15, 23, 42, 0.1);
 }
 
-/* -------------------------------------------------------------
- * Light Mode Typography & Surfaces
- * ----------------------------------------------------------- */
-html.light .text-white {
-  color: #1A231A !important;
+/* Solid-Morphism (Floating Solid with Dual-Light Shadows) */
+.solid-morph {
+  border-radius: 1.25rem;
+  background: #111827;
+  box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.4), -2px -2px 8px rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-html.light .text-slate-100 {
-  color: #1A231A !important;
+html.light .solid-morph {
+  background: #FFFFFF;
+  box-shadow: 6px 6px 16px rgba(15, 23, 42, 0.06), -4px -4px 12px rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(226, 232, 240, 0.9);
 }
 
+/* Glass Pills & Controls */
+.glass-pill {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+html.light .glass-pill {
+  background: rgba(241, 245, 249, 0.8);
+  border: 1px solid rgba(226, 232, 240, 0.85);
+  color: #0F172A;
+}
+
+/* =============================================================
+ * LIGHT THEME AUTOMATIC REFINED OVERRIDES
+ * =========================================================== */
+html.light .text-agro-cream {
+  color: #0F172A !important;
+}
+
+/* Accessible high-contrast badge colors in light mode */
+html.light .text-agro-lime {
+  color: #047857 !important;
+}
+html.light .text-agro-primary {
+  color: #059669 !important;
+}
+html.light .text-agro-amber {
+  color: #B45309 !important;
+}
+html.light .text-agro-terracotta {
+  color: #BE123C !important;
+}
+
+html.light .text-slate-100,
 html.light .text-slate-200 {
-  color: #263326 !important;
+  color: #1E293B !important;
 }
 
 html.light .text-slate-300 {
-  color: #404F40 !important;
+  color: #334155 !important;
 }
 
-html.light .text-slate-400 {
-  color: #636D61 !important;
+html.light .text-slate-400,
+html.light .text-agro-muted {
+  color: #64748B !important;
 }
 
 html.light .text-slate-500 {
-  color: #7B8579 !important;
+  color: #94A3B8 !important;
 }
 
+html.light .bg-agro-bg,
 html.light .bg-slate-950 {
-  background-color: #FAF7F0 !important;
+  background-color: #F8FAFC !important;
 }
 
+html.light .bg-agro-card,
 html.light .bg-slate-900 {
   background-color: #FFFFFF !important;
 }
 
-html.light .bg-slate-900\/60,
-html.light .bg-slate-900\/70,
-html.light .bg-slate-900\/80,
-html.light .bg-slate-900\/90 {
-  background-color: #F8F5EC !important;
-}
-
+html.light .bg-agro-surface,
 html.light .bg-slate-800 {
-  background-color: #EDE8DC !important;
-  color: #1A231A !important;
+  background-color: #F1F5F9 !important;
+  color: #0F172A !important;
 }
 
-html.light .bg-slate-800\/80,
-html.light .bg-slate-800\/70,
-html.light .bg-slate-800\/60 {
-  background-color: #E6E1D4 !important;
+html.light .bg-agro-hover,
+html.light .bg-slate-700 {
+  background-color: #E2E8F0 !important;
 }
 
-html.light .border-slate-800 {
-  border-color: #DDD8CB !important;
-}
-
+html.light .border-agro-border,
+html.light .border-slate-800,
 html.light .border-slate-700 {
-  border-color: #C8C2B3 !important;
+  border-color: #E2E8F0 !important;
 }
 
-/* -------------------------------------------------------------
- * Interactive Primary Buttons & Touch Feedback
- * ----------------------------------------------------------- */
+/* Table header contrast in light mode */
+html.light th {
+  color: #475569 !important;
+}
+
+/* Input fields in light mode */
+html.light input:not([type="range"]),
+html.light select,
+html.light textarea {
+  background-color: #FFFFFF !important;
+  color: #0F172A !important;
+  border-color: #CBD5E1 !important;
+}
+
+html.light input::placeholder,
+html.light textarea::placeholder {
+  color: #94A3B8 !important;
+}
+
+/* =============================================================
+ * INTERACTIVE PRIMARY BUTTONS & FEEDBACK
+ * =========================================================== */
 .btn-agro-primary {
-  @apply inline-flex items-center justify-center font-bold transition-all duration-150 rounded-xl bg-agro-primary hover:bg-agro-primaryHover text-agro-bg active:scale-[0.98] shadow-md shadow-agro-primary/20 disabled:opacity-50 disabled:cursor-not-allowed;
+  @apply inline-flex items-center justify-center font-bold transition-all duration-150 rounded-xl bg-agro-primary hover:bg-agro-primaryHover text-white active:scale-[0.98] shadow-md shadow-agro-primary/25 disabled:opacity-50 disabled:cursor-not-allowed;
 }
 
 .btn-agro-secondary {
   @apply inline-flex items-center justify-center font-semibold transition-all duration-150 rounded-xl bg-agro-surface hover:bg-agro-hover border border-agro-border text-agro-cream active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
 }
 
-/* -------------------------------------------------------------
- * Custom Organic Scrollbars
- * ----------------------------------------------------------- */
+/* =============================================================
+ * CUSTOM MODERN SCROLLBARS
+ * =========================================================== */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 html.dark ::-webkit-scrollbar-track {
-  background: #101510;
+  background: #0B0F17;
 }
 html.dark ::-webkit-scrollbar-thumb {
-  background: #273527;
+  background: #1E293B;
   border-radius: 9999px;
 }
 html.dark ::-webkit-scrollbar-thumb:hover {
-  background: #344734;
+  background: #334155;
 }
 
 html.light ::-webkit-scrollbar-track {
-  background: #FAF7F0;
+  background: #F8FAFC;
 }
 html.light ::-webkit-scrollbar-thumb {
-  background: #C8C2B3;
+  background: #CBD5E1;
   border-radius: 9999px;
 }
+html.light ::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}
 
-/* -------------------------------------------------------------
- * Reduced Motion Support
- * ----------------------------------------------------------- */
+/* =============================================================
+ * REDUCED MOTION SUPPORT
+ * =========================================================== */
 @media (prefers-reduced-motion: reduce) {
   *, ::before, ::after {
     animation-duration: 0.01ms !important;
