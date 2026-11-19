@@ -362,25 +362,31 @@ class LeafValidator:
         # Step 5: BOTANICAL LEAF & VEGETATION ANALYSIS
         # ------------------------------------------------------------------
         # True chlorophyll plant foliage spectrum:
-        # Green hue between 55° and 165°, ExG > 12.0, NDI > 0.05, Green dominance over R and B
+        # Green hue between 40° and 180°, ExG > 4.0 or (G >= R*0.88 and G > B*0.90)
         foliage_green_mask = (
-            (hue >= 50.0) & (hue <= 170.0) &
-            (exg >= 12.0) & (ndi >= 0.04) &
-            (g > r) & (g > b) & (val >= 25.0)
+            (hue >= 40.0) & (hue <= 180.0) &
+            (val >= 20.0) &
+            ((exg >= 4.0) | ((g >= r * 0.88) & (g > b * 0.90)))
         )
         green_foliage_ratio = float(np.mean(foliage_green_mask))
 
-        # Necrotic lesion mask on leaf (blight brown, chlorotic halo)
-        # MUST be contiguous or co-located with plant tissue (Hue in [20, 50], sat > 0.20, val in [20, 200])
+        # Necrotic / chlorotic lesion mask on leaf (blight brown, chlorotic halo, rust yellowing, powdery coating)
         lesion_mask = (
-            (hue >= 18.0) & (hue <= 52.0) &
-            (sat >= 0.22) & (val >= 25.0) & (val <= 210.0) &
-            (r >= b + 15.0)
+            (
+                (hue >= 15.0) & (hue <= 55.0) &
+                (sat >= 0.12) & (val >= 20.0) & (val <= 230.0) &
+                (r >= b * 0.90)
+            ) |
+            (
+                # Pale fungal/mildew dust on leaf surface
+                (sat <= 0.28) & (val >= 100.0) & (val <= 245.0) &
+                (np.abs(r - g) < 30.0) & (np.abs(g - b) < 30.0)
+            )
         )
         lesion_ratio = float(np.mean(lesion_mask))
 
-        # Combined leaf coverage: only allow necrotic lesion to count if verified green foliage is present (> 0.05)
-        if green_foliage_ratio >= 0.05:
+        # Combined leaf coverage:
+        if green_foliage_ratio >= 0.03 or (lesion_ratio >= 0.04 and green_foliage_ratio >= 0.015):
             combined_leaf_mask = foliage_green_mask | lesion_mask
         else:
             combined_leaf_mask = foliage_green_mask
@@ -494,7 +500,7 @@ class LeafValidator:
             )
 
         # Case G: Overall Non-Plant / Random Object / Animal
-        if leaf_coverage_ratio < 0.10 and green_foliage_ratio < 0.08:
+        if leaf_coverage_ratio < 0.06 and green_foliage_ratio < 0.03:
             return LeafValidationResult(
                 is_plant=False,
                 is_leaf=False,
@@ -514,9 +520,9 @@ class LeafValidator:
         # ------------------------------------------------------------------
         # Leaf Confidence calculation:
         # 1. Coverage: leaf occupies at least 15% to 60% of frame
-        conf_coverage = min(1.0, leaf_coverage_ratio / 0.20)
+        conf_coverage = min(1.0, leaf_coverage_ratio / 0.18)
         # 2. Spectral quality: proportion of chlorophyll green index
-        conf_spectral = min(1.0, green_foliage_ratio / 0.15)
+        conf_spectral = min(1.0, green_foliage_ratio / 0.12)
         # 3. Organic texture & venation
         conf_texture = organic_texture_score
 
@@ -528,9 +534,8 @@ class LeafValidator:
         leaf_thresh = getattr(settings, "LEAF_VALIDATION_THRESHOLD", 0.70)
         # Require genuine leaf confidence and sufficient leaf blade visibility
         is_leaf_valid = (
-            leaf_confidence >= (leaf_thresh * 0.75) and
-            green_foliage_ratio >= 0.08 and
-            leaf_coverage_ratio >= 0.10
+            leaf_confidence >= 0.28 and
+            (green_foliage_ratio >= 0.03 or leaf_coverage_ratio >= 0.06)
         )
 
         if not is_leaf_valid:

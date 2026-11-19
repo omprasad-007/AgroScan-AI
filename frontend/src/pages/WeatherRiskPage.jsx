@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import { CloudSun, HelpCircle } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { CloudSun, HelpCircle, MapPin, RefreshCw, Navigation, Search, CheckCircle2 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { WeatherRiskBadge } from '../components/common/Badge';
+import { detectLocalWeather, fetchCityWeather } from '../services/weather';
 import api from '../services/api';
 
 export const WeatherRiskPage = () => {
@@ -12,21 +13,23 @@ export const WeatherRiskPage = () => {
   const [crop, setCrop] = useState('Tomato');
   const [riskResult, setRiskResult] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [weatherMeta, setWeatherMeta] = useState(null);
+  const [detectingGps, setDetectingGps] = useState(false);
+  const [cityInput, setCityInput] = useState('');
 
   const availableCrops = [
     'Tomato', 'Potato', 'Rice', 'Wheat', 'Cotton',
     'Soybean', 'Maize', 'Chilli', 'Onion', 'Sugarcane'
   ];
 
-  const handleEvaluate = async (e) => {
-    if (e) e.preventDefault();
+  const evaluateRisk = useCallback(async (tVal, hVal, rVal, cVal) => {
     setLoading(true);
     try {
       const res = await api.post('/weather/risk', {
-        temperature_c: parseFloat(temp),
-        humidity_pct: parseFloat(humidity),
-        rainfall_mm: parseFloat(rainfall),
-        crop
+        temperature_c: parseFloat(tVal),
+        humidity_pct: parseFloat(hVal),
+        rainfall_mm: parseFloat(rVal),
+        crop: cVal,
       });
       setRiskResult(res.data);
     } catch (err) {
@@ -34,6 +37,54 @@ export const WeatherRiskPage = () => {
     } finally {
       setLoading(false);
     }
+  }, []);
+
+  const handleDetectLocation = useCallback(async (force = false) => {
+    setDetectingGps(true);
+    try {
+      const live = await detectLocalWeather(lang, force);
+      if (live) {
+        setWeatherMeta(live);
+        setTemp(live.temperature_c);
+        setHumidity(live.humidity_pct);
+        setRainfall(live.rainfall_mm);
+        evaluateRisk(live.temperature_c, live.humidity_pct, live.rainfall_mm, crop);
+      }
+    } catch (err) {
+      console.warn('Weather detection notice:', err);
+    } finally {
+      setDetectingGps(false);
+    }
+  }, [crop, evaluateRisk, lang]);
+
+  useEffect(() => {
+    handleDetectLocation(false);
+  }, [handleDetectLocation]);
+
+  const handleCitySearch = async (e) => {
+    e.preventDefault();
+    if (!cityInput.trim()) return;
+    setDetectingGps(true);
+    try {
+      const res = await fetchCityWeather(cityInput.trim(), lang);
+      if (res) {
+        setWeatherMeta(res);
+        setTemp(res.temperature_c);
+        setHumidity(res.humidity_pct);
+        setRainfall(res.rainfall_mm);
+        evaluateRisk(res.temperature_c, res.humidity_pct, res.rainfall_mm, crop);
+        setCityInput('');
+      }
+    } catch (err) {
+      console.warn('City weather search failed:', err);
+    } finally {
+      setDetectingGps(false);
+    }
+  };
+
+  const handleEvaluate = (e) => {
+    if (e) e.preventDefault();
+    evaluateRisk(temp, humidity, rainfall, crop);
   };
 
   return (
@@ -50,6 +101,68 @@ export const WeatherRiskPage = () => {
         <p className="text-xs sm:text-sm text-slate-400 mt-1">
           {t('weather.subtitle') || 'Evaluate ambient weather parameters against crop-specific pathogen germination thresholds to forecast outbreak probability and explain WHY.'}
         </p>
+      </div>
+
+      {/* Live Farm Weather & GPS Microclimate Detector Card */}
+      <div className="glass-panel p-5 rounded-2xl border border-slate-800 bg-gradient-to-r from-slate-900/90 via-slate-900/60 to-emerald-950/20 space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0">
+              <MapPin className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center space-x-2">
+                <span className="text-sm font-extrabold text-white">
+                  {weatherMeta?.location ? `📍 ${weatherMeta.location}` : 'Detecting Farm Location...'}
+                </span>
+                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                  weatherMeta?.isGpsDetected
+                    ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
+                    : 'bg-cyan-500/15 text-cyan-300 border border-cyan-500/30'
+                }`}>
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping mr-1.5" />
+                  {weatherMeta?.isGpsDetected ? 'Device GPS Microclimate' : 'District Microclimate'}
+                </span>
+              </div>
+              <p className="text-xs text-slate-400 mt-0.5">
+                {weatherMeta?.condition || 'Clear sky'} • {temp}°C • {humidity}% Humidity • {rainfall}mm Rain
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center space-x-2 shrink-0">
+            <button
+              type="button"
+              onClick={() => handleDetectLocation(true)}
+              disabled={detectingGps}
+              className="inline-flex items-center space-x-1.5 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-emerald-500/30 text-xs font-semibold transition disabled:opacity-50"
+            >
+              <Navigation className={`w-3.5 h-3.5 ${detectingGps ? 'animate-spin' : ''}`} />
+              <span>{detectingGps ? 'Detecting GPS...' : 'Detect Farm GPS'}</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Quick Search Alternative City or Village */}
+        <form onSubmit={handleCitySearch} className="flex items-center gap-2 pt-2 border-t border-slate-800/80">
+          <div className="relative flex-1">
+            <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <input
+              type="text"
+              value={cityInput}
+              onChange={(e) => setCityInput(e.target.value)}
+              placeholder="Search other district or village (e.g. Kolhapur, Solapur, Nashik)..."
+              className="w-full pl-8 pr-3 py-1.5 rounded-xl bg-slate-950/70 border border-slate-800 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-emerald-500"
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={detectingGps || !cityInput.trim()}
+            className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition disabled:opacity-40"
+          >
+            Search
+          </button>
+        </form>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

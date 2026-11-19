@@ -104,6 +104,11 @@ api.interceptors.response.use(
         originalRequest.headers.Authorization = 'Bearer ' + refreshedToken;
         return api(originalRequest);
       }
+      // If authenticating failed or timed out, public scanning endpoints can still succeed as guest!
+      if (requestUrl.includes('/predictions/analyze') || requestUrl.includes('/predictions/validate-image') || requestUrl.includes('/weather/')) {
+        delete originalRequest.headers.Authorization;
+        return api(originalRequest);
+      }
       clearStoredSession();
       window.dispatchEvent(new CustomEvent('agroscan:session-expired'));
     }

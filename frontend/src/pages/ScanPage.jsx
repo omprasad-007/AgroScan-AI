@@ -4,6 +4,7 @@ import { Upload, Sparkles, AlertCircle, CheckCircle2, Camera, RefreshCw, Home, M
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { CameraScanner } from '../components/camera/CameraScanner';
+import { detectLocalWeather } from '../services/weather';
 import api from '../services/api';
 
 const AVAILABLE_CROPS = [
@@ -40,11 +41,18 @@ export const ScanPage = () => {
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState('camera'); // 'camera' or 'upload'
   const [selectedCrop, setSelectedCrop] = useState('auto');
+  const [localWeather, setLocalWeather] = useState(null);
 
   const [farms, setFarms] = useState([]);
   const [selectedFarmId, setSelectedFarmId] = useState('');
 
-    useEffect(() => {
+  useEffect(() => {
+    detectLocalWeather()
+      .then(w => { if (w) setLocalWeather(w); })
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
     api.get('/health').catch(() => {});
     if (!isAuthenticated) {
       setFarms([]);
@@ -104,12 +112,13 @@ export const ScanPage = () => {
       return;
     }
     setIsAnalyzing(true);
-    // Navigate to animated Analysis Loading page with selected crop
+    // Navigate to animated Analysis Loading page with selected crop and local microclimate weather
     navigate('/analysis', {
       state: {
         imageFile: targetFile,
         farmId: selectedFarmId,
-        targetCrop: selectedCrop
+        targetCrop: selectedCrop,
+        weather: localWeather
       }
     });
   };

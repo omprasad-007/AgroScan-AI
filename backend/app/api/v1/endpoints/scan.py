@@ -296,29 +296,75 @@ async def analyze_leaf(
 def get_prediction_history(
     limit: int = Query(default=50, ge=1, le=100),
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: Optional[User] = Depends(get_optional_current_user),
 ):
-    predictions = (
-        db.query(ScanPrediction)
-        .filter(ScanPrediction.user_id == current_user.id)
-        .order_by(ScanPrediction.created_at.desc())
-        .limit(limit)
-        .all()
-    )
+    user_id = current_user.id if current_user else "guest"
+    query = db.query(ScanPrediction).filter(
+        (ScanPrediction.user_id == user_id) | (ScanPrediction.user_id == "guest")
+    ) if not current_user else db.query(ScanPrediction).filter(ScanPrediction.user_id == current_user.id)
+
+    predictions = query.order_by(ScanPrediction.created_at.desc()).limit(limit).all()
     return [format_prediction_response(prediction) for prediction in predictions]
+
+
+@router.delete("/history")
+def clear_prediction_history(
+    db: Session = Depends(get_db),
+    current_user: Optional[User] = Depends(get_optional_current_user),
+):
+    """Permanently delete all scan prediction history and associated recommendations."""
+    if current_user:
+        preds = db.query(ScanPrediction).filter(
+            (ScanPrediction.user_id == current_user.id) | (ScanPrediction.user_id == "guest")
+        ).all()
+    else:
+        # In demo or guest mode, clear all guest/demo scans
+        demo_farmer = db.query(User).filter(User.email == "farmer@agroscan.ai").first()
+        demo_ids = [demo_farmer.id] if demo_farmer else []
+        preds = db.query(ScanPrediction).filter(
+            (ScanPrediction.user_id == "guest") | (ScanPrediction.user_id.in_(demo_ids))
+        ).all()
+
+    pred_ids = [p.id for p in preds]
+    if pred_ids:
+        db.query(Recommendation).filter(Recommendation.prediction_id.in_(pred_ids)).delete(synchronize_session=False)
+        db.query(ScanPrediction).filter(ScanPrediction.id.in_(pred_ids)).delete(synchronize_session=False)
+        db.commit()
+
+    return {
+        "status": "success",
+        "deleted_count": len(pred_ids),
+        "message": "Scan history and diagnostic records cleared permanently from database.",
+    }
+
+
+@router.delete("/{id}")
+def delete_prediction_by_id(
+    id: str,
+    db: Session = Depends(get_db),
+    current_user: Optional[User] = Depends(get_optional_current_user),
+):
+    """Delete a single scan prediction record and its recommendations."""
+    pred = db.query(ScanPrediction).filter(ScanPrediction.id == id).first()
+    if not pred:
+        return {"status": "not_found", "id": id, "message": "Prediction record not found"}
+
+    db.query(Recommendation).filter(Recommendation.prediction_id == pred.id).delete(synchronize_session=False)
+    db.delete(pred)
+    db.commit()
+    return {"status": "success", "id": id, "message": "Scan record deleted successfully."}
 
 
 @router.get("/{id}", response_model=PredictionResponse)
 def get_prediction_by_id(
     id: str,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: Optional[User] = Depends(get_optional_current_user),
 ):
-    prediction = (
-        db.query(ScanPrediction)
-        .filter(ScanPrediction.id == id, ScanPrediction.user_id == current_user.id)
-        .first()
-    )
+    query = db.query(ScanPrediction).filter(ScanPrediction.id == id)
+    if current_user:
+        query = query.filter((ScanPrediction.user_id == current_user.id) | (ScanPrediction.user_id == "guest"))
+    prediction = query.first()
     if not prediction:
         raise HTTPException(status_code=404, detail="Prediction record not found")
     return format_prediction_response(prediction)

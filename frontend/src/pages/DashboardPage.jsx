@@ -11,18 +11,21 @@ import {
   RotateCcw,
   Sparkles,
   Leaf,
-  ShieldCheck
+  ShieldCheck,
+  MapPin
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { SeverityBadge, WeatherRiskBadge } from '../components/common/Badge';
+import { detectLocalWeather } from '../services/weather';
 import api from '../services/api';
 
 const STORAGE_KEY = 'agroscan_scans_v1';
 
 export const DashboardPage = () => {
   const { user } = useAuth();
-  const { t, translateCrop, translateDisease } = useLanguage();
+  const { t, translateCrop, translateDisease, lang } = useLanguage();
+  const [localWeather, setLocalWeather] = useState(null);
   const [analytics, setAnalytics] = useState({
     total_predictions: 0,
     healthy_count: 0,
@@ -160,12 +163,33 @@ export const DashboardPage = () => {
     };
   }, [refreshDashboardData]);
 
-  const handleResetData = () => {
+  useEffect(() => {
+    detectLocalWeather(lang)
+      .then(w => {
+        if (w) setLocalWeather(w);
+      })
+      .catch(() => {});
+  }, [lang]);
+
+  const handleResetData = async () => {
     try {
       localStorage.removeItem(STORAGE_KEY);
-      window.dispatchEvent(new Event('agroscan_scan_completed'));
       setShowResetModal(false);
-      refreshDashboardData();
+      setRecentScans([]);
+      setAnalytics({
+        total_predictions: 0,
+        healthy_count: 0,
+        diseased_count: 0,
+        average_confidence: 0,
+        weather_risk_summary: {
+          overall_risk_level: 'None',
+          current_temp: 26.5,
+          current_humidity: 65.0,
+          alert: t('dashboard.blank_desc') || 'Your dashboard is currently blank. Upload or capture a plant leaf photo to generate live diagnostics.'
+        }
+      });
+      await api.delete('/predictions/history').catch(() => {});
+      window.dispatchEvent(new Event('agroscan_scan_completed'));
     } catch (e) {
       console.error('Failed to reset dashboard data:', e);
     }
@@ -324,7 +348,7 @@ export const DashboardPage = () => {
         {/* Weather Risk Card */}
         <div className="glass-panel p-6 rounded-2xl lg:col-span-1 flex flex-col justify-between border border-slate-800/80">
           <div>
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-3">
               <div className="flex items-center space-x-2">
                 <CloudSun className="w-5 h-5 text-agri-400" />
                 <h3 className="text-base font-bold text-white">{t('nav.weather')}</h3>
@@ -332,15 +356,37 @@ export const DashboardPage = () => {
               <WeatherRiskBadge level={analytics.weather_risk_summary?.overall_risk_level || 'Low'} />
             </div>
 
+            {/* Local Farm Weather Location */}
+            {localWeather && (
+              <div className="mb-3 px-3 py-2 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
+                <div className="flex items-center space-x-2 text-xs">
+                  <MapPin className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                  <span className="font-bold text-slate-200 truncate max-w-[140px]">
+                    {localWeather.location}
+                  </span>
+                </div>
+                <span className="inline-flex items-center text-[10px] text-emerald-400 font-semibold">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse mr-1" />
+                  {localWeather.isGpsDetected ? 'Live GPS' : 'District'}
+                </span>
+              </div>
+            )}
+
             <div className="bg-slate-900/60 p-4 rounded-xl border border-slate-800 space-y-3 mb-4">
               <div className="flex justify-between text-xs text-slate-300">
                 <span>{t('dashboard.temperature') || 'Temperature'}</span>
-                <span className="font-semibold">{analytics.weather_risk_summary?.current_temp || 26.5}°C</span>
+                <span className="font-semibold">{localWeather?.temperature_c ?? analytics.weather_risk_summary?.current_temp ?? 26.5}°C</span>
               </div>
               <div className="flex justify-between text-xs text-slate-300">
                 <span>{t('dashboard.humidity') || 'Humidity'}</span>
-                <span className="font-semibold">{analytics.weather_risk_summary?.current_humidity || 65.0}%</span>
+                <span className="font-semibold">{localWeather?.humidity_pct ?? analytics.weather_risk_summary?.current_humidity ?? 65.0}%</span>
               </div>
+              {localWeather?.condition && (
+                <div className="flex justify-between text-xs text-slate-300 pt-1 border-t border-slate-800/80">
+                  <span>Conditions</span>
+                  <span className="text-emerald-400 font-medium">{localWeather.condition}</span>
+                </div>
+              )}
             </div>
 
             <p className="text-xs text-slate-300 leading-relaxed bg-slate-900/40 p-3 rounded-xl border border-slate-800">

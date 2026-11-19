@@ -62,25 +62,30 @@ export const HistoryPage = () => {
     return () => window.removeEventListener('agroscan_scan_completed', handleScanEvent);
   }, [fetchHistory]);
 
-  const handleDeleteItem = (id) => {
+  const handleDeleteItem = async (id) => {
     try {
       const updated = history.filter(item => item.id !== id);
       setHistory(updated);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      await api.delete('/predictions/' + id).catch(() => {});
       window.dispatchEvent(new Event('agroscan_scan_completed'));
     } catch (e) {
       console.error('Failed to delete item:', e);
     }
   };
 
-  const handleClearAll = () => {
+  const handleClearAll = async () => {
     try {
+      setLoading(true);
       localStorage.removeItem(STORAGE_KEY);
       setHistory([]);
       setShowClearModal(false);
+      await api.delete('/predictions/history').catch(() => {});
       window.dispatchEvent(new Event('agroscan_scan_completed'));
     } catch (e) {
       console.error('Failed to clear history:', e);
+    } finally {
+      setLoading(false);
     }
   };
 
