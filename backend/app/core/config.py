@@ -73,9 +73,17 @@ class Settings(BaseSettings):
     DISEASE_CONFIDENCE_THRESHOLD: float = 0.65
     CONSENSUS_AGREEMENT_MIN: float = 0.50
 
-    # ML Config
-    MODEL_TYPE: str = "demo"
+    # ML & Local Hugging Face Model Config
+    MODEL_TYPE: str = "huggingface"
     MODEL_PATH: str = "../ml/models/plant_disease_model_v1.h5"
+    MODEL_CACHE_DIR: str = os.path.join(_BASE_DIR, "models_cache")
+    DEFAULT_LOCAL_MODEL: str = "neghani/plantvillage-mobilenetv2"
+    SECONDARY_LOCAL_MODEL: str = "rodynaemad/plant-disease-dinov2-small"
+    HF_INFERENCE_TIMEOUT: float = 8.0
+    LOCAL_INFERENCE_ENABLED: bool = True
+    CONFIDENCE_CALIBRATION_TEMPERATURE: float = 0.8845
+    HIGH_CONFIDENCE_THRESHOLD: float = 0.70
+    MODERATE_CONFIDENCE_THRESHOLD: float = 0.50
     UPLOAD_DIR: str = "./uploads"
 
     model_config = {
@@ -91,3 +99,4 @@ class Settings(BaseSettings):
 settings = Settings()
 
 os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
+os.makedirs(settings.MODEL_CACHE_DIR, exist_ok=True)

@@ -1,0 +1,389 @@
+{
+  "repository_id": "neghani/plantvillage-mobilenetv2",
+  "selected_revision": "v1.1",
+  "immutable_commit_sha": "77e6d262dca53b818f7ad1d67088700754515639",
+  "annotated_tag_target_sha": "8bacd1d165f1cb5d0608e280e3caeb0da4e49424",
+  "model_architecture": "MobileNetV2ForImageClassification",
+  "base_model": "google/mobilenet_v2_1.0_224",
+  "task": "image-classification",
+  "license": "Apache-2.0",
+  "download_date": "2026-11-19T07:53:46.232108+00:00",
+  "model_directory": "backend/models/plantvillage-mobilenetv2",
+  "label_count": 38,
+  "id2label": {
+    "0": "Apple___Apple_scab",
+    "1": "Apple___Black_rot",
+    "2": "Apple___Cedar_apple_rust",
+    "3": "Apple___healthy",
+    "4": "Blueberry___healthy",
+    "5": "Cherry_(including_sour)___Powdery_mildew",
+    "6": "Cherry_(including_sour)___healthy",
+    "7": "Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot",
+    "8": "Corn_(maize)___Common_rust_",
+    "9": "Corn_(maize)___Northern_Leaf_Blight",
+    "10": "Corn_(maize)___healthy",
+    "11": "Grape___Black_rot",
+    "12": "Grape___Esca_(Black_Measles)",
+    "13": "Grape___Leaf_blight_(Isariopsis_Leaf_Spot)",
+    "14": "Grape___healthy",
+    "15": "Orange___Haunglongbing_(Citrus_greening)",
+    "16": "Peach___Bacterial_spot",
+    "17": "Peach___healthy",
+    "18": "Pepper,_bell___Bacterial_spot",
+    "19": "Pepper,_bell___healthy",
+    "20": "Potato___Early_blight",
+    "21": "Potato___Late_blight",
+    "22": "Potato___healthy",
+    "23": "Raspberry___healthy",
+    "24": "Soybean___healthy",
+    "25": "Squash___Powdery_mildew",
+    "26": "Strawberry___Leaf_scorch",
+    "27": "Strawberry___healthy",
+    "28": "Tomato___Bacterial_spot",
+    "29": "Tomato___Early_blight",
+    "30": "Tomato___Late_blight",
+    "31": "Tomato___Leaf_Mold",
+    "32": "Tomato___Septoria_leaf_spot",
+    "33": "Tomato___Spider_mites Two-spotted_spider_mite",
+    "34": "Tomato___Target_Spot",
+    "35": "Tomato___Tomato_Yellow_Leaf_Curl_Virus",
+    "36": "Tomato___Tomato_mosaic_virus",
+    "37": "Tomato___healthy"
+  },
+  "label2id": {
+    "Apple___Apple_scab": 0,
+    "Apple___Black_rot": 1,
+    "Apple___Cedar_apple_rust": 2,
+    "Apple___healthy": 3,
+    "Blueberry___healthy": 4,
+    "Cherry_(including_sour)___Powdery_mildew": 5,
+    "Cherry_(including_sour)___healthy": 6,
+    "Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot": 7,
+    "Corn_(maize)___Common_rust_": 8,
+    "Corn_(maize)___Northern_Leaf_Blight": 9,
+    "Corn_(maize)___healthy": 10,
+    "Grape___Black_rot": 11,
+    "Grape___Esca_(Black_Measles)": 12,
+    "Grape___Leaf_blight_(Isariopsis_Leaf_Spot)": 13,
+    "Grape___healthy": 14,
+    "Orange___Haunglongbing_(Citrus_greening)": 15,
+    "Peach___Bacterial_spot": 16,
+    "Peach___healthy": 17,
+    "Pepper,_bell___Bacterial_spot": 18,
+    "Pepper,_bell___healthy": 19,
+    "Potato___Early_blight": 20,
+    "Potato___Late_blight": 21,
+    "Potato___healthy": 22,
+    "Raspberry___healthy": 23,
+    "Soybean___healthy": 24,
+    "Squash___Powdery_mildew": 25,
+    "Strawberry___Leaf_scorch": 26,
+    "Strawberry___healthy": 27,
+    "Tomato___Bacterial_spot": 28,
+    "Tomato___Early_blight": 29,
+    "Tomato___Late_blight": 30,
+    "Tomato___Leaf_Mold": 31,
+    "Tomato___Septoria_leaf_spot": 32,
+    "Tomato___Spider_mites Two-spotted_spider_mite": 33,
+    "Tomato___Target_Spot": 34,
+    "Tomato___Tomato_Yellow_Leaf_Curl_Virus": 35,
+    "Tomato___Tomato_mosaic_virus": 36,
+    "Tomato___healthy": 37
+  },
+  "calibration": {
+    "temperature": 0.8845188130635788,
+    "n": 302,
+    "nll_before": 1.444065513326227,
+    "nll_after": 1.431728766930221,
+    "ece_before": 0.10527309113272877,
+    "ece_after": 0.08078068461964796,
+    "split": "plantdoc_validation",
+    "bins": 15
+  },
+  "threshold": {
+    "status": "selected",
+    "threshold": 0.5,
+    "note": "threshold 0.50 has the highest pass rate (125/302 (41.4%)) among those with >=70% of 'ok' answers correct.",
+    "best_available": {
+      "threshold": 0.95,
+      "precision": 0.9285714285714286,
+      "pass_rate": 0.08609271523178808,
+      "ok_n": 28,
+      "n": 302,
+      "coverage": 0.09271523178807947
+    },
+    "chosen": {
+      "threshold": 0.5,
+      "precision": 0.7142857142857143,
+      "pass_rate": 0.4139072847682119,
+      "ok_n": 175,
+      "n": 302,
+      "coverage": 0.5794701986754967
+    },
+    "sweep": [
+      {
+        "threshold": 0.3,
+        "n": 302,
+        "passes": 152,
+        "pass_rate": 0.5033112582781457,
+        "ok_n": 244,
+        "coverage": 0.8079470198675497,
+        "precision": 0.6229508196721312
+      },
+      {
+        "threshold": 0.35,
+        "n": 302,
+        "passes": 147,
+        "pass_rate": 0.4867549668874172,
+        "ok_n": 228,
+        "coverage": 0.7549668874172185,
+        "precision": 0.6447368421052632
+      },
+      {
+        "threshold": 0.4,
+        "n": 302,
+        "passes": 142,
+        "pass_rate": 0.47019867549668876,
+        "ok_n": 207,
+        "coverage": 0.6854304635761589,
+        "precision": 0.6859903381642513
+      },
+      {
+        "threshold": 0.45,
+        "n": 302,
+        "passes": 138,
+        "pass_rate": 0.45695364238410596,
+        "ok_n": 199,
+        "coverage": 0.6589403973509934,
+        "precision": 0.6934673366834171
+      },
+      {
+        "threshold": 0.5,
+        "n": 302,
+        "passes": 125,
+        "pass_rate": 0.4139072847682119,
+        "ok_n": 175,
+        "coverage": 0.5794701986754967,
+        "precision": 0.7142857142857143
+      },
+      {
+        "threshold": 0.55,
+        "n": 302,
+        "passes": 122,
+        "pass_rate": 0.40397350993377484,
+        "ok_n": 158,
+        "coverage": 0.5231788079470199,
+        "precision": 0.7721518987341772
+      },
+      {
+        "threshold": 0.6,
+        "n": 302,
+        "passes": 115,
+        "pass_rate": 0.38079470198675497,
+        "ok_n": 145,
+        "coverage": 0.48013245033112584,
+        "precision": 0.7931034482758621
+      },
+      {
+        "threshold": 0.65,
+        "n": 302,
+        "passes": 99,
+        "pass_rate": 0.32781456953642385,
+        "ok_n": 122,
+        "coverage": 0.40397350993377484,
+        "precision": 0.8114754098360656
+      },
+      {
+        "threshold": 0.7,
+        "n": 302,
+        "passes": 88,
+        "pass_rate": 0.2913907284768212,
+        "ok_n": 105,
+        "coverage": 0.347682119205298,
+        "precision": 0.8380952380952381
+      },
+      {
+        "threshold": 0.75,
+        "n": 302,
+        "passes": 74,
+        "pass_rate": 0.24503311258278146,
+        "ok_n": 88,
+        "coverage": 0.2913907284768212,
+        "precision": 0.8409090909090909
+      },
+      {
+        "threshold": 0.8,
+        "n": 302,
+        "passes": 65,
+        "pass_rate": 0.2152317880794702,
+        "ok_n": 76,
+        "coverage": 0.25165562913907286,
+        "precision": 0.8552631578947368
+      },
+      {
+        "threshold": 0.85,
+        "n": 302,
+        "passes": 53,
+        "pass_rate": 0.17549668874172186,
+        "ok_n": 62,
+        "coverage": 0.2052980132450331,
+        "precision": 0.8548387096774194
+      },
+      {
+        "threshold": 0.9,
+        "n": 302,
+        "passes": 36,
+        "pass_rate": 0.11920529801324503,
+        "ok_n": 39,
+        "coverage": 0.1291390728476821,
+        "precision": 0.9230769230769231
+      },
+      {
+        "threshold": 0.95,
+        "n": 302,
+        "passes": 26,
+        "pass_rate": 0.08609271523178808,
+        "ok_n": 28,
+        "coverage": 0.09271523178807947,
+        "precision": 0.9285714285714286
+      }
+    ],
+    "min_precision": 0.7,
+    "strategy": "B",
+    "temperature": 0.8845188130635788
+  },
+  "files": {
+    ".gitattributes": {
+      "size_bytes": 1584,
+      "sha256": "fc9908862b6e856db67cf541153d4bb49b753b485c9486184541fe4f045f9cbd"
+    },
+    "all_results.json": {
+      "size_bytes": 1167,
+      "sha256": "f40b13204037d9975bfb6982c50daadad786b8b77474e468c40c9a07a8832fc7"
+    },
+    "calibration.json": {
+      "size_bytes": 242,
+      "sha256": "81fd3e7182a970ff0c2eefc91f5d888385cf3fe668c606976d6a610d0ef7f47c"
+    },
+    "calibration_report.md": {
+      "size_bytes": 1856,
+      "sha256": "9e302e3c3e1a5d3f9e5b900792693630a1f85d97f9af3ea90a59de240e128118"
+    },
+    "config.json": {
+      "size_bytes": 3528,
+      "sha256": "2f674ba845a5cff86a893c8211a3dd40da7e74e0aa27180b3d2da374df40560f"
+    },
+    "eval_results.json": {
+      "size_bytes": 713,
+      "sha256": "d73dbbccd16652064d0e6bb1eaf35adbc53d7d135d299a8a8eb72ee0381bf09d"
+    },
+    "model.safetensors": {
+      "size_bytes": 9264680,
+      "sha256": "4903b6e3647ffedb5182c6e2f87200c56c4472d1bdbbcd8ce6a84650f14df084"
+    },
+    "preprocessor_config.json": {
+      "size_bytes": 435,
+      "sha256": "10488f6235ceb6e22320f0b243a3f44339876ee8507b1f9ad8901fc38ba8b68e"
+    },
+    "README.md": {
+      "size_bytes": 14901,
+      "sha256": "8923d18f3c9de81473aa2fc5efb94afdc00f7fff4b8708bf3ee2859bfb85f4e6"
+    },
+    "run_info.json": {
+      "size_bytes": 9994,
+      "sha256": "2024fcad36cd7f7f848a862f12c9e62347f83065b599d1c0f8f2a752a03902b8"
+    },
+    "splits.json": {
+      "size_bytes": 5108318,
+      "sha256": "d46d23314dc7e345c8817457cfaf10a48cf7cbc0740305e0b55883e0f6c9029e"
+    },
+    "test_results.json": {
+      "size_bytes": 290,
+      "sha256": "af68c17aafe1b1a17a86ba48f64075629c66670ded60ebee0f046767ce2596f5"
+    },
+    "threshold.json": {
+      "size_bytes": 3555,
+      "sha256": "2b692567a9b0552a626e0e1b6f0179f8efc3c76639d261520d5ba57f5c17868e"
+    },
+    "trainer_state.json": {
+      "size_bytes": 9526,
+      "sha256": "ca1215b1b2a5f17dac2cc10de258399242034982d949d5d0ccdb1b813b3cd484"
+    },
+    "training_args.bin": {
+      "size_bytes": 5265,
+      "sha256": "dcedd3d17b8910c08a254a550c117a590a5704d0d38ae09e525ebfba7186dc0a"
+    },
+    "train_results.json": {
+      "size_bytes": 204,
+      "sha256": "bb0581954cfce3e525b693978fc59634ab262b9a39db95481a5f1a3df477d798"
+    },
+    "real_world_set\\build_real_world_set.py": {
+      "size_bytes": 3346,
+      "sha256": "b32746f3475e578edc0319cddd368a085582e8e67ce1ffafe55cce11d85abf1f"
+    },
+    "real_world_set\\card_notes.md": {
+      "size_bytes": 808,
+      "sha256": "e3cc802063a1575b8428e335e72505f68e73233aa6e780d80b647e4f6bcb18f7"
+    },
+    "real_world_set\\labels.csv": {
+      "size_bytes": 5522,
+      "sha256": "b25d8d8327a7edd782273965cf8674eb54d78a342081622c23e1ca34e9908d2d"
+    },
+    "real_world_set\\README.md": {
+      "size_bytes": 2914,
+      "sha256": "eb11a9baaf74998438e1b204926edcfbefb5f354b2dbdd4c03a1602bf007b9a2"
+    },
+    "real_world_set\\sources.csv": {
+      "size_bytes": 11793,
+      "sha256": "0bc39ffa1613f16fd5452cac1ca9a851f61df22945b0580b54b7a866d950581d"
+    },
+    "reports\\classification_report.txt": {
+      "size_bytes": 3866,
+      "sha256": "667995e92e2fb54a435e8a9e2c36af12c83e092fa98cb3b78f9b001ec8ec7bcf"
+    },
+    "reports\\confusion_matrix.png": {
+      "size_bytes": 336161,
+      "sha256": "75f59c612fb2a579349ebbddd41a4a695d387e126ccf378d60c5e9c6a7d95ffa"
+    },
+    "reports\\metrics.json": {
+      "size_bytes": 21817,
+      "sha256": "bd618d9a9b7330581bbac7f6f5ce65ea45ab1d427cc5b31cccbdb97e84c481e9"
+    },
+    "reports\\threshold_sweep.csv": {
+      "size_bytes": 752,
+      "sha256": "cf53115f189e8f8b0d0b7edd1d0b8216fc92bc2279ecc9083b335fffc0c62451"
+    },
+    "reports\\real_world_set\\all\\report.md": {
+      "size_bytes": 2208,
+      "sha256": "9e1b79710275158ef4220d6d20ef727073b088dcc689630490328cf9e17308ea"
+    },
+    "reports\\real_world_set\\all\\results.csv": {
+      "size_bytes": 7765,
+      "sha256": "173e8e88876e71ffe36f07020105ddaf1ed5e68551baea233c1d90278ddb3e0d"
+    },
+    "reports\\real_world_set\\final\\report.md": {
+      "size_bytes": 2101,
+      "sha256": "842f3f894f292c4ed5fd26453d23499d372de65142ff09a694789235a9209107"
+    },
+    "reports\\real_world_set\\final\\results.csv": {
+      "size_bytes": 4252,
+      "sha256": "4183a7fb1b8a9a0e3d0f90a514392ea2ab72adb14537824b8ee812e059e5cb48"
+    },
+    "reports\\real_world_set\\final\\run.json": {
+      "size_bytes": 478,
+      "sha256": "7079b66dc1132e2c81c35f4a5b64ca3150fce4d84255767ad6b957b2aeb2a1e5"
+    },
+    "reports\\real_world_set\\tune\\report.md": {
+      "size_bytes": 2137,
+      "sha256": "5ab966adb95f15ac057de9369194028be1bc241c05f5a3af9290621a70dfd102"
+    },
+    "reports\\real_world_set\\tune\\results.csv": {
+      "size_bytes": 4192,
+      "sha256": "0b5ba55a1f784268cc6ed8f7c1a7cfd31946ac31ec22e1d9b1fe25c50ad5ce0d"
+    },
+    "reports\\real_world_set\\tune\\run.json": {
+      "size_bytes": 477,
+      "sha256": "c36b7559c3daa3d4d924aa2782c545593486962c106e83c073d4434691d9affb"
+    }
+  }
+}

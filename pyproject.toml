@@ -27,3 +27,4 @@ executionEnvironments = [
 pythonpath = [
   "backend"
 ]
+addopts = "-s"

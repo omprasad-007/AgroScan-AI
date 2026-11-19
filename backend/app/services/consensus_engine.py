@@ -134,6 +134,38 @@ CANONICAL_DISEASE_MAP: Dict[str, str] = {
     "citrus_canker": "citrus_canker",
     "citrus_greening": "citrus_greening",
 
+    # Apple (PlantVillage MobileNetV2 classes)
+    "apple_scab": "apple_scab",
+    "apple_black_rot": "apple_black_rot",
+    "apple_cedar_rust": "apple_cedar_rust",
+    "apple_cedar_apple_rust": "apple_cedar_rust",
+
+    # Cherry & Squash
+    "cherry_powdery_mildew": "cherry_powdery_mildew",
+    "squash_powdery_mildew": "squash_powdery_mildew",
+
+    # Corn / Maize
+    "corn_gray_leaf_spot": "corn_gray_leaf_spot",
+    "corn_cercospora_leaf_spot": "corn_gray_leaf_spot",
+
+    # Grape / Vine
+    "grape_esca": "grape_esca",
+    "grape_isariopsis_leaf_spot": "grape_isariopsis_leaf_spot",
+
+    # Peach & Bell Pepper
+    "peach_bacterial_spot": "peach_bacterial_spot",
+    "pepper_bacterial_spot": "pepper_bacterial_spot",
+    "bell_pepper_bacterial_spot": "pepper_bacterial_spot",
+
+    # Strawberry
+    "strawberry_leaf_scorch": "strawberry_leaf_scorch",
+
+    # Tomato Additional Classes
+    "tomato_leaf_mold": "tomato_leaf_mold",
+    "tomato_spider_mites": "tomato_spider_mites",
+    "tomato_target_spot": "tomato_target_spot",
+    "tomato_mosaic_virus": "tomato_mosaic_virus",
+
     # Healthy
     "healthy_leaf": "healthy_leaf",
     "healthy": "healthy_leaf",

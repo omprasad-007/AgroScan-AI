@@ -1,47 +1,73 @@
-import os
+"""
+AgroScan AI — Local Model Provider
+Executes local neural network evaluation using Hugging Face MobileNetV2 (PlantVillage v1.1).
+Augmented with Botanical Morphology classifier for explicit non-MobileNetV2 crop coverage.
+"""
+
 import time
-import hashlib
 import logging
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 from datetime import datetime, timezone
+
 from app.core.config import settings
-from app.services.disease_knowledge_base import get_disease_by_code, ALL_DISEASES
+from app.services.disease_knowledge_base import get_disease_by_code
+from app.services.crop_registry import (
+    get_crop_support,
+    is_crop_supported_by_local_model,
+    CropSupportStatus
+)
 from app.services.plant_species_classifier import PlantSpeciesClassifier
+from app.services.plant_disease_model import (
+    local_model_service,
+    ModelPredictionResult,
+    PredictionCandidate as ModelCandidate
+)
 from app.services.providers.base_provider import (
-    DiseaseDetectionProvider, ProviderDiagnosisResult, PredictionCandidate
+    DiseaseDetectionProvider,
+    ProviderDiagnosisResult,
+    PredictionCandidate,
+    ProviderHealthStatus
 )
 
-logger = logging.getLogger("agroscan")
+logger = logging.getLogger("agroscan.providers.local")
+
 
 class AgroScanLocalModelProvider(DiseaseDetectionProvider):
     """
-    AgroScan Internal Model Provider (MobileNetV2 / ResNet Vision Model & Botanical Species Classifier).
-    Executes actual local neural network inference or botanical morphological species analysis.
-    Identifies plant species and pathology across any agricultural crop.
+    AgroScan Local Model Provider.
+    Primary: Hugging Face MobileNetV2 (PlantVillage v1.1, Safetensors weights, 38 classes).
+    Secondary: Botanical Species & Pathology Classifier for non-PlantVillage crops.
     """
 
     def __init__(self):
-        super().__init__(name="agroscan_local", display_name="AgroScan Local Vision Engine")
-        self.model = None
-        self._model_loaded = False
+        super().__init__(name="agroscan_local", display_name="AgroScan Local Vision Engine (MobileNetV2)")
+        self.model_service = local_model_service
+        self._ensure_loaded()
 
-    def _try_load_model(self):
-        if not self._model_loaded:
-            model_path = getattr(settings, "MODEL_PATH", "ml/models/plant_disease_model_v1.h5")
-            if os.path.exists(model_path):
-                try:
-                    import importlib.util
-                    if importlib.util.find_spec("tensorflow") is not None:
-                        import tensorflow as tf  # type: ignore
-                        self.model = tf.keras.models.load_model(model_path)
-                        logger.info(f"Loaded local neural network model from {model_path}")
-                except Exception as e:
-                    logger.warning(f"Local TensorFlow model failed to load from {model_path}: {e}")
-            self._model_loaded = True
+    def _ensure_loaded(self):
+        try:
+            self.model_service.load_model()
+        except Exception as e:
+            logger.warning(f"Could not load MobileNetV2 model at provider init: {e}")
 
     def is_available(self) -> bool:
-        # Always available as reliable baseline engine
+        # Local model is self-hosted and always available
         return True
+
+    def get_health_status(self) -> ProviderHealthStatus:
+        base = super().get_health_status()
+        meta = self.model_service.get_model_metadata()
+        base.notes = (
+            f"MobileNetV2 ({meta.get('revision', 'v1.1')}) - "
+            f"Loaded: {meta.get('is_loaded')}, Classes: {meta.get('num_classes', 38)}, "
+            f"Device: {meta.get('device', 'cpu')}"
+        )
+        base.supported_crops = [
+            "apple", "blueberry", "cherry", "corn", "grape", "orange",
+            "peach", "pepper", "potato", "raspberry", "soybean",
+            "squash", "strawberry", "tomato"
+        ]
+        return base
 
     async def diagnose(
         self,
@@ -52,60 +78,67 @@ class AgroScanLocalModelProvider(DiseaseDetectionProvider):
     ) -> ProviderDiagnosisResult:
         self.total_calls += 1
         t0 = time.time()
-        self._try_load_model()
 
-        # Path 1: Genuine Local TensorFlow / Keras Neural Network Inference (if compiled on disk)
-        if self.model is not None:
+        # Step 1: Check target crop support status
+        is_target_specified = bool(plant_name and plant_name.lower() != "auto")
+        is_target_mobilenet_supported = is_crop_supported_by_local_model(plant_name) if is_target_specified else True
+
+        # Path 1: Execute Genuine MobileNetV2 Neural Network Inference
+        if not is_target_specified or is_target_mobilenet_supported:
             try:
-                from PIL import Image
-                import io
-                import numpy as np
-
-                pil_img = Image.open(io.BytesIO(image_bytes)).convert("RGB").resize((224, 224))
-                img_arr = np.array(pil_img, dtype=np.float32) / 255.0
-                img_tensor = np.expand_dims(img_arr, axis=0)
-
-                preds = self.model.predict(img_tensor)[0]
-                classes = [
-                    "tomato_early_blight", "tomato_late_blight", "tomato_yellow_leaf_curl",
-                    "potato_late_blight", "corn_common_rust", "healthy_leaf"
-                ]
-                top_idx = int(np.argmax(preds))
-                confidence = round(float(preds[top_idx]), 3)
-                code = classes[top_idx]
-                info = get_disease_by_code(code)
+                res: ModelPredictionResult = self.model_service.predict_disease(
+                    image_bytes,
+                    target_crop=plant_name if is_target_specified else None
+                )
 
                 latency = (time.time() - t0) * 1000.0
                 self.last_latency_ms = latency
                 self.last_success_at = datetime.now(timezone.utc)
 
-                is_healthy = code == "healthy_leaf"
+                kb_info = get_disease_by_code(res.disease_code)
+                sci_name = kb_info.get("scientific_name") or res.top_prediction.scientific_name or "N/A"
+
+                top_candidates: List[PredictionCandidate] = []
+                for c in res.top_predictions:
+                    top_candidates.append(
+                        PredictionCandidate(
+                            crop=c.crop,
+                            disease_name=c.disease_name,
+                            disease_code=c.canonical_disease_code,
+                            confidence=c.calibrated_score,
+                            is_healthy=c.is_healthy,
+                            scientific_name=c.scientific_name
+                        )
+                    )
+
+                warnings = []
+                if res.is_uncertain:
+                    warnings.append(
+                        res.uncertainty_note or "Confidence score is below calibrated decision threshold."
+                    )
+
                 return ProviderDiagnosisResult(
                     provider=self.name,
-                    status="success",
-                    plant=info["crop"],
-                    scientific_name=info.get("scientific_name", "N/A"),
-                    disease=info["disease_name"],
-                    disease_code=code,
-                    confidence=confidence,
-                    is_healthy=is_healthy,
-                    top_predictions=[
-                        PredictionCandidate(
-                            crop=info["crop"],
-                            disease_name=info["disease_name"],
-                            disease_code=code,
-                            confidence=confidence,
-                            is_healthy=is_healthy,
-                            scientific_name=info.get("scientific_name")
-                        )
-                    ],
+                    status="success" if not res.is_uncertain else "uncertain",
+                    plant=res.crop_detected,
+                    scientific_name=sci_name,
+                    disease=res.disease_name,
+                    disease_code=res.disease_code,
+                    confidence=res.confidence,
+                    is_healthy=res.is_healthy,
+                    top_predictions=top_candidates,
+                    warnings=warnings,
                     latency_ms=round(latency, 1),
                     is_demo=False
                 )
+
             except Exception as e:
-                logger.warning(f"Local TF model prediction failed, falling to species classifier: {e}")
+                logger.warning(f"MobileNetV2 inference failed: {e}. Falling to botanical classifier.")
+                self.failure_count += 1
 
         # Path 2: Advanced Botanical Plant Species & Pathology Classifier
+        # Used for explicit non-MobileNetV2 crops (Sugarcane, Cotton, Rice, Wheat, Mango, etc.)
+        crop_entry = get_crop_support(plant_name)
         species_info = PlantSpeciesClassifier.identify_species(image_bytes, target_crop=plant_name)
         code = species_info["disease_code"]
         kb_info = get_disease_by_code(code)
@@ -117,6 +150,13 @@ class AgroScanLocalModelProvider(DiseaseDetectionProvider):
         is_healthy = species_info["is_healthy"]
         crop_name = species_info["crop"]
         sci_name = species_info.get("scientific_name") or kb_info.get("scientific_name", "N/A")
+
+        warnings = []
+        if is_target_specified and not is_target_mobilenet_supported:
+            warnings.append(
+                f"Crop '{crop_name}' is outside MobileNetV2's 14 native PlantVillage crops. "
+                f"Diagnosed using AgroScan Botanical Morphology Classifier."
+            )
 
         return ProviderDiagnosisResult(
             provider=self.name,
@@ -137,6 +177,7 @@ class AgroScanLocalModelProvider(DiseaseDetectionProvider):
                     scientific_name=sci_name
                 )
             ],
+            warnings=warnings,
             latency_ms=round(latency, 1),
             is_demo=False
         )

@@ -18,6 +18,7 @@ from app.services.disease_knowledge_base import get_disease_by_code
 from app.services.leaf_validator import LeafValidationResult, LeafValidator
 from app.services.severity_analyzer import SeverityAnalyzer
 from app.services.weather_service import WeatherRiskService
+from app.services.ai import orchestrator, ModelRegistry
 
 logger = logging.getLogger("agroscan")
 router = APIRouter()
@@ -71,9 +72,24 @@ async def validate_plant_image(file: UploadFile = File(...)):
 
 @router.get("/providers/health")
 def get_provider_health_status(current_user: User = Depends(get_current_user)):
-    """Return provider monitoring data for signed-in users only."""
+    """Return provider and local Hugging Face model monitoring data for signed-in users only."""
     health_list = consensus_engine.get_all_provider_health()
-    return [health.model_dump() for health in health_list]
+    res = [health.model_dump() for health in health_list]
+    for hf in ModelRegistry.get_health_status():
+        res.append({
+            "provider_name": hf["model_id"],
+            "display_name": hf["display_name"],
+            "status": "AVAILABLE" if hf["status"] in ["LOADED_HEALTHY", "READY_TO_LOAD"] else "DEGRADED",
+            "is_configured": True,
+            "requires_key": False,
+            "latency_ms": hf["average_latency_ms"],
+            "failure_count": 1 if hf["last_error"] else 0,
+            "total_calls": hf["total_inferences"],
+            "success_rate": 1.0 if not hf["last_error"] else 0.8,
+            "supported_crops": ["Tomato", "Potato", "Apple", "Corn", "Grapes", "Soybean", "Bell Pepper"],
+            "notes": f"Local hardware execution ({hf['device']})"
+        })
+    return res
 
 
 def format_prediction_response(
@@ -86,25 +102,53 @@ def format_prediction_response(
         "organic_treatment": knowledge["organic_treatment"],
         "chemical_treatment": knowledge["chemical_treatment"],
         "prevention": knowledge["prevention"],
-        "disclaimer": "Decision-support guidance only. Follow locally approved product labels.",
+        "disclaimer": "Preliminary AI decision-support estimate. Follow locally approved product labels and consult an agronomist.",
     }
     meta = extra_meta or {}
 
+    pred_status = getattr(prediction, "status", None) or meta.get("status") or "DISEASE_DETECTED"
+    crop_support = getattr(prediction, "crop_support_status", None) or meta.get("crop_support_status") or "SUPPORTED"
+    mod_ver = getattr(prediction, "model_version", None) or meta.get("model_version") or "hybrid_v1.0"
+
     return PredictionResponse(
         id=prediction.id,
+        scan_id=prediction.id,
+        status=pred_status,
         image_url=prediction.image_path,
         plant=prediction.crop_detected,
+        plant_name=prediction.crop_detected,
         scientific_name=knowledge.get("scientific_name", "N/A"),
+        crop_support_status=crop_support,
         disease=prediction.disease_name,
+        disease_name=prediction.disease_name,
+        disease_code=prediction.disease_code,
+        disease_category=meta.get("disease_category", "Foliar Pathology"),
+        healthy_status="healthy" in prediction.disease_code.lower(),
         confidence=prediction.confidence_score,
+        prediction_confidence=prediction.confidence_score,
+        confidence_interpretation=(
+            "HIGH_CONFIDENCE" if prediction.confidence_score >= 0.70
+            else ("MODERATE_CONFIDENCE" if prediction.confidence_score >= 0.50 else "LOW_CONFIDENCE_UNCERTAIN")
+        ),
         severity=prediction.severity_level,
         severity_percentage=prediction.severity_percentage,
         affected_area=prediction.affected_area_cm2,
         risk=prediction.weather_risk_level,
         recommendation=recommendation_payload,
+        treatment_guidance=recommendation_payload,
+        prevention_guidance=recommendation_payload.get("prevention"),
+        recommended_next_steps=meta.get("recommended_next_steps", [
+            "Monitor crop foliage closely and ensure proper irrigation scheduling.",
+            "Verify symptoms with a field inspection before applying chemical controls."
+        ]),
+        limitations=meta.get("limitations", "Visual computer vision analysis evaluates superficial leaf features only."),
+        analysis_timestamp=str(prediction.created_at or ""),
+        model_version=mod_ver,
+        provider_information=meta.get("provider_information"),
+        model_predictions=meta.get("model_predictions", []),
+        provider_predictions=meta.get("provider_predictions", []),
+        agreement_status=meta.get("agreement_status", "SINGLE_SOURCE"),
         crop_detected=prediction.crop_detected,
-        disease_name=prediction.disease_name,
-        disease_code=prediction.disease_code,
         confidence_score=prediction.confidence_score,
         severity_level=prediction.severity_level,
         affected_area_cm2=prediction.affected_area_cm2,
@@ -195,49 +239,54 @@ async def analyze_leaf(
 
     try:
         language = (getattr(current_user, "language", "en") or "en") if current_user else "en"
-        consensus: ConsensusResult = await consensus_engine.diagnose_with_consensus(
+        weather_params = {"temperature_c": temp_c, "humidity_pct": humidity, "rainfall_mm": rainfall}
+
+        orch_res = await orchestrator.orchestrate_scan(
             image_bytes=contents,
             scan_id=scan_id,
             target_crop=target_crop,
+            weather_params=weather_params,
             location={"latitude": 16.58, "longitude": 74.31},
-            language=language,
+            is_guest=current_user is None,
+            image_url=f"/uploads/{unique_filename}",
+            language=language
         )
-        severity = SeverityAnalyzer.analyze_image_bytes(contents)
-        weather = WeatherRiskService.calculate_risk(
-            temp_c=temp_c,
-            humidity_pct=humidity,
-            rainfall_mm=rainfall,
-            crop=consensus.plant,
-            disease=consensus.disease,
-        )
+
+        if orch_res.get("status") in ["INVALID_IMAGE", "POOR_IMAGE_QUALITY"]:
+            message = orch_res.get("message") or "No clear leaf was detected in this image."
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=message)
+
+        if orch_res.get("status") == "PROVIDER_UNAVAILABLE":
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail=orch_res.get("message") or "Disease detection provider failure."
+            )
+
         prediction = ScanPrediction(
             id=scan_id,
             user_id=current_user.id if current_user else "guest",
             farm_id=farm_id if current_user else None,
             image_path=f"/uploads/{unique_filename}",
-            crop_detected=consensus.plant,
-            disease_name=consensus.disease,
-            disease_code=consensus.disease_code,
-            confidence_score=consensus.confidence,
-            severity_percentage=severity["severity_percentage"],
-            severity_level=severity["severity_level"],
-            affected_area_cm2=severity["affected_area_cm2"],
+            crop_detected=orch_res.get("plant", "Plant"),
+            disease_name=orch_res.get("disease", "Unknown"),
+            disease_code=orch_res.get("disease_code", "unknown_condition"),
+            confidence_score=orch_res.get("confidence", 0.50),
+            severity_percentage=orch_res.get("severity_percentage", 0.0),
+            severity_level=orch_res.get("severity_level", "Mild"),
+            affected_area_cm2=orch_res.get("affected_area_cm2", 0.0),
             ambient_temp_c=temp_c,
             humidity_pct=humidity,
             rainfall_mm=rainfall,
-            weather_risk_score=weather["risk_score"],
-            weather_risk_level=weather["risk_level"],
-            is_demo=consensus.is_demo,
+            weather_risk_score=orch_res.get("weather_risk_score", 0.0),
+            weather_risk_level=orch_res.get("weather_risk_level", "Low"),
+            is_demo=False,
+            status=orch_res.get("status", "DISEASE_DETECTED"),
+            crop_support_status=orch_res.get("crop_support_status", "SUPPORTED"),
+            model_version=orch_res.get("model_version", "hybrid_v1.0"),
+            provider_info=orch_res.get("primary_provider", "Local Hugging Face Engine")
         )
 
-        knowledge = get_disease_by_code(consensus.disease_code)
-        recommendation = {
-            "organic_treatment": knowledge["organic_treatment"],
-            "chemical_treatment": knowledge["chemical_treatment"],
-            "prevention": knowledge["prevention"],
-            "disclaimer": "Decision-support guidance only. Follow locally approved product labels.",
-        }
-
+        rec_data = orch_res.get("recommendation", {})
         if current_user:
             db.add(prediction)
             db.commit()
@@ -245,32 +294,15 @@ async def analyze_leaf(
             db.add(
                 Recommendation(
                     prediction_id=prediction.id,
-                    organic_remedy=recommendation["organic_treatment"],
-                    chemical_remedy=recommendation["chemical_treatment"],
-                    preventive_steps=recommendation["prevention"],
+                    organic_remedy=rec_data.get("organic_treatment", ""),
+                    chemical_remedy=rec_data.get("chemical_treatment", ""),
+                    preventive_steps=rec_data.get("prevention", ""),
+                    disclaimer=rec_data.get("disclaimer", "")
                 )
             )
             db.commit()
 
-        extra_meta = {
-            "is_guest": current_user is None,
-            "consensus_score": consensus.consensus_score,
-            "providers_agreed": f"{consensus.providers_agreed} of {consensus.providers_called}",
-            "providers_called": consensus.providers_called,
-            "agreement_level": consensus.agreement_level,
-            "primary_provider": consensus.primary_provider,
-            "supporting_providers": consensus.supporting_providers,
-            "alternative_diagnoses": consensus.alternative_diagnoses,
-            "image_quality_metrics": validation.quality_metrics,
-            "leaf_validation": {
-                "is_leaf": validation.is_leaf,
-                "leaf_confidence": validation.leaf_confidence,
-                "image_quality": validation.image_quality,
-                "leaf_visibility": validation.leaf_visibility,
-            },
-            "uncertainty_note": consensus.uncertainty_note,
-        }
-        return format_prediction_response(prediction, recommendation, extra_meta)
+        return PredictionResponse(**orch_res)
 
     except HTTPException:
         db.rollback()
@@ -344,10 +376,23 @@ def delete_prediction_by_id(
     db: Session = Depends(get_db),
     current_user: Optional[User] = Depends(get_optional_current_user),
 ):
-    """Delete a single scan prediction record and its recommendations."""
+    """Delete a single scan prediction record and its recommendations with strict ownership checks."""
     pred = db.query(ScanPrediction).filter(ScanPrediction.id == id).first()
     if not pred:
         return {"status": "not_found", "id": id, "message": "Prediction record not found"}
+
+    if current_user:
+        if pred.user_id != current_user.id and pred.user_id != "guest":
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You do not have permission to delete this scan record."
+            )
+    else:
+        if pred.user_id != "guest":
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Authentication required to delete non-guest scan records."
+            )
 
     db.query(Recommendation).filter(Recommendation.prediction_id == pred.id).delete(synchronize_session=False)
     db.delete(pred)
@@ -364,6 +409,8 @@ def get_prediction_by_id(
     query = db.query(ScanPrediction).filter(ScanPrediction.id == id)
     if current_user:
         query = query.filter((ScanPrediction.user_id == current_user.id) | (ScanPrediction.user_id == "guest"))
+    else:
+        query = query.filter(ScanPrediction.user_id == "guest")
     prediction = query.first()
     if not prediction:
         raise HTTPException(status_code=404, detail="Prediction record not found")

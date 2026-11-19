@@ -554,6 +554,218 @@ DISEASE_KNOWLEDGE_BASE: Dict[str, Dict[str, Any]] = {
         "prevention": "Control citrus leaf miner (Phyllocnistis citrella) whose leaf tunnels allow bacterial entry.",
         "general_guidance": "Wind-driven rain spreads bacteria rapidly between trees."
     },
+    "citrus_greening": {
+        "crop": "Citrus / Orange",
+        "disease_name": "Citrus Greening (Huanglongbing)",
+        "disease_code": "citrus_greening",
+        "scientific_name": "Candidatus Liberibacter asiaticus",
+        "symptoms": "Asymmetrical blotchy chlorotic mottling across leaf veins, vein yellowing and corking, small lopsided bitter fruits that remain green at the stylar end.",
+        "organic_treatment": "Eradicate psyllid insect vectors using insecticidal soaps and yellow sticky traps; inject micronutrient foliar sprays.",
+        "chemical_treatment": "Systemic insecticide treatment against Asian Citrus Psyllid (Imidacloprid 17.8% SL, 0.5ml/L). Remove severely diseased trees.",
+        "prevention": "Use certified disease-free nursery saplings; control psyllid vector populations rigorously.",
+        "general_guidance": "Incurable bacterial vascular infection vectored by psyllid insects."
+    },
+
+    # APPLE
+    "apple_scab": {
+        "crop": "Apple",
+        "disease_name": "Apple Scab",
+        "disease_code": "apple_scab",
+        "scientific_name": "Venturia inaequalis",
+        "symptoms": "Olive-green to dull dark brown velvety or corky spots on leaves and fruit, causing leaf distortion and early leaf fall.",
+        "organic_treatment": "Apply liquid lime sulfur or copper soap fungicide before petal fall; shred fallen orchard leaves with flail mower.",
+        "chemical_treatment": "Apply Captan 50% WP (2.0g/L), Mancozeb 75% WP (2.5g/L), or Myclobutanil 10% WP (0.5g/L).",
+        "prevention": "Rake and destroy fallen leaves in autumn; prune canopies to accelerate drying time.",
+        "general_guidance": "Primary infection occurs during spring rains when ascopores discharge."
+    },
+    "apple_black_rot": {
+        "crop": "Apple",
+        "disease_name": "Apple Black Rot",
+        "disease_code": "apple_black_rot",
+        "scientific_name": "Botryosphaeria obtusa",
+        "symptoms": "Frogeye leaf spots with purple margins and tan centers, cankers on limbs, and firm decaying fruit with concentric rings.",
+        "organic_treatment": "Prune out all dead branches, fire blight cankers, and mummified fruit from trees.",
+        "chemical_treatment": "Spray Captan or Thiophanate-methyl from bud break through harvest.",
+        "prevention": "Maintain tree vigor with balanced fertilizer; avoid bark mechanical injuries.",
+        "general_guidance": "Overwinters in dead wood and mummified apples."
+    },
+    "apple_cedar_rust": {
+        "crop": "Apple",
+        "disease_name": "Cedar Apple Rust",
+        "disease_code": "apple_cedar_rust",
+        "scientific_name": "Gymnosporangium juniperi-virginianae",
+        "symptoms": "Bright yellow-orange circular spots on upper leaf surfaces that enlarge and develop tiny black fungal pycnia in centers.",
+        "organic_treatment": "Remove nearby red cedar or juniper hosts within 500 meters of orchard; apply wettable sulfur.",
+        "chemical_treatment": "Apply Myclobutanil or Tebuconazole from pink bud stage through spring flush.",
+        "prevention": "Plant resistant cultivars (Liberty, Enterprise, Freedom).",
+        "general_guidance": "Requires alternate juniper/cedar host to complete its two-year life cycle."
+    },
+
+    # CHERRY & SQUASH
+    "cherry_powdery_mildew": {
+        "crop": "Cherry",
+        "disease_name": "Cherry Powdery Mildew",
+        "disease_code": "cherry_powdery_mildew",
+        "scientific_name": "Podosphaera clandestina",
+        "symptoms": "White superficial talc-like powdery fungal growth on leaves and green fruit; leaves curl upward and blister.",
+        "organic_treatment": "Spray potassium bicarbonate or cold-pressed Neem oil (4ml/L).",
+        "chemical_treatment": "Spray Wettable Sulfur 80% WP (2.5g/L) or Myclobutanil at petal fall.",
+        "prevention": "Improve airflow by summer pruning; avoid overhead sprinkling.",
+        "general_guidance": "Thrives in warm, dry weather with high relative humidity."
+    },
+    "squash_powdery_mildew": {
+        "crop": "Squash / Cucurbits",
+        "disease_name": "Squash Powdery Mildew",
+        "disease_code": "squash_powdery_mildew",
+        "scientific_name": "Podosphaera xanthii",
+        "symptoms": "Talc-like powdery white spots on upper and lower surfaces of leaves and petioles, leading to chlorosis and senescence.",
+        "organic_treatment": "Spray diluted milk/whey (1:9) or potassium bicarbonate (3g/L) with horticultural oil.",
+        "chemical_treatment": "Spray Azoxystrobin (1ml/L) or Triadimefon (0.5g/L) at first sign of white spots.",
+        "prevention": "Space cucurbits generously; avoid shaded microclimates and excessive nitrogen.",
+        "general_guidance": "Causes premature foliage defoliation and sunscald on fruits."
+    },
+
+    # CORN
+    "corn_gray_leaf_spot": {
+        "crop": "Corn (Maize)",
+        "disease_name": "Corn Gray Leaf Spot",
+        "disease_code": "corn_gray_leaf_spot",
+        "scientific_name": "Cercospora zeae-maydis",
+        "symptoms": "Narrow, rectangular, tan to gray lesions with sharp parallel margins delimited by leaf veins, expanding into severe blighting.",
+        "organic_treatment": "Rotate crops with non-grasses (soybean/legumes); practice conservation tillage residue management.",
+        "chemical_treatment": "Apply Azoxystrobin + Difenoconazole or Pyraclostrobin at tassel emergence (VT stage).",
+        "prevention": "Select resistant corn hybrids; bury crop residue where practical.",
+        "general_guidance": "Triggered by prolonged periods of high humidity (>90%) and warm temperatures."
+    },
+
+    # GRAPES
+    "grape_esca": {
+        "crop": "Grapes",
+        "disease_name": "Grape Esca (Black Measles)",
+        "disease_code": "grape_esca",
+        "scientific_name": "Phaeomoniella chlamydospora / Phaeoacremonium minimum",
+        "symptoms": "Tiger-stripe interveinal leaf scorch (yellow/red bands between veins), dark speckling on berry skins, and wood vascular necrosis.",
+        "organic_treatment": "Paint pruning wounds with Trichoderma-based wound sealants or paste.",
+        "chemical_treatment": "No systemic curative chemical exists; protect winter pruning cuts with wound sealants.",
+        "prevention": "Prune late in dormant season; disinfect shears between vines with alcohol.",
+        "general_guidance": "Fungal complex inhabiting vine trunk and cordons."
+    },
+    "grape_isariopsis_leaf_spot": {
+        "crop": "Grapes",
+        "disease_name": "Grape Isariopsis Leaf Spot (Leaf Blight)",
+        "disease_code": "grape_isariopsis_leaf_spot",
+        "scientific_name": "Pseudocercospora cladosporioides",
+        "symptoms": "Dark brown circular to irregular leaf spots with defined darker margins; spots coalesce causing early leaf drop.",
+        "organic_treatment": "Spray Bordeaux mixture (1%) or Copper Hydroxide after post-harvest pruning.",
+        "chemical_treatment": "Spray Mancozeb 75% WP (2.5g/L) or Carbendazim (1g/L).",
+        "prevention": "Remove pruned infected canes and leaves from vineyard rows.",
+        "general_guidance": "Most prominent on mature foliage towards late season."
+    },
+
+    # PEACH & BELL PEPPER
+    "peach_bacterial_spot": {
+        "crop": "Peach",
+        "disease_name": "Peach Bacterial Spot",
+        "disease_code": "peach_bacterial_spot",
+        "scientific_name": "Xanthomonas arboricola pv. pruni",
+        "symptoms": "Small angular purple-brown spots that drop out creating a shot-hole effect; sunken cracked lesions on fruit.",
+        "organic_treatment": "Copper foliar sprays at dormant and bud-swell stages; avoid excessive nitrogen.",
+        "chemical_treatment": "Low-rate copper hydroxide or oxytetracycline sprays during shuck split.",
+        "prevention": "Plant resistant peach varieties; create orchard windbreaks to reduce windblown sand abrasions.",
+        "general_guidance": "Bacterial pathogen favored by rainy windy spring weather."
+    },
+    "pepper_bacterial_spot": {
+        "crop": "Pepper (Bell)",
+        "disease_name": "Pepper Bacterial Spot",
+        "disease_code": "pepper_bacterial_spot",
+        "scientific_name": "Xanthomonas campestris pv. vesicatoria",
+        "symptoms": "Small, water-soaked angular leaf spots turning dark brown with yellow halos; severe defoliation and blistered fruit spots.",
+        "organic_treatment": "Hot water seed treatment (50°C for 25 min); spray fixed copper fungicides with mild surfactant.",
+        "chemical_treatment": "Copper Oxychloride (2.5g/L) mixed with Streptocycline (100 ppm, 1g/10L).",
+        "prevention": "Use certified pathogen-free seeds; avoid handling plants when foliage is wet.",
+        "general_guidance": "Spreads rapidly during warm rainfall through rain splashes."
+    },
+
+    # STRAWBERRY
+    "strawberry_leaf_scorch": {
+        "crop": "Strawberry",
+        "disease_name": "Strawberry Leaf Scorch",
+        "disease_code": "strawberry_leaf_scorch",
+        "scientific_name": "Diplocarpon earlianum",
+        "symptoms": "Irregular purple-to-dark brown blotches on upper leaf surfaces that merge, giving foliage a burned or scorched appearance.",
+        "organic_treatment": "Mow and clear old diseased leaves after harvest renovation; spray copper-based organic fungicides.",
+        "chemical_treatment": "Apply Captan 50% WP (2.0g/L) or Thiophanate-methyl (1.0g/L) at bloom.",
+        "prevention": "Plant in full sun with wide spacing on raised plastic-mulched beds.",
+        "general_guidance": "Infection occurs when leaves remain wet for 12+ consecutive hours."
+    },
+
+    # TOMATO ADDITIONAL
+    "tomato_bacterial_spot": {
+        "crop": "Tomato",
+        "disease_name": "Tomato Bacterial Spot",
+        "disease_code": "tomato_bacterial_spot",
+        "scientific_name": "Xanthomonas perforans / Xanthomonas euvesicatoria",
+        "symptoms": "Small (2-3 mm) dark brown water-soaked circular spots with yellow halos on leaves, stems, and scabby spots on fruit.",
+        "organic_treatment": "Spray copper hydroxide combined with Bacillus subtilis; use certified pathogen-free seeds.",
+        "chemical_treatment": "Copper Oxychloride (2.5g/L) + Streptocycline (100 ppm, 1g/10L water).",
+        "prevention": "Rotate out of Solanaceae for 2 years; sterilize stakes and drip lines.",
+        "general_guidance": "Highly contagious in overhead sprinkler environments."
+    },
+    "tomato_leaf_mold": {
+        "crop": "Tomato",
+        "disease_name": "Tomato Leaf Mold",
+        "disease_code": "tomato_leaf_mold",
+        "scientific_name": "Passalora fulva (Cladosporium fulvum)",
+        "symptoms": "Pale greenish-yellow chlorotic spots on upper leaf surfaces matching olive-green to grayish velvety mold on the lower leaf surface.",
+        "organic_treatment": "Increase greenhouse ventilation and air circulation; spray potassium bicarbonate or copper soap.",
+        "chemical_treatment": "Spray Chlorothalonil 75% WP (2g/L) or Difenoconazole 25% EC (0.5ml/L).",
+        "prevention": "Keep relative humidity below 85%; space plants for optimal ventilation.",
+        "general_guidance": "Most severe in polyhouse and high-tunnel environments."
+    },
+    "tomato_septoria_leaf_spot": {
+        "crop": "Tomato",
+        "disease_name": "Tomato Septoria Leaf Spot",
+        "disease_code": "tomato_septoria_leaf_spot",
+        "scientific_name": "Septoria lycopersici",
+        "symptoms": "Numerous circular spots (2-4 mm) with dark brown margins and sunken grayish-white centers dotted with tiny black pycnidia.",
+        "organic_treatment": "Mulch soil surface with straw or plastic to prevent splash dispersal; remove infected bottom leaves.",
+        "chemical_treatment": "Apply Mancozeb 75% WP (2.5g/L) or Chlorothalonil (2g/L) on 7-10 day schedule.",
+        "prevention": "Rotate crops; do not work in tomato patch when foliage is wet.",
+        "general_guidance": "Starts on lowest foliage after fruit set and moves upwards rapidly."
+    },
+    "tomato_spider_mites": {
+        "crop": "Tomato",
+        "disease_name": "Tomato Two-Spotted Spider Mites",
+        "disease_code": "tomato_spider_mites",
+        "scientific_name": "Tetranychus urticae",
+        "symptoms": "Fine yellow stippling and speckling on leaves, severe bronzing and drying, with fine silken webbing on leaf undersides.",
+        "organic_treatment": "Spray cold-pressed Neem oil (5ml/L) or insecticidal soap; release predatory mites (Phytoseiulus persimilis).",
+        "chemical_treatment": "Apply targeted miticide: Spiromesifen 22.9% SC (1ml/L) or Propargite 57% EC (2ml/L).",
+        "prevention": "Avoid dusty conditions; maintain adequate irrigation during hot dry weather.",
+        "general_guidance": "Populations explode under hot dry weather (>30°C, low humidity)."
+    },
+    "tomato_target_spot": {
+        "crop": "Tomato",
+        "disease_name": "Tomato Target Spot",
+        "disease_code": "tomato_target_spot",
+        "scientific_name": "Corynespora cassiicola",
+        "symptoms": "Brown circular lesions with concentric rings resembling a target board, surrounded by yellow halos, on leaves, petioles, and fruits.",
+        "organic_treatment": "Prune lower leaves to enhance airflow; apply copper bactericide/fungicide.",
+        "chemical_treatment": "Spray Azoxystrobin (1ml/L), Boscalid, or Chlorothalonil at first sign of target spots.",
+        "prevention": "Avoid overhead watering; ensure adequate plant spacing and staking.",
+        "general_guidance": "Favored by temperatures of 20-28°C and long dew periods."
+    },
+    "tomato_mosaic_virus": {
+        "crop": "Tomato",
+        "disease_name": "Tomato Mosaic Virus (ToMV)",
+        "disease_code": "tomato_mosaic_virus",
+        "scientific_name": "Tomato mosaic tobamovirus",
+        "symptoms": "Mottled light and dark green mosaic patterns on foliage, leaf distortion, blistering, shoestring leaves, and internal fruit browning.",
+        "organic_treatment": "Rogue out and destroy infected plants immediately; wash hands and tools in nonfat dry milk (20%) solution.",
+        "chemical_treatment": "No chemical viricide exists. Control aphid vectors and sanitize tools.",
+        "prevention": "Use certified virus-free seed; plant resistant cultivars (marked with 'T' or 'ToMV').",
+        "general_guidance": "Extremely stable virus transmitted mechanically by touch, tools, and tobacco smokers."
+    },
 
     # UNIVERSAL HEALTHY LEAF
     "healthy_leaf": {

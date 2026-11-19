@@ -108,6 +108,10 @@ class ScanPrediction(Base):
     weather_risk_level = Column(String, default="Low")
     
     is_demo = Column(Boolean, default=True)
+    status = Column(String, default="DISEASE_DETECTED")
+    crop_support_status = Column(String, default="SUPPORTED")
+    model_version = Column(String, default="hybrid_v1.0")
+    provider_info = Column(String, nullable=True)
     created_at = Column(DateTime, default=utc_now)
 
     user = relationship("User", back_populates="predictions")

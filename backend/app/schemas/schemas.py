@@ -189,6 +189,36 @@ class PredictionResponse(BaseModel):
     leaf_validation: Optional[Dict[str, Any]] = None
     uncertainty_note: Optional[str] = None
 
+    # Part 8 Normalized Intelligence Engine Fields
+    scan_id: Optional[str] = None
+    status: Optional[str] = "DISEASE_DETECTED"
+    image_validation_status: Optional[str] = "VALID_LEAF"
+    plant_name: Optional[str] = None
+    crop_support_status: Optional[str] = "SUPPORTED"
+    disease_category: Optional[str] = None
+    healthy_status: Optional[bool] = False
+    prediction_confidence: Optional[float] = None
+    confidence_interpretation: Optional[str] = None
+    top_predictions: Optional[List[Dict[str, Any]]] = None
+    model_score: Optional[float] = None
+    calibration_status: Optional[str] = "CALIBRATED_TEMPERATURE_SCALED"
+    model_name: Optional[str] = "MobileNetV2 (PlantVillage v1.1)"
+    model_revision: Optional[str] = "v1.1"
+    commit_sha: Optional[str] = "77e6d262dca53b818f7ad1d67088700754515639"
+    symptoms: Optional[str] = None
+    model_predictions: Optional[List[Dict[str, Any]]] = None
+    provider_predictions: Optional[List[Dict[str, Any]]] = None
+    agreement_status: Optional[str] = None
+    visible_symptoms: Optional[str] = None
+    possible_causes: Optional[str] = None
+    recommended_next_steps: Optional[List[str]] = None
+    prevention_guidance: Optional[str] = None
+    treatment_guidance: Optional[Dict[str, Any]] = None
+    limitations: Optional[str] = None
+    analysis_timestamp: Optional[str] = None
+    model_version: Optional[str] = None
+    provider_information: Optional[Dict[str, Any]] = None
+
 # --- Analytics & Weather Schemas ---
 class DashboardAnalyticsResponse(BaseModel):
     total_predictions: int

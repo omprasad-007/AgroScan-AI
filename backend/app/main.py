@@ -50,6 +50,18 @@ def seed_initial_data():
                 except Exception:
                     pass
 
+            prediction_cols = [
+                "status VARCHAR DEFAULT 'DISEASE_DETECTED'",
+                "crop_support_status VARCHAR DEFAULT 'SUPPORTED'",
+                "model_version VARCHAR DEFAULT 'hybrid_v1.0'",
+                "provider_info VARCHAR"
+            ]
+            for col_def in prediction_cols:
+                try:
+                    cursor.execute(f"ALTER TABLE predictions ADD COLUMN {col_def}")
+                except Exception:
+                    pass
+
             raw_conn.commit()
             raw_conn.close()
         except Exception:

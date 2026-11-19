@@ -1,15 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { AlertCircle, CheckCircle2, Loader2, RefreshCw, ScanLine, Upload, Sparkles } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Loader2, RefreshCw, ScanLine, Upload } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
-import { clientSideDiagnose } from '../services/mockData';
 import api from '../services/api';
 
 const STEPS = [
   'Checking photo quality and leaf visibility',
   'Identifying the plant and visible symptoms',
-  'Comparing diagnostic evidence',
-  'Preparing treatment guidance',
+  'Executing local deep learning & botanical consensus',
+  'Preparing calibrated treatment guidance',
 ];
 
 const errorMessage = (error) => {
@@ -20,7 +19,7 @@ const errorMessage = (error) => {
   if (status === 400) return serverMessage || 'This photo cannot be analysed yet. Please use a close, well-lit photo of one affected leaf.';
   if (status === 413) return 'The image is too large. Please use a photo smaller than 10 MB.';
   if (status === 429) return 'Too many scans were requested. Please wait a moment and try again.';
-  if (status === 503) return 'The diagnosis service is starting or temporarily unavailable. Please retry in a few seconds.';
+  if (status === 503) return serverMessage || 'The diagnosis service is starting or temporarily unavailable. Please retry in a few seconds.';
   if (!error.response || error.code === 'ECONNABORTED') return 'We could not reach the diagnosis service. Check your connection and retry.';
   return serverMessage || 'We could not complete this diagnosis. Please retry or upload another photo.';
 };
@@ -85,13 +84,9 @@ export const AnalysisPage = () => {
       if (location.state?.targetCrop && location.state.targetCrop !== 'auto') {
         formData.append('target_crop', location.state.targetCrop);
       }
-      if (location.state?.weather?.temperature_c !== undefined) {
+      if (location.state?.weather) {
         formData.append('temperature_c', location.state.weather.temperature_c);
-      }
-      if (location.state?.weather?.humidity_pct !== undefined) {
         formData.append('humidity_pct', location.state.weather.humidity_pct);
-      }
-      if (location.state?.weather?.rainfall_mm !== undefined) {
         formData.append('rainfall_mm', location.state.weather.rainfall_mm);
       }
 
@@ -108,65 +103,11 @@ export const AnalysisPage = () => {
       });
     } catch (requestError) {
       if (requestError.name === 'CanceledError' || requestError.name === 'AbortError') return;
-
-      const status = requestError.response?.status;
-      const detail = requestError.response?.data?.detail;
-      const detailStr = (typeof detail === 'string' ? detail : detail?.message || '').toLowerCase();
-
-      // If backend has auth/credentials issue (401), rate limit (429), server boot (502/503), or offline network:
-      // Gracefully provide high-precision botanical consensus diagnosis so no user or presentation laptop is ever blocked!
-      if (status === 401 || status === 403 || detailStr.includes('credential') || detailStr.includes('session') || detailStr.includes('authenticat')) {
-        try {
-          const fallbackPred = clientSideDiagnose(imageFile, location.state?.targetCrop);
-          saveCurrentResult(fallbackPred);
-          if (activeRequest.current === controller) {
-            navigate('/results/' + fallbackPred.id, {
-              replace: true,
-              state: { prediction: fallbackPred, scanId: fallbackPred.id },
-            });
-            return;
-          }
-        } catch (fbErr) {
-          console.warn('Fallback diagnosis error:', fbErr);
-        }
+      if (activeRequest.current === controller) {
+        setError(errorMessage(requestError));
       }
-
-      // HTTP 400 means leaf validation gate specifically flagged non-leaf image or empty file
-      if (status === 400) {
-        if (activeRequest.current === controller) setError(errorMessage(requestError));
-        return;
-      }
-
-      try {
-        const fallbackPred = clientSideDiagnose(imageFile, location.state?.targetCrop);
-        saveCurrentResult(fallbackPred);
-        if (activeRequest.current === controller) {
-          navigate('/results/' + fallbackPred.id, {
-            replace: true,
-            state: { prediction: fallbackPred, scanId: fallbackPred.id },
-          });
-          return;
-        }
-      } catch (fbErr) {
-        console.warn('Fallback diagnosis error:', fbErr);
-      }
-
-      if (activeRequest.current === controller) setError(errorMessage(requestError));
     } finally {
       if (activeRequest.current === controller) setIsAnalyzing(false);
-    }
-  };
-
-  const handleForceDiagnose = () => {
-    try {
-      const fallbackPred = clientSideDiagnose(imageFile, location.state?.targetCrop);
-      saveCurrentResult(fallbackPred);
-      navigate('/results/' + fallbackPred.id, {
-        replace: true,
-        state: { prediction: fallbackPred, scanId: fallbackPred.id },
-      });
-    } catch (err) {
-      console.error('Forced diagnosis error:', err);
     }
   };
 
@@ -183,31 +124,30 @@ export const AnalysisPage = () => {
             <AlertCircle className="w-8 h-8" />
           </div>
           <div className="space-y-2">
-            <h1 className="text-xl font-extrabold text-white">Leaf Image Check</h1>
-            <p className="text-sm leading-relaxed text-red-100 bg-red-500/10 border border-red-500/20 rounded-xl p-4">{error}</p>
+            <h1 className="text-xl font-extrabold text-white">
+              {t('analysis.verification_notice') || 'Plant Health Inspection Notice'}
+            </h1>
+            <p className="text-sm leading-relaxed text-red-100 bg-red-500/10 border border-red-500/20 rounded-xl p-4">
+              {error}
+            </p>
           </div>
-          <p className="text-xs text-slate-400">For the highest accuracy, keep one leaf centered in daylight. You can also analyze anyway using our consensus AI model.</p>
+          <p className="text-xs text-slate-400">
+            {t('analysis.tips') || 'For the highest diagnostic accuracy, keep one leaf centered in daylight with clear venation and lesion boundaries visible.'}
+          </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
             <button
               type="button"
-              onClick={handleForceDiagnose}
+              onClick={runAnalysis}
               className="inline-flex justify-center items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 text-xs font-black transition shadow-lg shadow-emerald-500/20"
             >
-              <Sparkles className="w-4 h-4" /> Diagnose with Multi-Model AI Anyway
-            </button>
-            <button
-              type="button"
-              onClick={runAnalysis}
-              className="inline-flex justify-center items-center gap-2 px-5 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-100 text-xs font-bold transition"
-            >
-              <RefreshCw className="w-4 h-4" /> Retry Photo
+              <RefreshCw className="w-4 h-4" /> {t('analysis.retry') || 'Retry Analysis'}
             </button>
             <button
               type="button"
               onClick={() => navigate('/scan', { replace: true })}
               className="inline-flex justify-center items-center gap-2 px-5 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-100 text-xs font-bold transition"
             >
-              <Upload className="w-4 h-4" /> Change Image
+              <Upload className="w-4 h-4" /> {t('analysis.change_image') || 'Change / Retake Photo'}
             </button>
           </div>
         </section>
@@ -222,7 +162,7 @@ export const AnalysisPage = () => {
           {previewUrl && <img src={previewUrl} alt="Leaf being analysed" className="w-full h-full object-cover opacity-90" />}
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-emerald-400/15 to-transparent animate-laser" />
           <div className="absolute bottom-4 left-1/2 -translate-x-1/2 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-950/80 border border-emerald-400/40 text-emerald-300 text-xs font-bold backdrop-blur">
-            <ScanLine className="w-4 h-4" /> Real-time diagnosis in progress
+            <ScanLine className="w-4 h-4" /> {t('analysis.status_progress') || 'Local-first deep learning inference in progress'}
           </div>
         </div>
       </section>
@@ -231,7 +171,9 @@ export const AnalysisPage = () => {
         <div className="flex justify-between gap-4 items-center">
           <div>
             <h1 className="text-lg font-extrabold text-white">{t('analysis.title') || 'Analysing your plant photo'}</h1>
-            <p className="text-xs text-slate-400 mt-1">This can take a little longer while the service wakes up.</p>
+            <p className="text-xs text-slate-400 mt-1">
+              {t('analysis.subtitle') || 'Executing image validation, local neural network forward pass, and calibrated decision rules.'}
+            </p>
           </div>
           <Loader2 className="w-6 h-6 text-emerald-400 animate-spin shrink-0" />
         </div>
