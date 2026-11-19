@@ -24,8 +24,34 @@ from pydantic import BaseModel, Field
 from PIL import Image
 import numpy as np
 
-import torch
-from transformers import AutoImageProcessor, AutoModelForImageClassification
+# Lazy-loaded ML imports to preserve memory in constrained cloud environments (e.g. Render 512MB RAM)
+_torch = None
+_AutoImageProcessor = None
+_AutoModelForImageClassification = None
+
+def _get_torch():
+    global _torch
+    if _torch is None:
+        try:
+            import torch
+            _torch = torch
+        except Exception as e:
+            logger.info(f"PyTorch runtime not available in this environment: {e}")
+            _torch = None
+    return _torch
+
+def _get_transformers():
+    global _AutoImageProcessor, _AutoModelForImageClassification
+    if _AutoImageProcessor is None or _AutoModelForImageClassification is None:
+        try:
+            from transformers import AutoImageProcessor, AutoModelForImageClassification
+            _AutoImageProcessor = AutoImageProcessor
+            _AutoModelForImageClassification = AutoModelForImageClassification
+        except Exception as e:
+            logger.info(f"Transformers runtime not available in this environment: {e}")
+            _AutoImageProcessor = None
+            _AutoModelForImageClassification = None
+    return _AutoImageProcessor, _AutoModelForImageClassification
 
 from app.services.crop_registry import (
     get_crop_support,
@@ -103,7 +129,7 @@ class PlantDiseaseModelService:
             return
         
         self.model_dir = model_dir or LOCAL_MODEL_DIR
-        self.device = torch.device("cpu")  # CPU inference by default for deterministic stability
+        self.device = "cpu"  # String representation initially to avoid importing torch at module load
         self.model = None
         self.processor = None
         self.id2label: Dict[str, str] = {}
@@ -115,9 +141,17 @@ class PlantDiseaseModelService:
         self.load_error: Optional[str] = None
         self.load_duration_ms: float = 0.0
 
-        # Attempt safe initial loading
+        # Attempt safe initial loading (loads JSON metadata only, zero torch dependency)
         self._load_metadata()
         self._initialized = True
+
+    def has_weights(self) -> bool:
+        """Returns True if local weights and config exist on disk."""
+        if not os.path.exists(self.model_dir):
+            return False
+        weights_path = os.path.join(self.model_dir, "model.safetensors")
+        config_path = os.path.join(self.model_dir, "config.json")
+        return os.path.exists(weights_path) and os.path.exists(config_path)
 
     def _load_metadata(self):
         """Loads calibration, threshold, and manifest metadata from local files."""
@@ -149,31 +183,29 @@ class PlantDiseaseModelService:
             except Exception as e:
                 logger.warning(f"Could not parse model_manifest.json: {e}")
 
-    def load_model(self) -> bool:
+    def load_model(self, force_reload: bool = False) -> bool:
         """
         Loads processor and model weights from disk once into memory.
         Safe for repeated calls (idempotent).
         """
-        if self.is_loaded and self.model is not None and self.processor is not None:
+        if self.is_loaded and self.model is not None and self.processor is not None and not force_reload:
             return True
 
         with self._lock:
-            if self.is_loaded and self.model is not None and self.processor is not None:
+            if self.is_loaded and self.model is not None and self.processor is not None and not force_reload:
                 return True
 
             t0 = time.time()
-            logger.info(f"Loading local MobileNetV2 model from {self.model_dir}...")
-
-            if not os.path.exists(self.model_dir):
-                self.load_error = f"Model directory not found: {self.model_dir}"
-                logger.error(self.load_error)
+            if not self.has_weights():
+                self.load_error = f"Model weights not present in {self.model_dir}"
+                logger.info(f"[PlantDiseaseModelService] {self.load_error}. Cloud / botanical fallback will be used.")
                 return False
 
-            weights_path = os.path.join(self.model_dir, "model.safetensors")
-            config_path = os.path.join(self.model_dir, "config.json")
-            if not os.path.exists(weights_path) or not os.path.exists(config_path):
-                self.load_error = f"Missing model.safetensors or config.json in {self.model_dir}"
-                logger.error(self.load_error)
+            torch = _get_torch()
+            AutoImageProcessor, AutoModelForImageClassification = _get_transformers()
+            if torch is None or AutoImageProcessor is None or AutoModelForImageClassification is None:
+                self.load_error = "PyTorch or Transformers runtime not available in this environment"
+                logger.info(f"[PlantDiseaseModelService] {self.load_error}. Cloud / botanical fallback will be used.")
                 return False
 
             try:
@@ -284,6 +316,10 @@ class PlantDiseaseModelService:
             success = self.load_model()
             if not success or self.model is None or self.processor is None:
                 raise RuntimeError(self.load_error or "Local MobileNetV2 model is not loaded.")
+
+        torch = _get_torch()
+        if torch is None:
+            raise RuntimeError("PyTorch runtime is not available in this environment.")
 
         t0 = time.time()
 

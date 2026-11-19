@@ -9,8 +9,6 @@ import logging
 from typing import Tuple, Dict, Any, Optional
 from PIL import Image
 import numpy as np
-import torch
-import torchvision.transforms as transforms
 
 logger = logging.getLogger("agroscan.ai.preprocessor")
 
@@ -38,11 +36,16 @@ class ImagePreprocessor:
     PyTorch tensors and RGB arrays.
     """
 
-    _tensor_transform = transforms.Compose([
-        transforms.Resize(DEFAULT_INFERENCE_SIZE, interpolation=transforms.InterpolationMode.BILINEAR),
-        transforms.ToTensor(),
-        transforms.Normalize(mean=IMAGENET_MEAN, std=IMAGENET_STD),
-    ])
+    _tensor_transform = None
+
+    @classmethod
+    def _get_transform(cls, size: Tuple[int, int]):
+        import torchvision.transforms as transforms
+        return transforms.Compose([
+            transforms.Resize(size, interpolation=transforms.InterpolationMode.BILINEAR),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=IMAGENET_MEAN, std=IMAGENET_STD),
+        ])
 
     @classmethod
     def decode_and_validate(cls, image_bytes: bytes) -> Tuple[Image.Image, np.ndarray, Dict[str, Any]]:
@@ -91,19 +94,12 @@ class ImagePreprocessor:
         return pil_image, np_rgb, metadata
 
     @classmethod
-    def prepare_inference_tensor(cls, pil_image: Image.Image, target_size: Tuple[int, int] = DEFAULT_INFERENCE_SIZE) -> torch.Tensor:
+    def prepare_inference_tensor(cls, pil_image: Image.Image, target_size: Tuple[int, int] = DEFAULT_INFERENCE_SIZE) -> Any:
         """
         Converts a PIL Image into a normalized 4D PyTorch tensor: (1, C, H, W).
         """
-        if target_size == DEFAULT_INFERENCE_SIZE:
-            tensor = cls._tensor_transform(pil_image)
-        else:
-            custom_transform = transforms.Compose([
-                transforms.Resize(target_size, interpolation=transforms.InterpolationMode.BILINEAR),
-                transforms.ToTensor(),
-                transforms.Normalize(mean=IMAGENET_MEAN, std=IMAGENET_STD),
-            ])
-            tensor = custom_transform(pil_image)
+        transform = cls._get_transform(target_size)
+        tensor = transform(pil_image)
 
         # Add batch dimension: (1, 3, 224, 224)
         return tensor.unsqueeze(0)

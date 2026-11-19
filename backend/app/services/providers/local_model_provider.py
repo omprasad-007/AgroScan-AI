@@ -42,17 +42,10 @@ class AgroScanLocalModelProvider(DiseaseDetectionProvider):
     def __init__(self):
         super().__init__(name="agroscan_local", display_name="AgroScan Local Vision Engine (MobileNetV2)")
         self.model_service = local_model_service
-        self._ensure_loaded()
-
-    def _ensure_loaded(self):
-        try:
-            self.model_service.load_model()
-        except Exception as e:
-            logger.warning(f"Could not load MobileNetV2 model at provider init: {e}")
 
     def is_available(self) -> bool:
-        # Local model is self-hosted and always available
-        return True
+        # Local model is available if weights are present locally or already loaded
+        return self.model_service.has_weights() or self.model_service.is_loaded
 
     def get_health_status(self) -> ProviderHealthStatus:
         base = super().get_health_status()
@@ -78,6 +71,13 @@ class AgroScanLocalModelProvider(DiseaseDetectionProvider):
     ) -> ProviderDiagnosisResult:
         self.total_calls += 1
         t0 = time.time()
+
+        # Lazy load weights on first inference request if available
+        if self.model_service.has_weights() and not self.model_service.is_loaded:
+            try:
+                self.model_service.load_model()
+            except Exception as e:
+                logger.warning(f"Lazy load of MobileNetV2 failed: {e}")
 
         # Step 1: Check target crop support status
         is_target_specified = bool(plant_name and plant_name.lower() != "auto")

@@ -8,11 +8,38 @@ import os
 import time
 import logging
 from typing import Dict, Any, Optional, Tuple, List
-import torch
-from transformers import AutoImageProcessor, AutoModelForImageClassification
 from app.core.config import settings
 
 logger = logging.getLogger("agroscan.ai.model_registry")
+
+# Lazy-loaded ML imports to preserve memory in constrained cloud environments (e.g. Render 512MB RAM)
+_torch = None
+_AutoImageProcessor = None
+_AutoModelForImageClassification = None
+
+def _get_torch():
+    global _torch
+    if _torch is None:
+        try:
+            import torch
+            _torch = torch
+        except Exception as e:
+            logger.info(f"PyTorch runtime not available in this environment: {e}")
+            _torch = None
+    return _torch
+
+def _get_transformers():
+    global _AutoImageProcessor, _AutoModelForImageClassification
+    if _AutoImageProcessor is None or _AutoModelForImageClassification is None:
+        try:
+            from transformers import AutoImageProcessor, AutoModelForImageClassification
+            _AutoImageProcessor = AutoImageProcessor
+            _AutoModelForImageClassification = AutoModelForImageClassification
+        except Exception as e:
+            logger.info(f"Transformers runtime not available in this environment: {e}")
+            _AutoImageProcessor = None
+            _AutoModelForImageClassification = None
+    return _AutoImageProcessor, _AutoModelForImageClassification
 
 
 class ModelInitializationError(RuntimeError):
@@ -67,9 +94,10 @@ class ModelRegistry:
     _loaded_processors: Dict[str, Any] = {}
 
     @classmethod
-    def get_preferred_device(cls) -> torch.device:
+    def get_preferred_device(cls) -> Any:
         """Determines whether CUDA or CPU should be used safely."""
-        if torch.cuda.is_available():
+        torch = _get_torch()
+        if torch is not None and torch.cuda.is_available():
             try:
                 # Test a minimal tensor allocation on CUDA
                 t = torch.zeros(1, device="cuda")
@@ -78,10 +106,10 @@ class ModelRegistry:
             except Exception as err:
                 logger.warning(f"CUDA reported available but tensor allocation failed: {err}. Falling back to CPU.")
                 return torch.device("cpu")
-        return torch.device("cpu")
+        return torch.device("cpu") if torch is not None else "cpu"
 
     @classmethod
-    def load_model(cls, repo_id: str) -> Tuple[Any, Any, torch.device]:
+    def load_model(cls, repo_id: str) -> Tuple[Any, Any, Any]:
         """
         Lazily loads the processor and model for repo_id.
         Reuses cached instance if already initialized.
@@ -89,6 +117,11 @@ class ModelRegistry:
         if repo_id in cls._loaded_models:
             device = cls.get_preferred_device()
             return cls._loaded_models[repo_id], cls._loaded_processors[repo_id], device
+
+        torch = _get_torch()
+        AutoImageProcessor, AutoModelForImageClassification = _get_transformers()
+        if torch is None or AutoImageProcessor is None or AutoModelForImageClassification is None:
+            raise ModelInitializationError("PyTorch or Transformers runtime not available in this environment.")
 
         meta = cls._MODELS_META.get(repo_id)
         if not meta:

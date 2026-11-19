@@ -8,7 +8,6 @@ import math
 import logging
 from typing import Dict, Any, List, Optional, Tuple
 import numpy as np
-import torch
 from app.core.config import settings
 
 logger = logging.getLogger("agroscan.ai.calibrator")
@@ -24,7 +23,7 @@ class ConfidenceCalibrator:
     DEFAULT_TEMPERATURE: float = 0.8845  # Empirical temperature from PlantVillage validation set
 
     @classmethod
-    def apply_temperature_scaling(cls, logits: torch.Tensor, temperature: Optional[float] = None) -> torch.Tensor:
+    def apply_temperature_scaling(cls, logits: Any, temperature: Optional[float] = None) -> Any:
         """
         Scales raw neural network logits by temperature T before softmax.
         T < 1.0 increases discriminative margin for well-calibrated models.
@@ -33,8 +32,16 @@ class ConfidenceCalibrator:
         t = temperature or getattr(settings, "CONFIDENCE_CALIBRATION_TEMPERATURE", cls.DEFAULT_TEMPERATURE)
         if t <= 0.0:
             t = 1.0
-        scaled_logits = logits / t
-        return torch.softmax(scaled_logits, dim=-1)
+
+        if hasattr(logits, "softmax"):  # PyTorch Tensor
+            import torch
+            scaled_logits = logits / t
+            return torch.softmax(scaled_logits, dim=-1)
+
+        arr = np.array(logits, dtype=np.float32)
+        scaled = arr / t
+        exp_arr = np.exp(scaled - np.max(scaled, axis=-1, keepdims=True))
+        return exp_arr / np.sum(exp_arr, axis=-1, keepdims=True)
 
     @classmethod
     def interpret_confidence(cls, confidence: float) -> str:

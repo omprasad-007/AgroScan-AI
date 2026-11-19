@@ -8,7 +8,6 @@ import time
 import logging
 from typing import Dict, Any, List, Optional, Tuple
 from PIL import Image
-import torch
 from app.core.config import settings
 from app.services.ai.image_preprocessor import ImagePreprocessor
 from app.services.ai.model_registry import ModelRegistry, ModelInitializationError
@@ -86,6 +85,7 @@ class HuggingFaceInferenceService:
             inputs = {"pixel_values": tensor}
 
         # 4. Execute forward pass with inference mode
+        import torch
         with torch.inference_mode():
             outputs = model(**inputs)
             logits = outputs.logits
