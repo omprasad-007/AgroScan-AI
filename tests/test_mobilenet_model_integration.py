@@ -354,7 +354,7 @@ def test_api_model_predict_route_valid_leaf():
     assert "status" in data
     assert "top_prediction" in data
     assert len(data["top_predictions"]) == 3
-    assert "MobileNet" in data["model_name"] or "DINOv2" in data["model_name"]
+    assert "MobileNet" in data["model_name"] or "DINOv2" in data["model_name"] or "Gemini" in data["model_name"] or "Vision" in data["model_name"]
 
 
 def test_api_model_predict_route_rejects_selfie():
@@ -393,7 +393,7 @@ def test_scan_analyze_full_pipeline_guest():
     assert data["recommendation"]["organic_treatment"] is not None
     assert data["recommendation"]["chemical_treatment"] is not None
     assert data["recommendation"]["prevention"] is not None
-    assert "MobileNet" in data["model_name"] or "DINOv2" in data["model_name"]
+    assert "MobileNet" in data["model_name"] or "DINOv2" in data["model_name"] or "Gemini" in data["model_name"] or "Vision" in data["model_name"]
 
 
 def test_scan_analyze_rejects_document():

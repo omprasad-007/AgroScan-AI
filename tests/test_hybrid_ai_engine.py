@@ -128,11 +128,21 @@ def test_crop_registry_partially_supported_crops():
     assert profile.common_name == "Mango"
     assert profile.limitations is not None
 
-    status, profile = CropRegistry.check_support("cotton")
+    status, profile = CropRegistry.check_support("onion")
     assert status == CropSupportStatus.PARTIALLY_SUPPORTED
 
-    status, profile = CropRegistry.check_support("rice")
+    status, profile = CropRegistry.check_support("pomegranate")
     assert status == CropSupportStatus.PARTIALLY_SUPPORTED
+
+
+def test_crop_registry_indian_crops_supported():
+    status, profile = CropRegistry.check_support("cotton")
+    assert status == CropSupportStatus.SUPPORTED
+    assert "sanjeevani-04/indian-crop-disease-mobilenetv2" in profile.supported_model_ids
+
+    status, profile = CropRegistry.check_support("rice")
+    assert status == CropSupportStatus.SUPPORTED
+    assert "sanjeevani-04/indian-crop-disease-mobilenetv2" in profile.supported_model_ids
 
 
 def test_crop_registry_unsupported_crop():

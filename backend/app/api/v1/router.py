@@ -26,6 +26,7 @@ api_router.include_router(geocoding.router, prefix="/geocoding", tags=["Geocodin
 api_router.include_router(plants.router, prefix="/plants", tags=["Plants"])
 api_router.include_router(scan.router, prefix="/predictions", tags=["Predictions & Scans"])
 api_router.include_router(scan.router, prefix="/scans", tags=["Predictions & Scans"])
+api_router.include_router(scan.router, prefix="/scan", tags=["Predictions & Scans"])
 api_router.include_router(weather.router, prefix="/weather", tags=["Weather"])
 api_router.include_router(recommendations.router, prefix="/recommendations", tags=["Recommendations"])
 api_router.include_router(chat.router, prefix="/chat", tags=["AI Chatbot"])

@@ -435,6 +435,54 @@
       "f1_score": "98.49%"
     }
   },
+  "secondary_active_model": {
+    "repository_id": "sanjeevani-04/indian-crop-disease-mobilenetv2",
+    "selected_revision": "main",
+    "model_architecture": "MobileNetV2ForImageClassification",
+    "base_model": "google/mobilenet_v2_1.0_224",
+    "task": "image-classification",
+    "license": "Apache-2.0",
+    "download_date": "2026-11-19T18:55:00Z",
+    "model_directory": "backend/models/indian-crop-disease-mobilenetv2",
+    "weights_size_bytes": 9249308,
+    "label_count": 35,
+    "target_crops": ["Cotton", "Maize", "Rice", "Sugarcane", "Wheat"],
+    "files": {
+      ".gitattributes": {
+        "size_bytes": 1519,
+        "sha256": "11ad7efa24975ee4b0c3c3a38ed18737f0658a5f75a0a96787b576a78a023361"
+      },
+      "config.json": {
+        "size_bytes": 2966,
+        "sha256": "8c595ed8523685818ff4739328dfefbc63721b1abe624a02d07f03c37409e249"
+      },
+      "model.safetensors": {
+        "size_bytes": 9249308,
+        "sha256": "46c0b33a7f1dc4dbe43f06606d4d6ca1b7f73aebd9c11eab8c60a80236e1d418"
+      },
+      "preprocessor_config.json": {
+        "size_bytes": 474,
+        "sha256": "dd3c71dd08e1282ed736a0d77268efaf2bae017028dc4028b761f1a819e4b2b7"
+      },
+      "README.md": {
+        "size_bytes": 2596,
+        "sha256": "ccb7c153e92006c4876a80859aa942ebe2e859b0e597426a00651b626f10b8e1"
+      },
+      "training_args.bin": {
+        "size_bytes": 5201,
+        "sha256": "50a4932517982eb241033f64eca882357d3023d356941152af85269a11b259f0"
+      }
+    },
+    "calibration": {
+      "temperature": 1.0,
+      "method": "temperature_scaling",
+      "threshold": 0.5
+    },
+    "performance": {
+      "cpu_latency_ms": 247.6,
+      "classes_count": 35
+    }
+  },
   "fallback_model": {
     "repository_id": "neghani/plantvillage-mobilenetv2",
     "selected_revision": "v1.1",
