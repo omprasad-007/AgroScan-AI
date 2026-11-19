@@ -169,6 +169,12 @@ class ModelRegistry:
             model_target = local_model_dir
             local_files_only = True
             logger.info(f"Loading local weights for '{repo_id}' from verified directory: {local_model_dir} (offline mode)")
+        elif os.environ.get("RENDER") or getattr(settings, "ENVIRONMENT", "").lower() == "production":
+            logger.info(f"Local model weights for '{repo_id}' not present on disk in cloud environment. Routing to cloud multimodal provider.")
+            raise ModelInitializationError(
+                f"Local model weights for '{repo_id}' are not bundled in cloud environment. "
+                "Routing directly to cloud multimodal botanical provider."
+            )
         else:
             model_target = repo_id
             local_files_only = False
