@@ -36,40 +36,40 @@ export const ForgotPasswordPage = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto py-12 space-y-6">
-      <Link to="/login" className="inline-flex items-center space-x-2 text-xs font-semibold text-slate-400 hover:text-white transition">
+    <div className="max-w-md mx-auto py-12 px-4 space-y-6">
+      <Link to="/login" className="inline-flex items-center space-x-2 text-xs font-semibold text-agro-muted hover:text-agro-cream transition">
         <ArrowLeft className="w-4 h-4" />
         <span>{t('forgot.back_to_login') || 'Back to Sign In'}</span>
       </Link>
 
-      <div className="glass-panel p-8 rounded-2xl space-y-6">
+      <div className="agro-panel p-6 sm:p-8 rounded-3xl space-y-6 shadow-2xl">
         <div className="text-center space-y-2">
-          <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center mx-auto border border-primary/20">
+          <div className="w-12 h-12 rounded-2xl bg-agro-primary/10 text-agro-primary flex items-center justify-center mx-auto border border-agro-primary/25 shadow-inner">
             <Mail className="w-6 h-6" />
           </div>
-          <h1 className="text-2xl font-bold text-white">{t('forgot.title') || 'Reset Your Password'}</h1>
-          <p className="text-xs text-slate-400">
+          <h1 className="text-2xl font-bold text-agro-cream tracking-tight">{t('forgot.title') || 'Reset Your Password'}</h1>
+          <p className="text-xs text-agro-muted">
             {t('forgot.subtitle') || 'Enter your registered email address and we will send you a link to reset your password.'}
           </p>
         </div>
 
         {successMsg && (
-          <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs flex items-center space-x-2">
+          <div className="p-4 rounded-xl bg-agro-primary/15 border border-agro-primary/30 text-agro-primary text-xs flex items-center space-x-2">
             <CheckCircle2 className="w-4 h-4 shrink-0" />
             <span>{successMsg}</span>
           </div>
         )}
 
         {errorMsg && (
-          <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs flex items-center space-x-2">
-            <AlertCircle className="w-4 h-4 shrink-0" />
+          <div className="p-4 rounded-xl bg-agro-terracotta/15 border border-agro-terracotta/30 text-agro-cream text-xs flex items-center space-x-2">
+            <AlertCircle className="w-4 h-4 shrink-0 text-agro-terracotta" />
             <span>{errorMsg}</span>
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1.5">
+            <label className="block text-xs font-semibold text-agro-cream/90 mb-1.5">
               {t('login.email') || 'Email Address'}
             </label>
             <input
@@ -77,7 +77,7 @@ export const ForgotPasswordPage = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="farmer@agroscan.ai"
-              className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-primary"
+              className="w-full px-4 py-2.5 rounded-xl bg-agro-bg border border-agro-border text-xs text-agro-cream placeholder-agro-muted/60 focus:outline-none focus:border-agro-primary focus:ring-1 focus:ring-agro-primary transition"
               required
             />
           </div>
@@ -85,14 +85,14 @@ export const ForgotPasswordPage = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs transition shadow-lg shadow-emerald-500/25 disabled:opacity-50"
+            className="w-full py-3 rounded-xl bg-agro-primary hover:bg-agro-primary-hover text-agro-bg font-extrabold text-xs transition shadow-lg shadow-agro-primary/20 disabled:opacity-50 cursor-pointer"
           >
             {loading ? (t('common.loading') || 'Sending Link...') : (t('forgot.submit') || 'Send Reset Link')}
           </button>
         </form>
 
         <div className="text-center pt-2">
-          <Link to="/login" className="text-xs text-agri-400 hover:underline">
+          <Link to="/login" className="text-xs text-agro-primary hover:text-agro-lime font-semibold transition">
             {t('forgot.back_to_login') || 'Back to Sign In'}
           </Link>
         </div>

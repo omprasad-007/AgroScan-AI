@@ -62,31 +62,31 @@ export const RegisterPage = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto py-12 space-y-6">
-      <div className="glass-panel p-8 rounded-2xl space-y-6">
+    <div className="max-w-md mx-auto py-12 px-4 space-y-6">
+      <div className="agro-panel p-6 sm:p-8 rounded-3xl space-y-6 shadow-2xl">
         
         {/* Header */}
         <div className="text-center space-y-2">
-          <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center mx-auto border border-primary/20">
+          <div className="w-12 h-12 rounded-2xl bg-agro-primary/10 text-agro-primary flex items-center justify-center mx-auto border border-agro-primary/25 shadow-inner">
             <UserPlus className="w-6 h-6" />
           </div>
-          <h1 className="text-2xl font-bold text-white">{t('register.title') || 'Create Farmer Account'}</h1>
-          <p className="text-xs text-slate-400">
+          <h1 className="text-2xl font-bold text-agro-cream tracking-tight">{t('register.title') || 'Create Farmer Account'}</h1>
+          <p className="text-xs text-agro-muted">
             {t('register.subtitle') || 'Create your farmer account for disease diagnostics & weather alerts'}
           </p>
         </div>
 
         {error && (
-          <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs flex items-center space-x-2">
-            <AlertCircle className="w-4 h-4 shrink-0" />
-            <span>{error}</span>
+          <div className="p-4 rounded-xl bg-agro-terracotta/15 border border-agro-terracotta/30 text-agro-cream text-xs flex items-center space-x-2">
+            <AlertCircle className="w-4 h-4 shrink-0 text-agro-terracotta" />
+            <span className="font-semibold">{error}</span>
           </div>
         )}
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1.5">
+            <label className="block text-xs font-semibold text-agro-cream/90 mb-1.5">
               {t('register.full_name') || 'Full Name'} *
             </label>
             <input
@@ -95,13 +95,13 @@ export const RegisterPage = () => {
               value={formData.fullName}
               onChange={handleChange}
               placeholder="Ramesh Patil"
-              className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-primary"
+              className="w-full px-4 py-2.5 rounded-xl bg-agro-bg border border-agro-border text-xs text-agro-cream placeholder-agro-muted/60 focus:outline-none focus:border-agro-primary focus:ring-1 focus:ring-agro-primary transition"
               required
             />
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1.5">
+            <label className="block text-xs font-semibold text-agro-cream/90 mb-1.5">
               {t('register.email') || 'Email Address'} *
             </label>
             <input
@@ -110,14 +110,14 @@ export const RegisterPage = () => {
               value={formData.email}
               onChange={handleChange}
               placeholder="name@gmail.com"
-              className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-primary"
+              className="w-full px-4 py-2.5 rounded-xl bg-agro-bg border border-agro-border text-xs text-agro-cream placeholder-agro-muted/60 focus:outline-none focus:border-agro-primary focus:ring-1 focus:ring-agro-primary transition"
               required
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1.5">
+              <label className="block text-xs font-semibold text-agro-cream/90 mb-1.5">
                 {t('register.password') || 'Password'} *
               </label>
               <input
@@ -126,13 +126,13 @@ export const RegisterPage = () => {
                 value={formData.password}
                 onChange={handleChange}
                 placeholder="••••••••"
-                className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-primary"
+                className="w-full px-4 py-2.5 rounded-xl bg-agro-bg border border-agro-border text-xs text-agro-cream placeholder-agro-muted/60 focus:outline-none focus:border-agro-primary focus:ring-1 focus:ring-agro-primary transition"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1.5">
+              <label className="block text-xs font-semibold text-agro-cream/90 mb-1.5">
                 {t('register.confirm_password') || 'Confirm Password'} *
               </label>
               <input
@@ -141,7 +141,7 @@ export const RegisterPage = () => {
                 value={formData.confirmPassword}
                 onChange={handleChange}
                 placeholder="••••••••"
-                className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-primary"
+                className="w-full px-4 py-2.5 rounded-xl bg-agro-bg border border-agro-border text-xs text-agro-cream placeholder-agro-muted/60 focus:outline-none focus:border-agro-primary focus:ring-1 focus:ring-agro-primary transition"
                 required
               />
             </div>
@@ -149,7 +149,7 @@ export const RegisterPage = () => {
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1.5">
+              <label className="block text-xs font-semibold text-agro-cream/90 mb-1.5">
                 {t('profile.district') || 'District / City'}
               </label>
               <input
@@ -158,19 +158,19 @@ export const RegisterPage = () => {
                 value={formData.city}
                 onChange={handleChange}
                 placeholder="Pune"
-                className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-primary"
+                className="w-full px-4 py-2.5 rounded-xl bg-agro-bg border border-agro-border text-xs text-agro-cream placeholder-agro-muted/60 focus:outline-none focus:border-agro-primary focus:ring-1 focus:ring-agro-primary transition"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1.5">
+              <label className="block text-xs font-semibold text-agro-cream/90 mb-1.5">
                 {t('profile.language') || 'Preferred Language'}
               </label>
               <select
                 name="preferredLanguage"
                 value={formData.preferredLanguage}
                 onChange={handleChange}
-                className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-xs text-white focus:outline-none focus:border-primary font-semibold"
+                className="w-full px-4 py-2.5 rounded-xl bg-agro-bg border border-agro-border text-xs text-agro-cream focus:outline-none focus:border-agro-primary focus:ring-1 focus:ring-agro-primary font-semibold transition cursor-pointer"
               >
                 <option value="en">English (EN)</option>
                 <option value="mr">मराठी (MR)</option>
@@ -181,7 +181,7 @@ export const RegisterPage = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs transition shadow-lg shadow-emerald-500/20 flex items-center justify-center space-x-2 disabled:opacity-50"
+            className="w-full py-3 rounded-xl bg-agro-primary hover:bg-agro-primary-hover text-agro-bg font-extrabold text-xs transition shadow-lg shadow-agro-primary/20 flex items-center justify-center space-x-2 disabled:opacity-50 cursor-pointer"
           >
             <UserPlus className="w-4 h-4" />
             <span>{loading ? (t('register.registering') || 'Creating Account...') : (t('register.submit') || 'Register Account')}</span>
@@ -189,9 +189,9 @@ export const RegisterPage = () => {
         </form>
 
         <div className="text-center pt-2">
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-agro-muted">
             {t('register.have_account') || 'Already have an account?'}{' '}
-            <Link to="/login" className="text-agri-400 hover:underline font-semibold">
+            <Link to="/login" className="text-agro-primary hover:text-agro-lime font-semibold transition">
               {t('register.sign_in') || 'Login'}
             </Link>
           </p>

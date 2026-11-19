@@ -39,31 +39,31 @@ export const LoginPage = () => {
 
   return (
     <div className="max-w-md mx-auto py-12 px-4 space-y-6">
-      <div className="glass-panel p-6 sm:p-8 rounded-3xl space-y-6 border border-slate-800 shadow-2xl">
+      <div className="agro-panel p-6 sm:p-8 rounded-3xl space-y-6 shadow-2xl">
         
         {/* Header */}
         <div className="text-center space-y-2">
-          <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center mx-auto border border-emerald-500/20 shadow-inner">
+          <div className="w-12 h-12 rounded-2xl bg-agro-primary/10 text-agro-primary flex items-center justify-center mx-auto border border-agro-primary/25 shadow-inner">
             <Leaf className="w-6 h-6" />
           </div>
-          <h1 className="text-2xl font-extrabold text-white tracking-tight">{t('login.title') || 'Sign In to AgroScan AI'}</h1>
-          <p className="text-xs text-slate-400">
+          <h1 className="text-2xl font-extrabold text-agro-cream tracking-tight">{t('login.title') || 'Sign In to AgroScan AI'}</h1>
+          <p className="text-xs text-agro-muted">
             {t('login.subtitle') || 'Enter your email and password to access plant health diagnostics'}
           </p>
         </div>
 
         {error && (
-          <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs space-y-2">
+          <div className="p-4 rounded-xl bg-agro-terracotta/15 border border-agro-terracotta/30 text-agro-cream text-xs space-y-2">
             <div className="flex items-center space-x-2">
-              <AlertCircle className="w-4 h-4 shrink-0 text-red-400" />
-              <span className="font-semibold">{error}</span>
+              <AlertCircle className="w-4 h-4 shrink-0 text-agro-terracotta" />
+              <span className="font-semibold text-agro-cream">{error}</span>
             </div>
             {(error.toLowerCase().includes('not found') || error.toLowerCase().includes('create an account') || error.toLowerCase().includes('register')) && (
-              <div className="pt-2 border-t border-red-500/20 flex items-center justify-between">
-                <span className="text-[11px] text-slate-300">{t('login.no_account') || "Don't have an account yet?"}</span>
+              <div className="pt-2 border-t border-agro-terracotta/20 flex items-center justify-between">
+                <span className="text-[11px] text-agro-muted">{t('login.no_account') || "Don't have an account yet?"}</span>
                 <Link
                   to="/register"
-                  className="px-3 py-1 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-[11px] transition shadow-md"
+                  className="px-3 py-1 rounded-lg bg-agro-primary hover:bg-agro-primary-hover text-agro-bg font-bold text-[11px] transition shadow-md"
                 >
                   {t('login.create_account') || 'Create Account'}
                 </Link>
@@ -75,7 +75,7 @@ export const LoginPage = () => {
         {/* Regular Login Form for User Credentials */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+            <label className="block text-xs font-semibold text-agro-cream/90 mb-1.5">
               {t('login.email') || 'Email Address'}
             </label>
             <input
@@ -83,7 +83,7 @@ export const LoginPage = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="name@gmail.com"
-              className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500"
+              className="w-full px-4 py-2.5 rounded-xl bg-agro-bg border border-agro-border text-xs text-agro-cream placeholder-agro-muted/60 focus:outline-none focus:border-agro-primary focus:ring-1 focus:ring-agro-primary transition"
               required
               autoComplete="email"
             />
@@ -91,10 +91,10 @@ export const LoginPage = () => {
 
           <div>
             <div className="flex justify-between items-center mb-1.5">
-              <label className="text-xs font-semibold text-slate-300">
+              <label className="text-xs font-semibold text-agro-cream/90">
                 {t('login.password') || 'Password'}
               </label>
-              <Link to="/forgot-password" className="text-xs text-agri-400 hover:underline">
+              <Link to="/forgot-password" className="text-xs text-agro-primary hover:text-agro-lime transition">
                 {t('login.forgot_password') || 'Forgot Password?'}
               </Link>
             </div>
@@ -103,7 +103,7 @@ export const LoginPage = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500"
+              className="w-full px-4 py-2.5 rounded-xl bg-agro-bg border border-agro-border text-xs text-agro-cream placeholder-agro-muted/60 focus:outline-none focus:border-agro-primary focus:ring-1 focus:ring-agro-primary transition"
               required
               autoComplete="current-password"
             />
@@ -112,7 +112,7 @@ export const LoginPage = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs transition shadow-lg shadow-emerald-500/20 flex items-center justify-center space-x-2 disabled:opacity-50 cursor-pointer"
+            className="w-full py-3 rounded-xl bg-agro-primary hover:bg-agro-primary-hover text-agro-bg font-black text-xs transition shadow-lg shadow-agro-primary/20 flex items-center justify-center space-x-2 disabled:opacity-50 cursor-pointer"
           >
             <LogIn className="w-4 h-4" />
             <span>{loading ? (t('login.signing_in') || 'Signing In...') : (t('login.submit') || 'Sign In')}</span>
@@ -120,7 +120,7 @@ export const LoginPage = () => {
         </form>
 
         {/* 1-Click Demo Login for Presentations and Evaluator Laptops */}
-        <div className="pt-2 border-t border-slate-800/80 space-y-2">
+        <div className="pt-2 border-t border-agro-border space-y-2">
           <button
             type="button"
             onClick={async () => {
@@ -138,20 +138,20 @@ export const LoginPage = () => {
               }
             }}
             disabled={loading}
-            className="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-emerald-500/40 text-emerald-300 font-bold text-xs transition flex items-center justify-center space-x-2 cursor-pointer shadow-md"
+            className="w-full py-2.5 rounded-xl bg-agro-surface hover:bg-agro-hover border border-agro-primary/40 text-agro-primary font-bold text-xs transition flex items-center justify-center space-x-2 cursor-pointer shadow-md"
           >
-            <Sparkles className="w-4 h-4 text-emerald-400" />
+            <Sparkles className="w-4 h-4 text-agro-primary" />
             <span>1-Click Demo Login (Presentation Mode)</span>
           </button>
-          <p className="text-[10px] text-center text-slate-400">
-            Pre-configured Account: <span className="text-slate-300 font-mono">farmer@agroscan.ai</span> / <span className="text-slate-300 font-mono">password123</span>
+          <p className="text-[10px] text-center text-agro-muted">
+            Pre-configured Account: <span className="text-agro-cream font-mono">farmer@agroscan.ai</span> / <span className="text-agro-cream font-mono">password123</span>
           </p>
         </div>
 
         <div className="text-center pt-2">
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-agro-muted">
             {t('login.no_account') || "Don't have an account?"}{' '}
-            <Link to="/register" className="text-emerald-400 hover:underline font-bold">
+            <Link to="/register" className="text-agro-primary hover:text-agro-lime font-bold transition">
               {t('login.create_account') || 'Create Account'}
             </Link>
           </p>

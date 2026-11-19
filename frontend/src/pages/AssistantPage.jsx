@@ -341,18 +341,18 @@ export const AssistantPage = () => {
       return;
     }
     const stagesEn = [
-      '🌾 Analyzing agricultural question & intent...',
-      '🔍 Querying FAO, ICAR & CABI Plantwise databases...',
-      '📄 Checking peer-reviewed plant pathology research...',
-      '🧪 Cross-checking evidence & safety guidelines...',
-      '✍️ Synthesizing evidence-based agronomist advisory...'
+      'Analyzing agricultural question & intent...',
+      'Querying FAO, ICAR & CABI Plantwise databases...',
+      'Checking peer-reviewed plant pathology research...',
+      'Cross-checking evidence & safety guidelines...',
+      'Synthesizing evidence-based agronomist advisory...'
     ];
     const stagesMr = [
-      '🌾 प्रश्नाचे स्वरूप व कृषी उद्देश तपासत आहे...',
-      '🔍 FAO, ICAR व कृषी डेटाबेस शोधत आहे...',
-      '📄 पीक रोग व कीड संशोधनाचे संदर्भ तपासत आहे...',
-      '🧪 औषध प्रमाण व सुरक्षा नियमांची खात्री करत आहे...',
-      '✍️ पुराव्यावर आधारित कृषी सल्ला तयार करत आहे...'
+      'प्रश्नाचे स्वरूप व कृषी उद्देश तपासत आहे...',
+      'FAO, ICAR व कृषी डेटाबेस शोधत आहे...',
+      'पीक रोग व कीड संशोधनाचे संदर्भ तपासत आहे...',
+      'औषध प्रमाण व सुरक्षा नियमांची खात्री करत आहे...',
+      'पुराव्यावर आधारित कृषी सल्ला तयार करत आहे...'
     ];
     const stages = lang === 'mr' ? stagesMr : stagesEn;
     setResearchStage(stages[0]);
