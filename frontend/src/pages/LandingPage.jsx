@@ -455,8 +455,8 @@ export const LandingPage = () => {
                 <p className="font-bold text-emerald-400">AgroScan AI Agronomist Response (Mango):</p>
                 <p>White powder with leaf curling indicates <strong>Powdery Mildew (Oidium mangiferae)</strong>.</p>
                 <ul className="list-disc pl-4 space-y-1 text-slate-300">
-                  <td><strong>Organic Solution:</strong> Spray Neem Oil (5ml/L) or wettable sulfur (2g/L) during cool morning hours.</td>
-                  <td><strong>Prevention:</strong> Ensure good canopy ventilation and avoid overhead watering.</td>
+                  <li><strong>Organic Solution:</strong> Spray Neem Oil (5ml/L) or wettable sulfur (2g/L) during cool morning hours.</li>
+                  <li><strong>Prevention:</strong> Ensure good canopy ventilation and avoid overhead watering.</li>
                 </ul>
               </div>
             </div>

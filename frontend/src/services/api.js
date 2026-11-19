@@ -5,17 +5,24 @@ const LIVE_BACKEND_URL = 'https://agroscan-ai-backend-6ppw.onrender.com/api/v1';
 export const getApiBaseUrl = () => {
   let envUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL;
 
-  if (envUrl && envUrl.includes('agroscan-ai-backend.onrender.com') && !envUrl.includes('agroscan-ai-backend-6ppw')) {
-    envUrl = envUrl.replace('agroscan-ai-backend.onrender.com', 'agroscan-ai-backend-6ppw.onrender.com');
-  }
-
   if (typeof window !== 'undefined' && window.location) {
     const hostname = window.location.hostname;
     const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1';
     const isVercel = hostname.endsWith('.vercel.app');
+
+    // On localhost in development, route directly to the local backend server
+    if (isLocalhost && (envUrl?.includes('localhost') || envUrl?.includes('127.0.0.1') || import.meta.env.DEV)) {
+      return `http://${hostname}:8000/api/v1`;
+    }
+
+    // On local network testing (e.g., testing from phone on same WiFi)
     if (!isLocalhost && !isVercel && envUrl && (envUrl.includes('localhost') || envUrl.includes('127.0.0.1'))) {
       return 'http://' + hostname + ':8000/api/v1';
     }
+  }
+
+  if (envUrl && envUrl.includes('agroscan-ai-backend.onrender.com') && !envUrl.includes('agroscan-ai-backend-6ppw')) {
+    envUrl = envUrl.replace('agroscan-ai-backend.onrender.com', 'agroscan-ai-backend-6ppw.onrender.com');
   }
 
   const rawApiUrl = envUrl || LIVE_BACKEND_URL;
