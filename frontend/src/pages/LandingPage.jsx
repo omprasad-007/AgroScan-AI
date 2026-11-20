@@ -300,7 +300,7 @@ export const LandingPage = () => {
         </div>
       </section>
 
-      {/* 4. How It Works (4-Step Visual Workflow) */}
+      {/* 3. How It Works (4-Step Visual Workflow) */}
       <section id="how-it-works" className="py-16 sm:py-24 bg-agro-surface/40 border-y border-agro-border relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
