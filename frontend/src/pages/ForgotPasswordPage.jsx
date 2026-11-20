@@ -85,7 +85,7 @@ export const ForgotPasswordPage = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 rounded-xl bg-agro-primary hover:bg-agro-primary-hover text-agro-bg font-extrabold text-xs transition shadow-lg shadow-agro-primary/20 disabled:opacity-50 cursor-pointer"
+            className="w-full py-3 rounded-xl bg-agro-primary hover:bg-agro-primaryHover text-white font-extrabold text-xs transition shadow-lg shadow-agro-primary/20 disabled:opacity-50 cursor-pointer active:scale-[0.98]"
           >
             {loading ? (t('common.loading') || 'Sending Link...') : (t('forgot.submit') || 'Send Reset Link')}
           </button>

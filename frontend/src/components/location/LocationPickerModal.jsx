@@ -193,7 +193,7 @@ export const LocationPickerModal = ({ isOpen, onClose, onSave, initialData }) =>
               type="button"
               onClick={() => setActiveTab('gps')}
               className={`py-2 px-2 rounded-lg flex items-center justify-center space-x-1.5 transition ${
-                activeTab === 'gps' ? 'bg-agro-primary text-agro-bg shadow font-bold' : 'text-agro-muted hover:text-agro-cream'
+                activeTab === 'gps' ? 'bg-agro-primary text-white shadow font-bold' : 'text-agro-muted hover:text-agro-cream'
               }`}
             >
               <Navigation className="w-3.5 h-3.5" />
@@ -205,7 +205,7 @@ export const LocationPickerModal = ({ isOpen, onClose, onSave, initialData }) =>
             type="button"
             onClick={() => setActiveTab('search')}
             className={`py-2 px-2 rounded-lg flex items-center justify-center space-x-1.5 transition ${
-              activeTab === 'search' ? 'bg-agro-primary text-agro-bg shadow font-bold' : 'text-agro-muted hover:text-agro-cream'
+              activeTab === 'search' ? 'bg-agro-primary text-white shadow font-bold' : 'text-agro-muted hover:text-agro-cream'
             }`}
           >
             <Search className="w-3.5 h-3.5" />
@@ -216,7 +216,7 @@ export const LocationPickerModal = ({ isOpen, onClose, onSave, initialData }) =>
             type="button"
             onClick={() => setActiveTab('manual')}
             className={`py-2 px-2 rounded-lg flex items-center justify-center space-x-1.5 transition ${
-              activeTab === 'manual' ? 'bg-agro-primary text-agro-bg shadow font-bold' : 'text-agro-muted hover:text-agro-cream'
+              activeTab === 'manual' ? 'bg-agro-primary text-white shadow font-bold' : 'text-agro-muted hover:text-agro-cream'
             }`}
           >
             <Edit3 className="w-3.5 h-3.5" />
@@ -232,11 +232,11 @@ export const LocationPickerModal = ({ isOpen, onClose, onSave, initialData }) =>
                 type="button"
                 onClick={handleAcquireGPS}
                 disabled={gpsLoading}
-                className="w-full py-3.5 px-4 rounded-xl bg-agro-primary hover:bg-agro-primary-hover text-agro-bg font-bold text-xs transition shadow-lg shadow-agro-primary/20 flex items-center justify-center space-x-2 disabled:opacity-50"
+                className="w-full py-3.5 px-4 rounded-xl bg-agro-primary hover:bg-agro-primaryHover text-white font-bold text-xs transition shadow-lg shadow-agro-primary/20 flex items-center justify-center space-x-2 disabled:opacity-50 active:scale-[0.98]"
               >
                 {gpsLoading ? (
                   <>
-                    <Loader2 className="w-4 h-4 animate-spin text-agro-bg" />
+                    <Loader2 className="w-4 h-4 animate-spin text-white" />
                     <span>{t('location.detecting') || 'Acquiring high-accuracy GPS coordinates...'}</span>
                   </>
                 ) : (
@@ -354,7 +354,7 @@ export const LocationPickerModal = ({ isOpen, onClose, onSave, initialData }) =>
                   <button
                     type="button"
                     onClick={handleConfirmGPSLocation}
-                    className="px-4 py-1.5 rounded-xl bg-agro-primary hover:bg-agro-primary-hover text-agro-bg text-xs font-bold shadow transition"
+                    className="px-4 py-1.5 rounded-xl bg-agro-primary hover:bg-agro-primaryHover text-white text-xs font-bold shadow transition active:scale-95"
                   >
                     {t('location.save') || 'Confirm & Save Location'}
                   </button>
@@ -478,7 +478,7 @@ export const LocationPickerModal = ({ isOpen, onClose, onSave, initialData }) =>
               </button>
               <button
                 type="submit"
-                className="px-5 py-2 rounded-xl bg-agro-primary hover:bg-agro-primary-hover text-agro-bg text-xs font-bold shadow transition"
+                className="px-5 py-2 rounded-xl bg-agro-primary hover:bg-agro-primaryHover text-white text-xs font-bold shadow transition active:scale-95"
               >
                 {t('profile.save_location') || 'Save Location'}
               </button>

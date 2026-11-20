@@ -223,7 +223,7 @@ export const DashboardPage = () => {
           {/* Strong Primary CTA: Scan Leaf Now */}
           <Link
             to="/scan"
-            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-agro-primary hover:bg-agro-primaryHover text-agro-bg font-extrabold text-sm transition shadow-lg shadow-agro-primary/25 active:scale-[0.98] shrink-0"
+            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-agro-primary hover:bg-agro-primaryHover text-white font-extrabold text-sm transition shadow-lg shadow-agro-primary/25 active:scale-[0.98] shrink-0"
           >
             <ScanLine className="w-4 h-4 shrink-0" aria-hidden="true" />
             <span>{t('dashboard.quick_scan') || 'Scan Leaf Now'}</span>
@@ -328,7 +328,7 @@ export const DashboardPage = () => {
 
             <Link
               to="/scan"
-              className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-2xl bg-agro-primary hover:bg-agro-primaryHover text-agro-bg font-extrabold text-sm transition shadow-lg shadow-agro-primary/25 shrink-0 active:scale-[0.98]"
+              className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-2xl bg-agro-primary hover:bg-agro-primaryHover text-white font-extrabold text-sm transition shadow-lg shadow-agro-primary/25 shrink-0 active:scale-[0.98]"
             >
               <Leaf className="w-4 h-4" aria-hidden="true" />
               <span>{t('dashboard.blank_cta')}</span>
@@ -424,52 +424,87 @@ export const DashboardPage = () => {
               </p>
               <Link
                 to="/scan"
-                className="inline-flex items-center gap-2 mt-2 px-4 py-2.5 rounded-xl bg-agro-primary hover:bg-agro-primaryHover text-agro-bg text-xs font-bold transition shadow-sm"
+                className="inline-flex items-center gap-2 mt-2 px-4 py-2.5 rounded-xl bg-agro-primary hover:bg-agro-primaryHover text-white text-xs font-bold transition shadow-sm"
               >
                 <Leaf className="w-3.5 h-3.5" aria-hidden="true" />
                 <span>{t('dashboard.blank_cta')}</span>
               </Link>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
-                <thead>
-                  <tr className="border-b border-agro-border text-agro-muted font-bold">
-                    <th className="py-2.5 px-3">{t('history.col_crop') || 'Crop'}</th>
-                    <th className="py-2.5 px-3">{t('history.col_disease') || 'Detected Disease'}</th>
-                    <th className="py-2.5 px-3">{t('history.col_severity') || 'Severity'}</th>
-                    <th className="py-2.5 px-3">{t('history.col_confidence') || 'Confidence'}</th>
-                    <th className="py-2.5 px-3 text-right">{t('history.col_report') || 'Action'}</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-agro-border">
-                  {recentScans.map((scan) => (
-                    <tr key={scan.id} className="hover:bg-agro-surface/50 transition-colors">
-                      <td className="py-3 px-3 font-bold text-agro-cream">
+            <>
+              {/* Mobile Stacked Cards for Recent Scans (< sm) */}
+              <div className="block sm:hidden space-y-3">
+                {recentScans.map((scan) => (
+                  <div
+                    key={scan.id}
+                    className="p-3.5 rounded-xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-200/90 dark:border-white/5 space-y-2 transition-all shadow-sm"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-slate-900 dark:text-slate-100 text-xs">
                         {translateCrop(scan.crop_detected || scan.plant)}
-                      </td>
-                      <td className="py-3 px-3 text-agro-muted">
-                        {translateDisease(scan.disease_name || scan.disease)}
-                      </td>
-                      <td className="py-3 px-3">
-                        <SeverityBadge level={scan.severity_level || scan.severity} />
-                      </td>
-                      <td className="py-3 px-3 font-mono text-agro-primary font-bold">
+                      </span>
+                      <SeverityBadge level={scan.severity_level || scan.severity} />
+                    </div>
+                    <div className="text-xs text-slate-600 dark:text-slate-400">
+                      {translateDisease(scan.disease_name || scan.disease)}
+                    </div>
+                    <div className="flex items-center justify-between pt-1.5 border-t border-slate-200/60 dark:border-white/5 text-xs">
+                      <span className="font-mono text-emerald-600 dark:text-emerald-400 font-bold">
                         {(((Number(scan.confidence_score ?? scan.confidence)) || 0.9) * 100).toFixed(1)}%
-                      </td>
-                      <td className="py-3 px-3 text-right">
-                        <Link
-                          to={`/results/${scan.id}`}
-                          className="text-xs font-bold text-agro-primary hover:underline"
-                        >
-                          {t('history.view_report') || 'View Report'}
-                        </Link>
-                      </td>
+                      </span>
+                      <Link
+                        to={`/results/${scan.id}`}
+                        className="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline inline-flex items-center gap-1"
+                      >
+                        <span>{t('history.view_report') || 'View Report'}</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </Link>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Desktop Table (>= sm) */}
+              <div className="hidden sm:block overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead>
+                    <tr className="border-b border-agro-border text-agro-muted font-bold">
+                      <th className="py-2.5 px-3">{t('history.col_crop') || 'Crop'}</th>
+                      <th className="py-2.5 px-3">{t('history.col_disease') || 'Detected Disease'}</th>
+                      <th className="py-2.5 px-3">{t('history.col_severity') || 'Severity'}</th>
+                      <th className="py-2.5 px-3">{t('history.col_confidence') || 'Confidence'}</th>
+                      <th className="py-2.5 px-3 text-right">{t('history.col_report') || 'Action'}</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody className="divide-y divide-agro-border">
+                    {recentScans.map((scan) => (
+                      <tr key={scan.id} className="hover:bg-agro-surface/50 transition-colors">
+                        <td className="py-3 px-3 font-bold text-agro-cream">
+                          {translateCrop(scan.crop_detected || scan.plant)}
+                        </td>
+                        <td className="py-3 px-3 text-agro-muted">
+                          {translateDisease(scan.disease_name || scan.disease)}
+                        </td>
+                        <td className="py-3 px-3">
+                          <SeverityBadge level={scan.severity_level || scan.severity} />
+                        </td>
+                        <td className="py-3 px-3 font-mono text-agro-primary font-bold">
+                          {(((Number(scan.confidence_score ?? scan.confidence)) || 0.9) * 100).toFixed(1)}%
+                        </td>
+                        <td className="py-3 px-3 text-right">
+                          <Link
+                            to={`/results/${scan.id}`}
+                            className="text-xs font-bold text-agro-primary hover:underline"
+                          >
+                            {t('history.view_report') || 'View Report'}
+                          </Link>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
           )}
         </div>
 

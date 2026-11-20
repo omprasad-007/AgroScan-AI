@@ -228,7 +228,7 @@ export const ProfilePage = () => {
           </div>
           <button
             onClick={() => setShowAddFarmModal(true)}
-            className="px-3.5 py-2.5 rounded-xl bg-agro-primary hover:bg-agro-primary-hover text-agro-bg font-bold text-xs flex items-center space-x-1.5 transition shadow-md shadow-agro-primary/20"
+            className="px-3.5 py-2.5 rounded-xl bg-agro-primary hover:bg-agro-primaryHover text-white font-bold text-xs flex items-center space-x-1.5 transition shadow-md shadow-agro-primary/20 active:scale-95"
           >
             <Plus className="w-4 h-4" />
             <span>{t('profile.add_farm') || 'Add Farm Plot'}</span>
@@ -380,7 +380,7 @@ export const ProfilePage = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-xl bg-agro-primary hover:bg-agro-primary-hover text-xs font-bold text-agro-bg shadow transition"
+                  className="px-4 py-2 rounded-xl bg-agro-primary hover:bg-agro-primaryHover text-xs font-bold text-white shadow transition active:scale-95"
                 >
                   {t('profile.save') || 'Save Plot'}
                 </button>

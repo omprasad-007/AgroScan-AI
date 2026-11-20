@@ -833,7 +833,7 @@ export const AssistantPage = () => {
                 type="button"
                 onClick={() => setLang('en')}
                 className={`px-2.5 py-1 rounded-lg transition ${
-                  lang === 'en' ? 'bg-agro-primary text-agro-bg shadow font-bold' : 'text-agro-muted hover:text-agro-cream'
+                  lang === 'en' ? 'bg-agro-primary text-white shadow font-bold' : 'text-agro-muted hover:text-agro-cream'
                 }`}
               >
                 EN
@@ -842,7 +842,7 @@ export const AssistantPage = () => {
                 type="button"
                 onClick={() => setLang('mr')}
                 className={`px-2.5 py-1 rounded-lg transition ${
-                  lang === 'mr' ? 'bg-agro-primary text-agro-bg shadow font-bold' : 'text-agro-muted hover:text-agro-cream'
+                  lang === 'mr' ? 'bg-agro-primary text-white shadow font-bold' : 'text-agro-muted hover:text-agro-cream'
                 }`}
               >
                 मराठी
@@ -920,8 +920,8 @@ export const AssistantPage = () => {
               <div
                 className={`p-4 rounded-2xl text-xs sm:text-sm leading-relaxed ${
                   msg.sender === 'user'
-                    ? 'bg-agro-primary text-agro-bg font-semibold rounded-tr-none shadow-md shadow-agro-primary/20'
-                    : 'bg-agro-card border border-agro-border text-agro-cream rounded-tl-none shadow-sm'
+                    ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-semibold rounded-tr-none shadow-md shadow-emerald-500/20'
+                    : 'bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-white/[0.08] text-slate-800 dark:text-slate-100 rounded-tl-none shadow-sm'
                 }`}
               >
                 <p className="whitespace-pre-wrap">{msg.content}</p>
@@ -1117,11 +1117,11 @@ export const AssistantPage = () => {
           <button
             type="submit"
             disabled={!input.trim() || loading}
-            className="h-12 px-4 sm:px-5 rounded-xl bg-agro-primary hover:bg-agro-primary-hover text-agro-bg flex items-center justify-center font-bold text-xs sm:text-sm shadow-lg shadow-agro-primary/20 shrink-0 disabled:opacity-50 transition space-x-1.5"
+            className="h-12 px-4 sm:px-5 rounded-xl bg-agro-primary hover:bg-agro-primaryHover text-white flex items-center justify-center font-bold text-xs sm:text-sm shadow-lg shadow-agro-primary/20 shrink-0 disabled:opacity-50 transition space-x-1.5 active:scale-95"
             aria-label="Send Question"
           >
             {loading ? (
-              <Loader2 className="w-4 h-4 animate-spin text-agro-bg" />
+              <Loader2 className="w-4 h-4 animate-spin text-white" />
             ) : (
               <>
                 <span className="hidden sm:inline">{lang === 'mr' ? 'विचारा' : 'Ask'}</span>
@@ -1228,7 +1228,7 @@ export const AssistantPage = () => {
               <button
                 type="button"
                 onClick={handleStartNewChat}
-                className="w-full py-2.5 px-3.5 rounded-xl bg-agro-primary hover:bg-agro-primary-hover text-agro-bg font-bold text-xs flex items-center justify-center space-x-2 transition shadow-md shadow-agro-primary/15"
+                className="w-full py-2.5 px-3.5 rounded-xl bg-agro-primary hover:bg-agro-primaryHover text-white font-bold text-xs flex items-center justify-center space-x-2 transition shadow-md shadow-agro-primary/15 active:scale-95"
               >
                 <Plus className="w-4 h-4" />
                 <span>{lang === 'mr' ? '+ नवीन कृषी संवाद सुरू करा' : '+ Start New Advisory Chat'}</span>

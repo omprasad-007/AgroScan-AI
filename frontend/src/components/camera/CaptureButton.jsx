@@ -24,7 +24,7 @@ export const CaptureButton = ({ onCapture, onSwitchCamera, onClose, canSwitch })
         aria-label="Capture Leaf Photo"
         className="relative group p-1.5 rounded-full bg-agro-primary/20 backdrop-blur-md border-2 border-agro-primary transition active:scale-90"
       >
-        <div className="w-16 h-16 rounded-full bg-agro-primary hover:bg-agro-primaryHover text-agro-bg flex items-center justify-center shadow-lg shadow-agro-primary/40 group-hover:scale-105 transition duration-150">
+        <div className="w-16 h-16 rounded-full bg-agro-primary hover:bg-agro-primaryHover text-white flex items-center justify-center shadow-lg shadow-agro-primary/40 group-hover:scale-105 transition duration-150">
           <Camera className="w-7 h-7" aria-hidden="true" />
         </div>
         <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5">

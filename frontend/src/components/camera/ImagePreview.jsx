@@ -37,7 +37,7 @@ export const ImagePreview = ({ imageUrl, onRetake, onUsePhoto, isScanning }) => 
             type="button"
             onClick={onUsePhoto}
             disabled={isScanning}
-            className="px-7 py-3 rounded-xl bg-agro-primary hover:bg-agro-primaryHover text-agro-bg text-xs font-extrabold flex items-center justify-center gap-2 transition shadow-lg shadow-agro-primary/25 disabled:opacity-50 active:scale-[0.98]"
+            className="px-7 py-3 rounded-xl bg-agro-primary hover:bg-agro-primaryHover text-white text-xs font-extrabold flex items-center justify-center gap-2 transition shadow-lg shadow-agro-primary/25 disabled:opacity-50 active:scale-[0.98]"
           >
             <Sparkles className="w-4 h-4" aria-hidden="true" />
             <span>{isScanning ? 'Diagnosing...' : 'Start Disease Diagnosis'}</span>

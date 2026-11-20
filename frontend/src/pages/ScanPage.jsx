@@ -166,7 +166,7 @@ export const ScanPage = () => {
       <nav aria-label="Scan Workflow Steps" className="agro-panel p-3 rounded-2xl border border-agro-border">
         <ol className="grid grid-cols-2 md:grid-cols-4 gap-2 text-left">
           <li className="flex items-center gap-2.5 p-2 rounded-xl bg-agro-surface/60 border border-agro-border">
-            <span className="w-6 h-6 rounded-lg bg-agro-primary text-agro-bg flex items-center justify-center text-xs font-black shrink-0">
+            <span className="w-6 h-6 rounded-lg bg-agro-primary text-white flex items-center justify-center text-xs font-black shrink-0">
               1
             </span>
             <div className="min-w-0 leading-tight">
@@ -176,7 +176,7 @@ export const ScanPage = () => {
           </li>
 
           <li className="flex items-center gap-2.5 p-2 rounded-xl bg-agro-surface/60 border border-agro-primary/30">
-            <span className="w-6 h-6 rounded-lg bg-agro-primary text-agro-bg flex items-center justify-center text-xs font-black shrink-0">
+            <span className="w-6 h-6 rounded-lg bg-agro-primary text-white flex items-center justify-center text-xs font-black shrink-0">
               2
             </span>
             <div className="min-w-0 leading-tight">
@@ -299,7 +299,7 @@ export const ScanPage = () => {
               onClick={() => setActiveTab('camera')}
               className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg transition-colors ${
                 activeTab === 'camera'
-                  ? 'bg-agro-primary text-agro-bg shadow-sm'
+                  ? 'bg-agro-primary text-white shadow-sm font-bold'
                   : 'text-agro-muted hover:text-agro-cream'
               }`}
             >
@@ -314,7 +314,7 @@ export const ScanPage = () => {
               onClick={() => setActiveTab('upload')}
               className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg transition-colors ${
                 activeTab === 'upload'
-                  ? 'bg-agro-primary text-agro-bg shadow-sm'
+                  ? 'bg-agro-primary text-white shadow-sm font-bold'
                   : 'text-agro-muted hover:text-agro-cream'
               }`}
             >
@@ -392,7 +392,7 @@ export const ScanPage = () => {
                     type="button"
                     onClick={() => handleUploadAndAnalyze()}
                     disabled={isAnalyzing}
-                    className="px-7 py-3 rounded-xl bg-agro-primary hover:bg-agro-primaryHover text-agro-bg text-xs font-extrabold flex items-center justify-center gap-2 transition shadow-lg shadow-agro-primary/25 active:scale-[0.98] disabled:opacity-50"
+                    className="px-7 py-3 rounded-xl bg-agro-primary hover:bg-agro-primaryHover text-white text-xs font-extrabold flex items-center justify-center gap-2 transition shadow-lg shadow-agro-primary/25 active:scale-[0.98] disabled:opacity-50"
                   >
                     <Sparkles className="w-4 h-4" aria-hidden="true" />
                     <span>{isAnalyzing ? 'Analyzing...' : 'Diagnose Plant Leaf Now'}</span>

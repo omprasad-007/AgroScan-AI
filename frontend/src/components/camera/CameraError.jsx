@@ -28,7 +28,7 @@ export const CameraError = ({ errorType, message, onRetry, onFallbackUpload, onN
           <button
             type="button"
             onClick={onNativeCapture}
-            className="px-4 py-2.5 rounded-xl bg-agro-primary hover:bg-agro-primaryHover text-agro-bg font-bold text-xs flex items-center justify-center gap-2 transition shadow-md shadow-agro-primary/20"
+            className="px-4 py-2.5 rounded-xl bg-agro-primary hover:bg-agro-primaryHover text-white font-bold text-xs flex items-center justify-center gap-2 transition shadow-md shadow-agro-primary/20 active:scale-95"
           >
             <Smartphone className="w-3.5 h-3.5" aria-hidden="true" />
             <span>Use Device Camera</span>

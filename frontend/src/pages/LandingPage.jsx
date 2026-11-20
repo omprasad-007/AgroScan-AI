@@ -19,14 +19,18 @@ import {
   Zap,
   Leaf,
   ShieldCheck,
-  CloudSun
+  CloudSun,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 
 export const LandingPage = () => {
   const { lang, toggleLanguage, t } = useLanguage();
   const { isAuthenticated } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const handleScanClick = () => navigate('/scan');
@@ -40,71 +44,86 @@ export const LandingPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-agro-bg text-agro-cream flex flex-col justify-between selection:bg-agro-primary selection:text-agro-bg">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col justify-between selection:bg-emerald-500 selection:text-white transition-colors duration-300">
 
       {/* 1. Header Navigation — Sticky on scroll */}
-      <header className="sticky top-0 z-50 bg-agro-bg/85 backdrop-blur-md border-b border-agro-border">
+      <header className="sticky top-0 z-50 bg-white/85 dark:bg-slate-950/85 backdrop-blur-xl border-b border-slate-200/90 dark:border-white/[0.08] shadow-[0_4px_24px_-4px_rgba(0,0,0,0.06)] dark:shadow-[0_4px_24px_-4px_rgba(0,0,0,0.3)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 sm:h-20">
 
             {/* Logo */}
             <Link to="/" className="flex items-center space-x-3 group">
-              <div className="w-10 h-10 rounded-xl bg-agro-primary flex items-center justify-center shadow-lg shadow-agro-primary/20 group-hover:scale-105 transition-transform">
-                <Sprout className="w-6 h-6 text-agro-bg" />
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-white flex items-center justify-center shadow-lg shadow-emerald-500/25 group-hover:scale-105 transition-transform">
+                <Sprout className="w-6 h-6" />
               </div>
               <div>
-                <span className="text-lg font-bold text-agro-cream tracking-tight">
-                  AgroScan <span className="text-agro-primary">AI</span>
+                <span className="text-lg font-bold text-slate-900 dark:text-white tracking-tight">
+                  AgroScan <span className="text-emerald-500 dark:text-emerald-400">AI</span>
                 </span>
-                <span className="block text-[10px] text-agro-muted font-medium tracking-wider uppercase">
+                <span className="block text-[10px] text-slate-500 dark:text-slate-400 font-medium tracking-wider uppercase">
                   {lang === 'mr' ? 'स्मार्ट पिके व रोग निदान' : 'Smart Agriculture & Diagnostics'}
                 </span>
               </div>
             </Link>
 
             {/* Desktop Nav Links */}
-            <nav className="hidden md:flex items-center space-x-8 text-sm font-semibold text-agro-muted">
+            <nav className="hidden md:flex items-center space-x-8 text-sm font-semibold text-slate-600 dark:text-slate-400">
               <button
                 onClick={() => scrollToSection('how-it-works')}
-                className="hover:text-agro-primary transition cursor-pointer"
+                className="hover:text-emerald-500 transition cursor-pointer"
               >
                 {lang === 'mr' ? 'हे कसे कार्य करते' : 'How it Works'}
               </button>
               <button
                 onClick={() => scrollToSection('features')}
-                className="hover:text-agro-primary transition cursor-pointer"
+                className="hover:text-emerald-500 transition cursor-pointer"
               >
                 {lang === 'mr' ? 'वैशिष्ट्ये' : 'Features'}
               </button>
               <button
                 onClick={() => scrollToSection('ai-preview')}
-                className="hover:text-agro-primary transition cursor-pointer"
+                className="hover:text-emerald-500 transition cursor-pointer"
               >
                 {lang === 'mr' ? 'AI सहाय्यक' : 'AI Assistant'}
               </button>
             </nav>
 
             {/* Right Header Actions */}
-            <div className="hidden md:flex items-center space-x-4">
+            <div className="hidden md:flex items-center space-x-3">
               <button
                 onClick={toggleLanguage}
-                className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-agro-surface hover:bg-agro-hover text-agro-cream text-xs font-semibold border border-agro-border transition"
+                className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/80 dark:hover:bg-slate-700/80 text-slate-700 dark:text-slate-200 text-xs font-semibold border border-slate-200 dark:border-slate-700/80 transition"
               >
-                <Globe className="w-4 h-4 text-agro-primary" />
+                <Globe className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                 <span>{lang === 'en' ? 'मराठी' : 'English'}</span>
+              </button>
+
+              {/* Theme Switcher Button */}
+              <button
+                type="button"
+                onClick={toggleTheme}
+                className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/80 dark:hover:bg-slate-700/80 text-amber-500 dark:text-amber-400 border border-slate-200 dark:border-slate-700/80 transition"
+                title={theme === 'dark' ? "Switch to light theme" : "Switch to dark theme"}
+                aria-label={theme === 'dark' ? "Switch to light theme" : "Switch to dark theme"}
+              >
+                {theme === 'dark' ? (
+                  <Sun className="w-4 h-4 text-amber-400" aria-hidden="true" />
+                ) : (
+                  <Moon className="w-4 h-4 text-slate-600" aria-hidden="true" />
+                )}
               </button>
 
               {isAuthenticated ? (
                 <Link
                   to="/dashboard"
-                  className="px-4 py-2 rounded-xl bg-agro-surface hover:bg-agro-hover text-agro-cream text-xs font-bold border border-agro-border transition"
+                  className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/80 dark:hover:bg-slate-700 text-slate-900 dark:text-white text-xs font-bold border border-slate-200 dark:border-slate-700 transition"
                 >
                   {lang === 'mr' ? 'डॅशबोर्डवर जा' : 'Farm Dashboard'}
                 </Link>
               ) : (
                 <Link
                   to="/login"
-                  className="px-4 py-2 rounded-xl text-xs font-bold text-agro-muted hover:text-agro-cream transition"
+                  className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition"
                 >
                   {lang === 'mr' ? 'लॉगिन करा' : 'Sign In'}
                 </Link>
@@ -112,24 +131,31 @@ export const LandingPage = () => {
 
               <button
                 onClick={handleScanClick}
-                className="px-5 py-2.5 rounded-xl bg-agro-primary hover:bg-agro-primary-hover text-agro-bg font-extrabold text-xs transition shadow-lg shadow-agro-primary/20 flex items-center space-x-1.5"
+                className="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-xs transition shadow-lg shadow-emerald-500/25 flex items-center space-x-1.5 active:scale-95"
               >
                 <ScanLine className="w-4 h-4" />
                 <span>{lang === 'mr' ? 'पीक स्कॅन करा' : 'Scan Your Plant'}</span>
               </button>
             </div>
 
-            {/* Mobile Hamburger Button */}
+            {/* Mobile Actions Button */}
             <div className="md:hidden flex items-center space-x-2">
               <button
+                onClick={toggleTheme}
+                className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-amber-500 dark:text-amber-400 border border-slate-200 dark:border-slate-700"
+                title="Toggle Theme"
+              >
+                {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4 text-slate-600" />}
+              </button>
+              <button
                 onClick={toggleLanguage}
-                className="p-2 rounded-lg bg-agro-surface text-agro-cream text-xs font-bold border border-agro-border"
+                className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-bold border border-slate-200 dark:border-slate-700"
               >
                 {lang === 'en' ? 'मराठी' : 'EN'}
               </button>
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-2 rounded-xl bg-agro-surface text-agro-cream border border-agro-border"
+                className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700"
               >
                 {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
               </button>
@@ -170,7 +196,7 @@ export const LandingPage = () => {
               )}
               <button
                 onClick={handleScanClick}
-                className="w-full text-center py-2.5 rounded-xl bg-agro-primary text-agro-bg font-extrabold text-xs flex items-center justify-center space-x-2"
+                className="w-full text-center py-2.5 rounded-xl bg-agro-primary hover:bg-agro-primaryHover text-white font-extrabold text-xs flex items-center justify-center space-x-2"
               >
                 <ScanLine className="w-4 h-4" />
                 <span>{lang === 'mr' ? 'पीक स्कॅन करा' : 'Scan Your Plant'}</span>
@@ -213,7 +239,7 @@ export const LandingPage = () => {
           <div className="mt-9 flex flex-col sm:flex-row items-center justify-center gap-4 max-w-md mx-auto">
             <button
               onClick={handleScanClick}
-              className="w-full sm:w-auto px-8 py-4 rounded-xl bg-agro-primary hover:bg-agro-primary-hover text-agro-bg font-black text-sm transition-all duration-200 shadow-xl shadow-agro-primary/25 flex items-center justify-center space-x-2 group"
+              className="w-full sm:w-auto px-8 py-4 rounded-xl bg-agro-primary hover:bg-agro-primaryHover text-white font-black text-sm transition-all duration-200 shadow-xl shadow-agro-primary/25 flex items-center justify-center space-x-2 group active:scale-95"
             >
               <ScanLine className="w-5 h-5" />
               <span>{lang === 'mr' ? 'आत्ताच पीक स्कॅन करा' : 'Scan Your Plant Now'}</span>
@@ -439,7 +465,7 @@ export const LandingPage = () => {
 
             {/* User Bubble */}
             <div className="flex items-start justify-end space-x-3">
-              <div className="bg-agro-primary text-agro-bg p-4 rounded-2xl rounded-tr-none text-xs sm:text-sm font-semibold max-w-md shadow-md shadow-agro-primary/15">
+              <div className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white p-4 rounded-2xl rounded-tr-none text-xs sm:text-sm font-semibold max-w-md shadow-md shadow-emerald-500/20">
                 "Why are my mango leaves curling and showing white powder?"
               </div>
               <div className="w-8 h-8 rounded-full bg-agro-surface text-agro-cream font-bold text-xs flex items-center justify-center shrink-0 border border-agro-border">
@@ -465,7 +491,7 @@ export const LandingPage = () => {
             <div className="pt-4 text-center">
               <button
                 onClick={handleScanClick}
-                className="px-6 py-3 rounded-xl bg-agro-primary hover:bg-agro-primary-hover text-agro-bg font-black text-xs transition inline-flex items-center space-x-2 shadow-lg shadow-agro-primary/20"
+                className="px-6 py-3 rounded-xl bg-agro-primary hover:bg-agro-primaryHover text-white font-black text-xs transition inline-flex items-center space-x-2 shadow-lg shadow-agro-primary/20 active:scale-95"
               >
                 <ScanLine className="w-4 h-4" />
                 <span>{lang === 'mr' ? 'आपले पीक स्कॅन करून विचारा' : 'Scan Your Crop & Ask AI'}</span>

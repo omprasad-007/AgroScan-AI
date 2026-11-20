@@ -33,7 +33,7 @@ export const CameraPreview = ({
         </div>
 
         {/* Scanning Box Viewfinder */}
-        <div className="relative w-64 h-64 sm:w-72 sm:h-72 rounded-3xl border-2 border-dashed border-agro-primary/70 shadow-[0_0_30px_rgba(47,191,113,0.25)] flex items-center justify-center">
+        <div className="relative w-64 h-64 sm:w-72 sm:h-72 rounded-3xl border-2 border-dashed border-agro-primary/70 shadow-[0_0_30px_rgba(16,185,129,0.3)] flex items-center justify-center">
           {/* Corner Guides */}
           <div className="absolute -top-1 -left-1 w-6 h-6 border-t-4 border-l-4 border-agro-lime rounded-tl-lg"></div>
           <div className="absolute -top-1 -right-1 w-6 h-6 border-t-4 border-r-4 border-agro-lime rounded-tr-lg"></div>
@@ -41,7 +41,7 @@ export const CameraPreview = ({
           <div className="absolute -bottom-1 -right-1 w-6 h-6 border-b-4 border-r-4 border-agro-lime rounded-br-lg"></div>
 
           {/* Animated Laser Scanning Line */}
-          <div className="w-full h-0.5 bg-gradient-to-r from-transparent via-agro-primary to-transparent shadow-[0_0_12px_#2FBF71] animate-laser"></div>
+          <div className="w-full h-0.5 bg-gradient-to-r from-transparent via-agro-primary to-transparent shadow-[0_0_12px_#10B981] animate-laser"></div>
         </div>
 
         {/* Bottom Mode Indicator */}

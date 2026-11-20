@@ -181,7 +181,7 @@ export const RegisterPage = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 rounded-xl bg-agro-primary hover:bg-agro-primary-hover text-agro-bg font-extrabold text-xs transition shadow-lg shadow-agro-primary/20 flex items-center justify-center space-x-2 disabled:opacity-50 cursor-pointer"
+            className="w-full py-3 rounded-xl bg-agro-primary hover:bg-agro-primaryHover text-white font-extrabold text-xs transition shadow-lg shadow-agro-primary/20 flex items-center justify-center space-x-2 disabled:opacity-50 cursor-pointer active:scale-[0.98]"
           >
             <UserPlus className="w-4 h-4" />
             <span>{loading ? (t('register.registering') || 'Creating Account...') : (t('register.submit') || 'Register Account')}</span>

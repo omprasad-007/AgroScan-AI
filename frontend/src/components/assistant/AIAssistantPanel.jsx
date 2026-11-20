@@ -212,14 +212,14 @@ export const AIAssistantPanel = ({ scanData, predictionId, autoOpen = true }) =>
             <button
               type="button"
               onClick={() => setLang('en')}
-              className={`px-2 py-0.5 rounded transition ${lang === 'en' ? 'bg-agro-primary text-agro-bg font-bold' : 'text-agro-muted hover:text-agro-cream'}`}
+              className={`px-2 py-0.5 rounded transition ${lang === 'en' ? 'bg-agro-primary text-white font-bold' : 'text-agro-muted hover:text-agro-cream'}`}
             >
               EN
             </button>
             <button
               type="button"
               onClick={() => setLang('mr')}
-              className={`px-2 py-0.5 rounded transition ${lang === 'mr' ? 'bg-agro-primary text-agro-bg font-bold' : 'text-agro-muted hover:text-agro-cream'}`}
+              className={`px-2 py-0.5 rounded transition ${lang === 'mr' ? 'bg-agro-primary text-white font-bold' : 'text-agro-muted hover:text-agro-cream'}`}
             >
               मराठी
             </button>
@@ -241,15 +241,15 @@ export const AIAssistantPanel = ({ scanData, predictionId, autoOpen = true }) =>
                 className={`p-3.5 rounded-2xl text-xs sm:text-sm leading-relaxed ${
                   msg.sender === 'user'
                     ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-semibold rounded-tr-none shadow-md shadow-emerald-500/20'
-                    : 'bg-slate-900/90 dark:bg-slate-900/90 light:bg-white border border-slate-800 dark:border-white/[0.08] light:border-slate-200 text-slate-100 dark:text-slate-100 light:text-slate-800 rounded-tl-none shadow-sm'
+                    : 'bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-white/[0.08] text-slate-800 dark:text-slate-100 rounded-tl-none shadow-sm'
                 }`}
               >
                 <p className="whitespace-pre-wrap">{msg.content}</p>
 
                 {/* Multi-Source Research Citations */}
                 {msg.sender === 'assistant' && msg.sources && msg.sources.length > 0 && (
-                  <div className="mt-2.5 pt-2 border-t border-slate-800 dark:border-white/[0.08] light:border-slate-200 space-y-1.5">
-                    <span className="text-[10px] font-bold text-emerald-400 dark:text-emerald-400 light:text-emerald-600 flex items-center gap-1.5">
+                  <div className="mt-2.5 pt-2 border-t border-slate-200 dark:border-white/[0.08] space-y-1.5">
+                    <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
                       <BookOpen className="w-3 h-3" />
                       <span>{lang === 'mr' ? 'तपासलेले संदर्भ (Sources):' : 'Verified Evidence & Sources:'}</span>
                     </span>
@@ -260,7 +260,7 @@ export const AIAssistantPanel = ({ scanData, predictionId, autoOpen = true }) =>
                           href={src.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-[10px] text-slate-400 dark:text-slate-400 light:text-slate-600 hover:text-emerald-400 dark:hover:text-emerald-400 light:hover:text-emerald-600 underline truncate transition"
+                          className="text-[10px] text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 underline truncate transition"
                         >
                           • [{src.source}] {src.title}
                         </a>
@@ -307,7 +307,7 @@ export const AIAssistantPanel = ({ scanData, predictionId, autoOpen = true }) =>
           <button
             type="submit"
             disabled={!input.trim() || loading}
-            className="px-4 h-10 rounded-xl bg-agro-primary hover:bg-agro-primary-hover text-agro-bg font-bold text-xs flex items-center justify-center shrink-0 disabled:opacity-50 transition shadow-md shadow-agro-primary/20"
+            className="px-4 h-10 rounded-xl bg-agro-primary hover:bg-agro-primaryHover text-white font-bold text-xs flex items-center justify-center shrink-0 disabled:opacity-50 transition shadow-md shadow-agro-primary/20 active:scale-95"
           >
             <Send className="w-4 h-4" />
           </button>

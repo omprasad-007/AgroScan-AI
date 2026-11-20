@@ -26,18 +26,15 @@ import { WeatherRiskPage } from './pages/WeatherRiskPage';
 const AppLayout = () => {
   const { isAuthenticated } = useAuth();
   const location = useLocation();
-  const isGuestFlow = location.pathname === '/scan'
-    || location.pathname === '/analysis'
-    || location.pathname.startsWith('/results/');
-  const isPublicPage = ['/', '/login', '/register', '/forgot-password'].includes(location.pathname) || isGuestFlow;
-  const showWorkspaceNavigation = isAuthenticated && !isPublicPage;
+  const isPublicAuthPage = ['/', '/login', '/register', '/forgot-password'].includes(location.pathname);
+  const showWorkspaceNavigation = isAuthenticated && !isPublicAuthPage;
 
   return (
     <div className="min-h-screen flex flex-col font-sans transition-colors duration-300">
       {location.pathname !== '/' && <Navbar />}
       <div className="flex-1 flex w-full">
         {showWorkspaceNavigation && <Sidebar />}
-        <main className={showWorkspaceNavigation ? 'flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full pb-20 md:pb-8' : 'w-full'}>
+        <main className={showWorkspaceNavigation ? 'flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full pb-28 md:pb-8' : 'w-full'}>
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<LoginPage />} />

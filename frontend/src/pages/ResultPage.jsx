@@ -98,7 +98,7 @@ export const ResultPage = () => {
         <p className="text-xs text-agro-muted">{error || t('result.not_found') || 'The requested diagnosis could not be found.'}</p>
         <Link
           to="/scan"
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-agro-primary hover:bg-agro-primaryHover text-agro-bg text-xs font-bold transition shadow-md"
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-agro-primary hover:bg-agro-primaryHover text-white text-xs font-bold transition shadow-md active:scale-95"
         >
           <ScanLine className="w-4 h-4" aria-hidden="true" />
           <span>{t('result.return_to_scan') || 'Scan Another Plant'}</span>
@@ -138,7 +138,7 @@ export const ResultPage = () => {
         <div className="flex items-center gap-2">
           <Link
             to="/scan"
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-agro-primary hover:bg-agro-primaryHover text-agro-bg text-xs font-bold transition shadow-sm"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-agro-primary hover:bg-agro-primaryHover text-white text-xs font-bold transition shadow-sm active:scale-95"
           >
             <ScanLine className="w-3.5 h-3.5" aria-hidden="true" />
             <span>Scan Another Leaf</span>

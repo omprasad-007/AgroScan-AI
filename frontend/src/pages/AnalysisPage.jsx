@@ -195,7 +195,7 @@ export const AnalysisPage = () => {
             <button
               type="button"
               onClick={handleForceDiagnose}
-              className="inline-flex justify-center items-center gap-2 px-6 py-3 rounded-xl bg-agro-primary hover:bg-agro-primaryHover text-agro-bg text-xs font-black transition shadow-lg shadow-agro-primary/25 active:scale-[0.98]"
+              className="inline-flex justify-center items-center gap-2 px-6 py-3 rounded-xl bg-agro-primary hover:bg-agro-primaryHover text-white text-xs font-black transition shadow-lg shadow-agro-primary/25 active:scale-[0.98]"
             >
               <Sparkles className="w-4 h-4" aria-hidden="true" />
               <span>Diagnose Leaf with Consensus AI Anyway</span>

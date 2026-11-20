@@ -279,7 +279,7 @@ export const CameraScanner = ({ onImageCaptured, onFallbackUpload, isAnalyzing }
             <button
               type="button"
               onClick={() => startCamera('environment')}
-              className="flex-1 px-6 py-3.5 rounded-xl bg-agro-primary hover:bg-agro-primaryHover text-agro-bg font-extrabold text-xs transition shadow-md shadow-agro-primary/25 flex items-center justify-center gap-2 active:scale-[0.98]"
+              className="flex-1 px-6 py-3.5 rounded-xl bg-agro-primary hover:bg-agro-primaryHover text-white font-extrabold text-xs transition shadow-md shadow-agro-primary/25 flex items-center justify-center gap-2 active:scale-[0.98]"
             >
               <Camera className="w-4 h-4" aria-hidden="true" />
               <span>{t('scan.camera_start') || 'Open Live Camera'}</span>

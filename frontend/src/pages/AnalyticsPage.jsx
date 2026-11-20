@@ -7,14 +7,14 @@ import { BarChart3, TrendingUp, PieChart as PieIcon, Activity } from 'lucide-rea
 import { useLanguage } from '../context/LanguageContext';
 import api from '../services/api';
 
-// Warm agriculture palette only: emerald, lime, amber, terracotta
-const PIE_COLORS = ['#2FBF71', '#A6D85A', '#F4B942', '#E76F51', '#38D47F', '#D48B47'];
+// Modern balanced tech palette: clean emerald, mint, amber, coral, cyan, violet
+const PIE_COLORS = ['#10B981', '#34D399', '#F59E0B', '#F43F5E', '#06B6D4', '#8B5CF6'];
 
 const SEVERITY_COLORS = {
-  Healthy: '#2FBF71',
-  Mild: '#A6D85A',
-  Moderate: '#F4B942',
-  Severe: '#E76F51',
+  Healthy: '#10B981',
+  Mild: '#34D399',
+  Moderate: '#F59E0B',
+  Severe: '#F43F5E',
 };
 
 export const AnalyticsPage = () => {
@@ -58,12 +58,13 @@ export const AnalyticsPage = () => {
   }));
 
   const customTooltipStyle = {
-    backgroundColor: '#182018',
-    borderColor: '#273527',
-    borderRadius: '0.75rem',
+    backgroundColor: 'rgba(15, 23, 42, 0.95)',
+    borderColor: 'rgba(255, 255, 255, 0.12)',
+    borderRadius: '0.85rem',
     fontSize: '12px',
-    color: '#FAF7EF',
-    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.4)'
+    color: '#F8FAFC',
+    boxShadow: '0 10px 30px rgba(0, 0, 0, 0.35)',
+    backdropFilter: 'blur(12px)'
   };
 
   return (
@@ -95,21 +96,21 @@ export const AnalyticsPage = () => {
               <AreaChart data={data?.monthly_trends || []}>
                 <defs>
                   <linearGradient id="diseasedGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#E76F51" stopOpacity={0.4}/>
-                    <stop offset="95%" stopColor="#E76F51" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="#F43F5E" stopOpacity={0.4}/>
+                    <stop offset="95%" stopColor="#F43F5E" stopOpacity={0}/>
                   </linearGradient>
                   <linearGradient id="healthyGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#2FBF71" stopOpacity={0.4}/>
-                    <stop offset="95%" stopColor="#2FBF71" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="#10B981" stopOpacity={0.4}/>
+                    <stop offset="95%" stopColor="#10B981" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
-                <XAxis dataKey="month" stroke="#7A786E" fontSize={11} tickLine={false} />
-                <YAxis stroke="#7A786E" fontSize={11} tickLine={false} />
-                <Tooltip contentStyle={customTooltipStyle} itemStyle={{ color: '#FAF7EF' }} />
+                <XAxis dataKey="month" stroke="#94A3B8" fontSize={11} tickLine={false} />
+                <YAxis stroke="#94A3B8" fontSize={11} tickLine={false} />
+                <Tooltip contentStyle={customTooltipStyle} itemStyle={{ color: '#F8FAFC' }} />
                 <Area 
                   type="monotone" 
                   dataKey="diseased" 
-                  stroke="#E76F51" 
+                  stroke="#F43F5E" 
                   strokeWidth={2}
                   fillOpacity={1} 
                   fill="url(#diseasedGrad)" 
@@ -118,7 +119,7 @@ export const AnalyticsPage = () => {
                 <Area 
                   type="monotone" 
                   dataKey="healthy" 
-                  stroke="#2FBF71" 
+                  stroke="#10B981" 
                   strokeWidth={2}
                   fillOpacity={1} 
                   fill="url(#healthyGrad)" 
@@ -154,14 +155,14 @@ export const AnalyticsPage = () => {
                     paddingAngle={4}
                     dataKey="count"
                     nameKey="displayName"
-                    stroke="#182018"
+                    stroke="rgba(15, 23, 42, 0.4)"
                     strokeWidth={2}
                   >
                     {localizedDistribution.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip contentStyle={customTooltipStyle} itemStyle={{ color: '#FAF7EF' }} />
+                  <Tooltip contentStyle={customTooltipStyle} itemStyle={{ color: '#F8FAFC' }} />
                 </PieChart>
               </ResponsiveContainer>
             )}

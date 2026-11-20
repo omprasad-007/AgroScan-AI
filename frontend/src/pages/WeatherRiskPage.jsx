@@ -154,7 +154,7 @@ export const WeatherRiskPage = () => {
               value={cityInput}
               onChange={(e) => setCityInput(e.target.value)}
               placeholder="Search other district or village (e.g. Kolhapur, Solapur, Nashik)..."
-              className="w-full pl-8 pr-3 py-1.5 rounded-xl bg-agro-bg border border-agro-border text-xs text-agro-cream placeholder-agro-muted/60 focus:outline-none focus:border-agro-primary focus:ring-1 focus:ring-agro-primary transition"
+              className="w-full pl-8 pr-3 py-1.5 rounded-xl bg-white dark:bg-slate-900/70 border border-slate-200 dark:border-white/10 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-agro-primary focus:ring-1 focus:ring-agro-primary transition"
             />
           </div>
           <button
@@ -183,7 +183,7 @@ export const WeatherRiskPage = () => {
             <select
               value={crop}
               onChange={(e) => setCrop(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl bg-agro-bg border border-agro-border text-xs text-agro-cream focus:outline-none focus:border-agro-primary focus:ring-1 focus:ring-agro-primary font-semibold transition cursor-pointer"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-slate-900/70 border border-slate-200 dark:border-white/10 text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:border-agro-primary focus:ring-1 focus:ring-agro-primary font-semibold transition cursor-pointer"
             >
               {availableCrops.map((c) => (
                 <option key={c} value={c}>{translateCrop(c)}</option>
@@ -251,7 +251,7 @@ export const WeatherRiskPage = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 rounded-xl bg-agro-primary hover:bg-agro-primary-hover text-agro-bg font-extrabold text-xs transition shadow-lg shadow-agro-primary/20 flex items-center justify-center space-x-2"
+            className="w-full py-3 rounded-xl bg-agro-primary hover:bg-agro-primaryHover text-white font-extrabold text-xs transition shadow-lg shadow-agro-primary/20 flex items-center justify-center space-x-2"
           >
             <ShieldCheck className="w-4 h-4" />
             <span>{loading ? (t('weather.simulating') || 'Evaluating Model...') : (t('weather.simulate_btn') || 'Calculate Outbreak Risk')}</span>
