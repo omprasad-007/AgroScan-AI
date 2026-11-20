@@ -118,9 +118,11 @@ export const DashboardPage = () => {
 
         const risks = allScans.map(s => s.weather_risk_level || s.risk || 'Low');
         let topRisk = 'Low';
-        if (risks.includes('Critical')) topRisk = 'Critical';
-        else if (risks.includes('High')) topRisk = 'High';
-        else if (risks.includes('Moderate') || risks.includes('Medium')) topRisk = 'Moderate';
+        if (risks.some(r => String(r).toLowerCase().includes('high') || String(r).toLowerCase().includes('critical'))) {
+          topRisk = 'High';
+        } else if (risks.some(r => String(r).toLowerCase().includes('med') || String(r).toLowerCase().includes('mod'))) {
+          topRisk = 'Moderate';
+        }
 
         const latest = allScans[0];
         setAnalytics({
@@ -167,8 +169,9 @@ export const DashboardPage = () => {
 
   const handleResetData = async () => {
     try {
-      localStorage.removeItem(STORAGE_KEY);
       setShowResetModal(false);
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.setItem(STORAGE_KEY, '[]');
       setRecentScans([]);
       setAnalytics({
         total_predictions: 0,
@@ -182,7 +185,11 @@ export const DashboardPage = () => {
           alert: t('dashboard.blank_desc') || 'Your dashboard is currently blank. Upload or capture a plant leaf photo to generate live diagnostics.'
         }
       });
-      await api.delete('/predictions/history').catch(() => {});
+      try {
+        await api.delete('/predictions/history');
+      } catch (e) {
+        console.warn('Backend reset call notice:', e);
+      }
       window.dispatchEvent(new Event('agroscan_scan_completed'));
     } catch (e) {
       console.error('Failed to reset dashboard data:', e);
@@ -197,7 +204,7 @@ export const DashboardPage = () => {
       {/* Welcome Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1">
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-agro-cream tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-agro-cream tracking-tight font-heading">
             {t('dashboard.title')} — {user?.full_name || user?.email?.split('@')[0] || t('header.role_farmer')}
           </h1>
           <p className="text-xs sm:text-sm text-agro-muted flex items-center gap-2">
@@ -212,7 +219,7 @@ export const DashboardPage = () => {
             <button
               type="button"
               onClick={() => setShowResetModal(true)}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-agro-surface hover:bg-agro-terracotta/15 text-agro-muted hover:text-agro-terracotta border border-agro-border hover:border-agro-terracotta/30 text-xs font-semibold transition"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-agro-surface hover:bg-agro-primary/10 text-agro-muted hover:text-agro-primary border border-agro-border hover:border-agro-primary/30 text-xs font-semibold transition"
               title={t('dashboard.reset_data')}
             >
               <RotateCcw className="w-3.5 h-3.5" aria-hidden="true" />
@@ -220,13 +227,13 @@ export const DashboardPage = () => {
             </button>
           )}
 
-          {/* Strong Primary CTA: Scan Leaf Now */}
+          {/* Strong Primary CTA: Start New Scan */}
           <Link
             to="/scan"
-            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-agro-primary hover:bg-agro-primaryHover text-white font-extrabold text-sm transition shadow-lg shadow-agro-primary/25 active:scale-[0.98] shrink-0"
+            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-agro-primary hover:bg-agro-primaryHover text-white font-extrabold text-sm transition shadow-lg shadow-orange-glow active:scale-[0.98] shrink-0"
           >
             <ScanLine className="w-4 h-4 shrink-0" aria-hidden="true" />
-            <span>{t('dashboard.quick_scan') || 'Scan Leaf Now'}</span>
+            <span>{t('nav.scan') || 'Start New Scan'}</span>
           </Link>
         </div>
       </div>
@@ -235,7 +242,7 @@ export const DashboardPage = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         
         {/* Total Scans Card */}
-        <div className="agro-panel p-5 rounded-2xl border border-agro-border">
+        <div className="agro-panel bg-agro-card p-5 rounded-2xl border border-agro-border">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-agro-muted">{t('dashboard.card_total')}</span>
             <div className="p-2 rounded-xl bg-agro-primary/10 text-agro-primary border border-agro-primary/25">
@@ -245,7 +252,7 @@ export const DashboardPage = () => {
           <div className="mt-3 flex items-baseline justify-between">
             <span className="text-3xl font-extrabold text-agro-cream">{analytics.total_predictions}</span>
             {analytics.total_predictions > 0 && (
-              <span className="text-[11px] font-mono text-agro-lime">
+              <span className="text-[11px] font-mono text-agro-highlight font-semibold">
                 Avg: {Math.round(analytics.average_confidence * 100)}%
               </span>
             )}
@@ -253,17 +260,17 @@ export const DashboardPage = () => {
         </div>
 
         {/* Healthy Crops Card */}
-        <div className="agro-panel p-5 rounded-2xl border border-agro-border">
+        <div className="agro-panel bg-agro-card p-5 rounded-2xl border border-agro-border">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-agro-muted">{t('dashboard.card_healthy')}</span>
-            <div className="p-2 rounded-xl bg-agro-primary/15 text-agro-primary border border-agro-primary/30">
+            <div className="p-2 rounded-xl bg-agro-accent/15 text-agro-accent border border-agro-accent/30">
               <ShieldCheck className="w-4 h-4" aria-hidden="true" />
             </div>
           </div>
           <div className="mt-3 flex items-baseline justify-between">
-            <span className="text-3xl font-extrabold text-agro-primary">{analytics.healthy_count}</span>
+            <span className="text-3xl font-extrabold text-agro-accent">{analytics.healthy_count}</span>
             {analytics.total_predictions > 0 && (
-              <span className="text-[11px] font-semibold text-agro-lime">
+              <span className="text-[11px] font-semibold text-agro-accent">
                 {Math.round((analytics.healthy_count / analytics.total_predictions) * 100)}%
               </span>
             )}
@@ -271,17 +278,17 @@ export const DashboardPage = () => {
         </div>
 
         {/* Diseased Crops Card */}
-        <div className="agro-panel p-5 rounded-2xl border border-agro-border">
+        <div className="agro-panel bg-agro-card p-5 rounded-2xl border border-agro-border">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-agro-muted">{t('dashboard.card_diseased')}</span>
-            <div className="p-2 rounded-xl bg-agro-amber/15 text-agro-amber border border-agro-amber/30">
+            <div className="p-2 rounded-xl bg-agro-primary/15 text-agro-primary border border-agro-primary/30">
               <AlertTriangle className="w-4 h-4" aria-hidden="true" />
             </div>
           </div>
           <div className="mt-3 flex items-baseline justify-between">
-            <span className="text-3xl font-extrabold text-agro-amber">{analytics.diseased_count}</span>
+            <span className="text-3xl font-extrabold text-agro-primary">{analytics.diseased_count}</span>
             {analytics.total_predictions > 0 && (
-              <span className="text-[11px] font-semibold text-agro-amber">
+              <span className="text-[11px] font-semibold text-agro-primary">
                 {Math.round((analytics.diseased_count / analytics.total_predictions) * 100)}%
               </span>
             )}
@@ -289,10 +296,10 @@ export const DashboardPage = () => {
         </div>
 
         {/* Outbreak Risk Card */}
-        <div className="agro-panel p-5 rounded-2xl border border-agro-border">
+        <div className="agro-panel bg-agro-card p-5 rounded-2xl border border-agro-border">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-agro-muted">{t('dashboard.card_risk')}</span>
-            <div className="p-2 rounded-xl bg-agro-lime/15 text-agro-lime border border-agro-lime/30">
+            <div className="p-2 rounded-xl bg-agro-highlight/15 text-agro-highlight border border-agro-highlight/30">
               <TrendingUp className="w-4 h-4" aria-hidden="true" />
             </div>
           </div>
@@ -311,14 +318,14 @@ export const DashboardPage = () => {
 
       {/* If Blank: Show Hero Blank State Banner */}
       {isBlank && (
-        <div className="agro-panel p-8 rounded-3xl border border-agro-primary/30 bg-gradient-to-r from-agro-card via-agro-surface/60 to-agro-card shadow-xl relative overflow-hidden">
+        <div className="agro-panel p-8 rounded-3xl border border-agro-primary/30 bg-agro-card shadow-xl relative overflow-hidden">
           <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="space-y-3 text-center md:text-left max-w-xl">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-agro-primary/10 border border-agro-primary/30 text-agro-primary text-xs font-bold">
                 <Sparkles className="w-3.5 h-3.5" aria-hidden="true" />
                 <span>Ready for Crop Diagnosis</span>
               </div>
-              <h2 className="text-xl sm:text-2xl font-extrabold text-agro-cream">
+              <h2 className="text-xl sm:text-2xl font-extrabold text-agro-cream font-heading">
                 Protect your crops with real-time AI pathology
               </h2>
               <p className="text-xs sm:text-sm text-agro-muted leading-relaxed">
@@ -328,7 +335,7 @@ export const DashboardPage = () => {
 
             <Link
               to="/scan"
-              className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-2xl bg-agro-primary hover:bg-agro-primaryHover text-white font-extrabold text-sm transition shadow-lg shadow-agro-primary/25 shrink-0 active:scale-[0.98]"
+              className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-2xl bg-agro-primary hover:bg-agro-primaryHover text-white font-extrabold text-sm transition shadow-lg shadow-orange-glow shrink-0 active:scale-[0.98]"
             >
               <Leaf className="w-4 h-4" aria-hidden="true" />
               <span>{t('dashboard.blank_cta')}</span>
@@ -342,12 +349,12 @@ export const DashboardPage = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Weather Risk Card */}
-        <div className="agro-panel p-6 rounded-3xl lg:col-span-1 flex flex-col justify-between border border-agro-border">
+        <div className="agro-panel bg-agro-card p-6 rounded-3xl lg:col-span-1 flex flex-col justify-between border border-agro-border">
           <div>
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <CloudSun className="w-5 h-5 text-agro-lime" aria-hidden="true" />
-                <h3 className="text-base font-bold text-agro-cream">{t('nav.weather')}</h3>
+                <CloudSun className="w-5 h-5 text-agro-highlight" aria-hidden="true" />
+                <h3 className="text-base font-bold text-agro-cream font-heading">{t('nav.weather')}</h3>
               </div>
               <WeatherRiskBadge level={analytics.weather_risk_summary?.overall_risk_level || 'Low'} />
             </div>
@@ -361,14 +368,14 @@ export const DashboardPage = () => {
                     {localWeather.location}
                   </span>
                 </div>
-                <span className="inline-flex items-center text-[10px] text-agro-lime font-semibold">
+                <span className="inline-flex items-center text-[10px] text-agro-primary font-semibold">
                   <span className="w-1.5 h-1.5 rounded-full bg-agro-primary animate-pulse mr-1" />
                   {localWeather.isGpsDetected ? 'Live GPS' : 'District'}
                 </span>
               </div>
             )}
 
-            <div className="bg-agro-surface/60 p-4 rounded-xl border border-agro-border space-y-3 mb-4">
+            <div className="bg-agro-surface p-4 rounded-xl border border-agro-border space-y-3 mb-4">
               <div className="flex justify-between text-xs text-agro-muted">
                 <span>{t('dashboard.temperature') || 'Temperature'}</span>
                 <span className="font-bold text-agro-cream">{localWeather?.temperature_c ?? analytics.weather_risk_summary?.current_temp ?? 26.5}°C</span>
@@ -380,12 +387,12 @@ export const DashboardPage = () => {
               {localWeather?.condition && (
                 <div className="flex justify-between text-xs text-agro-muted pt-1 border-t border-agro-border">
                   <span>Conditions</span>
-                  <span className="text-agro-lime font-semibold">{localWeather.condition}</span>
+                  <span className="text-agro-highlight font-semibold">{localWeather.condition}</span>
                 </div>
               )}
             </div>
 
-            <p className="text-xs text-agro-muted leading-relaxed bg-agro-surface/30 p-3 rounded-xl border border-agro-border">
+            <p className="text-xs text-agro-muted leading-relaxed bg-agro-surface p-3 rounded-xl border border-agro-border">
               {analytics.weather_risk_summary?.alert || t('dashboard.empty_msg')}
             </p>
           </div>
@@ -400,9 +407,9 @@ export const DashboardPage = () => {
         </div>
 
         {/* Recent Scans Table */}
-        <div className="agro-panel p-6 rounded-3xl lg:col-span-2 border border-agro-border">
+        <div className="agro-panel bg-agro-card p-6 rounded-3xl lg:col-span-2 border border-agro-border">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-base font-bold text-agro-cream">{t('dashboard.recent_scans') || t('nav.history')}</h3>
+            <h3 className="text-base font-bold text-agro-cream font-heading">{t('dashboard.recent_scans') || t('nav.history')}</h3>
             {recentScans.length > 0 && (
               <Link to="/history" className="text-xs text-agro-primary hover:underline inline-flex items-center gap-1 font-semibold">
                 <span>{t('dashboard.view_all') || 'View All'}</span>
@@ -437,24 +444,24 @@ export const DashboardPage = () => {
                 {recentScans.map((scan) => (
                   <div
                     key={scan.id}
-                    className="p-3.5 rounded-xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-200/90 dark:border-white/5 space-y-2 transition-all shadow-sm"
+                    className="p-3.5 rounded-xl bg-agro-surface border border-agro-border space-y-2 transition-all shadow-sm"
                   >
                     <div className="flex items-center justify-between">
-                      <span className="font-bold text-slate-900 dark:text-slate-100 text-xs">
+                      <span className="font-bold text-agro-cream text-xs">
                         {translateCrop(scan.crop_detected || scan.plant)}
                       </span>
                       <SeverityBadge level={scan.severity_level || scan.severity} />
                     </div>
-                    <div className="text-xs text-slate-600 dark:text-slate-400">
+                    <div className="text-xs text-agro-muted">
                       {translateDisease(scan.disease_name || scan.disease)}
                     </div>
-                    <div className="flex items-center justify-between pt-1.5 border-t border-slate-200/60 dark:border-white/5 text-xs">
-                      <span className="font-mono text-emerald-600 dark:text-emerald-400 font-bold">
+                    <div className="flex items-center justify-between pt-1.5 border-t border-agro-border text-xs">
+                      <span className="font-mono text-agro-primary font-bold">
                         {(((Number(scan.confidence_score ?? scan.confidence)) || 0.9) * 100).toFixed(1)}%
                       </span>
                       <Link
                         to={`/results/${scan.id}`}
-                        className="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline inline-flex items-center gap-1"
+                        className="text-xs font-bold text-agro-primary hover:underline inline-flex items-center gap-1"
                       >
                         <span>{t('history.view_report') || 'View Report'}</span>
                         <ArrowRight className="w-3.5 h-3.5" />
@@ -478,7 +485,7 @@ export const DashboardPage = () => {
                   </thead>
                   <tbody className="divide-y divide-agro-border">
                     {recentScans.map((scan) => (
-                      <tr key={scan.id} className="hover:bg-agro-surface/50 transition-colors">
+                      <tr key={scan.id} className="hover:bg-agro-surface/60 transition-colors">
                         <td className="py-3 px-3 font-bold text-agro-cream">
                           {translateCrop(scan.crop_detected || scan.plant)}
                         </td>
@@ -512,13 +519,13 @@ export const DashboardPage = () => {
 
       {/* Reset Confirmation Modal */}
       {showResetModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-agro-bg/80 backdrop-blur-sm animate-fade-in">
-          <div className="agro-panel max-w-md w-full p-6 sm:p-7 rounded-3xl border border-agro-terracotta/40 space-y-4 shadow-2xl">
-            <div className="flex items-center gap-3 text-agro-terracotta">
-              <div className="p-2.5 rounded-xl bg-agro-terracotta/15 border border-agro-terracotta/30">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-agro-bg/80 backdrop-blur-sm">
+          <div className="agro-panel bg-agro-card max-w-md w-full p-6 sm:p-7 rounded-3xl border border-agro-primary/40 space-y-4 shadow-2xl">
+            <div className="flex items-center gap-3 text-agro-primary">
+              <div className="p-2.5 rounded-xl bg-agro-primary/15 border border-agro-primary/30">
                 <AlertTriangle className="w-5 h-5" aria-hidden="true" />
               </div>
-              <h3 className="text-base font-bold text-agro-cream">{t('dashboard.reset_data')}</h3>
+              <h3 className="text-base font-bold text-agro-cream font-heading">{t('dashboard.reset_data')}</h3>
             </div>
             <p className="text-xs text-agro-muted leading-relaxed">
               {t('dashboard.reset_confirm') || 'Are you sure you want to clear scan records? The dashboard will return to a fresh blank state.'}
@@ -534,7 +541,7 @@ export const DashboardPage = () => {
               <button
                 type="button"
                 onClick={handleResetData}
-                className="px-4 py-2.5 rounded-xl bg-agro-terracotta hover:bg-agro-terracottaDark text-xs font-bold text-agro-cream transition shadow-md"
+                className="px-4 py-2.5 rounded-xl bg-agro-primary hover:bg-agro-primaryHover text-xs font-bold text-white transition shadow-md shadow-orange-glow"
               >
                 Confirm Reset (Clear)
               </button>

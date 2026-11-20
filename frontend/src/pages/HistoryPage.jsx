@@ -77,11 +77,16 @@ export const HistoryPage = () => {
   const handleClearAll = async () => {
     try {
       setLoading(true);
+      setShowClearModal(false);
+      setHistory([]);
       localStorage.removeItem(STORAGE_KEY);
       localStorage.setItem(STORAGE_KEY, '[]');
+      try {
+        await api.delete('/predictions/history');
+      } catch (apiErr) {
+        console.warn('Backend clear history notification:', apiErr);
+      }
       setHistory([]);
-      setShowClearModal(false);
-      await api.delete('/predictions/history').catch(() => {});
       window.dispatchEvent(new Event('agroscan_scan_completed'));
     } catch (e) {
       console.error('Failed to clear history:', e);
@@ -106,7 +111,7 @@ export const HistoryPage = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-agro-cream tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-agro-cream tracking-tight font-heading">
             {t('history.title') || 'Scan History & Diagnostic Logs'}
           </h1>
           <p className="text-xs sm:text-sm text-agro-muted mt-1">
@@ -117,16 +122,16 @@ export const HistoryPage = () => {
         <div className="flex items-center space-x-3 shrink-0">
           <Link
             to="/scan"
-            className="inline-flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-agro-primary hover:bg-agro-primaryHover text-white text-xs font-bold transition shadow-md shadow-agro-primary/20"
+            className="inline-flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-agro-primary hover:bg-agro-primaryHover text-white text-xs font-bold transition shadow-md shadow-orange-glow active:scale-95"
           >
             <ScanLine className="w-4 h-4" />
-            <span>{t('nav.scan') || 'Scan Plant'}</span>
+            <span>{t('nav.scan') || 'Start New Scan'}</span>
           </Link>
 
           {safeHistory.length > 0 && (
             <button
               onClick={() => setShowClearModal(true)}
-              className="inline-flex items-center space-x-1.5 px-3.5 py-2.5 rounded-xl bg-agro-surface hover:bg-agro-terracotta/15 text-agro-muted hover:text-agro-terracotta border border-agro-border hover:border-agro-terracotta/40 text-xs font-semibold transition"
+              className="inline-flex items-center space-x-1.5 px-3.5 py-2.5 rounded-xl bg-agro-surface hover:bg-agro-primary/10 text-agro-muted hover:text-agro-primary border border-agro-border hover:border-agro-primary/40 text-xs font-semibold transition"
               title="Clear all saved scan history"
             >
               <RotateCcw className="w-3.5 h-3.5" />
@@ -137,7 +142,7 @@ export const HistoryPage = () => {
       </div>
 
       {/* Filter & Search Bar */}
-      <div className="agro-panel p-4 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div className="agro-panel bg-agro-card p-4 rounded-2xl border border-agro-border flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="relative w-full sm:w-80">
           <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-agro-muted" />
           <input
@@ -145,7 +150,7 @@ export const HistoryPage = () => {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder={t('history.search_placeholder') || 'Search crop or disease...'}
-            className="w-full pl-10 pr-3.5 py-2.5 rounded-xl bg-white dark:bg-slate-900/70 border border-slate-200 dark:border-white/10 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-agro-primary focus:ring-1 focus:ring-agro-primary transition"
+            className="w-full pl-10 pr-3.5 py-2.5 rounded-xl bg-agro-surface border border-agro-border text-xs text-agro-cream placeholder-agro-muted focus:outline-none focus:border-agro-primary focus:ring-1 focus:ring-agro-primary transition"
           />
         </div>
 
@@ -154,7 +159,7 @@ export const HistoryPage = () => {
           <select
             value={cropFilter}
             onChange={(e) => setCropFilter(e.target.value)}
-            className="w-full sm:w-auto px-3.5 py-2.5 rounded-xl bg-white dark:bg-slate-900/70 border border-slate-200 dark:border-white/10 text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:border-agro-primary focus:ring-1 focus:ring-agro-primary font-semibold transition cursor-pointer"
+            className="w-full sm:w-auto px-3.5 py-2.5 rounded-xl bg-agro-surface border border-agro-border text-xs text-agro-cream focus:outline-none focus:border-agro-primary focus:ring-1 focus:ring-agro-primary font-semibold transition cursor-pointer"
           >
             <option value="All">{t('history.filter_all') || 'All Crops'}</option>
             <option value="Tomato">{translateCrop('Tomato')}</option>
@@ -173,7 +178,7 @@ export const HistoryPage = () => {
       </div>
 
       {/* History Container */}
-      <div className="agro-panel p-4 sm:p-6 rounded-2xl overflow-hidden">
+      <div className="agro-panel bg-agro-card p-4 sm:p-6 rounded-2xl border border-agro-border overflow-hidden">
         {loading ? (
           <div className="py-14 text-center text-xs text-agro-muted animate-pulse">
             {t('history.loading') || 'Loading scan history...'}
@@ -193,7 +198,7 @@ export const HistoryPage = () => {
             </div>
             <Link
               to="/scan"
-              className="inline-flex items-center space-x-2 mt-2 px-4 py-2.5 rounded-xl bg-agro-primary hover:bg-agro-primaryHover text-white text-xs font-bold transition shadow-md shadow-agro-primary/20"
+              className="inline-flex items-center space-x-2 mt-2 px-4 py-2.5 rounded-xl bg-agro-primary hover:bg-agro-primaryHover text-white text-xs font-bold transition shadow-md shadow-orange-glow active:scale-95"
             >
               <ScanLine className="w-4 h-4" />
               <span>{t('dashboard.blank_cta') || 'Scan Your First Plant Leaf'}</span>
@@ -206,33 +211,33 @@ export const HistoryPage = () => {
               {filteredHistory.map((item) => (
                 <div
                   key={item.id}
-                  className="p-4 rounded-xl bg-white/70 dark:bg-slate-900/60 border border-slate-200/90 dark:border-white/10 space-y-2.5 transition-all shadow-sm"
+                  className="p-4 rounded-xl bg-agro-surface border border-agro-border space-y-2.5 transition-all shadow-sm"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-slate-900 dark:text-white text-sm">
+                    <span className="font-bold text-agro-cream text-sm">
                       {translateCrop(item.crop_detected || item.plant)}
                     </span>
-                    <span className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">
+                    <span className="text-[11px] text-agro-muted font-mono">
                       {formatDate(item.created_at || item.timestamp || new Date())}
                     </span>
                   </div>
 
-                  <div className="text-xs text-slate-700 dark:text-slate-300 font-medium">
+                  <div className="text-xs text-agro-cream/90 font-medium">
                     {translateDisease(item.disease_name || item.disease)}
                   </div>
 
                   <div className="flex flex-wrap items-center gap-2 pt-1">
                     <SeverityBadge level={item.severity_level || item.severity} />
                     <WeatherRiskBadge level={item.weather_risk_level || item.risk || 'Low'} />
-                    <span className="font-mono text-xs font-bold text-emerald-600 dark:text-emerald-400 ml-auto">
+                    <span className="font-mono text-xs font-bold text-agro-primary ml-auto">
                       {(((Number(item.confidence_score ?? item.confidence)) || 0.9) * 100).toFixed(1)}%
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between pt-2 border-t border-slate-200/80 dark:border-white/10">
+                  <div className="flex items-center justify-between pt-2 border-t border-agro-border">
                     <button
                       onClick={() => handleDeleteItem(item.id)}
-                      className="p-1.5 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-500/10 transition"
+                      className="p-1.5 rounded-lg text-agro-muted hover:text-agro-primary hover:bg-agro-primary/10 transition"
                       title="Delete scan"
                       aria-label="Delete scan record"
                     >
@@ -264,9 +269,9 @@ export const HistoryPage = () => {
                     <th className="py-3 px-3 text-right">{t('history.col_report') || 'Action'}</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-agro-border/50">
+                <tbody className="divide-y divide-agro-border">
                   {filteredHistory.map((item) => (
-                    <tr key={item.id} className="hover:bg-agro-hover/40 transition group">
+                    <tr key={item.id} className="hover:bg-agro-surface/60 transition group">
                       <td className="py-3.5 px-3 text-agro-muted font-mono text-[11px]">
                         {formatDate(item.created_at || item.timestamp || new Date())}
                       </td>
@@ -289,14 +294,14 @@ export const HistoryPage = () => {
                         <div className="inline-flex items-center space-x-2">
                           <Link
                             to={`/results/${item.id}`}
-                            className="text-xs font-bold text-agro-primary hover:text-agro-lime inline-flex items-center space-x-1 transition"
+                            className="text-xs font-bold text-agro-primary hover:text-agro-primaryHover inline-flex items-center space-x-1 transition"
                           >
-                            <span>{t('history.view_report') || 'View'}</span>
+                            <span>{t('history.view_report') || 'View Full Report'}</span>
                             <ArrowRight className="w-3.5 h-3.5" />
                           </Link>
                           <button
                             onClick={() => handleDeleteItem(item.id)}
-                            className="p-1.5 rounded-lg text-agro-muted hover:text-agro-terracotta hover:bg-agro-terracotta/10 transition opacity-80 group-hover:opacity-100"
+                            className="p-1.5 rounded-lg text-agro-muted hover:text-agro-primary hover:bg-agro-primary/10 transition opacity-80 group-hover:opacity-100"
                             title="Delete scan"
                             aria-label="Delete scan record"
                           >
@@ -315,13 +320,13 @@ export const HistoryPage = () => {
 
       {/* Clear Modal */}
       {showClearModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-agro-bg/80 backdrop-blur-sm animate-fade-in">
-          <div className="agro-panel max-w-md w-full p-6 rounded-3xl border border-agro-terracotta/40 space-y-4 shadow-2xl">
-            <div className="flex items-center space-x-3 text-agro-terracotta">
-              <div className="p-2.5 rounded-xl bg-agro-terracotta/15 border border-agro-terracotta/30">
-                <AlertTriangle className="w-5 h-5 text-agro-terracotta" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-agro-bg/80 backdrop-blur-sm">
+          <div className="agro-panel bg-agro-card max-w-md w-full p-6 rounded-3xl border border-agro-primary/40 space-y-4 shadow-2xl">
+            <div className="flex items-center space-x-3 text-agro-primary">
+              <div className="p-2.5 rounded-xl bg-agro-primary/15 border border-agro-primary/30">
+                <AlertTriangle className="w-5 h-5 text-agro-primary" />
               </div>
-              <h3 className="text-base font-bold text-agro-cream">{t('dashboard.reset_data') || 'Reset Scans'}</h3>
+              <h3 className="text-base font-bold text-agro-cream font-heading">{t('dashboard.reset_data') || 'Reset Scans'}</h3>
             </div>
             <p className="text-xs text-agro-muted leading-relaxed">
               {t('dashboard.reset_confirm') || 'Are you sure you want to clear your scan history? All past diagnoses and health logs will be permanently deleted.'}
@@ -335,7 +340,7 @@ export const HistoryPage = () => {
               </button>
               <button
                 onClick={handleClearAll}
-                className="px-4 py-2 rounded-xl bg-agro-terracotta hover:bg-agro-terracotta/90 text-xs font-bold text-white transition shadow-lg shadow-agro-terracotta/20"
+                className="px-4 py-2 rounded-xl bg-agro-primary hover:bg-agro-primaryHover text-xs font-bold text-white transition shadow-lg shadow-orange-glow"
               >
                 {t('common.confirm') || 'Confirm Clear'}
               </button>

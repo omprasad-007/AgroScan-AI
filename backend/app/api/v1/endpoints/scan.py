@@ -352,17 +352,15 @@ def clear_prediction_history(
     current_user: Optional[User] = Depends(get_optional_current_user),
 ):
     """Permanently delete all scan prediction history and associated recommendations."""
-    if current_user:
+    if current_user and not settings.DEMO_MODE:
         preds = db.query(ScanPrediction).filter(
-            (ScanPrediction.user_id == current_user.id) | (ScanPrediction.user_id == "guest")
+            (ScanPrediction.user_id == current_user.id) |
+            (ScanPrediction.user_id == "guest") |
+            (ScanPrediction.user_id.is_(None))
         ).all()
     else:
-        # In demo or guest mode, clear all guest/demo scans
-        demo_farmer = db.query(User).filter(User.email == "farmer@agroscan.ai").first()
-        demo_ids = [demo_farmer.id] if demo_farmer else []
-        preds = db.query(ScanPrediction).filter(
-            (ScanPrediction.user_id == "guest") | (ScanPrediction.user_id.in_(demo_ids))
-        ).all()
+        # In demo mode, guest mode, or unauthenticated: clear all scan predictions
+        preds = db.query(ScanPrediction).all()
 
     pred_ids = [p.id for p in preds]
     if pred_ids:

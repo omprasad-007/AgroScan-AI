@@ -921,8 +921,8 @@ export const AssistantPage = () => {
               <div
                 className={`p-4 rounded-3xl text-xs sm:text-sm leading-relaxed shadow-sm ${
                   msg.sender === 'user'
-                    ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-medium rounded-tr-none shadow-md shadow-emerald-500/20'
-                    : 'bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-white/[0.08] text-slate-800 dark:text-slate-100 rounded-tl-none'
+                    ? 'bg-agro-primary text-white font-medium rounded-tr-none shadow-orange-glow'
+                    : 'bg-agro-card border border-agro-border text-agro-cream rounded-tl-none'
                 }`}
               >
                 <FormattedAIMessage

@@ -1,25 +1,25 @@
 import React from 'react';
-import { CheckCircle2, AlertTriangle, ShieldCheck, HelpCircle } from 'lucide-react';
+import { CheckCircle2, AlertTriangle, ShieldCheck } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 
 export const SeverityBadge = ({ level }) => {
   const { translateSeverity } = useLanguage();
   const normalized = String(level || 'Mild').toLowerCase();
 
-  let style = 'bg-agro-lime/10 text-agro-lime border-agro-lime/30';
+  let style = 'bg-agro-highlight/15 text-agro-highlight border-agro-highlight/30';
   let Icon = AlertTriangle;
 
   if (normalized.includes('healthy')) {
-    style = 'bg-agro-primary/10 text-agro-primary border-agro-primary/30';
+    style = 'bg-agro-accent/15 text-agro-accent border-agro-accent/30';
     Icon = ShieldCheck;
   } else if (normalized.includes('mild')) {
-    style = 'bg-agro-lime/15 text-agro-lime border-agro-lime/30';
+    style = 'bg-agro-highlight/15 text-agro-highlight border-agro-highlight/30';
     Icon = AlertTriangle;
   } else if (normalized.includes('moderate')) {
-    style = 'bg-agro-amber/15 text-agro-amber border-agro-amber/35';
+    style = 'bg-agro-highlight/20 text-agro-highlight border-agro-highlight/40 font-semibold';
     Icon = AlertTriangle;
-  } else if (normalized.includes('severe')) {
-    style = 'bg-agro-terracotta/15 text-agro-terracotta border-agro-terracotta/40';
+  } else if (normalized.includes('severe') || normalized.includes('critical')) {
+    style = 'bg-agro-primary/15 text-agro-primary border-agro-primary/40 font-bold';
     Icon = AlertTriangle;
   }
 
@@ -41,20 +41,20 @@ export const WeatherRiskBadge = ({ level }) => {
   const { translateRisk } = useLanguage();
   const normalized = String(level || 'Low').toLowerCase();
 
-  let style = 'bg-agro-primary/10 text-agro-primary border-agro-primary/30';
+  let style = 'bg-agro-accent/15 text-agro-accent border-agro-accent/30';
   let Icon = CheckCircle2;
 
   if (normalized.includes('low') || normalized.includes('none')) {
-    style = 'bg-agro-primary/10 text-agro-primary border-agro-primary/30';
+    style = 'bg-agro-accent/15 text-agro-accent border-agro-accent/30';
     Icon = CheckCircle2;
   } else if (normalized.includes('medium') || normalized.includes('moderate')) {
-    style = 'bg-agro-amber/15 text-agro-amber border-agro-amber/35';
+    style = 'bg-agro-highlight/15 text-agro-highlight border-agro-highlight/35';
     Icon = AlertTriangle;
   } else if (normalized.includes('high')) {
-    style = 'bg-agro-terracotta/15 text-agro-terracotta border-agro-terracotta/40';
+    style = 'bg-agro-primary/15 text-agro-primary border-agro-primary/40';
     Icon = AlertTriangle;
   } else if (normalized.includes('critical')) {
-    style = 'bg-agro-terracotta/25 text-agro-terracottaLight border-agro-terracotta/50 font-bold';
+    style = 'bg-agro-primary/25 text-agro-primary border-agro-primary/50 font-bold';
     Icon = AlertTriangle;
   }
 

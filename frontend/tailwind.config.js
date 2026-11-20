@@ -64,7 +64,174 @@ export default {
             text: '#FFF9F3',
             muted: '#D1C6BC',
           }
-        }
+        },
+
+        // Guardrail: Alias standard palettes so NO blue, green, or pure black is ever rendered
+        black: '#292421', // No pure black! Mapped to Deep Warm Charcoal
+
+        // Warm neutral scale (mapped from slate/zinc/gray)
+        slate: {
+          50: '#FAF9F6',  // Warm White
+          100: '#F2F0EC', // Soft Grey
+          200: '#E6E2DC', // Light Border
+          300: '#D6D0C8',
+          400: '#B7B4A8', // Warm beige
+          500: '#7D736A', // Muted brown
+          600: '#51463F', // Soft Border
+          700: '#403731', // Elevated Cocoa
+          800: '#342D29', // Dark Cocoa
+          900: '#292421', // Deep Warm Charcoal
+          950: '#221E1B',
+        },
+        zinc: {
+          50: '#FAF9F6',
+          100: '#F2F0EC',
+          200: '#E6E2DC',
+          300: '#D6D0C8',
+          400: '#B7B4A8',
+          500: '#7D736A',
+          600: '#51463F',
+          700: '#403731',
+          800: '#342D29',
+          900: '#292421',
+          950: '#221E1B',
+        },
+        gray: {
+          50: '#FAF9F6',
+          100: '#F2F0EC',
+          200: '#E6E2DC',
+          300: '#D6D0C8',
+          400: '#B7B4A8',
+          500: '#7D736A',
+          600: '#51463F',
+          700: '#403731',
+          800: '#342D29',
+          900: '#292421',
+          950: '#221E1B',
+        },
+
+        // Remap emerald and green directly to Vibrant / Bright Orange
+        emerald: {
+          50: '#FFF5F2',
+          100: '#FFE8E1',
+          200: '#FFD1C4',
+          300: '#FFAA94',
+          400: '#E96747', // Dark mode Bright Orange
+          500: '#C94427', // Light mode Vibrant Orange
+          600: '#B3391F',
+          700: '#8E2C17',
+          800: '#6A2011',
+          900: '#48150B',
+          950: '#342D29',
+        },
+        green: {
+          50: '#FFF5F2',
+          100: '#FFE8E1',
+          200: '#FFD1C4',
+          300: '#FFAA94',
+          400: '#E96747',
+          500: '#C94427',
+          600: '#B3391F',
+          700: '#8E2C17',
+          800: '#6A2011',
+          900: '#48150B',
+          950: '#342D29',
+        },
+
+        // Remap blue, indigo, cyan, sky, teal to Royal Purple & Light Purple
+        blue: {
+          50: '#FAF7FF',
+          100: '#F2EBFF',
+          200: '#E4D5FF',
+          300: '#D0B5FF',
+          400: '#B99AFF', // Dark mode Light Purple
+          500: '#7043C5', // Light mode Royal Purple
+          600: '#5B33A8',
+          700: '#482787',
+          800: '#371D67',
+          900: '#261347',
+          950: '#342D29',
+        },
+        indigo: {
+          50: '#FAF7FF',
+          100: '#F2EBFF',
+          200: '#E4D5FF',
+          300: '#D0B5FF',
+          400: '#B99AFF',
+          500: '#7043C5',
+          600: '#5B33A8',
+          700: '#482787',
+          800: '#371D67',
+          900: '#261347',
+          950: '#342D29',
+        },
+        cyan: {
+          50: '#FAF7FF',
+          100: '#F2EBFF',
+          200: '#E4D5FF',
+          300: '#D0B5FF',
+          400: '#B99AFF',
+          500: '#7043C5',
+          600: '#5B33A8',
+          700: '#482787',
+          800: '#371D67',
+          900: '#261347',
+          950: '#342D29',
+        },
+        sky: {
+          50: '#FAF7FF',
+          100: '#F2EBFF',
+          200: '#E4D5FF',
+          300: '#D0B5FF',
+          400: '#B99AFF',
+          500: '#7043C5',
+          600: '#5B33A8',
+          700: '#482787',
+          800: '#371D67',
+          900: '#261347',
+          950: '#342D29',
+        },
+        teal: {
+          50: '#FAF7FF',
+          100: '#F2EBFF',
+          200: '#E4D5FF',
+          300: '#D0B5FF',
+          400: '#B99AFF',
+          500: '#7043C5',
+          600: '#5B33A8',
+          700: '#482787',
+          800: '#371D67',
+          900: '#261347',
+          950: '#342D29',
+        },
+
+        // Remap amber and yellow to Harvest / Golden Yellow
+        amber: {
+          50: '#FFFDF5',
+          100: '#FFF9E5',
+          200: '#FFF0C2',
+          300: '#FFE494',
+          400: '#FFD477', // Dark mode Golden Yellow
+          500: '#F2B942', // Light mode Harvest Yellow
+          600: '#D99B28',
+          700: '#B37815',
+          800: '#8A590D',
+          900: '#613C07',
+          950: '#403731',
+        },
+        yellow: {
+          50: '#FFFDF5',
+          100: '#FFF9E5',
+          200: '#FFF0C2',
+          300: '#FFE494',
+          400: '#FFD477',
+          500: '#F2B942',
+          600: '#D99B28',
+          700: '#B37815',
+          800: '#8A590D',
+          900: '#613C07',
+          950: '#403731',
+        },
       },
       fontFamily: {
         sans: ['Inter', 'sans-serif'],

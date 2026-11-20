@@ -250,16 +250,16 @@ export const AIAssistantPanel = ({ scanData, predictionId, autoOpen = true }) =>
     >
       
       {/* Panel Header */}
-      <div className="bg-gradient-to-r from-emerald-950/80 via-slate-900/90 to-teal-950/80 border-b border-emerald-500/20 p-4 sm:p-5 flex items-center justify-between shrink-0">
+      <div className="bg-gradient-to-r from-agro-primary via-[#C94427] to-agro-accent border-b border-agro-border p-4 sm:p-5 flex items-center justify-between shrink-0 text-white">
         <div className="flex items-center space-x-3">
-          <div className="relative w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white flex items-center justify-center shadow-lg shadow-emerald-500/30 border border-emerald-400/30">
+          <div className="relative w-10 h-10 rounded-2xl bg-white/20 text-white flex items-center justify-center shadow-lg border border-white/30">
             <Bot className="w-5 h-5" />
-            <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-slate-950 animate-pulse" />
+            <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-agro-highlight border-2 border-agro-primary animate-pulse" />
           </div>
           <div>
-            <h3 className="text-sm sm:text-base font-extrabold text-white flex items-center space-x-2">
+            <h3 className="font-heading text-sm sm:text-base font-extrabold text-white flex items-center space-x-2">
               <span>{t('assistant.title') || (lang === 'mr' ? 'ॲग्रोस्कॅन AI कृषी सल्लागार' : 'AgroScan AI Agronomist')}</span>
-              <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] uppercase font-bold border border-emerald-500/30 tracking-wider">
+              <span className="px-2 py-0.5 rounded-full bg-white/20 text-white text-[10px] uppercase font-bold border border-white/30 tracking-wider">
                 {lang === 'mr' ? 'थेट AI' : 'Live AI'}
               </span>
             </h3>
@@ -320,7 +320,7 @@ export const AIAssistantPanel = ({ scanData, predictionId, autoOpen = true }) =>
             className={`flex gap-3 max-w-[92%] sm:max-w-[85%] ${msg.sender === 'user' ? 'ml-auto justify-end' : ''}`}
           >
             {msg.sender === 'assistant' && (
-              <div className="w-8 h-8 rounded-2xl bg-gradient-to-tr from-emerald-600/30 to-teal-500/20 text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-500/30 shadow-sm mt-0.5">
+              <div className="w-8 h-8 rounded-2xl bg-agro-accent/15 text-agro-accent flex items-center justify-center shrink-0 border border-agro-accent/30 shadow-sm mt-0.5">
                 <Bot className="w-4 h-4" />
               </div>
             )}
@@ -329,8 +329,8 @@ export const AIAssistantPanel = ({ scanData, predictionId, autoOpen = true }) =>
               <div
                 className={`p-4 rounded-3xl text-xs sm:text-sm leading-relaxed shadow-sm ${
                   msg.sender === 'user'
-                    ? 'bg-gradient-to-r from-emerald-600 to-teal-500 text-white font-medium rounded-tr-none shadow-md shadow-emerald-500/20'
-                    : 'bg-slate-900/90 dark:bg-slate-900/90 light:bg-white border border-slate-800 dark:border-white/[0.08] light:border-slate-200 text-slate-100 dark:text-slate-100 light:text-slate-800 rounded-tl-none'
+                    ? 'bg-agro-primary text-white font-medium rounded-tr-none shadow-orange-glow'
+                    : 'bg-agro-card border border-agro-border text-agro-cream rounded-tl-none'
                 }`}
               >
                 <FormattedAIMessage
@@ -346,8 +346,8 @@ export const AIAssistantPanel = ({ scanData, predictionId, autoOpen = true }) =>
         ))}
 
         {loading && (
-          <div className="flex items-center space-x-3 p-3 rounded-2xl bg-emerald-950/30 border border-emerald-500/20 text-emerald-400 text-xs sm:text-sm font-semibold animate-pulse w-fit">
-            <Sparkles className="w-4 h-4 animate-spin text-emerald-400" />
+          <div className="flex items-center space-x-3 p-3 rounded-2xl bg-agro-surface border border-agro-border text-agro-primary text-xs sm:text-sm font-semibold animate-pulse w-fit">
+            <Sparkles className="w-4 h-4 animate-spin text-agro-primary" />
             <span>{t('assistant.thinking') || (lang === 'mr' ? 'कृषी सल्लागार विश्लेषण करत आहे...' : 'AI Agronomist is analyzing symptoms & weather data...')}</span>
           </div>
         )}
@@ -357,7 +357,7 @@ export const AIAssistantPanel = ({ scanData, predictionId, autoOpen = true }) =>
       {/* Quick Replies & Input */}
       <div className="p-3 sm:p-4 bg-slate-900 dark:bg-slate-900 light:bg-white border-t border-slate-800 dark:border-white/[0.06] light:border-slate-200 space-y-3 shrink-0">
         <div className="flex overflow-x-auto gap-2 pb-1 hide-scrollbar">
-          <span className="text-[11px] font-bold text-emerald-400 uppercase tracking-wider shrink-0 flex items-center gap-1">
+          <span className="text-[11px] font-bold text-agro-highlight uppercase tracking-wider shrink-0 flex items-center gap-1">
             <Sprout className="w-3.5 h-3.5" />
             {lang === 'mr' ? 'सुचवलेले प्रश्न:' : 'Suggested:'}
           </span>
@@ -366,7 +366,7 @@ export const AIAssistantPanel = ({ scanData, predictionId, autoOpen = true }) =>
               key={idx}
               type="button"
               onClick={() => handleSendMessage(qr)}
-              className="whitespace-nowrap px-3.5 py-1.5 bg-slate-800 dark:bg-slate-800 light:bg-slate-100 border border-slate-700 dark:border-white/[0.08] light:border-slate-300 rounded-full text-xs font-medium text-slate-300 dark:text-slate-300 light:text-slate-700 hover:bg-emerald-500/20 hover:text-emerald-400 transition shrink-0"
+              className="whitespace-nowrap px-3.5 py-1.5 bg-agro-card border border-agro-border rounded-full text-xs font-medium text-agro-cream hover:bg-agro-primary/20 hover:text-agro-primary transition shrink-0"
             >
               {qr}
             </button>
@@ -381,7 +381,7 @@ export const AIAssistantPanel = ({ scanData, predictionId, autoOpen = true }) =>
             className={`w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 border transition ${
               isListening
                 ? 'bg-rose-500/20 text-rose-400 border-rose-500 animate-pulse'
-                : 'bg-slate-800 dark:bg-slate-800 light:bg-slate-100 text-slate-300 hover:text-emerald-400 border-slate-700 dark:border-white/[0.08] light:border-slate-200'
+                : 'bg-agro-card text-agro-muted hover:text-agro-primary border border-agro-border'
             }`}
             title={isListening ? 'Stop listening' : 'Voice input'}
           >
@@ -393,13 +393,13 @@ export const AIAssistantPanel = ({ scanData, predictionId, autoOpen = true }) =>
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder={t('assistant.placeholder_input') || (lang === 'mr' ? "पिकांबद्दल काहीही विचारा (उदा. औषध प्रमाण, रोग लक्षणे, खत)..." : "Ask AgroScan AI about crop care, dosages, organic remedies...")}
-            className="flex-1 h-11 px-4 rounded-2xl bg-slate-950 dark:bg-slate-950 light:bg-slate-50 border border-slate-700/80 dark:border-white/[0.08] light:border-slate-300 text-xs sm:text-sm text-slate-100 dark:text-slate-100 light:text-slate-800 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 placeholder:text-slate-500 transition"
+            className="flex-1 h-11 px-4 rounded-2xl bg-agro-surface border border-agro-border text-xs sm:text-sm text-agro-cream focus:outline-none focus:border-agro-primary focus:ring-1 focus:ring-agro-primary placeholder:text-agro-muted transition"
           />
 
           <button
             type="submit"
             disabled={!input.trim() || loading}
-            className="px-5 h-11 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white font-bold text-xs sm:text-sm flex items-center justify-center shrink-0 disabled:opacity-40 transition-all shadow-md shadow-emerald-500/25 active:scale-95"
+            className="px-5 h-11 rounded-2xl bg-agro-primary hover:bg-agro-primaryHover text-white font-bold text-xs sm:text-sm flex items-center justify-center shrink-0 disabled:opacity-40 transition-all shadow-md shadow-orange-glow active:scale-95"
             title="Send"
           >
             <Send className="w-4 h-4" />

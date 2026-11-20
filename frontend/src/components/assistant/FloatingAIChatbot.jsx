@@ -208,20 +208,20 @@ export const FloatingAIChatbot = () => {
             <span className="text-xs font-bold tracking-wide">
               {lang === 'mr' ? 'AI कृषी सल्लागार' : 'Ask AI Agronomist'}
             </span>
-            <span className="w-2 h-2 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse" />
+            <span className="w-2 h-2 rounded-full bg-agro-primary animate-pulse" />
           </div>
 
           {/* Glowing Circular FAB */}
           <button
             type="button"
             onClick={() => { setIsOpen(true); setHasUnread(false); }}
-            className="relative w-14 h-14 rounded-full bg-gradient-to-tr from-emerald-600 via-teal-500 to-emerald-400 text-white flex items-center justify-center shadow-2xl shadow-emerald-500/50 hover:scale-105 active:scale-95 transition-all border-2 border-white/20 group"
+            className="relative w-14 h-14 rounded-full bg-gradient-to-tr from-agro-primary via-[#C94427] to-agro-accent text-white flex items-center justify-center shadow-2xl shadow-orange-glow hover:scale-105 active:scale-95 transition-all border-2 border-white/20 group"
             title={lang === 'mr' ? 'AI कृषी सल्लागार उघडा' : 'Open AI Agronomist Chat'}
           >
             <Bot className="w-7 h-7 text-white group-hover:scale-110 transition-transform" />
             <span className="absolute -top-1 -right-1 flex h-4 w-4">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-4 w-4 bg-emerald-500 border-2 border-white dark:border-slate-900" />
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-agro-highlight opacity-75" />
+              <span className="relative inline-flex rounded-full h-4 w-4 bg-agro-highlight border-2 border-white dark:border-agro-card" />
             </span>
           </button>
         </div>
@@ -230,25 +230,25 @@ export const FloatingAIChatbot = () => {
       {/* 2. Floating Chat Drawer / Window */}
       {isOpen && (
         <div 
-          className={`fixed bottom-20 md:bottom-8 right-4 md:right-8 z-50 w-[94vw] sm:w-[460px] md:w-[500px] flex flex-col rounded-3xl overflow-hidden shadow-2xl border border-slate-200 dark:border-emerald-500/30 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 backdrop-blur-2xl transition-all duration-300 animate-slide-up ${
+          className={`fixed bottom-20 md:bottom-8 right-4 md:right-8 z-50 w-[94vw] sm:w-[460px] md:w-[500px] flex flex-col rounded-3xl overflow-hidden shadow-2xl border border-agro-border bg-agro-card text-agro-cream backdrop-blur-2xl transition-all duration-300 animate-slide-up ${
             isMinimized ? 'h-16' : 'h-[640px] max-h-[85vh]'
           }`}
         >
           {/* Header */}
-          <div className="p-4 bg-gradient-to-r from-emerald-700 via-teal-700 to-emerald-800 dark:from-emerald-950/80 dark:via-slate-900/90 dark:to-teal-950/80 border-b border-emerald-600/30 dark:border-emerald-500/20 flex items-center justify-between shrink-0 select-none text-white">
+          <div className="p-4 bg-gradient-to-r from-agro-primary via-[#C94427] to-agro-accent border-b border-agro-border flex items-center justify-between shrink-0 select-none text-white">
             <div className="flex items-center gap-3">
-              <div className="relative w-9 h-9 rounded-2xl bg-white/20 dark:bg-gradient-to-tr dark:from-emerald-600 dark:to-teal-500 text-white flex items-center justify-center shadow-md shadow-emerald-500/30 border border-white/30 dark:border-emerald-400/30">
+              <div className="relative w-9 h-9 rounded-2xl bg-white/20 text-white flex items-center justify-center shadow-md border border-white/30">
                 <Bot className="w-5 h-5 text-white" />
-                <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-300 dark:bg-emerald-400 border-2 border-emerald-800 dark:border-slate-950 animate-pulse" />
+                <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-agro-highlight border-2 border-agro-primary animate-pulse" />
               </div>
               <div>
-                <h3 className="text-sm font-extrabold flex items-center gap-2 text-white">
+                <h3 className="font-heading text-sm font-extrabold flex items-center gap-2 text-white">
                   <span>{lang === 'mr' ? 'ॲग्रोस्कॅन AI कृषी सल्लागार' : 'AgroScan AI Agronomist'}</span>
                   <span className="px-2 py-0.5 rounded-full bg-white/20 text-white border border-white/30 text-[10px] font-bold uppercase tracking-wider">
                     {lang === 'mr' ? 'थेट' : 'Live'}
                   </span>
                 </h3>
-                <p className="text-[11px] text-emerald-100 dark:text-emerald-200/80">
+                <p className="text-[11px] text-white/80">
                   {lang === 'mr' ? 'पिकांचे रोग, खते व फवारणी सल्ला' : 'Crop pathology, dosages & farm remedies'}
                 </p>
               </div>
@@ -320,14 +320,14 @@ export const FloatingAIChatbot = () => {
           {!isMinimized && (
             <>
               {/* Message Feed */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50 dark:bg-slate-950/70">
+              <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-agro-surface">
                 {messages.map((msg, idx) => (
                   <div
                     key={idx}
                     className={`flex gap-3 max-w-[92%] ${msg.sender === 'user' ? 'ml-auto justify-end' : ''}`}
                   >
                     {msg.sender === 'assistant' && (
-                      <div className="w-8 h-8 rounded-2xl bg-emerald-500/10 dark:bg-gradient-to-tr dark:from-emerald-600/30 dark:to-teal-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-500/20 dark:border-emerald-500/30 shadow-sm mt-0.5">
+                      <div className="w-8 h-8 rounded-2xl bg-agro-accent/15 text-agro-accent flex items-center justify-center shrink-0 border border-agro-accent/30 shadow-sm mt-0.5">
                         <Bot className="w-4 h-4" />
                       </div>
                     )}
@@ -336,8 +336,8 @@ export const FloatingAIChatbot = () => {
                       <div
                         className={`p-4 rounded-3xl text-xs sm:text-sm leading-relaxed shadow-md ${
                           msg.sender === 'user'
-                            ? 'bg-gradient-to-r from-emerald-600 to-teal-500 text-white font-medium rounded-tr-none shadow-emerald-500/20'
-                            : 'bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-white/[0.08] text-slate-800 dark:text-slate-100 rounded-tl-none'
+                            ? 'bg-agro-primary text-white font-medium rounded-tr-none shadow-orange-glow'
+                            : 'bg-agro-card border border-agro-border text-agro-cream rounded-tl-none'
                         }`}
                       >
                         <FormattedAIMessage
@@ -354,8 +354,8 @@ export const FloatingAIChatbot = () => {
 
                 {/* Animated Thinking State */}
                 {loading && (
-                  <div className="flex items-center gap-3 p-3 rounded-2xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-500/20 text-emerald-700 dark:text-emerald-400 text-xs font-semibold animate-pulse w-fit">
-                    <Sparkles className="w-4 h-4 animate-spin text-emerald-500 dark:text-emerald-400" />
+                  <div className="flex items-center gap-3 p-3 rounded-2xl bg-agro-surface border border-agro-border text-agro-primary text-xs font-semibold animate-pulse w-fit">
+                    <Sparkles className="w-4 h-4 animate-spin text-agro-primary" />
                     <span>{lang === 'mr' ? 'कृषी सल्लागार विश्लेषण करत आहे...' : 'AI Agronomist is analyzing remedies & dosages...'}</span>
                   </div>
                 )}
@@ -414,14 +414,14 @@ export const FloatingAIChatbot = () => {
                         ? (lang === 'mr' ? 'ऐकत आहे... बोला' : 'Listening... Speak now')
                         : (lang === 'mr' ? 'पिकांबद्दल काहीही विचारा (उदा. खते, रोग, फवारणी)...' : 'Ask about crop care, organic sprays, dosages...')
                     }
-                    className="flex-1 h-10 px-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-white/[0.08] text-xs sm:text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition placeholder:text-slate-400"
+                    className="flex-1 h-10 px-4 rounded-2xl bg-agro-surface border border-agro-border text-xs sm:text-sm text-agro-cream focus:outline-none focus:border-agro-primary focus:ring-1 focus:ring-agro-primary transition placeholder:text-agro-muted"
                   />
 
                   {/* Send Button */}
                   <button
                     type="submit"
                     disabled={!input.trim() || loading}
-                    className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white flex items-center justify-center shrink-0 shadow-md shadow-emerald-500/30 disabled:opacity-40 transition-all active:scale-95"
+                    className="w-10 h-10 rounded-2xl bg-agro-primary hover:bg-agro-primaryHover text-white flex items-center justify-center shrink-0 shadow-md shadow-orange-glow disabled:opacity-40 transition-all active:scale-95"
                     title="Send"
                   >
                     <Send className="w-4 h-4" />
@@ -429,15 +429,15 @@ export const FloatingAIChatbot = () => {
                 </form>
 
                 {/* Subtitle / Disclaimer */}
-                <div className="flex items-center justify-between mt-2 px-1 text-[10px] text-slate-400 dark:text-slate-500">
+                <div className="flex items-center justify-between mt-2 px-1 text-[10px] text-agro-muted">
                   <span className="flex items-center gap-1">
-                    <Sparkles className="w-3 h-3 text-emerald-500 dark:text-emerald-400" />
+                    <Sparkles className="w-3 h-3 text-agro-highlight" />
                     <span>{lang === 'mr' ? 'कृषी तज्ज्ञ संदर्भयुक्त AI' : 'Expert Grounded Agricultural AI'}</span>
                   </span>
                   <button
                     type="button"
                     onClick={handleExportChat}
-                    className="hover:text-emerald-600 dark:hover:text-emerald-400 transition underline"
+                    className="hover:text-agro-primary transition underline"
                   >
                     {lang === 'mr' ? 'संवाद सेव्ह करा' : 'Save Transcript'}
                   </button>

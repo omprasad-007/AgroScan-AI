@@ -187,13 +187,13 @@ export const AnalysisPage = () => {
   if (error) {
     return (
       <div className="max-w-xl mx-auto py-10 px-4">
-        <section className="agro-panel p-7 sm:p-9 rounded-3xl border border-agro-terracotta/40 text-center space-y-5 shadow-2xl">
-          <div className="w-16 h-16 mx-auto rounded-2xl bg-agro-terracotta/15 border border-agro-terracotta/30 flex items-center justify-center text-agro-terracotta">
+        <section className="agro-panel p-7 sm:p-9 rounded-3xl border border-agro-primary/40 text-center space-y-5 shadow-2xl bg-agro-card">
+          <div className="w-16 h-16 mx-auto rounded-2xl bg-agro-primary/15 border border-agro-primary/30 flex items-center justify-center text-agro-primary">
             <AlertCircle className="w-8 h-8" aria-hidden="true" />
           </div>
           <div className="space-y-2">
-            <h1 className="text-xl font-extrabold text-agro-cream">Leaf Image Check</h1>
-            <p className="text-sm leading-relaxed text-agro-cream bg-agro-surface/80 border border-agro-border rounded-xl p-4">
+            <h1 className="text-xl font-extrabold text-agro-cream font-heading">Leaf Image Check</h1>
+            <p className="text-sm leading-relaxed text-agro-cream bg-agro-surface border border-agro-border rounded-xl p-4">
               {error}
             </p>
           </div>
@@ -204,7 +204,7 @@ export const AnalysisPage = () => {
             <button
               type="button"
               onClick={handleForceDiagnose}
-              className="inline-flex justify-center items-center gap-2 px-6 py-3 rounded-xl bg-agro-primary hover:bg-agro-primaryHover text-white text-xs font-black transition shadow-lg shadow-agro-primary/25 active:scale-[0.98]"
+              className="inline-flex justify-center items-center gap-2 px-6 py-3 rounded-xl bg-agro-primary hover:bg-agro-primaryHover text-white text-xs font-black transition shadow-lg shadow-orange-glow active:scale-[0.98]"
             >
               <Sparkles className="w-4 h-4" aria-hidden="true" />
               <span>Diagnose Leaf with Consensus AI Anyway</span>
@@ -240,7 +240,7 @@ export const AnalysisPage = () => {
             <img src={previewUrl} alt="Leaf being analysed" className="w-full h-full object-cover opacity-90" />
           )}
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-agro-primary/20 to-transparent animate-laser" />
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-agro-card/90 border border-agro-primary/50 text-agro-lime text-xs font-bold backdrop-blur-md shadow-lg">
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-agro-card/90 border border-agro-primary/50 text-agro-highlight text-xs font-bold backdrop-blur-md shadow-lg">
             <ScanLine className="w-4 h-4 text-agro-primary animate-pulse" aria-hidden="true" />
             <span>AI Computer Vision Pipeline In Progress</span>
           </div>
@@ -248,10 +248,10 @@ export const AnalysisPage = () => {
       </section>
 
       {/* Progress & Staging Card */}
-      <section className="agro-panel p-6 rounded-3xl border border-agro-border space-y-4">
+      <section className="agro-panel p-6 rounded-3xl border border-agro-border space-y-4 bg-agro-card">
         <div className="flex justify-between gap-4 items-center">
           <div>
-            <h1 className="text-lg font-extrabold text-agro-cream">
+            <h1 className="text-lg font-extrabold text-agro-cream font-heading">
               {t('analysis.title') || 'Analysing Plant Health & Pathology'}
             </h1>
             <p className="text-xs text-agro-muted mt-0.5">
@@ -279,10 +279,10 @@ export const AnalysisPage = () => {
                 key={step}
                 className={`flex items-center gap-3 p-2.5 rounded-xl text-xs transition-colors ${
                   current
-                    ? 'bg-agro-surface text-agro-cream font-bold border border-agro-borderStrong'
+                    ? 'bg-agro-surface text-agro-cream font-bold border border-agro-border'
                     : complete
-                    ? 'text-agro-lime'
-                    : 'text-agro-mutedDark'
+                    ? 'text-agro-highlight font-semibold'
+                    : 'text-agro-muted'
                 }`}
               >
                 {complete ? (
