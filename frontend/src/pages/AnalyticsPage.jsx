@@ -3,18 +3,18 @@ import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, 
   PieChart, Pie, Cell, AreaChart, Area 
 } from 'recharts';
-import { BarChart3, TrendingUp, PieChart as PieIcon, Activity } from 'lucide-react';
+import { BarChart3, TrendingUp, PieChart as PieIcon } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import api from '../services/api';
 
-// Modern balanced tech palette: clean emerald, mint, amber, coral, cyan, violet
-const PIE_COLORS = ['#10B981', '#34D399', '#F59E0B', '#F43F5E', '#06B6D4', '#8B5CF6'];
+// Signature Theme Palette: Vibrant Orange, Harvest Yellow, Royal Purple, Warm Neutrals
+const PIE_COLORS = ['#C94427', '#F2B942', '#7043C5', '#E96747', '#FFD477', '#B99AFF'];
 
 const SEVERITY_COLORS = {
-  Healthy: '#10B981',
-  Mild: '#34D399',
-  Moderate: '#F59E0B',
-  Severe: '#F43F5E',
+  Healthy: '#7043C5', // Royal Purple
+  Mild: '#FFD477',    // Golden Yellow
+  Moderate: '#F2B942',// Harvest Yellow
+  Severe: '#C94427',  // Vibrant Orange
 };
 
 export const AnalyticsPage = () => {
@@ -54,17 +54,16 @@ export const AnalyticsPage = () => {
   const localizedSeverity = (data?.severity_distribution || []).map(item => ({
     ...item,
     displayName: translateSeverity(item.name),
-    color: SEVERITY_COLORS[item.name] || '#2FBF71'
+    color: SEVERITY_COLORS[item.name] || '#C94427'
   }));
 
   const customTooltipStyle = {
-    backgroundColor: 'rgba(15, 23, 42, 0.95)',
-    borderColor: 'rgba(255, 255, 255, 0.12)',
+    backgroundColor: '#342D29',
+    borderColor: '#51463F',
     borderRadius: '0.85rem',
     fontSize: '12px',
-    color: '#F8FAFC',
+    color: '#FFF9F3',
     boxShadow: '0 10px 30px rgba(0, 0, 0, 0.35)',
-    backdropFilter: 'blur(12px)'
   };
 
   return (
@@ -72,7 +71,7 @@ export const AnalyticsPage = () => {
       
       {/* Header */}
       <div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-agro-cream tracking-tight">
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-agro-cream tracking-tight font-heading">
           {t('analytics.title') || 'Crop Health & Disease Analytics'}
         </h1>
         <p className="text-xs sm:text-sm text-agro-muted mt-1">
@@ -84,10 +83,10 @@ export const AnalyticsPage = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
         {/* Monthly Disease Trends */}
-        <div className="agro-panel p-6 rounded-2xl space-y-4">
+        <div className="agro-panel bg-agro-card border border-agro-border p-6 rounded-2xl space-y-4">
           <div className="flex items-center space-x-2">
             <TrendingUp className="w-5 h-5 text-agro-primary" />
-            <h3 className="text-sm font-bold text-agro-cream">
+            <h3 className="text-sm font-bold text-agro-cream font-heading">
               {t('analytics.monthly_trends') || 'Monthly Disease Outbreak Trends'}
             </h3>
           </div>
@@ -96,21 +95,21 @@ export const AnalyticsPage = () => {
               <AreaChart data={data?.monthly_trends || []}>
                 <defs>
                   <linearGradient id="diseasedGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#F43F5E" stopOpacity={0.4}/>
-                    <stop offset="95%" stopColor="#F43F5E" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="#C94427" stopOpacity={0.4}/>
+                    <stop offset="95%" stopColor="#C94427" stopOpacity={0}/>
                   </linearGradient>
                   <linearGradient id="healthyGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#10B981" stopOpacity={0.4}/>
-                    <stop offset="95%" stopColor="#10B981" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="#7043C5" stopOpacity={0.4}/>
+                    <stop offset="95%" stopColor="#7043C5" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
-                <XAxis dataKey="month" stroke="#94A3B8" fontSize={11} tickLine={false} />
-                <YAxis stroke="#94A3B8" fontSize={11} tickLine={false} />
-                <Tooltip contentStyle={customTooltipStyle} itemStyle={{ color: '#F8FAFC' }} />
+                <XAxis dataKey="month" stroke="#7D736A" fontSize={11} tickLine={false} />
+                <YAxis stroke="#7D736A" fontSize={11} tickLine={false} />
+                <Tooltip contentStyle={customTooltipStyle} itemStyle={{ color: '#FFF9F3' }} />
                 <Area 
                   type="monotone" 
                   dataKey="diseased" 
-                  stroke="#F43F5E" 
+                  stroke="#C94427" 
                   strokeWidth={2}
                   fillOpacity={1} 
                   fill="url(#diseasedGrad)" 
@@ -119,7 +118,7 @@ export const AnalyticsPage = () => {
                 <Area 
                   type="monotone" 
                   dataKey="healthy" 
-                  stroke="#10B981" 
+                  stroke="#7043C5" 
                   strokeWidth={2}
                   fillOpacity={1} 
                   fill="url(#healthyGrad)" 
@@ -131,10 +130,10 @@ export const AnalyticsPage = () => {
         </div>
 
         {/* Disease Prevalence Distribution */}
-        <div className="agro-panel p-6 rounded-2xl space-y-4">
+        <div className="agro-panel bg-agro-card border border-agro-border p-6 rounded-2xl space-y-4">
           <div className="flex items-center space-x-2">
-            <PieIcon className="w-5 h-5 text-agro-primary" />
-            <h3 className="text-sm font-bold text-agro-cream">
+            <PieIcon className="w-5 h-5 text-agro-highlight" />
+            <h3 className="text-sm font-bold text-agro-cream font-heading">
               {t('analytics.disease_share') || 'Disease Prevalence Share'}
             </h3>
           </div>
@@ -155,14 +154,14 @@ export const AnalyticsPage = () => {
                     paddingAngle={4}
                     dataKey="count"
                     nameKey="displayName"
-                    stroke="rgba(15, 23, 42, 0.4)"
-                    strokeWidth={2}
+                    stroke="#51463F"
+                    strokeWidth={1}
                   >
                     {localizedDistribution.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip contentStyle={customTooltipStyle} itemStyle={{ color: '#F8FAFC' }} />
+                  <Tooltip contentStyle={customTooltipStyle} itemStyle={{ color: '#FFF9F3' }} />
                 </PieChart>
               </ResponsiveContainer>
             )}
@@ -170,10 +169,10 @@ export const AnalyticsPage = () => {
         </div>
 
         {/* Severity Distribution */}
-        <div className="agro-panel p-6 rounded-2xl space-y-4 lg:col-span-2">
+        <div className="agro-panel bg-agro-card border border-agro-border p-6 rounded-2xl space-y-4 lg:col-span-2">
           <div className="flex items-center space-x-2">
             <BarChart3 className="w-5 h-5 text-agro-primary" />
-            <h3 className="text-sm font-bold text-agro-cream">
+            <h3 className="text-sm font-bold text-agro-cream font-heading">
               {t('analytics.severity_dist') || 'Leaf Lesion Severity Breakdown'}
             </h3>
           </div>
@@ -185,12 +184,12 @@ export const AnalyticsPage = () => {
             ) : (
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={localizedSeverity}>
-                  <XAxis dataKey="displayName" stroke="#7A786E" fontSize={11} tickLine={false} />
-                  <YAxis stroke="#7A786E" fontSize={11} tickLine={false} />
-                  <Tooltip contentStyle={customTooltipStyle} itemStyle={{ color: '#FAF7EF' }} />
+                  <XAxis dataKey="displayName" stroke="#7D736A" fontSize={11} tickLine={false} />
+                  <YAxis stroke="#7D736A" fontSize={11} tickLine={false} />
+                  <Tooltip contentStyle={customTooltipStyle} itemStyle={{ color: '#FFF9F3' }} />
                   <Bar dataKey="value" radius={[6, 6, 0, 0]} name="Occurrences">
                     {localizedSeverity.map((entry, index) => (
-                      <Cell key={`bar-${index}`} fill={entry.color || '#2FBF71'} />
+                      <Cell key={`bar-${index}`} fill={entry.color || '#C94427'} />
                     ))}
                   </Bar>
                 </BarChart>

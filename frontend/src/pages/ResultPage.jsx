@@ -144,13 +144,13 @@ export const ResultPage = () => {
             <span>Scan Another Leaf</span>
           </Link>
           {(scan.model_name || scan.model_version) && (
-            <span className="px-2.5 py-1 rounded-xl bg-agro-surface border border-agro-border text-agro-lime text-[10px] font-bold flex items-center gap-1">
+            <span className="px-2.5 py-1 rounded-xl bg-agro-surface border border-agro-border text-agro-accent text-[10px] font-bold flex items-center gap-1">
               <Cpu className="w-3 h-3" aria-hidden="true" />
               <span>{scan.model_name || scan.model_version.split('/').pop()}</span>
             </span>
           )}
           {scan.is_demo && (
-            <span className="px-2.5 py-1 rounded-xl bg-agro-amber/15 border border-agro-amber/30 text-agro-amber text-[10px] font-bold uppercase tracking-wider">
+            <span className="px-2.5 py-1 rounded-xl bg-agro-highlight/15 border border-agro-highlight/30 text-agro-highlight text-[10px] font-bold uppercase tracking-wider">
               {t('result.demo_badge') || 'Demonstration Mode'}
             </span>
           )}
@@ -158,19 +158,19 @@ export const ResultPage = () => {
       </div>
 
       {/* Main Report Card */}
-      <section className="agro-panel p-6 sm:p-8 rounded-3xl border border-agro-border space-y-6 shadow-xl">
+      <section className="agro-panel p-6 sm:p-8 rounded-3xl border border-agro-border space-y-6 shadow-xl bg-agro-card">
         
         {/* Title & Diagnostic Badges */}
         <div className="border-b border-agro-border pb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-1">
-            <div className="flex items-center gap-2 text-xs font-bold text-agro-lime uppercase tracking-wider">
+            <div className="flex items-center gap-2 text-xs font-bold text-agro-highlight uppercase tracking-wider">
               <Sprout className="w-4 h-4" aria-hidden="true" />
               <span>{displayCrop}</span>
               {scan.scientific_name && scan.scientific_name !== 'N/A' && (
                 <span className="text-agro-muted lowercase font-normal italic">({scan.scientific_name})</span>
               )}
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-agro-cream tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-agro-cream tracking-tight font-heading">
               {displayDisease}
             </h1>
             <div className="flex items-center gap-3 text-xs text-agro-muted pt-1">
@@ -212,7 +212,7 @@ export const ResultPage = () => {
             <span className="text-xl sm:text-2xl font-extrabold text-agro-primary mt-1 block">
               {((scan.confidence || scan.confidence_score || 0.90) * 100).toFixed(1)}%
             </span>
-            <span className="text-[10px] text-agro-lime font-medium block mt-0.5">
+            <span className="text-[10px] text-agro-highlight font-medium block mt-0.5">
               {confidenceInterp === 'HIGH_CONFIDENCE' ? t('result.conf_high') || 'High Confidence' :
                confidenceInterp === 'MODERATE_CONFIDENCE' ? t('result.conf_mod') || 'Moderate Confidence' :
                t('result.conf_low') || 'Uncertain'}
@@ -308,8 +308,8 @@ export const ResultPage = () => {
             </div>
 
             {/* Prevention */}
-            <div className="p-5 rounded-2xl bg-agro-surface/70 border border-agro-lime/30 space-y-2">
-              <h3 className="text-xs font-bold text-agro-lime uppercase tracking-wider flex items-center gap-2">
+            <div className="p-5 rounded-2xl bg-agro-surface border border-agro-accent/30 space-y-2">
+              <h3 className="text-xs font-bold text-agro-accent uppercase tracking-wider flex items-center gap-2">
                 <ShieldCheck className="w-4 h-4" aria-hidden="true" />
                 <span>{t('result.prevention') || 'Preventive Agricultural Practices'}</span>
               </h3>

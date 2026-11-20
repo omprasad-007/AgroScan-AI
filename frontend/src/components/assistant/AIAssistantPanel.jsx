@@ -244,7 +244,7 @@ export const AIAssistantPanel = ({ scanData, predictionId, autoOpen = true }) =>
 
   return (
     <div 
-      className={`agro-panel rounded-3xl border border-emerald-500/30 dark:border-white/[0.08] light:border-slate-200 shadow-2xl overflow-hidden flex flex-col bg-slate-950/95 dark:bg-slate-950/95 light:bg-white backdrop-blur-xl transition-all duration-300 ${
+      className={`agro-panel rounded-3xl border border-agro-border shadow-2xl overflow-hidden flex flex-col bg-agro-card backdrop-blur-xl transition-all duration-300 ${
         isExpanded ? 'min-h-[720px] h-[750px]' : 'min-h-[520px] h-[560px]'
       }`}
     >
@@ -263,7 +263,7 @@ export const AIAssistantPanel = ({ scanData, predictionId, autoOpen = true }) =>
                 {lang === 'mr' ? 'थेट AI' : 'Live AI'}
               </span>
             </h3>
-            <p className="text-[11px] sm:text-xs text-emerald-200/80">
+            <p className="text-[11px] sm:text-xs text-white/80">
               {lang === 'mr' ? 'भारतीय शेतकऱ्यांसाठी वैज्ञानिक व सेंद्रिय कृषी सल्ला' : 'Contextual agronomic & diagnostic guidance for farmers'}
             </p>
           </div>
@@ -275,10 +275,10 @@ export const AIAssistantPanel = ({ scanData, predictionId, autoOpen = true }) =>
             type="button"
             onClick={handleExportChat}
             disabled={messages.length === 0}
-            className="px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 text-slate-200 hover:text-white text-xs font-bold border border-slate-700 flex items-center space-x-1.5 transition disabled:opacity-50"
+            className="px-3 py-1.5 rounded-xl bg-agro-surface hover:bg-agro-hover text-agro-cream text-xs font-bold border border-agro-border flex items-center space-x-1.5 transition disabled:opacity-50"
             title="Export full chat transcript as Markdown (.md)"
           >
-            <Download className="w-3.5 h-3.5 text-emerald-400" />
+            <Download className="w-3.5 h-3.5 text-agro-highlight" />
             <span className="hidden sm:inline">{lang === 'mr' ? 'संवाद जतन करा' : 'Export Chat'}</span>
           </button>
 
@@ -286,25 +286,25 @@ export const AIAssistantPanel = ({ scanData, predictionId, autoOpen = true }) =>
           <button
             type="button"
             onClick={() => setIsExpanded(prev => !prev)}
-            className="p-2 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 text-slate-200 hover:text-white border border-slate-700 transition"
+            className="p-2 rounded-xl bg-agro-surface hover:bg-agro-hover text-agro-cream border border-agro-border transition"
             title={isExpanded ? 'Collapse size' : 'Expand size'}
           >
             {isExpanded ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
           </button>
 
           {/* Language Toggle */}
-          <div className="flex bg-black/40 rounded-xl p-0.5 border border-white/10 text-[11px] font-bold">
+          <div className="flex bg-agro-surface rounded-xl p-0.5 border border-agro-border text-[11px] font-bold">
             <button
               type="button"
               onClick={() => setLang('en')}
-              className={`px-2.5 py-1 rounded-lg transition ${lang === 'en' ? 'bg-emerald-500 text-white font-bold' : 'text-slate-400 hover:text-white'}`}
+              className={`px-2.5 py-1 rounded-lg transition ${lang === 'en' ? 'bg-agro-primary text-white font-bold' : 'text-agro-muted hover:text-agro-cream'}`}
             >
               EN
             </button>
             <button
               type="button"
               onClick={() => setLang('mr')}
-              className={`px-2.5 py-1 rounded-lg transition ${lang === 'mr' ? 'bg-emerald-500 text-white font-bold' : 'text-slate-400 hover:text-white'}`}
+              className={`px-2.5 py-1 rounded-lg transition ${lang === 'mr' ? 'bg-agro-primary text-white font-bold' : 'text-agro-muted hover:text-agro-cream'}`}
             >
               मराठी
             </button>
@@ -313,7 +313,7 @@ export const AIAssistantPanel = ({ scanData, predictionId, autoOpen = true }) =>
       </div>
 
       {/* Messages Feed */}
-      <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 bg-slate-950/70 dark:bg-slate-950/70 light:bg-slate-50">
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 bg-agro-bg">
         {messages.map((msg, i) => (
           <div 
             key={i} 
@@ -355,7 +355,7 @@ export const AIAssistantPanel = ({ scanData, predictionId, autoOpen = true }) =>
       </div>
 
       {/* Quick Replies & Input */}
-      <div className="p-3 sm:p-4 bg-slate-900 dark:bg-slate-900 light:bg-white border-t border-slate-800 dark:border-white/[0.06] light:border-slate-200 space-y-3 shrink-0">
+      <div className="p-3 sm:p-4 bg-agro-card border-t border-agro-border space-y-3 shrink-0">
         <div className="flex overflow-x-auto gap-2 pb-1 hide-scrollbar">
           <span className="text-[11px] font-bold text-agro-highlight uppercase tracking-wider shrink-0 flex items-center gap-1">
             <Sprout className="w-3.5 h-3.5" />

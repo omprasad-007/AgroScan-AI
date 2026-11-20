@@ -202,9 +202,9 @@ export const FloatingAIChatbot = () => {
           {/* Pulsing Hint Pill */}
           <div 
             onClick={() => { setIsOpen(true); setHasUnread(false); }}
-            className="hidden sm:flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-white/95 dark:bg-slate-900/90 text-slate-800 dark:text-slate-100 border border-slate-200 dark:border-emerald-500/40 shadow-xl backdrop-blur-md cursor-pointer hover:border-emerald-500 transition group animate-fade-in"
+            className="hidden sm:flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-agro-card text-agro-cream border border-agro-border shadow-xl backdrop-blur-md cursor-pointer hover:border-agro-primary transition group animate-fade-in"
           >
-            <Sparkles className="w-4 h-4 text-emerald-500 dark:text-emerald-400 group-hover:rotate-12 transition-transform" />
+            <Sparkles className="w-4 h-4 text-agro-primary group-hover:rotate-12 transition-transform" />
             <span className="text-xs font-bold tracking-wide">
               {lang === 'mr' ? 'AI कृषी सल्लागार' : 'Ask AI Agronomist'}
             </span>
@@ -257,18 +257,18 @@ export const FloatingAIChatbot = () => {
             {/* Actions */}
             <div className="flex items-center gap-1.5">
               {/* Language Switcher */}
-              <div className="flex bg-black/20 dark:bg-black/40 rounded-xl p-0.5 border border-white/20 text-[10px] font-bold">
+              <div className="flex bg-black/20 rounded-xl p-0.5 border border-white/20 text-[10px] font-bold">
                 <button
                   type="button"
                   onClick={() => setLang('en')}
-                  className={`px-2 py-0.5 rounded-lg transition ${lang === 'en' ? 'bg-white text-emerald-800 font-extrabold dark:bg-emerald-500 dark:text-white' : 'text-white/80 hover:text-white'}`}
+                  className={`px-2 py-0.5 rounded-lg transition ${lang === 'en' ? 'bg-white text-brand-orange-light font-extrabold' : 'text-white/80 hover:text-white'}`}
                 >
                   EN
                 </button>
                 <button
                   type="button"
                   onClick={() => setLang('mr')}
-                  className={`px-2 py-0.5 rounded-lg transition ${lang === 'mr' ? 'bg-white text-emerald-800 font-extrabold dark:bg-emerald-500 dark:text-white' : 'text-white/80 hover:text-white'}`}
+                  className={`px-2 py-0.5 rounded-lg transition ${lang === 'mr' ? 'bg-white text-brand-orange-light font-extrabold' : 'text-white/80 hover:text-white'}`}
                 >
                   मराठी
                 </button>
@@ -364,8 +364,8 @@ export const FloatingAIChatbot = () => {
               </div>
 
               {/* Quick Prompt Carousel */}
-              <div className="px-3 py-2 bg-white dark:bg-slate-900/80 border-t border-slate-200 dark:border-white/[0.06] flex items-center gap-2 overflow-x-auto hide-scrollbar">
-                <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider shrink-0 flex items-center gap-1">
+              <div className="px-3 py-2 bg-agro-card border-t border-agro-border flex items-center gap-2 overflow-x-auto hide-scrollbar">
+                <span className="text-[10px] font-bold text-agro-highlight uppercase tracking-wider shrink-0 flex items-center gap-1">
                   <Sprout className="w-3 h-3" />
                   {lang === 'mr' ? 'सुचवलेले:' : 'Quick:'}
                 </span>
@@ -374,7 +374,7 @@ export const FloatingAIChatbot = () => {
                     key={qIdx}
                     type="button"
                     onClick={() => handleSendMessage(q)}
-                    className="whitespace-nowrap px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-emerald-50 dark:hover:bg-emerald-500/20 border border-slate-200 dark:border-white/[0.08] text-[11px] text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition shrink-0 font-medium"
+                    className="whitespace-nowrap px-3 py-1 rounded-full bg-agro-surface hover:bg-agro-primary/20 border border-agro-border text-[11px] text-agro-cream hover:text-agro-primary transition shrink-0 font-medium"
                   >
                     {q}
                   </button>
@@ -382,7 +382,7 @@ export const FloatingAIChatbot = () => {
               </div>
 
               {/* Input Area */}
-              <div className="p-3 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-white/[0.06]">
+              <div className="p-3 bg-agro-card border-t border-agro-border">
                 <form
                   onSubmit={(e) => {
                     e.preventDefault();
@@ -397,7 +397,7 @@ export const FloatingAIChatbot = () => {
                     className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 border transition ${
                       isListening
                         ? 'bg-rose-500/20 text-rose-500 border-rose-500 animate-pulse'
-                        : 'bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 border-slate-200 dark:border-white/[0.08]'
+                        : 'bg-agro-surface text-agro-muted hover:text-agro-primary border border-agro-border'
                     }`}
                     title={isListening ? 'Stop listening' : 'Speak your question'}
                   >
