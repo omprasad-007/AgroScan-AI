@@ -148,9 +148,9 @@ export const mr = {
 
   // Location System & GPS
   "location.title": "स्थान निवडा",
-  "location.use_gps": "📍 माझे वर्तमान स्थान वापरा",
-  "location.search_loc": "🔎 स्थान शोधा",
-  "location.enter_manual": "✏️ स्थान स्वतः भरा",
+  "location.use_gps": "माझे वर्तमान स्थान वापरा",
+  "location.search_loc": "स्थान शोधा",
+  "location.enter_manual": "स्थान स्वतः भरा",
   "location.detected_title": "स्थान आढळले",
   "location.use_this": "हे स्थान वापरा",
   "location.confirm_location": "कृषी स्थान निश्चित करा",

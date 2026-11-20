@@ -33,7 +33,7 @@ export const Sidebar = () => {
   }
 
   return (
-    <aside className="w-64 bg-white/85 dark:bg-slate-950/70 backdrop-blur-xl border-r border-slate-200/90 dark:border-white/[0.08] shrink-0 hidden md:block min-h-[calc(100vh-4rem)] p-4 flex flex-col justify-between transition-colors duration-300">
+    <aside className="w-64 bg-agro-card/85 backdrop-blur-xl border-r border-agro-border shrink-0 hidden md:block min-h-[calc(100vh-4rem)] p-4 flex flex-col justify-between transition-colors duration-200">
       <nav className="space-y-1.5" aria-label="Main navigation">
         {links.map((link) => {
           const Icon = link.icon;
@@ -53,8 +53,8 @@ export const Sidebar = () => {
                 }
                 return `flex items-center space-x-3 px-3.5 py-2.5 rounded-xl font-medium text-sm transition-all duration-150 ${
                   isActive
-                    ? 'bg-slate-100 dark:bg-slate-800/90 text-slate-900 dark:text-white font-bold border border-slate-300/80 dark:border-slate-700 shadow-sm'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/50 border border-transparent'
+                    ? 'bg-agro-surface text-agro-cream font-bold border border-agro-border shadow-sm'
+                    : 'text-agro-muted hover:text-agro-cream hover:bg-agro-surface border border-transparent'
                 }`;
               }}
             >
@@ -84,7 +84,7 @@ export const Sidebar = () => {
           <Sparkles className="w-4 h-4 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
           <span>Multi-Crop Vision AI</span>
         </div>
-        <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed">
+        <p className="text-[11px] text-agro-muted leading-relaxed">
           Capture close-up leaf photos with natural daylight for highest diagnostic accuracy.
         </p>
       </div>

@@ -6,46 +6,46 @@
   :root,
   html.light {
     color-scheme: light;
-    --bg-canvas: 248 250 252;          /* #F8FAFC - crisp luminous canvas */
-    --bg-card: 255 255 255;            /* #FFFFFF - pure white */
-    --bg-surface: 241 245 249;         /* #F1F5F9 - soft light slate */
-    --bg-hover: 226 232 240;           /* #E2E8F0 */
-    --border-color: #E2E8F0;           /* Crisp light border */
-    --border-strong: #CBD5E1;          /* Defined border */
-    --text-primary: 15 23 42;          /* #0F172A - deep charcoal text */
-    --text-muted: 100 116 139;         /* #64748B - clean readable muted text */
+    --bg-canvas: 250 250 248;           /* Warm organic paper/stone #FAFAF8 */
+    --bg-card: 255 255 255;             /* Pure white crisp card */
+    --bg-surface: 243 245 242;          /* Soft sage/stone tint #F3F5F2 */
+    --bg-hover: 232 236 230;            /* Soft sage hover */
+    --border-color: #E2E8E0;            /* Crisp organic border */
+    --border-strong: #CBD5C8;           /* High contrast border */
+    --text-primary: 20 30 24;           /* Deep forest charcoal #141E18 */
+    --text-muted: 82 98 88;             /* Readable forest slate #526258 */
     
-    --primary: 16 185 129;             /* #10B981 - clean emerald */
-    --primary-hover: 5 150 105;        /* #059669 */
-    --lime: 4 120 87;                  /* #047857 - deep mint for high contrast */
-    --amber: 180 83 9;                 /* #B45309 - amber-700 */
-    --terracotta: 190 18 60;           /* #BE123C - rose-700 */
+    --primary: 16 185 129;              /* Emerald 500 #10B981 */
+    --primary-hover: 5 150 105;         /* Emerald 600 #059669 */
+    --lime: 13 148 136;                 /* Teal 600 */
+    --amber: 217 119 6;                 /* Amber 600 */
+    --terracotta: 225 29 72;            /* Rose 600 */
     
-    --panel-bg: rgba(255, 255, 255, 0.98);
-    --panel-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 1px 3px 0 rgba(15, 23, 42, 0.02);
-    --panel-shadow-hover: 0 12px 30px -4px rgba(15, 23, 42, 0.08), 0 4px 8px -2px rgba(15, 23, 42, 0.03);
+    --panel-bg: rgba(255, 255, 255, 0.92);
+    --panel-shadow: 0 4px 20px -2px rgba(20, 30, 24, 0.05), 0 1px 3px 0 rgba(20, 30, 24, 0.02);
+    --panel-shadow-hover: 0 16px 36px -4px rgba(20, 30, 24, 0.08), 0 4px 12px -2px rgba(20, 30, 24, 0.03);
   }
 
   html.dark {
     color-scheme: dark;
-    --bg-canvas: 10 14 23;             /* #0A0E17 - deep rich obsidian */
-    --bg-card: 17 24 39;               /* #111827 - dark slate card */
-    --bg-surface: 26 36 51;            /* #1A2433 */
-    --bg-hover: 38 53 74;              /* #26354A */
-    --border-color: rgba(255, 255, 255, 0.08); /* Frosted border */
-    --border-strong: rgba(255, 255, 255, 0.16);
-    --text-primary: 248 250 252;       /* #F8FAFC - crisp white */
-    --text-muted: 148 163 184;         /* #94A3B8 - slate muted */
+    --bg-canvas: 11 16 14;              /* Deep obsidian emerald #0B100E */
+    --bg-card: 17 24 21;                /* Rich forest obsidian #111815 */
+    --bg-surface: 24 34 30;             /* Elevated surface #18221E */
+    --bg-hover: 34 48 42;               /* Elevated hover #22302A */
+    --border-color: rgba(255, 255, 255, 0.08); /* Frosted glass border */
+    --border-strong: rgba(16, 185, 129, 0.25);
+    --text-primary: 245 248 246;        /* Clean organic white */
+    --text-muted: 156 175 165;          /* Muted sage */
     
-    --primary: 16 185 129;             /* #10B981 */
+    --primary: 16 185 129;              /* #10B981 */
     --primary-hover: 5 150 105;
-    --lime: 52 211 153;                /* #34D399 */
-    --amber: 245 158 11;               /* #F59E0B */
-    --terracotta: 244 63 94;           /* #F43F5E */
+    --lime: 52 211 153;                 /* #34D399 */
+    --amber: 245 158 11;                /* #F59E0B */
+    --terracotta: 244 63 94;            /* #F43F5E */
     
-    --panel-bg: rgba(17, 24, 39, 0.75);
-    --panel-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.45), inset 0 1px 0 0 rgba(255, 255, 255, 0.07);
-    --panel-shadow-hover: 0 16px 40px -4px rgba(0, 0, 0, 0.6), inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
+    --panel-bg: rgba(17, 24, 21, 0.78);
+    --panel-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.45), inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
+    --panel-shadow-hover: 0 20px 48px -4px rgba(0, 0, 0, 0.65), inset 0 1px 0 0 rgba(16, 185, 129, 0.2);
   }
 
   body {
@@ -64,19 +64,52 @@
 }
 
 /* =============================================================
- * BACKGROUNDS FOR DARK AND LIGHT THEMES
+ * BACKGROUNDS FOR DARK AND LIGHT THEMES (21st.dev / Stitch)
  * =========================================================== */
 html.dark body {
-  background-color: #0A0E17;
+  background-color: #0B100E;
   background-image: 
-    radial-gradient(at 15% 10%, rgba(16, 185, 129, 0.06) 0px, transparent 40%),
-    radial-gradient(at 85% 15%, rgba(6, 182, 212, 0.05) 0px, transparent 40%);
+    radial-gradient(at 15% 10%, rgba(16, 185, 129, 0.08) 0px, transparent 45%),
+    radial-gradient(at 85% 15%, rgba(20, 184, 166, 0.06) 0px, transparent 40%),
+    radial-gradient(at 50% 60%, rgba(16, 185, 129, 0.04) 0px, transparent 50%);
   background-attachment: fixed;
 }
 
 html.light body {
-  background-color: #F8FAFC;
-  background-image: none;
+  background-color: #FAFAF8;
+  background-image: 
+    radial-gradient(at 20% 10%, rgba(16, 185, 129, 0.04) 0px, transparent 40%),
+    radial-gradient(at 80% 20%, rgba(245, 158, 11, 0.02) 0px, transparent 35%);
+  background-attachment: fixed;
+}
+
+/* Grid overlay pattern */
+.bg-grid-pattern {
+  background-size: 32px 32px;
+  background-image: 
+    linear-gradient(to right, rgba(16, 185, 129, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(16, 185, 129, 0.05) 1px, transparent 1px);
+}
+
+html.light .bg-grid-pattern {
+  background-image: 
+    linear-gradient(to right, rgba(0, 0, 0, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
+}
+
+/* =============================================================
+ * 3D PERSPECTIVE & CARDS
+ * =========================================================== */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
 }
 
 /* =============================================================
@@ -86,8 +119,8 @@ html.light body {
 .glass-panel,
 .glass-card {
   background: var(--panel-bg);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--border-color);
   border-radius: 1.25rem;
   box-shadow: var(--panel-shadow);
@@ -129,25 +162,25 @@ html.light body {
 }
 
 /* Form Controls in Light and Dark Mode */
-html.light input:not([type="range"]),
-html.light select,
-html.light textarea {
-  background-color: #FFFFFF !important;
-  color: #0F172A !important;
-  border-color: #CBD5E1 !important;
+input:not([type="range"]),
+select,
+textarea {
+  background-color: rgb(var(--bg-surface));
+  color: rgb(var(--text-primary));
+  border: 1px solid var(--border-color);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-html.dark input:not([type="range"]),
-html.dark select,
-html.dark textarea {
-  background-color: rgba(15, 23, 42, 0.8) !important;
-  color: #F8FAFC !important;
-  border-color: rgba(255, 255, 255, 0.12) !important;
+input:not([type="range"]):focus,
+select:focus,
+textarea:focus {
+  border-color: #10B981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
 }
 
-html.light input::placeholder,
-html.light textarea::placeholder {
-  color: #94A3B8 !important;
+input::placeholder,
+textarea::placeholder {
+  color: rgb(var(--text-muted));
 }
 
 /* Interactive Buttons */
@@ -159,6 +192,46 @@ html.light textarea::placeholder {
   @apply inline-flex items-center justify-center font-bold transition-all duration-150 rounded-xl bg-agro-surface hover:bg-agro-hover border border-agro-border text-agro-cream active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
 }
 
+/* Modern Laser Scanner Line Animation */
+@keyframes laser-sweep {
+  0% {
+    top: 0%;
+    opacity: 0.8;
+  }
+  50% {
+    top: 96%;
+    opacity: 1;
+  }
+  100% {
+    top: 0%;
+    opacity: 0.8;
+  }
+}
+
+.animate-laser-sweep {
+  animation: laser-sweep 3s ease-in-out infinite;
+}
+
+/* Modern Ambient Pulse Badge */
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 8px rgba(16, 185, 129, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+  }
+}
+
+.pulse-ring-emerald {
+  animation: pulse-ring 2.5s infinite;
+}
+
 /* Modern Scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
@@ -166,25 +239,25 @@ html.light textarea::placeholder {
 }
 
 html.dark ::-webkit-scrollbar-track {
-  background: #0A0E17;
+  background: #0B100E;
 }
 html.dark ::-webkit-scrollbar-thumb {
-  background: #1E293B;
+  background: #18221E;
   border-radius: 9999px;
 }
 html.dark ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
+  background: #22302A;
 }
 
 html.light ::-webkit-scrollbar-track {
-  background: #F8FAFC;
+  background: #FAFAF8;
 }
 html.light ::-webkit-scrollbar-thumb {
-  background: #CBD5E1;
+  background: #CBD5C8;
   border-radius: 9999px;
 }
 html.light ::-webkit-scrollbar-thumb:hover {
-  background: #94A3B8;
+  background: #9CAF9E;
 }
 
 @media (prefers-reduced-motion: reduce) {

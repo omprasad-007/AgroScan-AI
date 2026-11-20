@@ -24,7 +24,7 @@ export const MobileNav = () => {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-white/90 dark:bg-slate-950/85 backdrop-blur-xl border-t border-slate-200/90 dark:border-white/[0.08] px-2 py-1.5 shadow-[0_-8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_-8px_30px_rgba(0,0,0,0.4)] safe-area-pb"
+      className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-agro-card/90 backdrop-blur-xl border-t border-agro-border px-2 py-1.5 shadow-[0_-8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_-8px_30px_rgba(0,0,0,0.4)] safe-area-pb"
       aria-label="Mobile Navigation"
     >
       <div className="flex items-center justify-around max-w-md mx-auto">

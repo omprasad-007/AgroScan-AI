@@ -139,9 +139,9 @@ export const en = {
 
   // Location System & GPS
   "location.title": "Location Selector",
-  "location.use_gps": "📍 Use My Current Location",
-  "location.search_loc": "🔎 Search Location",
-  "location.enter_manual": "✏️ Enter Location Manually",
+  "location.use_gps": "Use My Current Location",
+  "location.search_loc": "Search Location",
+  "location.enter_manual": "Enter Location Manually",
   "location.detected_title": "Location Detected",
   "location.use_this": "Use This Location",
   "location.confirm_location": "Confirm Agricultural Location",

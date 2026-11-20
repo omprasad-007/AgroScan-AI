@@ -1,7 +1,26 @@
 import api from './api';
 
 const WEATHER_CACHE_KEY = 'agroscan_local_weather_cache';
+const FARM_DISTRICT_KEY = 'agroscan_farm_district';
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes cache
+
+export const getSavedFarmDistrict = () => {
+  try {
+    return localStorage.getItem(FARM_DISTRICT_KEY) || 'Kolhapur';
+  } catch {
+    return 'Kolhapur';
+  }
+};
+
+export const setSavedFarmDistrict = (districtName) => {
+  try {
+    if (districtName) {
+      localStorage.setItem(FARM_DISTRICT_KEY, districtName);
+    }
+  } catch {
+    // LocalStorage error
+  }
+};
 
 export const getCachedWeather = () => {
   try {
@@ -19,7 +38,6 @@ export const getCachedWeather = () => {
 
 export const setCachedWeather = (data) => {
   try {
-    // Only cache verified live weather
     if (data && data.liveApi !== false) {
       sessionStorage.setItem(WEATHER_CACHE_KEY, JSON.stringify({
         data,
@@ -40,30 +58,29 @@ export const clearWeatherCache = () => {
 };
 
 /**
- * Automatically detects the farmer's live location:
- * 1. Checks device GPS via HTML5 Geolocation (high accuracy).
- * 2. If GPS is denied/unavailable, automatically queries the backend which resolves
- *    the farmer's real city/district via IP Geolocation (e.g. Kolhapur, Maharashtra).
- * 3. Never hardcodes a false default like Pune.
+ * Detects local weather for the farmer:
+ * 1. If GPS is specifically requested, queries HTML5 Geolocation.
+ * 2. If user has a saved farm district, uses their selected district (never forces Pune).
+ * 3. Falls back to backend location lookup.
  */
-export const detectLocalWeather = async (lang = 'en', forceRefresh = false) => {
+export const detectLocalWeather = async (lang = 'en', forceRefresh = false, useGps = false) => {
   if (forceRefresh) {
     clearWeatherCache();
   } else {
     const cached = getCachedWeather();
-    if (cached) return cached;
+    if (cached && !useGps) return cached;
   }
 
   const weatherLang = lang === 'mr' ? 'mr' : 'en';
 
-  // 1. Try Browser HTML5 GPS Geolocation
-  if (typeof navigator !== 'undefined' && navigator.geolocation) {
+  // 1. Try Browser HTML5 GPS Geolocation if requested or available
+  if (useGps && typeof navigator !== 'undefined' && navigator.geolocation) {
     try {
       const position = await new Promise((resolve, reject) => {
         navigator.geolocation.getCurrentPosition(
           resolve,
           reject,
-          { timeout: 4000, maximumAge: 60000, enableHighAccuracy: true }
+          { timeout: 7000, maximumAge: 30000, enableHighAccuracy: true }
         );
       });
 
@@ -73,44 +90,48 @@ export const detectLocalWeather = async (lang = 'en', forceRefresh = false) => {
       });
 
       const weatherData = {
-        location: res.data.location || 'Local Farm',
+        location: res.data.location || 'Local Farm GPS',
         temperature_c: Number(res.data.temperature_c ?? 26.5),
-        humidity_pct: Number(res.data.humidity_pct ?? 65.0),
+        humidity_pct: Number(res.data.humidity_pct ?? 55.0),
         rainfall_mm: Number(res.data.rainfall_mm ?? 0.0),
         condition: res.data.condition || 'Clear sky',
-        wind_speed_kmh: Number(res.data.wind_speed_kmh ?? 12.0),
+        wind_speed_kmh: Number(res.data.wind_speed_kmh ?? 8.0),
         latitude: Number(res.data.latitude ?? latitude),
         longitude: Number(res.data.longitude ?? longitude),
         isGpsDetected: true,
         detectionMethod: 'device_gps',
+        spraying_advisory: res.data.spraying_advisory || null,
         liveApi: res.data.live_api ?? true,
         detectedAt: new Date().toISOString(),
       };
 
       setCachedWeather(weatherData);
       return weatherData;
-    } catch {
-      // GPS denied, blocked, or timed out - proceed to IP-based real location resolution
+    } catch (gpsErr) {
+      console.warn("GPS Geolocation notice:", gpsErr);
+      throw new Error(gpsErr.code === 1 ? 'PERMISSION_DENIED' : 'GPS_UNAVAILABLE');
     }
   }
 
-  // 2. Automatic Real IP Location Fallback (Backend detects client's actual city/coordinates)
+  // 2. Check farmer's saved farm district first (defaults to Kolhapur agro-hub, NOT false Pune)
+  const targetDistrict = getSavedFarmDistrict();
   try {
     const res = await api.get('/weather/current', {
-      params: { lang: weatherLang },
+      params: { city: targetDistrict, lang: weatherLang },
     });
 
     const weatherData = {
-      location: res.data.location || 'Local Farm',
+      location: res.data.location || targetDistrict,
       temperature_c: Number(res.data.temperature_c ?? 26.5),
-      humidity_pct: Number(res.data.humidity_pct ?? 65.0),
+      humidity_pct: Number(res.data.humidity_pct ?? 55.0),
       rainfall_mm: Number(res.data.rainfall_mm ?? 0.0),
       condition: res.data.condition || 'Clear sky',
-      wind_speed_kmh: Number(res.data.wind_speed_kmh ?? 12.0),
-      latitude: Number(res.data.latitude ?? 16.69),
-      longitude: Number(res.data.longitude ?? 74.24),
+      wind_speed_kmh: Number(res.data.wind_speed_kmh ?? 8.0),
+      latitude: Number(res.data.latitude ?? 16.705),
+      longitude: Number(res.data.longitude ?? 74.243),
       isGpsDetected: false,
-      detectionMethod: res.data.detection_method || 'auto_ip',
+      detectionMethod: res.data.detection_method || 'district_select',
+      spraying_advisory: res.data.spraying_advisory || null,
       liveApi: res.data.live_api ?? true,
       detectedAt: new Date().toISOString(),
     };
@@ -128,25 +149,45 @@ export const detectLocalWeather = async (lang = 'en', forceRefresh = false) => {
  */
 export const fetchCityWeather = async (cityName, lang = 'en') => {
   const weatherLang = lang === 'mr' ? 'mr' : 'en';
+  const cleanName = cityName.trim();
   const res = await api.get('/weather/current', {
-    params: { city: cityName.trim(), lang: weatherLang },
+    params: { city: cleanName, lang: weatherLang },
   });
 
   const data = {
-    location: res.data.location || cityName,
+    location: res.data.location || cleanName,
     temperature_c: Number(res.data.temperature_c ?? 26.5),
-    humidity_pct: Number(res.data.humidity_pct ?? 65.0),
+    humidity_pct: Number(res.data.humidity_pct ?? 55.0),
     rainfall_mm: Number(res.data.rainfall_mm ?? 0.0),
     condition: res.data.condition || 'Clear sky',
-    wind_speed_kmh: Number(res.data.wind_speed_kmh ?? 12.0),
-    latitude: Number(res.data.latitude ?? 16.69),
-    longitude: Number(res.data.longitude ?? 74.24),
-    isGpsDetected: false,
-    detectionMethod: 'city_query',
+    wind_speed_kmh: Number(res.data.wind_speed_kmh ?? 8.0),
+    latitude: Number(res.data.latitude ?? 16.705),
+    longitude: Number(res.data.longitude ?? 74.243),
+    isGpsDetected: res.data.is_gps ?? false,
+    detectionMethod: res.data.detection_method || 'city_query',
+    spraying_advisory: res.data.spraying_advisory || null,
     liveApi: res.data.live_api ?? true,
     detectedAt: new Date().toISOString(),
   };
 
+  setSavedFarmDistrict(cleanName);
   setCachedWeather(data);
   return data;
+};
+
+/**
+ * Fetch 5-day daily agricultural forecast including foliar spraying advisory
+ */
+export const fetchWeatherForecast = async (cityName = null, lat = null, lon = null, lang = 'en') => {
+  const weatherLang = lang === 'mr' ? 'mr' : 'en';
+  const params = { lang: weatherLang };
+  if (lat && lon) {
+    params.lat = lat;
+    params.lon = lon;
+  } else {
+    params.city = (cityName || getSavedFarmDistrict()).trim();
+  }
+
+  const res = await api.get('/weather/forecast', { params });
+  return res.data;
 };

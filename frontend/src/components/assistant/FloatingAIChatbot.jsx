@@ -62,8 +62,8 @@ export const FloatingAIChatbot = () => {
   useEffect(() => {
     if (messages.length === 0) {
       const welcomeMsg = lang === 'mr'
-        ? `🌱 **नमस्कार शेतकरी बंधूंनो!** मी तुमचा **ॲग्रोस्कॅन AI कृषी सल्लागार** आहे.\n\nतुम्ही मला पिकांचे रोग, सेंद्रिय औषधोपचार, खत व्यवस्थापन, किंवा फवारणीच्या प्रमाणाबद्दल काहीही विचारू शकता. खालीलपैकी एका प्रश्नावर क्लिक करा किंवा खाली थेट टाईप करा:`
-        : `🌱 **Hello Farmer!** I am your **AgroScan AI Agronomist**.\n\nAsk me anything about plant disease diagnosis, organic remedies, chemical dosages, irrigation schedules, or crop nutrition. Tap a quick question below or type your inquiry:`;
+        ? `**नमस्कार शेतकरी बंधूंनो!** मी तुमचा **ॲग्रोस्कॅन AI कृषी सल्लागार** आहे.\n\nतुम्ही मला पिकांचे रोग, सेंद्रिय औषधोपचार, खत व्यवस्थापन, किंवा फवारणीच्या प्रमाणाबद्दल काहीही विचारू शकता. खालीलपैकी एका प्रश्नावर क्लिक करा किंवा खाली थेट टाईप करा:`
+        : `**Hello Farmer!** I am your **AgroScan AI Agronomist**.\n\nAsk me anything about plant disease diagnosis, organic remedies, chemical dosages, irrigation schedules, or crop nutrition. Tap a quick question below or type your inquiry:`;
 
       setMessages([{
         sender: 'assistant',
@@ -184,8 +184,8 @@ export const FloatingAIChatbot = () => {
   // Reset conversation
   const handleResetChat = () => {
     const welcomeMsg = lang === 'mr'
-      ? `🌱 **नमस्कार!** नवा सल्ला सत्र सुरू झाले आहे. पिकांच्या कोणत्याही समस्येबाबत विचारा:`
-      : `🌱 **Hello!** New consultation session started. Ask any question about crop health:`;
+      ? `**नमस्कार!** नवा सल्ला सत्र सुरू झाले आहे. पिकांच्या कोणत्याही समस्येबाबत विचारा:`
+      : `**Hello!** New consultation session started. Ask any question about crop health:`;
 
     setMessages([{
       sender: 'assistant',

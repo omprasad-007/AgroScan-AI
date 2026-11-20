@@ -1,25 +1,79 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { CloudSun, HelpCircle, MapPin, Navigation, Search, CheckCircle2, ShieldCheck, Thermometer, Droplets, CloudRain } from 'lucide-react';
+import { 
+  CloudSun, HelpCircle, MapPin, Navigation, Search, CheckCircle2, 
+  ShieldCheck, Thermometer, Droplets, CloudRain, Wind, AlertTriangle, 
+  Calendar, Info, RefreshCw, Compass
+} from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { WeatherRiskBadge } from '../components/common/Badge';
-import { detectLocalWeather, fetchCityWeather } from '../services/weather';
+import { 
+  detectLocalWeather, 
+  fetchCityWeather, 
+  fetchWeatherForecast,
+  getSavedFarmDistrict,
+  setSavedFarmDistrict
+} from '../services/weather';
 import api from '../services/api';
+
+const MAHARASHTRA_DISTRICTS = [
+  { id: 'Kolhapur', name_en: 'Kolhapur', name_mr: 'कोल्हापूर' },
+  { id: 'Pune', name_en: 'Pune', name_mr: 'पुणे' },
+  { id: 'Sangli', name_en: 'Sangli', name_mr: 'सांगली' },
+  { id: 'Satara', name_en: 'Satara', name_mr: 'सातारा' },
+  { id: 'Solapur', name_en: 'Solapur', name_mr: 'सोलापूर' },
+  { id: 'Nashik', name_en: 'Nashik', name_mr: 'नाशिक' },
+  { id: 'Ahmednagar', name_en: 'Ahmednagar / Ahilyanagar', name_mr: 'अहमदनगर / अहिल्यानगर' },
+  { id: 'Jalgaon', name_en: 'Jalgaon', name_mr: 'जळगाव' },
+  { id: 'Chhatrapati Sambhajinagar', name_en: 'Chhatrapati Sambhajinagar', name_mr: 'छत्रपती संभाजीनगर' },
+  { id: 'Nagpur', name_en: 'Nagpur', name_mr: 'नागपूर' },
+  { id: 'Amravati', name_en: 'Amravati', name_mr: 'अमरावती' },
+  { id: 'Nanded', name_en: 'Nanded', name_mr: 'नांदेड' },
+  { id: 'Latur', name_en: 'Latur', name_mr: 'लातूर' },
+  { id: 'Dhule', name_en: 'Dhule', name_mr: 'धुळे' },
+  { id: 'Ratnagiri', name_en: 'Ratnagiri', name_mr: 'रत्नागिरी' },
+  { id: 'Sindhudurg', name_en: 'Sindhudurg', name_mr: 'सिंधुदुर्ग' },
+  { id: 'Baramati', name_en: 'Baramati (Pune Hub)', name_mr: 'बारामती (पुणे)' },
+  { id: 'Kagal', name_en: 'Kagal (Kolhapur Hub)', name_mr: 'कागल (कोल्हापूर)' },
+  { id: 'Karad', name_en: 'Karad (Satara Hub)', name_mr: 'कराड (सातारा)' },
+  { id: 'Pandharpur', name_en: 'Pandharpur (Solapur Hub)', name_mr: 'पंढरपूर (सोलापूर)' },
+  { id: 'Beed', name_en: 'Beed', name_mr: 'बीड' },
+  { id: 'Parbhani', name_en: 'Parbhani', name_mr: 'परभणी' },
+  { id: 'Jalna', name_en: 'Jalna', name_mr: 'जालना' },
+  { id: 'Dharashiv', name_en: 'Dharashiv / Osmanabad', name_mr: 'धाराशिव / उस्मानाबाद' },
+  { id: 'Buldhana', name_en: 'Buldhana', name_mr: 'बुलढाणा' },
+  { id: 'Akola', name_en: 'Akola', name_mr: 'अकोला' },
+  { id: 'Yavatmal', name_en: 'Yavatmal', name_mr: 'यवतमाळ' },
+  { id: 'Washim', name_en: 'Washim', name_mr: 'वाशीम' },
+  { id: 'Wardha', name_en: 'Wardha', name_mr: 'वर्धा' },
+  { id: 'Chandrapur', name_en: 'Chandrapur', name_mr: 'चंद्रपूर' },
+  { id: 'Gadchiroli', name_en: 'Gadchiroli', name_mr: 'गडचिरोली' },
+  { id: 'Gondia', name_en: 'Gondia', name_mr: 'गोंदिया' },
+  { id: 'Bhandara', name_en: 'Bhandara', name_mr: 'भंडारा' },
+  { id: 'Thane', name_en: 'Thane', name_mr: 'ठाणे' },
+  { id: 'Palghar', name_en: 'Palghar', name_mr: 'पालघर' },
+  { id: 'Raigad', name_en: 'Raigad', name_mr: 'रायगड' },
+];
 
 export const WeatherRiskPage = () => {
   const { t, translateCrop, lang } = useLanguage();
-  const [temp, setTemp] = useState(24.5);
-  const [humidity, setHumidity] = useState(82.0);
-  const [rainfall, setRainfall] = useState(5.0);
+  const [temp, setTemp] = useState(25.5);
+  const [humidity, setHumidity] = useState(45.0);
+  const [rainfall, setRainfall] = useState(0.0);
+  const [windSpeed, setWindSpeed] = useState(6.0);
   const [crop, setCrop] = useState('Tomato');
   const [riskResult, setRiskResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [weatherMeta, setWeatherMeta] = useState(null);
+  const [forecastList, setForecastList] = useState([]);
   const [detectingGps, setDetectingGps] = useState(false);
+  const [gpsErrorMsg, setGpsErrorMsg] = useState('');
   const [cityInput, setCityInput] = useState('');
+  const [selectedDistrict, setSelectedDistrict] = useState(() => getSavedFarmDistrict());
 
   const availableCrops = [
     'Tomato', 'Potato', 'Rice', 'Wheat', 'Cotton',
-    'Soybean', 'Maize', 'Chilli', 'Onion', 'Sugarcane'
+    'Soybean', 'Maize', 'Chilli', 'Onion', 'Sugarcane',
+    'Grapes', 'Pomegranate', 'Banana', 'Mango'
   ];
 
   const evaluateRisk = useCallback(async (tVal, hVal, rVal, cVal) => {
@@ -39,47 +93,75 @@ export const WeatherRiskPage = () => {
     }
   }, []);
 
-  const handleDetectLocation = useCallback(async (force = false) => {
+  const loadWeatherForLocation = useCallback(async (locationQuery = null, lat = null, lon = null) => {
     setDetectingGps(true);
+    setGpsErrorMsg('');
     try {
-      const live = await detectLocalWeather(lang, force);
+      let live = null;
+      if (lat && lon) {
+        live = await detectLocalWeather(lang, true, true);
+      } else {
+        const target = locationQuery || selectedDistrict || 'Kolhapur';
+        live = await fetchCityWeather(target, lang);
+      }
+
       if (live) {
         setWeatherMeta(live);
         setTemp(live.temperature_c);
         setHumidity(live.humidity_pct);
         setRainfall(live.rainfall_mm);
+        setWindSpeed(live.wind_speed_kmh || 6.0);
         evaluateRisk(live.temperature_c, live.humidity_pct, live.rainfall_mm, crop);
       }
+
+      // Load 5-day forecast
+      const fcData = await fetchWeatherForecast(locationQuery || selectedDistrict, lat, lon, lang);
+      if (fcData && fcData.forecast) {
+        setForecastList(fcData.forecast);
+      }
     } catch (err) {
-      console.warn('Weather detection notice:', err);
+      console.warn('Weather detection error:', err);
+      if (err.message === 'PERMISSION_DENIED') {
+        setGpsErrorMsg(
+          lang === 'mr'
+            ? 'मोबाईल/ब्राउझरमध्ये GPS परवानगी बंद आहे. कृपया खाली दिलेल्या ड्रॉपडाउनमधून तुमचा जिल्हा निवडा.'
+            : 'GPS permission denied or unavailable on this device. Please select your farm district below.'
+        );
+      } else {
+        setGpsErrorMsg(
+          lang === 'mr'
+            ? 'हवामान तपासताना अडचण आली. कृपया जिल्हा निवडा किंवा गावाचे नाव शोधा.'
+            : 'Unable to reach GPS. Please select your farm district from the list below.'
+        );
+      }
     } finally {
       setDetectingGps(false);
     }
-  }, [crop, evaluateRisk, lang]);
+  }, [crop, evaluateRisk, lang, selectedDistrict]);
 
   useEffect(() => {
-    handleDetectLocation(false);
-  }, [handleDetectLocation]);
+    loadWeatherForLocation(selectedDistrict);
+  }, []); // Initial load on mount
+
+  const handleDistrictChange = (e) => {
+    const newDistrict = e.target.value;
+    setSelectedDistrict(newDistrict);
+    setSavedFarmDistrict(newDistrict);
+    loadWeatherForLocation(newDistrict);
+  };
 
   const handleCitySearch = async (e) => {
     e.preventDefault();
     if (!cityInput.trim()) return;
-    setDetectingGps(true);
-    try {
-      const res = await fetchCityWeather(cityInput.trim(), lang);
-      if (res) {
-        setWeatherMeta(res);
-        setTemp(res.temperature_c);
-        setHumidity(res.humidity_pct);
-        setRainfall(res.rainfall_mm);
-        evaluateRisk(res.temperature_c, res.humidity_pct, res.rainfall_mm, crop);
-        setCityInput('');
-      }
-    } catch (err) {
-      console.warn('City weather search failed:', err);
-    } finally {
-      setDetectingGps(false);
-    }
+    const query = cityInput.trim();
+    setSelectedDistrict(query);
+    setSavedFarmDistrict(query);
+    await loadWeatherForLocation(query);
+    setCityInput('');
+  };
+
+  const handleTriggerGps = () => {
+    loadWeatherForLocation(null, 1, 1);
   };
 
   const handleEvaluate = (e) => {
@@ -88,130 +170,309 @@ export const WeatherRiskPage = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="max-w-5xl mx-auto space-y-6 pb-28">
       
       {/* Header */}
-      <div>
-        <div className="flex items-center space-x-2">
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-agro-cream tracking-tight">
-            {t('weather.title') || 'Weather Outbreak Risk Simulator'}
-          </h1>
-          <span className="px-2.5 py-0.5 rounded-full bg-agro-primary/10 border border-agro-primary/30 text-[10px] font-bold text-agro-primary uppercase tracking-wide">
-            {t('weather.decision_engine') || 'Scientific Decision Engine'}
-          </span>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <div className="flex items-center space-x-2">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+              {t('weather.title') || 'Weather Outbreak Risk Simulator'}
+            </h1>
+            <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide">
+              {lang === 'mr' ? 'थेट कृषी हवामान' : 'Live Microclimate'}
+            </span>
+          </div>
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 max-w-2xl">
+            {t('weather.subtitle') || 'Evaluate ambient weather parameters against crop-specific pathogen germination thresholds to forecast outbreak probability and explain WHY.'}
+          </p>
         </div>
-        <p className="text-xs sm:text-sm text-agro-muted mt-1">
-          {t('weather.subtitle') || 'Evaluate ambient weather parameters against crop-specific pathogen germination thresholds to forecast outbreak probability and explain WHY.'}
-        </p>
+
+        {/* GPS Trigger Button */}
+        <button
+          type="button"
+          onClick={handleTriggerGps}
+          disabled={detectingGps}
+          className="inline-flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition shadow-md shadow-emerald-600/20 active:scale-95 disabled:opacity-50 shrink-0 self-start sm:self-auto"
+          title="Detect exact coordinates via device GPS"
+        >
+          <Navigation className={`w-4 h-4 ${detectingGps ? 'animate-spin' : ''}`} />
+          <span>{detectingGps ? (lang === 'mr' ? 'GPS शोधत आहे...' : 'Locating GPS...') : (lang === 'mr' ? 'शेताचे थेट GPS घ्या' : 'Detect Farm GPS')}</span>
+        </button>
       </div>
 
-      {/* Live Farm Weather & GPS Microclimate Detector Card */}
-      <div className="agro-panel p-5 rounded-2xl space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl bg-agro-primary/10 border border-agro-primary/25 flex items-center justify-center text-agro-primary shrink-0">
+      {/* GPS Error Notification banner if GPS denied */}
+      {gpsErrorMsg && (
+        <div className="p-4 rounded-2xl bg-amber-500/15 border border-amber-500/30 text-amber-800 dark:text-amber-300 text-xs flex items-center gap-3 animate-fade-in">
+          <AlertTriangle className="w-5 h-5 shrink-0 text-amber-500" />
+          <div className="flex-1">
+            <p className="font-bold">{lang === 'mr' ? 'GPS माहिती' : 'Farm Location Notice'}</p>
+            <p className="text-[11px] mt-0.5 leading-relaxed">{gpsErrorMsg}</p>
+          </div>
+        </div>
+      )}
+
+      {/* 1. Primary Live Farm Location & Microclimate Selector Card */}
+      <div className="agro-panel p-5 sm:p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl space-y-5">
+        
+        {/* Farm District Selector & Village Search Bar */}
+        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
+          
+          {/* District Dropdown Selector */}
+          <div className="flex items-center gap-2.5 flex-1">
+            <div className="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/25 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0">
               <MapPin className="w-5 h-5" />
             </div>
-            <div>
-              <div className="flex items-center space-x-2">
-                <span className="text-sm font-extrabold text-agro-cream">
-                  {weatherMeta?.location ? weatherMeta.location : 'Detecting Farm Location...'}
-                </span>
-                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                  weatherMeta?.isGpsDetected
-                    ? 'bg-agro-primary/15 text-agro-primary border border-agro-primary/30'
-                    : 'bg-agro-lime/15 text-agro-lime border border-agro-lime/30'
-                }`}>
-                  <span className="w-1.5 h-1.5 rounded-full bg-agro-primary animate-ping mr-1.5" />
-                  {weatherMeta?.isGpsDetected
-                    ? 'Device GPS Microclimate'
-                    : (weatherMeta?.detectionMethod === 'auto_ip' ? 'Live Auto Location' : 'District Microclimate')}
-                </span>
-              </div>
-              <p className="text-xs text-agro-muted mt-0.5">
-                {weatherMeta?.condition || 'Clear sky'} • {temp}°C • {humidity}% Humidity • {rainfall}mm Rain
-              </p>
+            <div className="flex-1">
+              <label htmlFor="farm-district" className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">
+                {lang === 'mr' ? 'तुमचा शेती जिल्हा निवडा:' : 'Select Your Farm District:'}
+              </label>
+              <select
+                id="farm-district"
+                value={selectedDistrict}
+                onChange={handleDistrictChange}
+                className="w-full px-3.5 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-900 dark:text-slate-100 focus-visible:ring-2 focus-visible:ring-emerald-500 cursor-pointer shadow-sm"
+              >
+                {MAHARASHTRA_DISTRICTS.map((d) => (
+                  <option key={d.id} value={d.id}>
+                    {lang === 'mr' ? `${d.name_mr} (${d.name_en})` : `${d.name_en} (${d.name_mr})`}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
 
-          <div className="flex items-center space-x-2 shrink-0">
+          {/* Quick Village / Taluka Search */}
+          <form onSubmit={handleCitySearch} className="flex items-center gap-2 flex-1">
+            <div className="relative flex-1">
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input
+                type="text"
+                value={cityInput}
+                onChange={(e) => setCityInput(e.target.value)}
+                placeholder={lang === 'mr' ? 'गाव, तालुका किंवा पिनकोड शोधा...' : 'Search any village, taluka or PIN...'}
+                className="w-full pl-9 pr-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition shadow-sm"
+              />
+            </div>
             <button
-              type="button"
-              onClick={() => handleDetectLocation(true)}
-              disabled={detectingGps}
-              className="inline-flex items-center space-x-1.5 px-3 py-2 rounded-xl bg-agro-surface hover:bg-agro-hover text-agro-primary border border-agro-primary/30 text-xs font-semibold transition disabled:opacity-50"
+              type="submit"
+              disabled={detectingGps || !cityInput.trim()}
+              className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition shadow-sm disabled:opacity-40"
             >
-              <Navigation className={`w-3.5 h-3.5 ${detectingGps ? 'animate-spin' : ''}`} />
-              <span>{detectingGps ? 'Detecting GPS...' : 'Detect Farm GPS'}</span>
+              {lang === 'mr' ? 'शोधा' : 'Search'}
             </button>
+          </form>
+
+        </div>
+
+        {/* Current Weather Snapshot Banner */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+              <Thermometer className="w-5 h-5" />
+            </div>
+            <div>
+              <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 block uppercase">
+                {lang === 'mr' ? 'तापमान' : 'Temperature'}
+              </span>
+              <span className="text-lg font-black text-slate-900 dark:text-white">
+                {temp}°C
+              </span>
+            </div>
+          </div>
+
+          <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+              <Droplets className="w-5 h-5" />
+            </div>
+            <div>
+              <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 block uppercase">
+                {lang === 'mr' ? 'सापेक्ष आर्द्रता' : 'Humidity'}
+              </span>
+              <span className="text-lg font-black text-slate-900 dark:text-white">
+                {humidity}%
+              </span>
+            </div>
+          </div>
+
+          <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 flex items-center justify-center shrink-0">
+              <CloudRain className="w-5 h-5" />
+            </div>
+            <div>
+              <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 block uppercase">
+                {lang === 'mr' ? 'पाऊस' : '24h Rainfall'}
+              </span>
+              <span className="text-lg font-black text-slate-900 dark:text-white">
+                {rainfall} mm
+              </span>
+            </div>
+          </div>
+
+          <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-teal-500/10 text-teal-600 dark:text-teal-400 flex items-center justify-center shrink-0">
+              <Wind className="w-5 h-5" />
+            </div>
+            <div>
+              <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 block uppercase">
+                {lang === 'mr' ? 'वाऱ्याचा वेग' : 'Wind Speed'}
+              </span>
+              <span className="text-lg font-black text-slate-900 dark:text-white">
+                {windSpeed} km/h
+              </span>
+            </div>
           </div>
         </div>
 
-        {/* Quick Search Alternative City or Village */}
-        <form onSubmit={handleCitySearch} className="flex items-center gap-2 pt-2 border-t border-agro-border/70">
-          <div className="relative flex-1">
-            <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-agro-muted" />
-            <input
-              type="text"
-              value={cityInput}
-              onChange={(e) => setCityInput(e.target.value)}
-              placeholder="Search other district or village (e.g. Kolhapur, Solapur, Nashik)..."
-              className="w-full pl-8 pr-3 py-1.5 rounded-xl bg-white dark:bg-slate-900/70 border border-slate-200 dark:border-white/10 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-agro-primary focus:ring-1 focus:ring-agro-primary transition"
-            />
+        {/* Active Location & Spray Advisory Ribbon */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-2xl bg-emerald-50/80 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/60">
+          <div className="flex items-center gap-2.5">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping" />
+            <span className="text-xs font-bold text-emerald-900 dark:text-emerald-200">
+              {lang === 'mr' ? 'सक्रिय शेती हवामान:' : 'Active Farm Weather:'} <strong>{weatherMeta?.location || selectedDistrict}</strong> ({weatherMeta?.condition || 'Clear sky'})
+            </span>
           </div>
-          <button
-            type="submit"
-            disabled={detectingGps || !cityInput.trim()}
-            className="px-3 py-1.5 rounded-xl bg-agro-surface hover:bg-agro-hover text-agro-cream text-xs font-semibold border border-agro-border transition disabled:opacity-40"
-          >
-            Search
-          </button>
-        </form>
 
-        {/* Quick Popular Agricultural Districts */}
-        <div className="flex items-center gap-1.5 flex-wrap pt-1 text-[11px] text-agro-muted">
-          <span className="font-medium">Quick Districts:</span>
-          {['Kolhapur', 'Pune', 'Nashik', 'Sangli', 'Solapur', 'Nagpur', 'Satara', 'Amravati'].map((cName) => (
+          {/* Spraying Advisory Tag */}
+          {weatherMeta?.spraying_advisory && (
+            <div className="flex items-center gap-2">
+              <span className={`px-3 py-1 rounded-full text-xs font-extrabold flex items-center gap-1.5 shadow-sm ${
+                weatherMeta.spraying_advisory.status === 'SAFE'
+                  ? 'bg-emerald-600 text-white'
+                  : weatherMeta.spraying_advisory.status === 'CAUTION'
+                  ? 'bg-amber-500 text-white'
+                  : 'bg-rose-600 text-white'
+              }`}>
+                <ShieldCheck className="w-3.5 h-3.5" />
+                <span>{weatherMeta.spraying_advisory.headline}</span>
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* Spraying Advisory Detail Explanation */}
+        {weatherMeta?.spraying_advisory && (
+          <p className="text-xs text-slate-600 dark:text-slate-300 px-1 leading-relaxed">
+            🌿 <strong>{lang === 'mr' ? 'फवारणी सल्ला:' : 'Spraying Advisory:'}</strong> {weatherMeta.spraying_advisory.reason}
+          </p>
+        )}
+
+        {/* 1-Tap Popular Maharashtra Agricultural Districts */}
+        <div className="flex items-center gap-1.5 flex-wrap pt-2 border-t border-slate-100 dark:border-slate-800 text-[11px] text-slate-500">
+          <span className="font-bold text-slate-700 dark:text-slate-300">
+            {lang === 'mr' ? 'जलद जिल्हे:' : 'Quick Districts:'}
+          </span>
+          {['Kolhapur', 'Pune', 'Sangli', 'Satara', 'Solapur', 'Nashik', 'Ahmednagar', 'Jalgaon', 'Nagpur', 'Amravati'].map((cName) => (
             <button
               key={cName}
               type="button"
               onClick={() => {
-                setCityInput(cName);
-                fetchCityWeather(cName, lang).then(res => {
-                  if (res) {
-                    setWeatherMeta(res);
-                    setTemp(res.temperature_c);
-                    setHumidity(res.humidity_pct);
-                    setRainfall(res.rainfall_mm);
-                    evaluateRisk(res.temperature_c, res.humidity_pct, res.rainfall_mm, crop);
-                  }
-                });
+                setSelectedDistrict(cName);
+                setSavedFarmDistrict(cName);
+                loadWeatherForLocation(cName);
               }}
-              className="px-2 py-0.5 rounded-lg bg-agro-surface hover:bg-agro-hover border border-agro-border text-agro-cream hover:text-agro-primary transition-colors text-[10px] font-semibold"
+              className={`px-2.5 py-1 rounded-lg border transition-all text-[11px] font-semibold cursor-pointer ${
+                selectedDistrict.toLowerCase() === cName.toLowerCase()
+                  ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
+                  : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300'
+              }`}
             >
               {cName}
             </button>
           ))}
         </div>
+
       </div>
 
+      {/* 2. 5-Day Agricultural Weather & Foliar Spray Forecast */}
+      {forecastList.length > 0 && (
+        <section className="agro-panel p-5 sm:p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <Calendar className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+              <span>{lang === 'mr' ? '५ दिवसांचा शेती हवामान व फवारणी अंदाज' : '5-Day Agricultural Weather & Spray Forecast'}</span>
+            </h3>
+            <span className="text-[11px] text-slate-400 font-medium">
+              {weatherMeta?.location || selectedDistrict}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-5 gap-3">
+            {forecastList.map((dayItem, idx) => (
+              <div 
+                key={idx}
+                className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 space-y-2 text-center"
+              >
+                <div className="border-b border-slate-200/60 dark:border-slate-700 pb-1.5">
+                  <span className="block text-xs font-black text-slate-900 dark:text-white">
+                    {dayItem.day_name}
+                  </span>
+                  <span className="text-[10px] text-slate-500 font-semibold">
+                    {dayItem.date_display}
+                  </span>
+                </div>
+
+                <div className="py-1">
+                  <span className="block text-base font-extrabold text-slate-900 dark:text-white font-mono">
+                    {dayItem.temp_max}° / <span className="text-slate-400 text-xs font-normal">{dayItem.temp_min}°C</span>
+                  </span>
+                  <span className="text-[11px] text-slate-600 dark:text-slate-300 font-medium block truncate mt-0.5">
+                    {dayItem.condition}
+                  </span>
+                </div>
+
+                <div className="text-[10px] text-slate-500 dark:text-slate-400 space-y-0.5 font-medium border-t border-slate-200/60 dark:border-slate-700 pt-1.5">
+                  <div className="flex justify-between">
+                    <span>{lang === 'mr' ? 'आर्द्रता:' : 'Humidity:'}</span>
+                    <strong className="text-slate-800 dark:text-slate-200">{dayItem.humidity_pct}%</strong>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>{lang === 'mr' ? 'पाऊस:' : 'Rain %:'}</span>
+                    <strong className="text-slate-800 dark:text-slate-200">{dayItem.rain_probability_pct}%</strong>
+                  </div>
+                </div>
+
+                {/* Day Spray Badge */}
+                {dayItem.spraying_advisory && (
+                  <div className={`mt-2 py-1 px-2 rounded-lg text-[10px] font-extrabold truncate ${
+                    dayItem.spraying_advisory.status === 'SAFE'
+                      ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
+                      : dayItem.spraying_advisory.status === 'CAUTION'
+                      ? 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300'
+                      : 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300'
+                  }`}>
+                    {dayItem.spraying_advisory.headline.split('—')[0]}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* 3. Crop Pathogen Outbreak Risk Simulator */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
         {/* Input Controls */}
-        <form onSubmit={handleEvaluate} className="agro-panel p-6 rounded-2xl space-y-4">
-          <h3 className="text-sm font-bold text-agro-cream flex items-center space-x-2">
-            <CloudSun className="w-4 h-4 text-agro-primary" />
-            <span>{t('weather.card_params') || 'Weather & Crop Parameters'}</span>
-          </h3>
+        <form onSubmit={handleEvaluate} className="agro-panel p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl space-y-5">
+          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center space-x-2">
+              <CloudSun className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+              <span>{t('weather.card_params') || 'Weather & Crop Parameters'}</span>
+            </h3>
+            <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-bold">
+              {lang === 'mr' ? 'थेट हवामानाशी समक्रमित' : 'Synced with Live Weather'}
+            </span>
+          </div>
 
           <div>
-            <label className="block text-xs font-medium text-agro-muted mb-1.5">
+            <label className="block text-xs font-bold text-slate-700 dark:text-slate-200 mb-1.5">
               {t('weather.target_crop') || 'Target Crop'}
             </label>
             <select
               value={crop}
               onChange={(e) => setCrop(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-slate-900/70 border border-slate-200 dark:border-white/10 text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:border-agro-primary focus:ring-1 focus:ring-agro-primary font-semibold transition cursor-pointer"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 font-bold transition cursor-pointer shadow-sm"
             >
               {availableCrops.map((c) => (
                 <option key={c} value={c}>{translateCrop(c)}</option>
@@ -220,12 +481,12 @@ export const WeatherRiskPage = () => {
           </div>
 
           <div>
-            <label className="text-xs font-medium text-agro-muted mb-1.5 flex justify-between">
+            <label className="text-xs font-bold text-slate-700 dark:text-slate-200 mb-1.5 flex justify-between">
               <span className="flex items-center space-x-1.5">
-                <Thermometer className="w-3.5 h-3.5 text-agro-primary" />
+                <Thermometer className="w-3.5 h-3.5 text-emerald-600" />
                 <span>{t('weather.temp') || 'Ambient Temperature (°C)'}</span>
               </span>
-              <strong className="text-agro-primary font-mono">{temp}°C</strong>
+              <strong className="text-emerald-600 dark:text-emerald-400 font-mono text-sm">{temp}°C</strong>
             </label>
             <input
               type="range"
@@ -234,52 +495,52 @@ export const WeatherRiskPage = () => {
               step="0.5"
               value={temp}
               onChange={(e) => setTemp(e.target.value)}
-              className="w-full accent-agro-primary cursor-pointer"
+              className="w-full accent-emerald-500 cursor-pointer"
             />
           </div>
 
           <div>
-            <label className="text-xs font-medium text-agro-muted mb-1.5 flex justify-between">
+            <label className="text-xs font-bold text-slate-700 dark:text-slate-200 mb-1.5 flex justify-between">
               <span className="flex items-center space-x-1.5">
-                <Droplets className="w-3.5 h-3.5 text-agro-lime" />
+                <Droplets className="w-3.5 h-3.5 text-blue-500" />
                 <span>{t('weather.humidity') || 'Relative Humidity (%)'}</span>
               </span>
-              <strong className="text-agro-lime font-mono">{humidity}%</strong>
+              <strong className="text-blue-600 dark:text-blue-400 font-mono text-sm">{humidity}%</strong>
             </label>
             <input
               type="range"
-              min="20"
+              min="15"
               max="100"
               step="1"
               value={humidity}
               onChange={(e) => setHumidity(e.target.value)}
-              className="w-full accent-agro-primary cursor-pointer"
+              className="w-full accent-emerald-500 cursor-pointer"
             />
           </div>
 
           <div>
-            <label className="text-xs font-medium text-agro-muted mb-1.5 flex justify-between">
+            <label className="text-xs font-bold text-slate-700 dark:text-slate-200 mb-1.5 flex justify-between">
               <span className="flex items-center space-x-1.5">
-                <CloudRain className="w-3.5 h-3.5 text-agro-amber" />
+                <CloudRain className="w-3.5 h-3.5 text-cyan-500" />
                 <span>{t('weather.rainfall') || '24h Rainfall (mm)'}</span>
               </span>
-              <strong className="text-agro-amber font-mono">{rainfall} mm</strong>
+              <strong className="text-cyan-600 dark:text-cyan-400 font-mono text-sm">{rainfall} mm</strong>
             </label>
             <input
               type="range"
               min="0"
               max="50"
-              step="1"
+              step="0.5"
               value={rainfall}
               onChange={(e) => setRainfall(e.target.value)}
-              className="w-full accent-agro-primary cursor-pointer"
+              className="w-full accent-emerald-500 cursor-pointer"
             />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 rounded-xl bg-agro-primary hover:bg-agro-primaryHover text-white font-extrabold text-xs transition shadow-lg shadow-agro-primary/20 flex items-center justify-center space-x-2"
+            className="w-full py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs transition shadow-lg shadow-emerald-600/25 flex items-center justify-center space-x-2 active:scale-95"
           >
             <ShieldCheck className="w-4 h-4" />
             <span>{loading ? (t('weather.simulating') || 'Evaluating Model...') : (t('weather.simulate_btn') || 'Calculate Outbreak Risk')}</span>
@@ -287,54 +548,54 @@ export const WeatherRiskPage = () => {
         </form>
 
         {/* Risk Output & Scientific "Explain WHY" Display */}
-        <div className="agro-panel p-6 rounded-2xl flex flex-col justify-between space-y-4">
+        <div className="agro-panel p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl flex flex-col justify-between space-y-4">
           {riskResult ? (
             <div className="space-y-4">
-              <div className="flex items-center justify-between border-b border-agro-border pb-3">
+              <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
                 <div>
-                  <span className="text-xs text-agro-muted block">{t('weather.outbreak_risk') || 'Outbreak Risk Index'}</span>
-                  <span className="text-[11px] text-agro-cream font-mono font-medium">Target: {riskResult.pathogen}</span>
+                  <span className="text-xs font-bold text-slate-500 dark:text-slate-400 block">{t('weather.outbreak_risk') || 'Outbreak Risk Index'}</span>
+                  <span className="text-xs text-slate-900 dark:text-white font-bold">Target Pathogen: <strong>{riskResult.pathogen}</strong></span>
                 </div>
                 <WeatherRiskBadge level={riskResult.risk_level} />
               </div>
 
-              <div className="text-center py-3 bg-agro-surface rounded-xl border border-agro-border">
-                <span className="text-4xl font-extrabold text-agro-cream font-mono">{riskResult.risk_score}</span>
-                <span className="text-xs text-agro-muted block mt-0.5">
-                  {lang === 'mr' ? '१०० पैकी जोखीम गुण' : 'out of 100 Risk Score'}
+              <div className="text-center py-4 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200/80 dark:border-slate-700/60">
+                <span className="text-5xl font-black text-slate-900 dark:text-white font-mono">{riskResult.risk_score}</span>
+                <span className="text-xs text-slate-500 block mt-1 font-semibold">
+                  {lang === 'mr' ? '१०० पैकी जोखीम गुण (Risk Score)' : 'out of 100 Pathogen Infection Potential'}
                 </span>
               </div>
 
               {/* Scientific "Explain WHY" Breakdown */}
-              <div className="bg-agro-surface p-4 rounded-xl border border-agro-border space-y-2">
-                <div className="flex items-center space-x-1.5 text-xs font-bold text-agro-primary border-b border-agro-border pb-2">
+              <div className="bg-slate-50 dark:bg-slate-800/60 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-700/60 space-y-2">
+                <div className="flex items-center space-x-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 border-b border-slate-200 dark:border-slate-700 pb-2">
                   <HelpCircle className="w-4 h-4" />
                   <span>{t('weather.why_this_risk') || 'Scientific Breakdown — Explain WHY'}</span>
                 </div>
-                <ul className="space-y-2 text-xs text-agro-cream/90 pt-1">
+                <ul className="space-y-2 text-xs text-slate-700 dark:text-slate-200 pt-1">
                   {(riskResult.contributing_factors || []).map((f, i) => (
                     <li key={i} className="flex items-start space-x-2 leading-relaxed">
-                      <span className="text-agro-primary font-bold shrink-0">•</span>
+                      <span className="text-emerald-500 font-bold shrink-0">•</span>
                       <span>{f}</span>
                     </li>
                   ))}
                 </ul>
               </div>
 
-              <div className="text-xs text-agro-amber bg-agro-amber/10 p-3.5 rounded-xl border border-agro-amber/30 leading-relaxed font-medium">
-                {riskResult.advice}
+              <div className="text-xs text-amber-900 dark:text-amber-200 bg-amber-50 dark:bg-amber-950/40 p-4 rounded-2xl border border-amber-200 dark:border-amber-800 leading-relaxed font-semibold">
+                🌾 {riskResult.advice}
               </div>
             </div>
           ) : (
-            <div className="text-center py-16 text-agro-muted text-xs">
+            <div className="text-center py-16 text-slate-400 text-xs">
               {lang === 'mr' 
-                ? 'पीक निवडा, हवामान घटक समायोजित करा आणि रोग प्रादुर्भावाचा वैज्ञानिक अंदाज पाहण्यासाठी "रोग प्रादुर्भाव धोका तपासा" वर क्लिक करा.'
+                ? 'पीक निवडा, हवामान घटक तपासा आणि रोग प्रादुर्भावाचा वैज्ञानिक अंदाज पाहण्यासाठी "रोग प्रादुर्भाव धोका तपासा" वर क्लिक करा.'
                 : 'Select a crop, adjust parameters, and click "Calculate Outbreak Risk" to view scientific pathogen transmission forecasts.'
               }
             </div>
           )}
 
-          <p className="text-[11px] text-agro-muted/70 italic pt-3 border-t border-agro-border">
+          <p className="text-[11px] text-slate-400 italic pt-3 border-t border-slate-100 dark:border-slate-800">
             {lang === 'mr'
               ? 'टीप: तापमान, सापेक्ष आर्द्रता आणि पाऊस या घटकांवर आधारित पारदर्शक ७-टप्प्यांची मूल्यांकन प्रणाली.'
               : 'Note: Transparent 7-stage risk evaluation pipeline based on temperature, relative humidity, and rainfall germination thresholds.'
