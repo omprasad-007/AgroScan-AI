@@ -20,9 +20,9 @@ export const Sidebar = () => {
 
   const links = [
     { to: '/dashboard', label: t('nav.dashboard') || 'Dashboard', icon: LayoutDashboard },
-    { to: '/scan', label: t('nav.scan') || 'Scan Plant', icon: ScanLine, isPrimary: true },
+    { to: '/scan', label: t('nav.scan') || 'Start New Scan', icon: ScanLine, isPrimary: true },
     { to: '/history', label: t('nav.history') || 'Diagnostic History', icon: History },
-    { to: '/analytics', label: t('nav.analytics') || 'Crop Analytics', icon: BarChart3 },
+    { to: '/analytics', label: t('nav.analytics') || 'Crop Insights', icon: BarChart3 },
     { to: '/weather', label: t('nav.weather') || 'Weather Outbreak', icon: CloudSun },
     { to: '/assistant', label: t('nav.assistant') || 'AI Agronomist', icon: MessageCircle },
     { to: '/profile', label: t('nav.profile') || 'Farmer Profile', icon: User },
@@ -33,7 +33,7 @@ export const Sidebar = () => {
   }
 
   return (
-    <aside className="w-64 bg-agro-card/85 backdrop-blur-xl border-r border-agro-border shrink-0 hidden md:block min-h-[calc(100vh-4rem)] p-4 flex flex-col justify-between transition-colors duration-200">
+    <aside className="w-64 bg-agro-card/90 backdrop-blur-xl border-r border-agro-border shrink-0 hidden md:block min-h-[calc(100vh-4rem)] p-4 flex flex-col justify-between transition-colors duration-200">
       <nav className="space-y-1.5" aria-label="Main navigation">
         {links.map((link) => {
           const Icon = link.icon;
@@ -45,13 +45,13 @@ export const Sidebar = () => {
               to={link.to}
               className={({ isActive }) => {
                 if (isPrimary) {
-                  return `flex items-center justify-between px-3.5 py-3 rounded-xl font-bold text-sm transition-all duration-200 mb-2.5 ${
+                  return `flex items-center justify-between px-3.5 py-3 rounded-xl font-bold text-button-text transition-all duration-200 mb-2.5 ${
                     isActive
-                      ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-500/25 ring-2 ring-emerald-400/50'
-                      : 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500 hover:text-white border border-emerald-500/25 shadow-sm'
+                      ? 'bg-agro-primary text-white shadow-md shadow-orange-glow ring-2 ring-agro-highlight/50'
+                      : 'bg-agro-primary/10 text-agro-primary hover:bg-agro-primary hover:text-white border border-agro-primary/25 shadow-sm'
                   }`;
                 }
-                return `flex items-center space-x-3 px-3.5 py-2.5 rounded-xl font-medium text-sm transition-all duration-150 ${
+                return `flex items-center space-x-3 px-3.5 py-2.5 rounded-xl font-medium text-label-text transition-all duration-150 ${
                   isActive
                     ? 'bg-agro-surface text-agro-cream font-bold border border-agro-border shadow-sm'
                     : 'text-agro-muted hover:text-agro-cream hover:bg-agro-surface border border-transparent'
@@ -66,7 +66,7 @@ export const Sidebar = () => {
                   </div>
                   {isPrimary && (
                     <span className={`text-[10px] uppercase tracking-wider font-extrabold px-1.5 py-0.5 rounded-md ${
-                      isActive ? 'bg-white/20 text-white' : 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-400'
+                      isActive ? 'bg-white/20 text-white' : 'bg-agro-highlight/20 text-agro-highlight'
                     }`}>
                       Live
                     </span>
@@ -79,13 +79,13 @@ export const Sidebar = () => {
       </nav>
 
       {/* Helpful Quick Prompt Card */}
-      <div className="mt-6 p-4 rounded-2xl glass-card space-y-2">
-        <div className="flex items-center gap-2 text-xs font-bold text-emerald-600 dark:text-emerald-400">
-          <Sparkles className="w-4 h-4 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
-          <span>Multi-Crop Vision AI</span>
+      <div className="mt-6 p-4 rounded-2xl agro-panel space-y-2">
+        <div className="flex items-center gap-2 text-label-text font-bold text-agro-highlight">
+          <Sparkles className="w-4 h-4 text-agro-highlight" aria-hidden="true" />
+          <span>AgroScan Intelligence</span>
         </div>
-        <p className="text-[11px] text-agro-muted leading-relaxed">
-          Capture close-up leaf photos with natural daylight for highest diagnostic accuracy.
+        <p className="text-supporting-text text-agro-muted leading-relaxed">
+          Intelligent plant disease detection and real-time crop monitoring.
         </p>
       </div>
     </aside>

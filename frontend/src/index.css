@@ -6,95 +6,110 @@
   :root,
   html.light {
     color-scheme: light;
-    --bg-canvas: 250 250 248;           /* Warm organic paper/stone #FAFAF8 */
-    --bg-card: 255 255 255;             /* Pure white crisp card */
-    --bg-surface: 243 245 242;          /* Soft sage/stone tint #F3F5F2 */
-    --bg-hover: 232 236 230;            /* Soft sage hover */
-    --border-color: #E2E8E0;            /* Crisp organic border */
-    --border-strong: #CBD5C8;           /* High contrast border */
-    --text-primary: 20 30 24;           /* Deep forest charcoal #141E18 */
-    --text-muted: 82 98 88;             /* Readable forest slate #526258 */
-    
-    --primary: 16 185 129;              /* Emerald 500 #10B981 */
-    --primary-hover: 5 150 105;         /* Emerald 600 #059669 */
-    --lime: 13 148 136;                 /* Teal 600 */
-    --amber: 217 119 6;                 /* Amber 600 */
-    --terracotta: 225 29 72;            /* Rose 600 */
-    
-    --panel-bg: rgba(255, 255, 255, 0.92);
-    --panel-shadow: 0 4px 20px -2px rgba(20, 30, 24, 0.05), 0 1px 3px 0 rgba(20, 30, 24, 0.02);
-    --panel-shadow-hover: 0 16px 36px -4px rgba(20, 30, 24, 0.08), 0 4px 12px -2px rgba(20, 30, 24, 0.03);
+    /* Light Theme (Vibrant Orange + Harvest Yellow + Royal Purple on Warm White) */
+    --bg-canvas: 250 249 246;         /* Warm White #FAF9F6 */
+    --bg-card: 255 255 255;           /* Pure White #FFFFFF */
+    --bg-surface: 242 240 236;        /* Soft Grey #F2F0EC */
+    --bg-hover: 234 230 224;          /* Soft warm hover */
+    --border-color: #E6E2DC;          /* Light Border #E6E2DC */
+    --border-strong: #D6D0C8;         /* Defined border */
+    --text-primary: 57 51 47;         /* Charcoal Brown #39332F */
+    --text-muted: 125 115 106;        /* Muted brown #7D736A */
+
+    --primary: 201 68 39;             /* Vibrant Orange #C94427 */
+    --primary-hover: 179 57 31;       /* Darker orange #B3391F */
+    --highlight: 242 185 66;          /* Harvest Yellow #F2B942 */
+    --accent: 112 67 197;             /* Royal Purple #7043C5 */
+
+    --panel-bg: rgba(255, 255, 255, 0.96);
+    --panel-shadow: 0 4px 18px -2px rgba(57, 51, 47, 0.06), 0 1px 3px 0 rgba(57, 51, 47, 0.03);
+    --panel-shadow-hover: 0 12px 28px -4px rgba(57, 51, 47, 0.1), 0 4px 10px -2px rgba(57, 51, 47, 0.05);
   }
 
   html.dark {
     color-scheme: dark;
-    --bg-canvas: 11 16 14;              /* Deep obsidian emerald #0B100E */
-    --bg-card: 17 24 21;                /* Rich forest obsidian #111815 */
-    --bg-surface: 24 34 30;             /* Elevated surface #18221E */
-    --bg-hover: 34 48 42;               /* Elevated hover #22302A */
-    --border-color: rgba(255, 255, 255, 0.08); /* Frosted glass border */
-    --border-strong: rgba(16, 185, 129, 0.25);
-    --text-primary: 245 248 246;        /* Clean organic white */
-    --text-muted: 156 175 165;          /* Muted sage */
-    
-    --primary: 16 185 129;              /* #10B981 */
-    --primary-hover: 5 150 105;
-    --lime: 52 211 153;                 /* #34D399 */
-    --amber: 245 158 11;                /* #F59E0B */
-    --terracotta: 244 63 94;            /* #F43F5E */
-    
-    --panel-bg: rgba(17, 24, 21, 0.78);
-    --panel-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.45), inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
-    --panel-shadow-hover: 0 20px 48px -4px rgba(0, 0, 0, 0.65), inset 0 1px 0 0 rgba(16, 185, 129, 0.2);
+    /* Dark Theme (Deep Warm Charcoal + Dark Cocoa + Bright Orange + Golden Yellow + Light Purple) */
+    --bg-canvas: 41 36 33;            /* Deep Warm Charcoal #292421 */
+    --bg-card: 52 45 41;              /* Dark Cocoa #342D29 */
+    --bg-surface: 64 55 49;           /* Elevated Cocoa #403731 */
+    --bg-hover: 77 66 59;             /* Warm cocoa hover */
+    --border-color: #51463F;          /* Soft Border #51463F */
+    --border-strong: #6B5D54;         /* Defined soft border */
+    --text-primary: 255 249 243;      /* Warm White #FFF9F3 */
+    --text-muted: 209 198 188;        /* Muted Ivory #D1C6BC */
+
+    --primary: 233 103 71;            /* Bright Orange #E96747 */
+    --primary-hover: 214 86 54;       /* Hover Orange #D65636 */
+    --highlight: 255 212 119;         /* Golden Yellow #FFD477 */
+    --accent: 185 154 255;            /* Light Purple #B99AFF */
+
+    --panel-bg: rgba(52, 45, 41, 0.88);
+    /* In dark mode, soft borders rather than heavy shadows */
+    --panel-shadow: 0 0 0 1px #51463F, 0 4px 16px -2px rgba(0, 0, 0, 0.25);
+    --panel-shadow-hover: 0 0 0 1px #E96747, 0 8px 24px -2px rgba(0, 0, 0, 0.35);
   }
 
   body {
     @apply min-h-screen font-sans antialiased text-agro-cream bg-agro-bg transition-colors duration-200;
   }
 
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading tracking-tight;
+  }
+
   ::selection {
-    background-color: rgba(16, 185, 129, 0.25);
-    color: #10B981;
+    background-color: rgba(201, 68, 39, 0.25);
+    color: #C94427;
+  }
+
+  html.dark ::selection {
+    background-color: rgba(233, 103, 71, 0.3);
+    color: #FFD477;
   }
 
   :focus-visible {
-    outline: 2px solid #10B981;
+    outline: 2px solid #C94427;
     outline-offset: 2px;
+  }
+
+  html.dark :focus-visible {
+    outline: 2px solid #E96747;
   }
 }
 
 /* =============================================================
- * BACKGROUNDS FOR DARK AND LIGHT THEMES (21st.dev / Stitch)
+ * BACKGROUNDS FOR DARK AND LIGHT THEMES
+ * NO blue, green, or pure black!
  * =========================================================== */
 html.dark body {
-  background-color: #0B100E;
+  background-color: #292421;
   background-image: 
-    radial-gradient(at 15% 10%, rgba(16, 185, 129, 0.08) 0px, transparent 45%),
-    radial-gradient(at 85% 15%, rgba(20, 184, 166, 0.06) 0px, transparent 40%),
-    radial-gradient(at 50% 60%, rgba(16, 185, 129, 0.04) 0px, transparent 50%);
+    radial-gradient(at 15% 10%, rgba(233, 103, 71, 0.07) 0px, transparent 40%),
+    radial-gradient(at 85% 15%, rgba(185, 154, 255, 0.05) 0px, transparent 40%),
+    radial-gradient(at 50% 60%, rgba(255, 212, 119, 0.04) 0px, transparent 50%);
   background-attachment: fixed;
 }
 
 html.light body {
-  background-color: #FAFAF8;
+  background-color: #FAF9F6;
   background-image: 
-    radial-gradient(at 20% 10%, rgba(16, 185, 129, 0.04) 0px, transparent 40%),
-    radial-gradient(at 80% 20%, rgba(245, 158, 11, 0.02) 0px, transparent 35%);
+    radial-gradient(at 20% 10%, rgba(201, 68, 39, 0.04) 0px, transparent 40%),
+    radial-gradient(at 80% 20%, rgba(112, 67, 197, 0.03) 0px, transparent 35%);
   background-attachment: fixed;
 }
 
-/* Grid overlay pattern */
+/* Subtle Grid Pattern */
 .bg-grid-pattern {
   background-size: 32px 32px;
   background-image: 
-    linear-gradient(to right, rgba(16, 185, 129, 0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(16, 185, 129, 0.05) 1px, transparent 1px);
+    linear-gradient(to right, rgba(201, 68, 39, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(201, 68, 39, 0.04) 1px, transparent 1px);
 }
 
-html.light .bg-grid-pattern {
+html.dark .bg-grid-pattern {
   background-image: 
-    linear-gradient(to right, rgba(0, 0, 0, 0.03) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
+    linear-gradient(to right, rgba(233, 103, 71, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(233, 103, 71, 0.05) 1px, transparent 1px);
 }
 
 /* =============================================================
@@ -108,19 +123,15 @@ html.light .bg-grid-pattern {
   transform-style: preserve-3d;
 }
 
-.backface-hidden {
-  backface-visibility: hidden;
-}
-
 /* =============================================================
- * GLASSMORPHISM & SOLID MORPHING SURFACES
+ * SURFACES & PANELS
  * =========================================================== */
 .agro-panel,
 .glass-panel,
 .glass-card {
   background: var(--panel-bg);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--border-color);
   border-radius: 1.25rem;
   box-shadow: var(--panel-shadow);
@@ -132,33 +143,6 @@ html.light .bg-grid-pattern {
 .glass-card:hover {
   border-color: var(--border-strong);
   box-shadow: var(--panel-shadow-hover);
-}
-
-/* Interactive Hover Lift */
-.agro-panel-hover,
-.glass-panel-hover {
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.agro-panel-hover:hover,
-.glass-panel-hover:hover {
-  transform: translateY(-2px);
-  border-color: rgba(16, 185, 129, 0.4);
-}
-
-/* Solid-Morphism */
-.solid-morph {
-  border-radius: 1.25rem;
-  background: rgb(var(--bg-card));
-  border: 1px solid var(--border-color);
-  box-shadow: var(--panel-shadow);
-}
-
-/* Glass Pills & Controls */
-.glass-pill {
-  background: rgb(var(--bg-surface));
-  border: 1px solid var(--border-color);
-  color: rgb(var(--text-primary));
 }
 
 /* Form Controls in Light and Dark Mode */
@@ -174,8 +158,8 @@ textarea {
 input:not([type="range"]):focus,
 select:focus,
 textarea:focus {
-  border-color: #10B981;
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+  border-color: rgb(var(--primary));
+  box-shadow: 0 0 0 3px rgba(var(--primary), 0.18);
 }
 
 input::placeholder,
@@ -185,14 +169,14 @@ textarea::placeholder {
 
 /* Interactive Buttons */
 .btn-agro-primary {
-  @apply inline-flex items-center justify-center font-extrabold transition-all duration-150 rounded-xl bg-agro-primary hover:bg-agro-primaryHover text-white active:scale-[0.98] shadow-md shadow-agro-primary/25 disabled:opacity-50 disabled:cursor-not-allowed;
+  @apply inline-flex items-center justify-center font-bold text-[15px] transition-all duration-150 rounded-xl bg-agro-primary hover:bg-agro-primaryHover text-white active:scale-[0.98] shadow-md disabled:opacity-50 disabled:cursor-not-allowed;
 }
 
 .btn-agro-secondary {
-  @apply inline-flex items-center justify-center font-bold transition-all duration-150 rounded-xl bg-agro-surface hover:bg-agro-hover border border-agro-border text-agro-cream active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
+  @apply inline-flex items-center justify-center font-semibold text-[15px] transition-all duration-150 rounded-xl bg-agro-surface hover:bg-agro-hover border border-agro-border text-agro-cream active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
 }
 
-/* Modern Laser Scanner Line Animation */
+/* Laser Scanner Line Animation (Orange/Yellow HUD) */
 @keyframes laser-sweep {
   0% {
     top: 0%;
@@ -212,52 +196,32 @@ textarea::placeholder {
   animation: laser-sweep 3s ease-in-out infinite;
 }
 
-/* Modern Ambient Pulse Badge */
-@keyframes pulse-ring {
-  0% {
-    transform: scale(0.95);
-    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
-  }
-  70% {
-    transform: scale(1);
-    box-shadow: 0 0 0 8px rgba(16, 185, 129, 0);
-  }
-  100% {
-    transform: scale(0.95);
-    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
-  }
-}
-
-.pulse-ring-emerald {
-  animation: pulse-ring 2.5s infinite;
-}
-
-/* Modern Scrollbars */
+/* Scrollbars - Warm Cocoa & Ivory */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 html.dark ::-webkit-scrollbar-track {
-  background: #0B100E;
+  background: #292421;
 }
 html.dark ::-webkit-scrollbar-thumb {
-  background: #18221E;
+  background: #51463F;
   border-radius: 9999px;
 }
 html.dark ::-webkit-scrollbar-thumb:hover {
-  background: #22302A;
+  background: #6B5D54;
 }
 
 html.light ::-webkit-scrollbar-track {
-  background: #FAFAF8;
+  background: #FAF9F6;
 }
 html.light ::-webkit-scrollbar-thumb {
-  background: #CBD5C8;
+  background: #E6E2DC;
   border-radius: 9999px;
 }
 html.light ::-webkit-scrollbar-thumb:hover {
-  background: #9CAF9E;
+  background: #D1C9BE;
 }
 
 @media (prefers-reduced-motion: reduce) {

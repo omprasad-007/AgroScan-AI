@@ -20,61 +20,61 @@ export const Navbar = () => {
   const isScanActive = location.pathname === '/scan' || location.pathname === '/analysis';
 
   return (
-    <header className="sticky top-0 z-40 bg-white/80 dark:bg-[#0B100E]/80 backdrop-blur-xl border-b border-agro-border transition-colors duration-200">
+    <header className="sticky top-0 z-40 bg-agro-card/90 dark:bg-agro-card/90 backdrop-blur-xl border-b border-agro-border transition-colors duration-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-16 sm:h-20">
           
           {/* Brand Logo */}
           <Link
             to={isAuthenticated ? "/dashboard" : "/"}
-            className="flex items-center gap-3 group focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-xl"
+            className="flex items-center gap-3 group focus-visible:ring-2 focus-visible:ring-agro-primary rounded-xl"
             aria-label="AgroScan AI Home"
           >
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-white flex items-center justify-center shadow-md shadow-emerald-500/25 group-hover:scale-105 transition-all duration-200">
-              <Sprout className="w-5 h-5" aria-hidden="true" />
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-agro-primary via-[#C94427] to-agro-accent text-white flex items-center justify-center shadow-md shadow-agro-primary/25 group-hover:scale-105 transition-all duration-200">
+              <Sprout className="w-5 h-5 text-white" aria-hidden="true" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-base font-extrabold tracking-tight text-agro-cream block">
-                  AgroScan <span className="text-emerald-500 dark:text-emerald-400">AI</span>
+                <span className="font-heading text-lg font-extrabold tracking-tight text-agro-cream block">
+                  AgroScan <span className="text-agro-primary">AI</span>
                 </span>
-                <span className="hidden sm:inline-flex items-center px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold bg-agro-highlight/15 text-agro-highlight border border-agro-highlight/30">
                   v2.4
                 </span>
               </div>
-              <span className="block text-[10px] text-agro-muted font-semibold tracking-wider uppercase">
-                {t('subtitle_short') || 'Smart Agriculture & Diagnostics'}
+              <span className="block text-supporting-text text-agro-muted font-medium tracking-wider uppercase">
+                {t('subtitle_short') || 'Smart Plant Health Monitoring'}
               </span>
             </div>
           </Link>
 
           {/* Center / Right Actions */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-2.5 sm:gap-3">
             
-            {/* Primary Action CTA: Scan Plant */}
+            {/* Primary Action CTA: Start New Scan */}
             <Link
               to="/scan"
-              className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all duration-200 text-white ${
+              className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-button-text font-bold transition-all duration-200 text-white ${
                 isScanActive
-                  ? 'bg-emerald-500 shadow-lg shadow-emerald-500/30 ring-2 ring-emerald-400'
-                  : 'bg-emerald-500 hover:bg-emerald-600 shadow-md shadow-emerald-500/25 hover:shadow-emerald-500/40 active:scale-[0.98]'
+                  ? 'bg-agro-primary shadow-lg shadow-agro-primary/30 ring-2 ring-agro-highlight'
+                  : 'bg-agro-primary hover:bg-agro-primaryHover shadow-md shadow-agro-primary/25 active:scale-[0.98]'
               }`}
-              title={t('nav.scan') || 'Scan Plant Leaf'}
-              aria-label={t('nav.scan') || 'Scan Plant Leaf'}
+              title={t('nav.scan') || 'Start New Scan'}
+              aria-label={t('nav.scan') || 'Start New Scan'}
             >
               <ScanLine className="w-4 h-4 shrink-0" aria-hidden="true" />
-              <span className="hidden sm:inline">{t('nav.scan') || 'Scan Plant'}</span>
+              <span className="hidden sm:inline">{t('nav.scan') || 'Start New Scan'}</span>
             </Link>
 
             {/* Language Switcher */}
             <button
               type="button"
               onClick={toggleLanguage}
-              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-agro-surface hover:bg-agro-hover text-agro-cream text-xs font-bold border border-agro-border transition-all duration-150 backdrop-blur-md"
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-agro-surface hover:bg-agro-hover text-agro-cream text-label-text font-semibold border border-agro-border transition-all duration-150 backdrop-blur-md"
               title={lang === 'en' ? 'मराठी मध्ये बदला (Switch to Marathi)' : 'Switch to English'}
               aria-label={lang === 'en' ? 'Switch to Marathi' : 'Switch to English'}
             >
-              <Globe className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
+              <Globe className="w-3.5 h-3.5 text-agro-primary" aria-hidden="true" />
               <span>{lang === 'en' ? 'मराठी' : 'English'}</span>
             </button>
 
@@ -82,33 +82,33 @@ export const Navbar = () => {
             <button
               type="button"
               onClick={toggleTheme}
-              className="p-2 rounded-xl bg-agro-surface hover:bg-agro-hover text-amber-500 dark:text-amber-400 border border-agro-border transition-all duration-150 backdrop-blur-md"
+              className="p-2.5 rounded-xl bg-agro-surface hover:bg-agro-hover text-agro-highlight border border-agro-border transition-all duration-150 backdrop-blur-md"
               title={theme === 'dark' ? "Switch to light theme" : "Switch to dark theme"}
               aria-label={theme === 'dark' ? "Switch to light theme" : "Switch to dark theme"}
             >
               {theme === 'dark' ? (
-                <Sun className="w-4 h-4 text-amber-400" aria-hidden="true" />
+                <Sun className="w-4 h-4 text-agro-highlight" aria-hidden="true" />
               ) : (
-                <Moon className="w-4 h-4 text-slate-600" aria-hidden="true" />
+                <Moon className="w-4 h-4 text-agro-accent" aria-hidden="true" />
               )}
             </button>
 
             {/* User Session / Auth Links */}
             {isAuthenticated ? (
-              <div className="flex items-center gap-2 pl-1 border-l border-agro-border">
+              <div className="flex items-center gap-2 pl-2 border-l border-agro-border">
                 <Link
                   to="/profile"
-                  className="hidden md:flex items-center gap-2 px-2.5 py-1.5 rounded-xl hover:bg-agro-surface text-right transition-colors"
+                  className="hidden md:flex items-center gap-2.5 px-3 py-1.5 rounded-xl hover:bg-agro-surface text-right transition-colors"
                   title="Farmer Profile"
                 >
-                  <div className="w-7 h-7 rounded-lg bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+                  <div className="w-7 h-7 rounded-lg bg-agro-accent/15 border border-agro-accent/30 flex items-center justify-center text-agro-accent">
                     <User className="w-3.5 h-3.5" aria-hidden="true" />
                   </div>
                   <div className="flex flex-col text-left leading-tight">
-                    <span className="text-xs font-bold text-agro-cream truncate max-w-[120px]">
+                    <span className="text-label-text font-bold text-agro-cream truncate max-w-[120px]">
                       {user?.full_name || 'Farmer'}
                     </span>
-                    <span className="text-[10px] text-agro-muted truncate max-w-[120px]">
+                    <span className="text-supporting-text text-agro-muted truncate max-w-[120px]">
                       {user?.email}
                     </span>
                   </div>
@@ -117,7 +117,7 @@ export const Navbar = () => {
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="p-2 rounded-xl bg-agro-surface hover:bg-rose-500/20 text-agro-muted hover:text-rose-500 border border-agro-border transition-colors"
+                  className="p-2 rounded-xl bg-agro-surface hover:bg-agro-primary/10 text-agro-muted hover:text-agro-primary border border-agro-border transition-colors"
                   title={t('nav.logout') || 'Sign Out'}
                   aria-label={t('nav.logout') || 'Sign Out'}
                 >
@@ -128,13 +128,13 @@ export const Navbar = () => {
               <div className="flex items-center gap-2">
                 <Link
                   to="/login"
-                  className="px-3 py-1.5 rounded-xl text-xs font-bold text-agro-muted hover:text-agro-cream hover:bg-agro-surface transition-colors"
+                  className="px-3 py-2 rounded-xl text-label-text font-semibold text-agro-muted hover:text-agro-cream hover:bg-agro-surface transition-colors"
                 >
                   {t('nav.login') || 'Sign In'}
                 </Link>
                 <Link
                   to="/register"
-                  className="px-3.5 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-xs transition shadow-sm"
+                  className="px-3.5 py-2 rounded-xl bg-agro-surface hover:bg-agro-hover border border-agro-border text-agro-cream font-bold text-label-text transition"
                 >
                   {t('nav.register') || 'Register'}
                 </Link>
