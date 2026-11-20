@@ -123,7 +123,9 @@ export const WeatherRiskPage = () => {
                     : 'bg-agro-lime/15 text-agro-lime border border-agro-lime/30'
                 }`}>
                   <span className="w-1.5 h-1.5 rounded-full bg-agro-primary animate-ping mr-1.5" />
-                  {weatherMeta?.isGpsDetected ? 'Device GPS Microclimate' : 'District Microclimate'}
+                  {weatherMeta?.isGpsDetected
+                    ? 'Device GPS Microclimate'
+                    : (weatherMeta?.detectionMethod === 'auto_ip' ? 'Live Auto Location' : 'District Microclimate')}
                 </span>
               </div>
               <p className="text-xs text-agro-muted mt-0.5">
@@ -165,6 +167,32 @@ export const WeatherRiskPage = () => {
             Search
           </button>
         </form>
+
+        {/* Quick Popular Agricultural Districts */}
+        <div className="flex items-center gap-1.5 flex-wrap pt-1 text-[11px] text-agro-muted">
+          <span className="font-medium">Quick Districts:</span>
+          {['Kolhapur', 'Pune', 'Nashik', 'Sangli', 'Solapur', 'Nagpur', 'Satara', 'Amravati'].map((cName) => (
+            <button
+              key={cName}
+              type="button"
+              onClick={() => {
+                setCityInput(cName);
+                fetchCityWeather(cName, lang).then(res => {
+                  if (res) {
+                    setWeatherMeta(res);
+                    setTemp(res.temperature_c);
+                    setHumidity(res.humidity_pct);
+                    setRainfall(res.rainfall_mm);
+                    evaluateRisk(res.temperature_c, res.humidity_pct, res.rainfall_mm, crop);
+                  }
+                });
+              }}
+              className="px-2 py-0.5 rounded-lg bg-agro-surface hover:bg-agro-hover border border-agro-border text-agro-cream hover:text-agro-primary transition-colors text-[10px] font-semibold"
+            >
+              {cName}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

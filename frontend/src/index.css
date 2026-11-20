@@ -3,12 +3,53 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
-    color-scheme: dark light;
+  :root,
+  html.light {
+    color-scheme: light;
+    --bg-canvas: 248 250 252;          /* #F8FAFC - crisp luminous canvas */
+    --bg-card: 255 255 255;            /* #FFFFFF - pure white */
+    --bg-surface: 241 245 249;         /* #F1F5F9 - soft light slate */
+    --bg-hover: 226 232 240;           /* #E2E8F0 */
+    --border-color: #E2E8F0;           /* Crisp light border */
+    --border-strong: #CBD5E1;          /* Defined border */
+    --text-primary: 15 23 42;          /* #0F172A - deep charcoal text */
+    --text-muted: 100 116 139;         /* #64748B - clean readable muted text */
+    
+    --primary: 16 185 129;             /* #10B981 - clean emerald */
+    --primary-hover: 5 150 105;        /* #059669 */
+    --lime: 4 120 87;                  /* #047857 - deep mint for high contrast */
+    --amber: 180 83 9;                 /* #B45309 - amber-700 */
+    --terracotta: 190 18 60;           /* #BE123C - rose-700 */
+    
+    --panel-bg: rgba(255, 255, 255, 0.98);
+    --panel-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 1px 3px 0 rgba(15, 23, 42, 0.02);
+    --panel-shadow-hover: 0 12px 30px -4px rgba(15, 23, 42, 0.08), 0 4px 8px -2px rgba(15, 23, 42, 0.03);
+  }
+
+  html.dark {
+    color-scheme: dark;
+    --bg-canvas: 10 14 23;             /* #0A0E17 - deep rich obsidian */
+    --bg-card: 17 24 39;               /* #111827 - dark slate card */
+    --bg-surface: 26 36 51;            /* #1A2433 */
+    --bg-hover: 38 53 74;              /* #26354A */
+    --border-color: rgba(255, 255, 255, 0.08); /* Frosted border */
+    --border-strong: rgba(255, 255, 255, 0.16);
+    --text-primary: 248 250 252;       /* #F8FAFC - crisp white */
+    --text-muted: 148 163 184;         /* #94A3B8 - slate muted */
+    
+    --primary: 16 185 129;             /* #10B981 */
+    --primary-hover: 5 150 105;
+    --lime: 52 211 153;                /* #34D399 */
+    --amber: 245 158 11;               /* #F59E0B */
+    --terracotta: 244 63 94;           /* #F43F5E */
+    
+    --panel-bg: rgba(17, 24, 39, 0.75);
+    --panel-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.45), inset 0 1px 0 0 rgba(255, 255, 255, 0.07);
+    --panel-shadow-hover: 0 16px 40px -4px rgba(0, 0, 0, 0.6), inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
   }
 
   body {
-    @apply min-h-screen font-sans antialiased text-slate-100 bg-slate-950 transition-colors duration-300;
+    @apply min-h-screen font-sans antialiased text-agro-cream bg-agro-bg transition-colors duration-200;
   }
 
   ::selection {
@@ -16,7 +57,6 @@
     color: #10B981;
   }
 
-  /* Accessible outline & focus */
   :focus-visible {
     outline: 2px solid #10B981;
     outline-offset: 2px;
@@ -24,76 +64,41 @@
 }
 
 /* =============================================================
- * DARK MODE: Modern Obsidian Tech with Subtle Ambient Mesh
+ * BACKGROUNDS FOR DARK AND LIGHT THEMES
  * =========================================================== */
 html.dark body {
-  background-color: #0B0F17;
-  color: #F8FAFC;
+  background-color: #0A0E17;
   background-image: 
-    radial-gradient(at 15% 10%, rgba(16, 185, 129, 0.08) 0px, transparent 40%),
-    radial-gradient(at 85% 20%, rgba(6, 182, 212, 0.06) 0px, transparent 40%),
-    radial-gradient(at 50% 90%, rgba(16, 185, 129, 0.05) 0px, transparent 50%);
+    radial-gradient(at 15% 10%, rgba(16, 185, 129, 0.06) 0px, transparent 40%),
+    radial-gradient(at 85% 15%, rgba(6, 182, 212, 0.05) 0px, transparent 40%);
   background-attachment: fixed;
 }
 
-/* =============================================================
- * LIGHT MODE: Ultra-Clean, Luminous White & Slate Architecture
- * =========================================================== */
 html.light body {
   background-color: #F8FAFC;
-  color: #0F172A;
-  background-image: 
-    radial-gradient(at 10% 10%, rgba(16, 185, 129, 0.05) 0px, transparent 40%),
-    radial-gradient(at 90% 15%, rgba(14, 165, 233, 0.04) 0px, transparent 40%);
-  background-attachment: fixed;
+  background-image: none;
 }
 
 /* =============================================================
  * GLASSMORPHISM & SOLID MORPHING SURFACES
  * =========================================================== */
-
-/* Dark Mode Glassmorphic Card */
 .agro-panel,
 .glass-panel,
 .glass-card {
-  background: rgba(17, 24, 39, 0.75);
+  background: var(--panel-bg);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border-color);
   border-radius: 1.25rem;
-  box-shadow: 
-    0 8px 32px 0 rgba(0, 0, 0, 0.37),
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.07);
+  box-shadow: var(--panel-shadow);
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .agro-panel:hover,
 .glass-panel:hover,
 .glass-card:hover {
-  border-color: rgba(255, 255, 255, 0.14);
-}
-
-/* Light Mode Glassmorphic Card (Pure White with Subtle Floating Depth) */
-html.light .agro-panel,
-html.light .glass-panel,
-html.light .glass-card {
-  background: rgba(255, 255, 255, 0.88);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(226, 232, 240, 0.85);
-  box-shadow: 
-    0 10px 30px -4px rgba(15, 23, 42, 0.06),
-    0 2px 6px -1px rgba(15, 23, 42, 0.03),
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.95);
-}
-
-html.light .agro-panel:hover,
-html.light .glass-panel:hover,
-html.light .glass-card:hover {
-  border-color: #CBD5E1;
-  box-shadow: 
-    0 16px 36px -4px rgba(15, 23, 42, 0.09),
-    0 4px 12px -2px rgba(15, 23, 42, 0.04);
+  border-color: var(--border-strong);
+  box-shadow: var(--panel-shadow-hover);
 }
 
 /* Interactive Hover Lift */
@@ -105,117 +110,25 @@ html.light .glass-card:hover {
 .agro-panel-hover:hover,
 .glass-panel-hover:hover {
   transform: translateY(-2px);
-  border-color: rgba(16, 185, 129, 0.35);
-  box-shadow: 0 16px 40px -6px rgba(0, 0, 0, 0.5);
+  border-color: rgba(16, 185, 129, 0.4);
 }
 
-html.light .agro-panel-hover:hover,
-html.light .glass-panel-hover:hover {
-  transform: translateY(-2px);
-  border-color: #94A3B8;
-  box-shadow: 0 16px 40px -6px rgba(15, 23, 42, 0.1);
-}
-
-/* Solid-Morphism (Floating Solid with Dual-Light Shadows) */
+/* Solid-Morphism */
 .solid-morph {
   border-radius: 1.25rem;
-  background: #111827;
-  box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.4), -2px -2px 8px rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-html.light .solid-morph {
-  background: #FFFFFF;
-  box-shadow: 6px 6px 16px rgba(15, 23, 42, 0.06), -4px -4px 12px rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(226, 232, 240, 0.9);
+  background: rgb(var(--bg-card));
+  border: 1px solid var(--border-color);
+  box-shadow: var(--panel-shadow);
 }
 
 /* Glass Pills & Controls */
 .glass-pill {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgb(var(--bg-surface));
+  border: 1px solid var(--border-color);
+  color: rgb(var(--text-primary));
 }
 
-html.light .glass-pill {
-  background: rgba(241, 245, 249, 0.8);
-  border: 1px solid rgba(226, 232, 240, 0.85);
-  color: #0F172A;
-}
-
-/* =============================================================
- * LIGHT THEME AUTOMATIC REFINED OVERRIDES
- * =========================================================== */
-html.light .text-agro-cream {
-  color: #0F172A !important;
-}
-
-/* Accessible high-contrast badge colors in light mode */
-html.light .text-agro-lime {
-  color: #047857 !important;
-}
-html.light .text-agro-primary {
-  color: #059669 !important;
-}
-html.light .text-agro-amber {
-  color: #B45309 !important;
-}
-html.light .text-agro-terracotta {
-  color: #BE123C !important;
-}
-
-html.light .text-slate-100,
-html.light .text-slate-200 {
-  color: #1E293B !important;
-}
-
-html.light .text-slate-300 {
-  color: #334155 !important;
-}
-
-html.light .text-slate-400,
-html.light .text-agro-muted {
-  color: #64748B !important;
-}
-
-html.light .text-slate-500 {
-  color: #94A3B8 !important;
-}
-
-html.light .bg-agro-bg,
-html.light .bg-slate-950 {
-  background-color: #F8FAFC !important;
-}
-
-html.light .bg-agro-card,
-html.light .bg-slate-900 {
-  background-color: #FFFFFF !important;
-}
-
-html.light .bg-agro-surface,
-html.light .bg-slate-800 {
-  background-color: #F1F5F9 !important;
-  color: #0F172A !important;
-}
-
-html.light .bg-agro-hover,
-html.light .bg-slate-700 {
-  background-color: #E2E8F0 !important;
-}
-
-html.light .border-agro-border,
-html.light .border-slate-800,
-html.light .border-slate-700 {
-  border-color: #E2E8F0 !important;
-}
-
-/* Table header contrast in light mode */
-html.light th {
-  color: #475569 !important;
-}
-
-/* Input fields in light mode */
+/* Form Controls in Light and Dark Mode */
 html.light input:not([type="range"]),
 html.light select,
 html.light textarea {
@@ -224,32 +137,36 @@ html.light textarea {
   border-color: #CBD5E1 !important;
 }
 
+html.dark input:not([type="range"]),
+html.dark select,
+html.dark textarea {
+  background-color: rgba(15, 23, 42, 0.8) !important;
+  color: #F8FAFC !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
 html.light input::placeholder,
 html.light textarea::placeholder {
   color: #94A3B8 !important;
 }
 
-/* =============================================================
- * INTERACTIVE PRIMARY BUTTONS & FEEDBACK
- * =========================================================== */
+/* Interactive Buttons */
 .btn-agro-primary {
-  @apply inline-flex items-center justify-center font-bold transition-all duration-150 rounded-xl bg-agro-primary hover:bg-agro-primaryHover text-white active:scale-[0.98] shadow-md shadow-agro-primary/25 disabled:opacity-50 disabled:cursor-not-allowed;
+  @apply inline-flex items-center justify-center font-extrabold transition-all duration-150 rounded-xl bg-agro-primary hover:bg-agro-primaryHover text-white active:scale-[0.98] shadow-md shadow-agro-primary/25 disabled:opacity-50 disabled:cursor-not-allowed;
 }
 
 .btn-agro-secondary {
-  @apply inline-flex items-center justify-center font-semibold transition-all duration-150 rounded-xl bg-agro-surface hover:bg-agro-hover border border-agro-border text-agro-cream active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
+  @apply inline-flex items-center justify-center font-bold transition-all duration-150 rounded-xl bg-agro-surface hover:bg-agro-hover border border-agro-border text-agro-cream active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
 }
 
-/* =============================================================
- * CUSTOM MODERN SCROLLBARS
- * =========================================================== */
+/* Modern Scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 html.dark ::-webkit-scrollbar-track {
-  background: #0B0F17;
+  background: #0A0E17;
 }
 html.dark ::-webkit-scrollbar-thumb {
   background: #1E293B;
@@ -270,9 +187,6 @@ html.light ::-webkit-scrollbar-thumb:hover {
   background: #94A3B8;
 }
 
-/* =============================================================
- * REDUCED MOTION SUPPORT
- * =========================================================== */
 @media (prefers-reduced-motion: reduce) {
   *, ::before, ::after {
     animation-duration: 0.01ms !important;

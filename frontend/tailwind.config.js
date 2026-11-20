@@ -8,41 +8,22 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Modern Balanced Product Palette
+        // Modern Balanced Product Palette powered by dynamic CSS variables
         agro: {
-          bg: '#0B0F17',             // Modern sleek dark canvas
-          card: '#111827',           // Clean elevated dark surface
-          surface: '#1E293B',        // Interactive surface
-          hover: '#26354A',          // Hover state
-          high: '#334155',           // High-contrast
-          border: 'rgba(255, 255, 255, 0.08)', // Frosted glass border
-          borderStrong: 'rgba(255, 255, 255, 0.16)',
-          borderHighlight: 'rgba(16, 185, 129, 0.4)',
-          primary: '#10B981',        // Clean modern emerald green
-          primaryHover: '#059669',   // Emerald hover
-          'primary-hover': '#059669', // Alias for hyphenated usages
-          primaryDark: '#047857',
-          lime: '#34D399',           // Fresh mint/lime secondary accent
-          limeDark: '#10B981',
-          limeLight: '#6EE7B7',
-          amber: '#F59E0B',          // Warning/harvest amber
-          amberDark: '#D97706',
-          amberLight: '#FBBF24',
-          terracotta: '#F43F5E',     // Rose/coral alert
-          terracottaDark: '#E11D48',
-          terracottaLight: '#FB7185',
-          cream: '#F8FAFC',          // Crisp white text in dark mode
-          muted: '#94A3B8',          // Refined neutral slate muted
-          mutedDark: '#64748B',      // Darker muted
-          mutedLight: '#CBD5E1',     // Light muted
-
-          // Light mode tokens
-          lightBg: '#F8FAFC',        // Clean luminous modern white/slate canvas
-          lightCard: '#FFFFFF',      // Pure white card
-          lightSurface: '#F1F5F9',   // Soft light slate surface
-          lightBorder: '#E2E8F0',    // Clean subtle light border
-          lightText: '#0F172A',      // Deep charcoal/slate text
-          lightMuted: '#64748B',     // Slate muted text
+          bg: 'rgb(var(--bg-canvas) / <alpha-value>)',
+          card: 'rgb(var(--bg-card) / <alpha-value>)',
+          surface: 'rgb(var(--bg-surface) / <alpha-value>)',
+          hover: 'rgb(var(--bg-hover) / <alpha-value>)',
+          border: 'var(--border-color)',
+          borderStrong: 'var(--border-strong)',
+          cream: 'rgb(var(--text-primary) / <alpha-value>)',
+          muted: 'rgb(var(--text-muted) / <alpha-value>)',
+          primary: 'rgb(var(--primary) / <alpha-value>)',
+          primaryHover: 'rgb(var(--primary-hover) / <alpha-value>)',
+          'primary-hover': 'rgb(var(--primary-hover) / <alpha-value>)',
+          lime: 'rgb(var(--lime) / <alpha-value>)',
+          amber: 'rgb(var(--amber) / <alpha-value>)',
+          terracotta: 'rgb(var(--terracotta) / <alpha-value>)',
         },
 
         // Clean modern slate palette

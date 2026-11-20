@@ -181,6 +181,9 @@ async def analyze_leaf(
     temperature_c: float = Form(24.0),
     humidity_pct: float = Form(78.0),
     rainfall_mm: float = Form(5.0),
+    latitude: Optional[float] = Form(None),
+    longitude: Optional[float] = Form(None),
+    location_name: Optional[str] = Form(None),
     db: Session = Depends(get_db),
     current_user: Optional[User] = Depends(get_optional_current_user),
 ):
@@ -246,7 +249,11 @@ async def analyze_leaf(
             scan_id=scan_id,
             target_crop=target_crop,
             weather_params=weather_params,
-            location={"latitude": 16.58, "longitude": 74.31},
+            location={
+                "latitude": latitude or 16.6941,
+                "longitude": longitude or 74.2366,
+                "location_name": location_name or "Local Farm"
+            },
             is_guest=current_user is None,
             image_url=f"/uploads/{unique_filename}",
             language=language

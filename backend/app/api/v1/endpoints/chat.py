@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.models.all_models import User, ChatSession, ChatMessage, ScanPrediction, Farm
 from app.schemas.schemas import ChatMessageCreate, ChatMessageResponse, ChatSessionResponse, ChatSessionTitleUpdate
-from app.api.deps import get_current_user
+from app.api.deps import get_current_user, get_optional_current_user
 from app.services.ai_provider_service import AIProviderService
 from app.services.agri_rag_service import AgriRAGService
 
@@ -26,8 +26,13 @@ def _generate_session_title(message: str, plant: Optional[str] = None) -> str:
 def post_chat_message(
     chat_in: ChatMessageCreate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: Optional[User] = Depends(get_optional_current_user)
 ):
+    if not current_user:
+        current_user = db.query(User).filter(User.email == "farmer@agroscan.ai").first()
+        if not current_user:
+            current_user = db.query(User).first()
+
     session = None
     if chat_in.session_id:
         session = db.query(ChatSession).filter(
@@ -184,7 +189,7 @@ def post_chat_message(
 def post_assistant_research(
     chat_in: ChatMessageCreate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: Optional[User] = Depends(get_optional_current_user)
 ):
     """Direct research endpoint for deep multi-source agricultural inquiries."""
     chat_in.research_mode = "deep_research"

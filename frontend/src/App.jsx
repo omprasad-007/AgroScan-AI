@@ -22,6 +22,7 @@ import { RegisterPage } from './pages/RegisterPage';
 import { ResultPage } from './pages/ResultPage';
 import { ScanPage } from './pages/ScanPage';
 import { WeatherRiskPage } from './pages/WeatherRiskPage';
+import { FloatingAIChatbot } from './components/assistant/FloatingAIChatbot';
 
 const AppLayout = () => {
   const { isAuthenticated } = useAuth();
@@ -57,6 +58,7 @@ const AppLayout = () => {
         </main>
       </div>
       {showWorkspaceNavigation && <MobileNav />}
+      <FloatingAIChatbot />
     </div>
   );
 };

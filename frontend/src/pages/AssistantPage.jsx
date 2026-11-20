@@ -8,6 +8,7 @@ import {
   History, Plus, Trash2, MessageSquare, Clock, ChevronRight
 } from 'lucide-react';
 import api from '../services/api';
+import { FormattedAIMessage } from '../components/assistant/FormattedAIMessage';
 
 // Curated Farmer FAQs organized by categories for instant tapping
 const FARMER_FAQ_CATEGORIES = {
@@ -918,56 +919,19 @@ export const AssistantPage = () => {
               </div>
               
               <div
-                className={`p-4 rounded-2xl text-xs sm:text-sm leading-relaxed ${
+                className={`p-4 rounded-3xl text-xs sm:text-sm leading-relaxed shadow-sm ${
                   msg.sender === 'user'
-                    ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-semibold rounded-tr-none shadow-md shadow-emerald-500/20'
-                    : 'bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-white/[0.08] text-slate-800 dark:text-slate-100 rounded-tl-none shadow-sm'
+                    ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-medium rounded-tr-none shadow-md shadow-emerald-500/20'
+                    : 'bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-white/[0.08] text-slate-800 dark:text-slate-100 rounded-tl-none'
                 }`}
               >
-                <p className="whitespace-pre-wrap">{msg.content}</p>
-
-                {/* Multi-Source Research Citations & Evidence Panel */}
-                {msg.sender === 'assistant' && msg.sources && msg.sources.length > 0 && (
-                  <div className="mt-3.5 pt-3 border-t border-agro-border space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[11px] font-bold text-agro-primary flex items-center gap-1.5">
-                        <BookOpen className="w-3.5 h-3.5" />
-                        <span>{lang === 'mr' ? 'तपासलेले कृषी संशोधन व संदर्भ (Sources):' : 'Verified Agricultural Research & Sources:'}</span>
-                      </span>
-                      {msg.source_agreement && (
-                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-agro-primary/15 text-agro-primary border border-agro-primary/30 font-semibold">
-                          {msg.source_agreement === 'high' ? 'High Consensus' : 'Multi-Source Verified'}
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 pt-1">
-                      {msg.sources.map((src, sIdx) => (
-                        <a
-                          key={sIdx}
-                          href={src.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex flex-col p-2.5 rounded-xl bg-agro-surface/80 border border-agro-border hover:border-agro-primary/50 transition group"
-                        >
-                          <div className="flex items-center justify-between gap-1 mb-0.5">
-                            <span className="text-[10px] font-bold text-agro-muted group-hover:text-agro-primary truncate">
-                              {src.source}
-                            </span>
-                            {src.trust_score && (
-                              <span className="text-[9px] font-mono text-agro-primary bg-agro-primary/10 px-1.5 py-0.5 rounded border border-agro-primary/20 font-bold">
-                                {Math.round(src.trust_score * 100)}% Trust
-                              </span>
-                            )}
-                          </div>
-                          <span className="text-[11px] text-agro-cream font-medium line-clamp-1 group-hover:text-agro-lime transition">
-                            {src.title}
-                          </span>
-                        </a>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                <FormattedAIMessage
+                  content={msg.content}
+                  sender={msg.sender}
+                  sources={msg.sources}
+                  timestamp={msg.timestamp}
+                  lang={lang}
+                />
               </div>
             </div>
 

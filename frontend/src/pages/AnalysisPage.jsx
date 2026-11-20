@@ -94,6 +94,15 @@ export const AnalysisPage = () => {
       if (location.state?.weather?.rainfall_mm !== undefined) {
         formData.append('rainfall_mm', location.state.weather.rainfall_mm);
       }
+      if (location.state?.weather?.latitude !== undefined) {
+        formData.append('latitude', location.state.weather.latitude);
+      }
+      if (location.state?.weather?.longitude !== undefined) {
+        formData.append('longitude', location.state.weather.longitude);
+      }
+      if (location.state?.weather?.location) {
+        formData.append('location_name', location.state.weather.location);
+      }
 
       const response = await api.post('/predictions/analyze', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },

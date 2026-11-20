@@ -1,0 +1,452 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { 
+  Bot, Send, X, Sparkles, MessageCircle, Maximize2, 
+  RotateCcw, Download, Mic, MicOff, Volume2, 
+  ChevronDown, HelpCircle, Sprout, ArrowUpRight
+} from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useLanguage } from '../../context/LanguageContext';
+import { FormattedAIMessage } from './FormattedAIMessage';
+import api from '../../services/api';
+
+/**
+ * FloatingAIChatbot
+ * Persistent, global floating AI Agronomist chatbot widget.
+ * Available across all pages for instant farming advice, crop diagnosis questions,
+ * organic remedies, pesticide dosages, and weather guidance in English and Marathi.
+ */
+export const FloatingAIChatbot = () => {
+  const { lang, setLang, t } = useLanguage();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  if (location.pathname === '/assistant') {
+    return null;
+  }
+
+  const [isOpen, setIsOpen] = useState(false);
+  const [isMinimized, setIsMinimized] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const [hasUnread, setHasUnread] = useState(false);
+  
+  const chatEndRef = useRef(null);
+  const recognitionRef = useRef(null);
+
+  // Initialize Speech Recognition once
+  useEffect(() => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      const recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = lang === 'mr' ? 'mr-IN' : 'en-US';
+
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        if (transcript) {
+          setInput(prev => (prev ? `${prev} ${transcript}` : transcript));
+        }
+        setIsListening(false);
+      };
+
+      recognition.onerror = () => setIsListening(false);
+      recognition.onend = () => setIsListening(false);
+      recognitionRef.current = recognition;
+    }
+  }, [lang]);
+
+  // Initial Welcome Greeting
+  useEffect(() => {
+    if (messages.length === 0) {
+      const welcomeMsg = lang === 'mr'
+        ? `🌱 **नमस्कार शेतकरी बंधूंनो!** मी तुमचा **ॲग्रोस्कॅन AI कृषी सल्लागार** आहे.\n\nतुम्ही मला पिकांचे रोग, सेंद्रिय औषधोपचार, खत व्यवस्थापन, किंवा फवारणीच्या प्रमाणाबद्दल काहीही विचारू शकता. खालीलपैकी एका प्रश्नावर क्लिक करा किंवा खाली थेट टाईप करा:`
+        : `🌱 **Hello Farmer!** I am your **AgroScan AI Agronomist**.\n\nAsk me anything about plant disease diagnosis, organic remedies, chemical dosages, irrigation schedules, or crop nutrition. Tap a quick question below or type your inquiry:`;
+
+      setMessages([{
+        sender: 'assistant',
+        content: welcomeMsg,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      }]);
+    }
+  }, [lang]);
+
+  // Auto-scroll to bottom of chat
+  useEffect(() => {
+    if (isOpen && !isMinimized) {
+      chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages, isOpen, isMinimized]);
+
+  // Handle Speech Recognition Toggle
+  const toggleListening = () => {
+    if (!recognitionRef.current) {
+      alert(lang === 'mr' ? 'आपल्या ब्राउझरमध्ये व्हॉइस इनपुट उपलब्ध नाही.' : 'Voice recognition is not supported in this browser.');
+      return;
+    }
+
+    if (isListening) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    } else {
+      recognitionRef.current.lang = lang === 'mr' ? 'mr-IN' : 'en-US';
+      try {
+        recognitionRef.current.start();
+        setIsListening(true);
+      } catch {
+        setIsListening(false);
+      }
+    }
+  };
+
+  // Send Message
+  const handleSendMessage = async (textToSend) => {
+    const query = (textToSend || input).trim();
+    if (!query || loading) return;
+
+    const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    setInput('');
+    setMessages(prev => [...prev, { sender: 'user', content: query, timestamp: timeStr }]);
+    setLoading(true);
+
+    try {
+      const res = await api.post('/chat', {
+        message: query,
+        language: lang
+      });
+
+      const botReply = res.data?.answer || res.data?.content || (
+        lang === 'mr' 
+          ? "माहिती यशस्वीरीत्या प्राप्त झाली. पिकाचे नियमित निरीक्षण करा." 
+          : "Guidance retrieved. Continue regular crop monitoring."
+      );
+
+      setMessages(prev => [...prev, {
+        sender: 'assistant',
+        content: botReply,
+        sources: res.data?.sources || [],
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      }]);
+    } catch (err) {
+      setMessages(prev => [...prev, {
+        sender: 'assistant',
+        content: lang === 'mr'
+          ? "माफ करा, सर्व्हर तात्पुरता व्यस्त आहे. कृपया काही क्षणांनंतर पुन्हा प्रयत्न करा."
+          : "The agronomy service is momentarily busy. Please try again in a few moments.",
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      }]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Quick Action Chips
+  const quickQuestions = lang === 'mr' ? [
+    'टोमॅटो करपा रोगावर सेंद्रिय उपाय काय?',
+    'निंबोळी अर्क (Neem Oil) फवारणीचे योग्य प्रमाण',
+    'कपाशीवरील पांढऱ्या माशीवर नियंत्रण कसे करावे?',
+    'ऊस तांबेरा व लाल कुज रोगाची लक्षणे',
+    'ठिबक सिंचनाने पाणी देण्याचे वेळापत्रक'
+  ] : [
+    'How to cure tomato early blight organically?',
+    'What is the correct Neem Oil spray ratio (ppm)?',
+    'Quick organic remedy for cotton whiteflies',
+    'Sugarcane red rot symptoms and control',
+    'Optimal drip irrigation schedule for vegetables'
+  ];
+
+  // Export full chat transcript
+  const handleExportChat = () => {
+    if (messages.length === 0) return;
+    const dateStr = new Date().toISOString().split('T')[0];
+    let md = `# AgroScan AI — Field Advisory Transcript\n\n`;
+    md += `**Date**: ${dateStr}\n`;
+    md += `**Language**: ${lang === 'mr' ? 'मराठी' : 'English'}\n`;
+    md += `==============================================\n\n`;
+
+    messages.forEach((msg) => {
+      const label = msg.sender === 'user' ? (lang === 'mr' ? 'शेतकरी' : 'Farmer') : (lang === 'mr' ? 'ॲग्रोस्कॅन AI कृषी सल्लागार' : 'AgroScan AI Agronomist');
+      md += `### ${label} (${msg.timestamp || ''})\n${msg.content}\n\n`;
+    });
+
+    const blob = new Blob(["\uFEFF" + md], { type: 'text/markdown;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `agroscan-advisory-${dateStr}.md`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  // Reset conversation
+  const handleResetChat = () => {
+    const welcomeMsg = lang === 'mr'
+      ? `🌱 **नमस्कार!** नवा सल्ला सत्र सुरू झाले आहे. पिकांच्या कोणत्याही समस्येबाबत विचारा:`
+      : `🌱 **Hello!** New consultation session started. Ask any question about crop health:`;
+
+    setMessages([{
+      sender: 'assistant',
+      content: welcomeMsg,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    }]);
+  };
+
+  return (
+    <>
+      {/* 1. Floating Action Button (FAB) */}
+      {!isOpen && (
+        <div className="fixed bottom-20 md:bottom-8 right-5 md:right-8 z-50 flex items-center gap-3">
+          {/* Pulsing Hint Pill */}
+          <div 
+            onClick={() => { setIsOpen(true); setHasUnread(false); }}
+            className="hidden sm:flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-slate-900/90 dark:bg-slate-900/90 light:bg-white text-slate-100 dark:text-slate-100 light:text-slate-800 border border-emerald-500/40 shadow-xl backdrop-blur-md cursor-pointer hover:border-emerald-400 transition group animate-fade-in"
+          >
+            <Sparkles className="w-4 h-4 text-emerald-400 group-hover:rotate-12 transition-transform" />
+            <span className="text-xs font-bold tracking-wide">
+              {lang === 'mr' ? 'AI कृषी सल्लागार' : 'Ask AI Agronomist'}
+            </span>
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+          </div>
+
+          {/* Glowing Circular FAB */}
+          <button
+            type="button"
+            onClick={() => { setIsOpen(true); setHasUnread(false); }}
+            className="relative w-14 h-14 rounded-full bg-gradient-to-tr from-emerald-600 via-teal-500 to-emerald-400 text-white flex items-center justify-center shadow-2xl shadow-emerald-500/50 hover:scale-105 active:scale-95 transition-all border-2 border-white/20 group"
+            title={lang === 'mr' ? 'AI कृषी सल्लागार उघडा' : 'Open AI Agronomist Chat'}
+          >
+            <Bot className="w-7 h-7 text-white group-hover:scale-110 transition-transform" />
+            <span className="absolute -top-1 -right-1 flex h-4 w-4">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-4 w-4 bg-emerald-500 border-2 border-slate-900" />
+            </span>
+          </button>
+        </div>
+      )}
+
+      {/* 2. Floating Chat Drawer / Window */}
+      {isOpen && (
+        <div 
+          className={`fixed bottom-20 md:bottom-8 right-4 md:right-8 z-50 w-[94vw] sm:w-[460px] md:w-[500px] flex flex-col rounded-3xl overflow-hidden shadow-2xl border border-emerald-500/30 bg-slate-950 dark:bg-slate-950 light:bg-white text-slate-100 dark:text-slate-100 light:text-slate-800 backdrop-blur-2xl transition-all duration-300 animate-slide-up ${
+            isMinimized ? 'h-16' : 'h-[640px] max-h-[85vh]'
+          }`}
+        >
+          {/* Header */}
+          <div className="p-4 bg-gradient-to-r from-emerald-950/80 via-slate-900/90 to-teal-950/80 border-b border-emerald-500/20 flex items-center justify-between shrink-0 select-none">
+            <div className="flex items-center gap-3">
+              <div className="relative w-9 h-9 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white flex items-center justify-center shadow-md shadow-emerald-500/30 border border-emerald-400/30">
+                <Bot className="w-5 h-5" />
+                <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-slate-950 animate-pulse" />
+              </div>
+              <div>
+                <h3 className="text-sm font-extrabold flex items-center gap-2 text-white">
+                  <span>{lang === 'mr' ? 'ॲग्रोस्कॅन AI कृषी सल्लागार' : 'AgroScan AI Agronomist'}</span>
+                  <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold uppercase tracking-wider">
+                    {lang === 'mr' ? 'थेट' : 'Live'}
+                  </span>
+                </h3>
+                <p className="text-[11px] text-emerald-200/80">
+                  {lang === 'mr' ? 'पिकांचे रोग, खते व फवारणी सल्ला' : 'Crop pathology, dosages & farm remedies'}
+                </p>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex items-center gap-1.5">
+              {/* Language Switcher */}
+              <div className="flex bg-black/40 rounded-xl p-0.5 border border-white/10 text-[10px] font-bold">
+                <button
+                  type="button"
+                  onClick={() => setLang('en')}
+                  className={`px-2 py-0.5 rounded-lg transition ${lang === 'en' ? 'bg-emerald-500 text-white' : 'text-slate-400 hover:text-white'}`}
+                >
+                  EN
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLang('mr')}
+                  className={`px-2 py-0.5 rounded-lg transition ${lang === 'mr' ? 'bg-emerald-500 text-white' : 'text-slate-400 hover:text-white'}`}
+                >
+                  मराठी
+                </button>
+              </div>
+
+              {/* Fullpage View */}
+              <button
+                type="button"
+                onClick={() => { setIsOpen(false); navigate('/assistant'); }}
+                className="p-1.5 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white transition"
+                title={lang === 'mr' ? 'संपूर्ण स्क्रीनवर उघडा' : 'Expand to full page'}
+              >
+                <Maximize2 className="w-4 h-4" />
+              </button>
+
+              {/* Reset Session */}
+              <button
+                type="button"
+                onClick={handleResetChat}
+                className="p-1.5 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white transition"
+                title={lang === 'mr' ? 'नवे सत्र सुरू करा' : 'New consultation session'}
+              >
+                <RotateCcw className="w-4 h-4" />
+              </button>
+
+              {/* Minimize / Expand Toggle */}
+              <button
+                type="button"
+                onClick={() => setIsMinimized(prev => !prev)}
+                className="p-1.5 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white transition"
+                title={isMinimized ? 'Expand' : 'Minimize'}
+              >
+                <ChevronDown className={`w-4 h-4 transition-transform ${isMinimized ? 'rotate-180' : ''}`} />
+              </button>
+
+              {/* Close */}
+              <button
+                type="button"
+                onClick={() => setIsOpen(false)}
+                className="p-1.5 rounded-xl hover:bg-rose-500/20 text-slate-300 hover:text-rose-400 transition"
+                title="Close"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
+          {/* Body (Messages Feed + Quick Prompts) */}
+          {!isMinimized && (
+            <>
+              {/* Message Feed */}
+              <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-950/70 dark:bg-slate-950/70 light:bg-slate-50">
+                {messages.map((msg, idx) => (
+                  <div
+                    key={idx}
+                    className={`flex gap-3 max-w-[92%] ${msg.sender === 'user' ? 'ml-auto justify-end' : ''}`}
+                  >
+                    {msg.sender === 'assistant' && (
+                      <div className="w-8 h-8 rounded-2xl bg-gradient-to-tr from-emerald-600/30 to-teal-500/20 text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-500/30 shadow-sm mt-0.5">
+                        <Bot className="w-4 h-4" />
+                      </div>
+                    )}
+
+                    <div className={`flex flex-col gap-1 ${msg.sender === 'user' ? 'items-end' : ''}`}>
+                      <div
+                        className={`p-4 rounded-3xl text-xs sm:text-sm leading-relaxed shadow-md ${
+                          msg.sender === 'user'
+                            ? 'bg-gradient-to-r from-emerald-600 to-teal-500 text-white font-medium rounded-tr-none shadow-emerald-500/20'
+                            : 'bg-slate-900/90 dark:bg-slate-900/90 light:bg-white border border-slate-800 dark:border-white/[0.08] light:border-slate-200 text-slate-100 dark:text-slate-100 light:text-slate-800 rounded-tl-none'
+                        }`}
+                      >
+                        <FormattedAIMessage
+                          content={msg.content}
+                          sender={msg.sender}
+                          sources={msg.sources}
+                          timestamp={msg.timestamp}
+                          lang={lang}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+
+                {/* Animated Thinking State */}
+                {loading && (
+                  <div className="flex items-center gap-3 p-3 rounded-2xl bg-emerald-950/30 border border-emerald-500/20 text-emerald-400 text-xs font-semibold animate-pulse w-fit">
+                    <Sparkles className="w-4 h-4 animate-spin text-emerald-400" />
+                    <span>{lang === 'mr' ? 'कृषी सल्लागार विश्लेषण करत आहे...' : 'AI Agronomist is analyzing remedies & dosages...'}</span>
+                  </div>
+                )}
+
+                <div ref={chatEndRef} />
+              </div>
+
+              {/* Quick Prompt Carousel */}
+              <div className="px-3 py-2 bg-slate-900/80 dark:bg-slate-900/80 light:bg-slate-100 border-t border-slate-800 dark:border-white/[0.06] light:border-slate-200 flex items-center gap-2 overflow-x-auto hide-scrollbar">
+                <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider shrink-0 flex items-center gap-1">
+                  <Sprout className="w-3 h-3" />
+                  {lang === 'mr' ? 'सुचवलेले:' : 'Quick:'}
+                </span>
+                {quickQuestions.map((q, qIdx) => (
+                  <button
+                    key={qIdx}
+                    type="button"
+                    onClick={() => handleSendMessage(q)}
+                    className="whitespace-nowrap px-3 py-1 rounded-full bg-slate-800 dark:bg-slate-800 light:bg-white hover:bg-emerald-500/20 border border-slate-700 dark:border-white/[0.08] light:border-slate-300 text-[11px] text-slate-300 dark:text-slate-300 light:text-slate-700 hover:text-emerald-400 transition shrink-0"
+                  >
+                    {q}
+                  </button>
+                ))}
+              </div>
+
+              {/* Input Area */}
+              <div className="p-3 bg-slate-900 dark:bg-slate-900 light:bg-white border-t border-slate-800 dark:border-white/[0.06] light:border-slate-200">
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handleSendMessage();
+                  }}
+                  className="flex items-center gap-2"
+                >
+                  {/* Voice Dictation Button */}
+                  <button
+                    type="button"
+                    onClick={toggleListening}
+                    className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 border transition ${
+                      isListening
+                        ? 'bg-rose-500/20 text-rose-400 border-rose-500 animate-pulse'
+                        : 'bg-slate-800/80 dark:bg-slate-800/80 light:bg-slate-100 text-slate-300 hover:text-emerald-400 border-slate-700 dark:border-white/[0.08] light:border-slate-200'
+                    }`}
+                    title={isListening ? 'Stop listening' : 'Speak your question'}
+                  >
+                    {isListening ? <MicOff className="w-4 h-4 text-rose-400" /> : <Mic className="w-4 h-4" />}
+                  </button>
+
+                  {/* Text Input */}
+                  <input
+                    type="text"
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    placeholder={
+                      isListening
+                        ? (lang === 'mr' ? 'ऐकत आहे... बोला' : 'Listening... Speak now')
+                        : (lang === 'mr' ? 'पिकांबद्दल काहीही विचारा (उदा. खते, रोग, फवारणी)...' : 'Ask about crop care, organic sprays, dosages...')
+                    }
+                    className="flex-1 h-10 px-4 rounded-2xl bg-slate-950 dark:bg-slate-950 light:bg-slate-50 border border-slate-700/80 dark:border-white/[0.08] light:border-slate-300 text-xs sm:text-sm text-slate-100 dark:text-slate-100 light:text-slate-800 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition placeholder:text-slate-500"
+                  />
+
+                  {/* Send Button */}
+                  <button
+                    type="submit"
+                    disabled={!input.trim() || loading}
+                    className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white flex items-center justify-center shrink-0 shadow-md shadow-emerald-500/30 disabled:opacity-40 transition-all active:scale-95"
+                    title="Send"
+                  >
+                    <Send className="w-4 h-4" />
+                  </button>
+                </form>
+
+                {/* Subtitle / Disclaimer */}
+                <div className="flex items-center justify-between mt-2 px-1 text-[10px] text-slate-500 dark:text-slate-500 light:text-slate-400">
+                  <span className="flex items-center gap-1">
+                    <Sparkles className="w-3 h-3 text-emerald-400" />
+                    <span>{lang === 'mr' ? 'कृषी तज्ज्ञ संदर्भयुक्त AI' : 'Expert Grounded Agricultural AI'}</span>
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleExportChat}
+                    className="hover:text-emerald-400 transition underline"
+                  >
+                    {lang === 'mr' ? 'संवाद सेव्ह करा' : 'Save Transcript'}
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      )}
+    </>
+  );
+};

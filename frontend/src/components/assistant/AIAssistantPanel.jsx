@@ -1,14 +1,51 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Bot, Send, Download, Sparkles, BookOpen } from 'lucide-react';
+import { 
+  Bot, Send, Download, Sparkles, BookOpen, Maximize2, 
+  Minimize2, Mic, MicOff, RotateCcw, Sprout, ArrowUpRight
+} from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
+import { FormattedAIMessage } from './FormattedAIMessage';
 import api from '../../services/api';
 
+/**
+ * AIAssistantPanel
+ * Full-featured, spacious AI Agronomist consultation panel.
+ * Embedded directly in scan results and diagnosis dashboards with 
+ * context awareness, rich markdown formatting, and bilingual speech/audio.
+ */
 export const AIAssistantPanel = ({ scanData, predictionId, autoOpen = true }) => {
   const { lang, setLang, t, translateCrop, translateDisease } = useLanguage();
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+
   const chatEndRef = useRef(null);
+  const recognitionRef = useRef(null);
+
+  // Initialize Speech Recognition once
+  useEffect(() => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      const recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = lang === 'mr' ? 'mr-IN' : 'en-US';
+
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        if (transcript) {
+          setInput(prev => (prev ? `${prev} ${transcript}` : transcript));
+        }
+        setIsListening(false);
+      };
+
+      recognition.onerror = () => setIsListening(false);
+      recognition.onend = () => setIsListening(false);
+      recognitionRef.current = recognition;
+    }
+  }, [lang]);
 
   // Initial Pre-seeded Context Greeting
   useEffect(() => {
@@ -30,12 +67,20 @@ export const AIAssistantPanel = ({ scanData, predictionId, autoOpen = true }) =>
           : `I see this is **${rawCrop}** with **${rawDisease}** detected — ask me anything about organic remedies, chemical options, or prevention.`;
       }
 
-      setMessages([{ sender: 'assistant', content: greeting, timestamp: new Date().toLocaleTimeString() }]);
+      setMessages([{ 
+        sender: 'assistant', 
+        content: greeting, 
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
+      }]);
     } else {
       const welcome = lang === 'mr' 
         ? "नमस्कार! मी तुमचा ॲग्रोस्कॅन AI कृषी सल्लागार आहे. पिकांच्या आरोग्याबद्दल किंवा रोगाबद्दल प्रश्न विचारा."
         : "Hello! I am your AgroScan AI Agronomist. Ask me anything about crop diseases, remedies, or farming guidance.";
-      setMessages([{ sender: 'assistant', content: welcome, timestamp: new Date().toLocaleTimeString() }]);
+      setMessages([{ 
+        sender: 'assistant', 
+        content: welcome, 
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
+      }]);
     }
   }, [scanData, lang, translateCrop, translateDisease]);
 
@@ -43,28 +88,53 @@ export const AIAssistantPanel = ({ scanData, predictionId, autoOpen = true }) =>
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const handleSendMessage = async (textToSend) => {
-    if (!textToSend.trim() || loading) return;
+  // Handle Speech Recognition Toggle
+  const toggleListening = () => {
+    if (!recognitionRef.current) {
+      alert(lang === 'mr' ? 'आपल्या ब्राउझरमध्ये व्हॉइस इनपुट उपलब्ध नाही.' : 'Voice recognition is not supported in this browser.');
+      return;
+    }
 
-    const userText = textToSend.trim();
+    if (isListening) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    } else {
+      recognitionRef.current.lang = lang === 'mr' ? 'mr-IN' : 'en-US';
+      try {
+        recognitionRef.current.start();
+        setIsListening(true);
+      } catch {
+        setIsListening(false);
+      }
+    }
+  };
+
+  const handleSendMessage = async (textToSend) => {
+    const query = (textToSend || input).trim();
+    if (!query || loading) return;
+
     const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    
     setInput('');
-    setMessages(prev => [...prev, { sender: 'user', content: userText, timestamp: timeStr }]);
+    setMessages(prev => [...prev, { sender: 'user', content: query, timestamp: timeStr }]);
     setLoading(true);
 
     try {
       const res = await api.post('/chat', {
-        message: userText,
+        message: query,
         prediction_id: predictionId || (scanData ? scanData.id : undefined),
         language: lang
       });
 
-      const botContent = res.data.answer || res.data.content;
+      const botContent = res.data?.answer || res.data?.content || (
+        lang === 'mr'
+          ? "माहिती प्राप्त झाली. पिकाचे नियमित निरीक्षण ठेवा."
+          : "Consultation response generated. Please scout your foliage regularly."
+      );
+
       setMessages(prev => [...prev, { 
         sender: 'assistant', 
         content: botContent,
-        sources: res.data.sources || [],
+        sources: res.data?.sources || [],
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
       }]);
     } catch (err) {
@@ -89,7 +159,7 @@ export const AIAssistantPanel = ({ scanData, predictionId, autoOpen = true }) =>
     const confidence = scanData?.confidence_score ? `${(scanData.confidence_score * 100).toFixed(1)}%` : 'N/A';
     const dateStr = new Date().toISOString().split('T')[0];
 
-    let md = `# AgroScan AI — Chat & Advisory Report\n\n`;
+    let md = `# AgroScan AI — Field Chat & Advisory Report\n\n`;
     md += `**Date**: ${dateStr}\n`;
     md += `**Plant**: ${plantName}\n`;
     md += `**Disease / Status**: ${diseaseName}\n`;
@@ -133,9 +203,9 @@ export const AIAssistantPanel = ({ scanData, predictionId, autoOpen = true }) =>
         }
         return [
           `${disease} ची लक्षणे व तीव्रता`,
-          `${disease} वर सेंद्रिय उपाय`,
-          `${disease} साठी रासायनिक फवारणी`,
-          `हा रोग कसा रोखावा?`
+          `${disease} वर सेंद्रिय उपाय काय आहेत?`,
+          `${disease} साठी रासायनिक फवारणी व प्रमाण`,
+          `हा रोग इतर झाडांवर पसरू नये म्हणून काय करावे?`
         ];
       }
 
@@ -150,46 +220,51 @@ export const AIAssistantPanel = ({ scanData, predictionId, autoOpen = true }) =>
       return [
         `Symptoms of ${rawDisease}`,
         `Organic treatment for ${rawDisease}`,
-        `Chemical options for ${rawDisease}`,
-        `How to prevent ${rawDisease}`
+        `Chemical spray & dosage for ${rawDisease}`,
+        `How to prevent ${rawDisease} spread`
       ];
     }
 
     if (lang === 'mr') {
       return [
-        "सेंद्रिय कंपोस्ट खत कसे बनवावे?",
-        "ठिबक सिंचन मार्गदर्शन",
-        "कीड नियंत्रण टिप्स",
-        "माती परीक्षण माहिती"
+        "टोमॅटो करपा रोगावर सेंद्रिय फवारणी कोणती?",
+        "निंबोळी अर्क (Neem Oil) वापरण्याचे प्रमाण किती?",
+        "कपाशीवरील कीड नियंत्रणासाठी उपाय",
+        "ऊस पिकासाठी ठिबक सिंचन वेळापत्रक"
       ];
     }
 
     return [
-      "How to make organic compost?",
-      "Drip irrigation guidance",
-      "Pest control tips",
-      "Soil testing advice"
+      "Organic cure for tomato early blight",
+      "Correct Neem Oil spray dilution (ppm)",
+      "Pest control tips for cotton crops",
+      "Drip irrigation schedule for sugarcane"
     ];
   };
 
   return (
-    <div className="agro-panel rounded-2xl border border-agro-border shadow-2xl overflow-hidden flex flex-col">
+    <div 
+      className={`agro-panel rounded-3xl border border-emerald-500/30 dark:border-white/[0.08] light:border-slate-200 shadow-2xl overflow-hidden flex flex-col bg-slate-950/95 dark:bg-slate-950/95 light:bg-white backdrop-blur-xl transition-all duration-300 ${
+        isExpanded ? 'min-h-[720px] h-[750px]' : 'min-h-[520px] h-[560px]'
+      }`}
+    >
       
       {/* Panel Header */}
-      <div className="bg-agro-surface/90 border-b border-agro-border p-4 flex items-center justify-between">
-        <div className="flex items-center space-x-2.5">
-          <div className="w-8 h-8 rounded-lg bg-agro-primary/20 text-agro-primary flex items-center justify-center border border-agro-primary/30">
+      <div className="bg-gradient-to-r from-emerald-950/80 via-slate-900/90 to-teal-950/80 border-b border-emerald-500/20 p-4 sm:p-5 flex items-center justify-between shrink-0">
+        <div className="flex items-center space-x-3">
+          <div className="relative w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white flex items-center justify-center shadow-lg shadow-emerald-500/30 border border-emerald-400/30">
             <Bot className="w-5 h-5" />
+            <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-slate-950 animate-pulse" />
           </div>
           <div>
-            <h3 className="text-sm font-bold text-agro-cream flex items-center space-x-2">
-              <span>{t('assistant.title') || 'AgroScan AI Agronomist'}</span>
-              <span className="px-2 py-0.5 rounded-full bg-agro-primary/10 text-agro-primary text-[10px] uppercase font-bold border border-agro-primary/20">
+            <h3 className="text-sm sm:text-base font-extrabold text-white flex items-center space-x-2">
+              <span>{t('assistant.title') || (lang === 'mr' ? 'ॲग्रोस्कॅन AI कृषी सल्लागार' : 'AgroScan AI Agronomist')}</span>
+              <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] uppercase font-bold border border-emerald-500/30 tracking-wider">
                 {lang === 'mr' ? 'थेट AI' : 'Live AI'}
               </span>
             </h3>
-            <p className="text-[11px] text-agro-muted">
-              {lang === 'mr' ? 'भारतीय शेतकऱ्यांसाठी संदर्भयुक्त कृषी मार्गदर्शन' : 'Contextual guidance for Indian smallholder farmers'}
+            <p className="text-[11px] sm:text-xs text-emerald-200/80">
+              {lang === 'mr' ? 'भारतीय शेतकऱ्यांसाठी वैज्ञानिक व सेंद्रिय कृषी सल्ला' : 'Contextual agronomic & diagnostic guidance for farmers'}
             </p>
           </div>
         </div>
@@ -200,26 +275,36 @@ export const AIAssistantPanel = ({ scanData, predictionId, autoOpen = true }) =>
             type="button"
             onClick={handleExportChat}
             disabled={messages.length === 0}
-            className="px-3 py-1.5 rounded-lg bg-agro-surface hover:bg-agro-hover text-agro-cream text-xs font-bold border border-agro-border flex items-center space-x-1.5 transition disabled:opacity-50"
+            className="px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 text-slate-200 hover:text-white text-xs font-bold border border-slate-700 flex items-center space-x-1.5 transition disabled:opacity-50"
             title="Export full chat transcript as Markdown (.md)"
           >
-            <Download className="w-3.5 h-3.5 text-agro-primary" />
-            <span>{lang === 'mr' ? 'संवाद जतन करा' : 'Export Chat'}</span>
+            <Download className="w-3.5 h-3.5 text-emerald-400" />
+            <span className="hidden sm:inline">{lang === 'mr' ? 'संवाद जतन करा' : 'Export Chat'}</span>
+          </button>
+
+          {/* Expand / Minimize Toggle */}
+          <button
+            type="button"
+            onClick={() => setIsExpanded(prev => !prev)}
+            className="p-2 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 text-slate-200 hover:text-white border border-slate-700 transition"
+            title={isExpanded ? 'Collapse size' : 'Expand size'}
+          >
+            {isExpanded ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
           </button>
 
           {/* Language Toggle */}
-          <div className="flex bg-agro-bg rounded-lg p-1 border border-agro-border text-[11px] font-bold">
+          <div className="flex bg-black/40 rounded-xl p-0.5 border border-white/10 text-[11px] font-bold">
             <button
               type="button"
               onClick={() => setLang('en')}
-              className={`px-2 py-0.5 rounded transition ${lang === 'en' ? 'bg-agro-primary text-white font-bold' : 'text-agro-muted hover:text-agro-cream'}`}
+              className={`px-2.5 py-1 rounded-lg transition ${lang === 'en' ? 'bg-emerald-500 text-white font-bold' : 'text-slate-400 hover:text-white'}`}
             >
               EN
             </button>
             <button
               type="button"
               onClick={() => setLang('mr')}
-              className={`px-2 py-0.5 rounded transition ${lang === 'mr' ? 'bg-agro-primary text-white font-bold' : 'text-agro-muted hover:text-agro-cream'}`}
+              className={`px-2.5 py-1 rounded-lg transition ${lang === 'mr' ? 'bg-emerald-500 text-white font-bold' : 'text-slate-400 hover:text-white'}`}
             >
               मराठी
             </button>
@@ -228,68 +313,60 @@ export const AIAssistantPanel = ({ scanData, predictionId, autoOpen = true }) =>
       </div>
 
       {/* Messages Feed */}
-      <div className="p-4 space-y-4 max-h-96 overflow-y-auto bg-agro-bg/50">
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 bg-slate-950/70 dark:bg-slate-950/70 light:bg-slate-50">
         {messages.map((msg, i) => (
-          <div key={i} className={`flex gap-3 max-w-[90%] ${msg.sender === 'user' ? 'ml-auto justify-end' : ''}`}>
+          <div 
+            key={i} 
+            className={`flex gap-3 max-w-[92%] sm:max-w-[85%] ${msg.sender === 'user' ? 'ml-auto justify-end' : ''}`}
+          >
             {msg.sender === 'assistant' && (
-              <div className="w-7 h-7 rounded-full bg-agro-primary/20 text-agro-primary flex items-center justify-center shrink-0 border border-agro-primary/30">
+              <div className="w-8 h-8 rounded-2xl bg-gradient-to-tr from-emerald-600/30 to-teal-500/20 text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-500/30 shadow-sm mt-0.5">
                 <Bot className="w-4 h-4" />
               </div>
             )}
+            
             <div className={`flex flex-col gap-1 ${msg.sender === 'user' ? 'items-end' : ''}`}>
               <div
-                className={`p-3.5 rounded-2xl text-xs sm:text-sm leading-relaxed ${
+                className={`p-4 rounded-3xl text-xs sm:text-sm leading-relaxed shadow-sm ${
                   msg.sender === 'user'
-                    ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-semibold rounded-tr-none shadow-md shadow-emerald-500/20'
-                    : 'bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-white/[0.08] text-slate-800 dark:text-slate-100 rounded-tl-none shadow-sm'
+                    ? 'bg-gradient-to-r from-emerald-600 to-teal-500 text-white font-medium rounded-tr-none shadow-md shadow-emerald-500/20'
+                    : 'bg-slate-900/90 dark:bg-slate-900/90 light:bg-white border border-slate-800 dark:border-white/[0.08] light:border-slate-200 text-slate-100 dark:text-slate-100 light:text-slate-800 rounded-tl-none'
                 }`}
               >
-                <p className="whitespace-pre-wrap">{msg.content}</p>
-
-                {/* Multi-Source Research Citations */}
-                {msg.sender === 'assistant' && msg.sources && msg.sources.length > 0 && (
-                  <div className="mt-2.5 pt-2 border-t border-slate-200 dark:border-white/[0.08] space-y-1.5">
-                    <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
-                      <BookOpen className="w-3 h-3" />
-                      <span>{lang === 'mr' ? 'तपासलेले संदर्भ (Sources):' : 'Verified Evidence & Sources:'}</span>
-                    </span>
-                    <div className="flex flex-col gap-1">
-                      {msg.sources.map((src, sIdx) => (
-                        <a
-                          key={sIdx}
-                          href={src.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-[10px] text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 underline truncate transition"
-                        >
-                          • [{src.source}] {src.title}
-                        </a>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                <FormattedAIMessage
+                  content={msg.content}
+                  sender={msg.sender}
+                  sources={msg.sources}
+                  timestamp={msg.timestamp}
+                  lang={lang}
+                />
               </div>
             </div>
           </div>
         ))}
+
         {loading && (
-          <div className="flex items-center space-x-2 text-xs text-agro-primary font-semibold animate-pulse">
-            <Sparkles className="w-4 h-4 animate-spin" />
-            <span>{t('assistant.thinking') || 'Thinking...'}</span>
+          <div className="flex items-center space-x-3 p-3 rounded-2xl bg-emerald-950/30 border border-emerald-500/20 text-emerald-400 text-xs sm:text-sm font-semibold animate-pulse w-fit">
+            <Sparkles className="w-4 h-4 animate-spin text-emerald-400" />
+            <span>{t('assistant.thinking') || (lang === 'mr' ? 'कृषी सल्लागार विश्लेषण करत आहे...' : 'AI Agronomist is analyzing symptoms & weather data...')}</span>
           </div>
         )}
         <div ref={chatEndRef} />
       </div>
 
       {/* Quick Replies & Input */}
-      <div className="p-3 bg-agro-surface border-t border-agro-border space-y-2">
+      <div className="p-3 sm:p-4 bg-slate-900 dark:bg-slate-900 light:bg-white border-t border-slate-800 dark:border-white/[0.06] light:border-slate-200 space-y-3 shrink-0">
         <div className="flex overflow-x-auto gap-2 pb-1 hide-scrollbar">
+          <span className="text-[11px] font-bold text-emerald-400 uppercase tracking-wider shrink-0 flex items-center gap-1">
+            <Sprout className="w-3.5 h-3.5" />
+            {lang === 'mr' ? 'सुचवलेले प्रश्न:' : 'Suggested:'}
+          </span>
           {getQuickReplies().map((qr, idx) => (
             <button
               key={idx}
               type="button"
               onClick={() => handleSendMessage(qr)}
-              className="whitespace-nowrap px-3 py-1 bg-agro-bg border border-agro-border rounded-full text-xs font-medium text-agro-muted hover:bg-agro-hover hover:text-agro-cream transition shrink-0"
+              className="whitespace-nowrap px-3.5 py-1.5 bg-slate-800 dark:bg-slate-800 light:bg-slate-100 border border-slate-700 dark:border-white/[0.08] light:border-slate-300 rounded-full text-xs font-medium text-slate-300 dark:text-slate-300 light:text-slate-700 hover:bg-emerald-500/20 hover:text-emerald-400 transition shrink-0"
             >
               {qr}
             </button>
@@ -297,17 +374,33 @@ export const AIAssistantPanel = ({ scanData, predictionId, autoOpen = true }) =>
         </div>
 
         <form onSubmit={(e) => { e.preventDefault(); handleSendMessage(input); }} className="flex gap-2">
+          {/* Voice Input Microphone */}
+          <button
+            type="button"
+            onClick={toggleListening}
+            className={`w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 border transition ${
+              isListening
+                ? 'bg-rose-500/20 text-rose-400 border-rose-500 animate-pulse'
+                : 'bg-slate-800 dark:bg-slate-800 light:bg-slate-100 text-slate-300 hover:text-emerald-400 border-slate-700 dark:border-white/[0.08] light:border-slate-200'
+            }`}
+            title={isListening ? 'Stop listening' : 'Voice input'}
+          >
+            {isListening ? <MicOff className="w-4 h-4 text-rose-400" /> : <Mic className="w-4 h-4" />}
+          </button>
+
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder={t('assistant.placeholder_input') || (lang === 'mr' ? "पिकांबद्दल काहीही विचारा..." : "Ask AgroScan AI about crop care, dosage, or remedies...")}
-            className="flex-1 h-10 px-3.5 rounded-xl bg-agro-bg border border-agro-border text-xs text-agro-cream focus:outline-none focus:border-agro-primary focus:ring-1 focus:ring-agro-primary placeholder:text-agro-muted/60 transition"
+            placeholder={t('assistant.placeholder_input') || (lang === 'mr' ? "पिकांबद्दल काहीही विचारा (उदा. औषध प्रमाण, रोग लक्षणे, खत)..." : "Ask AgroScan AI about crop care, dosages, organic remedies...")}
+            className="flex-1 h-11 px-4 rounded-2xl bg-slate-950 dark:bg-slate-950 light:bg-slate-50 border border-slate-700/80 dark:border-white/[0.08] light:border-slate-300 text-xs sm:text-sm text-slate-100 dark:text-slate-100 light:text-slate-800 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 placeholder:text-slate-500 transition"
           />
+
           <button
             type="submit"
             disabled={!input.trim() || loading}
-            className="px-4 h-10 rounded-xl bg-agro-primary hover:bg-agro-primaryHover text-white font-bold text-xs flex items-center justify-center shrink-0 disabled:opacity-50 transition shadow-md shadow-agro-primary/20 active:scale-95"
+            className="px-5 h-11 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white font-bold text-xs sm:text-sm flex items-center justify-center shrink-0 disabled:opacity-40 transition-all shadow-md shadow-emerald-500/25 active:scale-95"
+            title="Send"
           >
             <Send className="w-4 h-4" />
           </button>
