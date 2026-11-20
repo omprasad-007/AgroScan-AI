@@ -45,11 +45,11 @@ const AppLayout = () => {
             <Route path="/scan" element={<ScanPage />} />
             <Route path="/analysis" element={<AnalysisPage />} />
             <Route path="/results/:scanId" element={<ResultPage />} />
+            <Route path="/weather" element={<WeatherRiskPage />} />
 
             <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
             <Route path="/history" element={<ProtectedRoute><HistoryPage /></ProtectedRoute>} />
             <Route path="/analytics" element={<ProtectedRoute><AnalyticsPage /></ProtectedRoute>} />
-            <Route path="/weather" element={<ProtectedRoute><WeatherRiskPage /></ProtectedRoute>} />
             <Route path="/assistant" element={<ProtectedRoute><AssistantPage /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
             <Route path="/admin" element={<ProtectedRoute adminOnly><AdminDashboardPage /></ProtectedRoute>} />
