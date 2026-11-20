@@ -142,165 +142,107 @@ export const ScanPage = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="max-w-4xl mx-auto space-y-6 pb-28">
       
       {/* Header */}
       <div className="space-y-1.5">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-agro-primary/15 border border-agro-primary/30 flex items-center justify-center text-agro-primary">
+          <div className="w-8 h-8 rounded-lg bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
             <ScanLine className="w-4 h-4" aria-hidden="true" />
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-agro-cream tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
             {t('scan.title') || 'Scan Plant Leaf'}
           </h1>
-          <span className="hidden sm:inline-flex items-center px-2.5 py-0.5 rounded-full bg-agro-primary/15 border border-agro-primary/30 text-[10px] font-extrabold text-agro-primary uppercase tracking-wide">
+          <span className="hidden sm:inline-flex items-center px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-[10px] font-extrabold text-emerald-700 dark:text-emerald-300 uppercase tracking-wide">
             Live AI Vision
           </span>
         </div>
-        <p className="text-xs sm:text-sm text-agro-muted max-w-2xl leading-relaxed">
+        <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 max-w-2xl leading-relaxed">
           {t('scan.subtitle') || 'Capture or upload a plant photo for instant species identification, disease severity quantification, and organic/chemical remedies.'}
         </p>
       </div>
 
-      {/* 4-Step Simplified Workflow Indicator */}
-      <nav aria-label="Scan Workflow Steps" className="agro-panel p-3 rounded-2xl border border-agro-border">
-        <ol className="grid grid-cols-2 md:grid-cols-4 gap-2 text-left">
-          <li className="flex items-center gap-2.5 p-2 rounded-xl bg-agro-surface/60 border border-agro-border">
-            <span className="w-6 h-6 rounded-lg bg-agro-primary text-white flex items-center justify-center text-xs font-black shrink-0">
-              1
-            </span>
-            <div className="min-w-0 leading-tight">
-              <span className="block text-xs font-bold text-agro-cream truncate">Crop Context</span>
-              <span className="text-[10px] text-agro-muted truncate block">Auto or select crop</span>
-            </div>
-          </li>
-
-          <li className="flex items-center gap-2.5 p-2 rounded-xl bg-agro-surface/60 border border-agro-primary/30">
-            <span className="w-6 h-6 rounded-lg bg-agro-primary text-white flex items-center justify-center text-xs font-black shrink-0">
-              2
-            </span>
-            <div className="min-w-0 leading-tight">
-              <span className="block text-xs font-bold text-agro-cream truncate">Leaf Photo</span>
-              <span className="text-[10px] text-agro-muted truncate block">Camera or upload</span>
-            </div>
-          </li>
-
-          <li className="flex items-center gap-2.5 p-2 rounded-xl bg-agro-surface/30">
-            <span className="w-6 h-6 rounded-lg bg-agro-surface text-agro-muted flex items-center justify-center text-xs font-bold shrink-0">
-              3
-            </span>
-            <div className="min-w-0 leading-tight">
-              <span className="block text-xs font-semibold text-agro-muted truncate">AI Analysis</span>
-              <span className="text-[10px] text-agro-mutedDark truncate block">Vision consensus</span>
-            </div>
-          </li>
-
-          <li className="flex items-center gap-2.5 p-2 rounded-xl bg-agro-surface/30">
-            <span className="w-6 h-6 rounded-lg bg-agro-surface text-agro-muted flex items-center justify-center text-xs font-bold shrink-0">
-              4
-            </span>
-            <div className="min-w-0 leading-tight">
-              <span className="block text-xs font-semibold text-agro-muted truncate">Prescription</span>
-              <span className="text-[10px] text-agro-mutedDark truncate block">Remedies & dosage</span>
-            </div>
-          </li>
-        </ol>
-      </nav>
-
-      {/* Step 1: Optional Context (Crop & Farm & Weather) */}
-      <section className="agro-panel p-5 rounded-2xl border border-agro-border space-y-4">
-        <div className="flex items-center justify-between border-b border-agro-border pb-3">
-          <div className="flex items-center gap-2">
-            <Sprout className="w-4 h-4 text-agro-lime" aria-hidden="true" />
-            <h2 className="text-sm font-bold text-agro-cream">Step 1: Crop & Field Context</h2>
+      {/* Sleek Step Progress Indicator */}
+      <div className="px-4 py-3 rounded-2xl bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 shadow-sm">
+        <div className="flex items-center justify-between text-xs font-semibold">
+          <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-bold">
+            <span className="w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[10px] font-black shadow-sm">1</span>
+            <span>Capture / Upload</span>
           </div>
-          {localWeather && (
-            <div className="flex items-center gap-1.5 text-[11px] text-agro-muted">
-              <CloudSun className="w-3.5 h-3.5 text-agro-amber" aria-hidden="true" />
-              <span>{localWeather.location}: <strong>{localWeather.temperature_c}°C</strong></span>
-            </div>
-          )}
+          <div className="h-0.5 flex-1 mx-3 sm:mx-6 bg-slate-200 dark:bg-slate-800"></div>
+          <div className="flex items-center gap-2 text-slate-400 dark:text-slate-500">
+            <span className="w-5 h-5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 flex items-center justify-center text-[10px] font-bold">2</span>
+            <span>AI Pathology Analysis</span>
+          </div>
+          <div className="h-0.5 flex-1 mx-3 sm:mx-6 bg-slate-200 dark:bg-slate-800"></div>
+          <div className="flex items-center gap-2 text-slate-400 dark:text-slate-500">
+            <span className="w-5 h-5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 flex items-center justify-center text-[10px] font-bold">3</span>
+            <span>Prescription & Remedies</span>
+          </div>
         </div>
+      </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="target-crop" className="block text-xs font-bold text-agro-cream mb-1.5">
-              Plant / Crop Species <span className="font-normal text-agro-muted">(Optional)</span>
-            </label>
-            <select
-              id="target-crop"
-              value={selectedCrop}
-              onChange={(e) => setSelectedCrop(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl bg-agro-surface border border-agro-border text-xs font-bold text-agro-cream focus-visible:ring-2 focus-visible:ring-agro-primary focus-visible:border-transparent transition-colors"
-            >
-              {AVAILABLE_CROPS.map((c) => (
-                <option key={c.id} value={c.id} className="bg-agro-card text-agro-cream">
-                  {c.name}
-                </option>
-              ))}
-            </select>
-            <p className="text-[11px] text-agro-muted mt-1 leading-normal">
-              Select your crop for species-tuned pathology or leave as <strong>Auto-Detect</strong>.
-            </p>
-          </div>
-
-          {farms.length > 0 && (
-            <div>
-              <label htmlFor="target-farm" className="block text-xs font-bold text-agro-cream mb-1.5">
-                Target Farm Plot
+      {/* Primary Action Section: Camera & Upload Hero Card */}
+      <section className="agro-panel p-5 sm:p-7 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl space-y-6">
+        
+        {/* Context Controls: Crop Species & Field Context */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800/80">
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="flex items-center gap-2 min-w-0">
+              <Sprout className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" aria-hidden="true" />
+              <label htmlFor="target-crop" className="text-xs font-bold text-slate-700 dark:text-slate-200 whitespace-nowrap">
+                Crop Species:
               </label>
               <select
-                id="target-farm"
-                value={selectedFarmId}
-                onChange={(e) => setSelectedFarmId(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-agro-surface border border-agro-border text-xs font-semibold text-agro-cream focus-visible:ring-2 focus-visible:ring-agro-primary transition-colors"
+                id="target-crop"
+                value={selectedCrop}
+                onChange={(e) => setSelectedCrop(e.target.value)}
+                className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-900 dark:text-slate-100 focus-visible:ring-2 focus-visible:ring-emerald-500 cursor-pointer"
               >
-                {farms.map((f) => (
-                  <option key={f.id} value={f.id} className="bg-agro-card text-agro-cream">
-                    {f.name} ({f.village || ''}, {f.district || ''})
+                {AVAILABLE_CROPS.map((c) => (
+                  <option key={c.id} value={c.id} className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">
+                    {c.name}
                   </option>
                 ))}
               </select>
-              {selectedFarm && (
-                <p className="text-[11px] text-agro-muted mt-1">
-                  Location: {selectedFarm.village || ''}, {selectedFarm.district || ''}
-                </p>
-              )}
             </div>
-          )}
-        </div>
-      </section>
 
-      {/* Error Alert if any */}
-      {error && (
-        <div className="p-4 rounded-xl bg-agro-terracotta/15 border border-agro-terracotta/35 text-agro-terracotta text-xs flex items-center gap-2.5">
-          <AlertCircle className="w-4 h-4 shrink-0" aria-hidden="true" />
-          <span className="font-semibold">{error}</span>
-        </div>
-      )}
-
-      {/* Step 2: Camera or Upload Tabs */}
-      <section className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Camera className="w-4 h-4 text-agro-primary" aria-hidden="true" />
-            <h2 className="text-sm font-bold text-agro-cream">Step 2: Add Leaf Photograph</h2>
+            {farms.length > 0 && (
+              <div className="flex items-center gap-2">
+                <label htmlFor="target-farm" className="text-xs font-bold text-slate-700 dark:text-slate-200 whitespace-nowrap">
+                  Farm Plot:
+                </label>
+                <select
+                  id="target-farm"
+                  value={selectedFarmId}
+                  onChange={(e) => setSelectedFarmId(e.target.value)}
+                  className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-900 dark:text-slate-100 focus-visible:ring-2 focus-visible:ring-emerald-500 cursor-pointer"
+                >
+                  {farms.map((f) => (
+                    <option key={f.id} value={f.id} className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">
+                      {f.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
           </div>
 
+          {/* Mode Switcher Tabs */}
           <div
             role="tablist"
             aria-label="Capture Mode"
-            className="inline-flex p-1 rounded-xl bg-agro-surface border border-agro-border text-xs font-bold"
+            className="inline-flex p-1 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-bold shrink-0 self-start sm:self-auto"
           >
             <button
               type="button"
               role="tab"
               aria-selected={activeTab === 'camera'}
               onClick={() => setActiveTab('camera')}
-              className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg transition-colors ${
+              className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-lg transition-all ${
                 activeTab === 'camera'
-                  ? 'bg-agro-primary text-white shadow-sm font-bold'
-                  : 'text-agro-muted hover:text-agro-cream'
+                  ? 'bg-emerald-600 text-white shadow font-extrabold'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               <Camera className="w-3.5 h-3.5" aria-hidden="true" />
@@ -312,19 +254,42 @@ export const ScanPage = () => {
               role="tab"
               aria-selected={activeTab === 'upload'}
               onClick={() => setActiveTab('upload')}
-              className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg transition-colors ${
+              className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-lg transition-all ${
                 activeTab === 'upload'
-                  ? 'bg-agro-primary text-white shadow-sm font-bold'
-                  : 'text-agro-muted hover:text-agro-cream'
+                  ? 'bg-emerald-600 text-white shadow font-extrabold'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               <Upload className="w-3.5 h-3.5" aria-hidden="true" />
-              <span>Upload</span>
+              <span>Upload Photo</span>
             </button>
           </div>
         </div>
 
-        {/* Tab 1: Live Camera View */}
+        {/* Local Weather Status Pill (if available) */}
+        {localWeather && (
+          <div className="flex items-center justify-between px-3.5 py-2 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-800 dark:text-amber-300">
+            <div className="flex items-center gap-2">
+              <CloudSun className="w-4 h-4 text-amber-500" aria-hidden="true" />
+              <span className="font-semibold">Local Agro-Climate: {localWeather.location}</span>
+            </div>
+            <div className="flex items-center gap-3 font-medium">
+              <span>{localWeather.temperature_c}°C</span>
+              <span>•</span>
+              <span>{localWeather.humidity_percent}% Humidity</span>
+            </div>
+          </div>
+        )}
+
+        {/* Error Alert */}
+        {error && (
+          <div className="p-4 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 text-xs flex items-center gap-2.5">
+            <AlertCircle className="w-4 h-4 shrink-0" aria-hidden="true" />
+            <span className="font-semibold">{error}</span>
+          </div>
+        )}
+
+        {/* Active Tab 1: Live Camera View */}
         {activeTab === 'camera' && (
           <CameraScanner
             onImageCaptured={handleCameraCaptured}
@@ -333,15 +298,15 @@ export const ScanPage = () => {
           />
         )}
 
-        {/* Tab 2: File Upload View */}
+        {/* Active Tab 2: File Upload Dropzone */}
         {activeTab === 'upload' && (
-          <div className="agro-panel p-6 sm:p-8 rounded-3xl border border-agro-border text-center space-y-5">
+          <div className="text-center space-y-5">
             {!previewUrl ? (
               <div
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={handleDrop}
                 onClick={() => fileInputRef.current?.click()}
-                className="border-2 border-dashed border-agro-border hover:border-agro-primary/50 bg-agro-surface/40 hover:bg-agro-surface/80 rounded-2xl p-8 sm:p-12 transition-all cursor-pointer space-y-4 group"
+                className="border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-emerald-500 dark:hover:border-emerald-400 bg-slate-50/60 dark:bg-slate-800/40 hover:bg-emerald-50/20 dark:hover:bg-slate-800/70 rounded-3xl p-8 sm:p-14 transition-all cursor-pointer space-y-4 group shadow-inner"
               >
                 <input
                   ref={fileInputRef}
@@ -351,51 +316,51 @@ export const ScanPage = () => {
                   onChange={(e) => handleFileChange(e.target.files?.[0])}
                 />
                 
-                <div className="w-16 h-16 rounded-2xl bg-agro-primary/10 border border-agro-primary/25 text-agro-primary flex items-center justify-center mx-auto group-hover:scale-105 transition-transform">
+                <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/25 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto group-hover:scale-105 transition-transform shadow-sm">
                   <Upload className="w-8 h-8" aria-hidden="true" />
                 </div>
 
-                <div className="space-y-1">
-                  <h3 className="text-base font-bold text-agro-cream">
-                    Drop your leaf photo here, or <span className="text-agro-primary underline">browse</span>
+                <div className="space-y-1.5">
+                  <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
+                    Drop your leaf photo here, or <span className="text-emerald-600 dark:text-emerald-400 underline underline-offset-2">browse files</span>
                   </h3>
-                  <p className="text-xs text-agro-muted">
-                    Supports JPEG, PNG, or WEBP up to 10MB
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    Supports high-resolution JPEG, PNG, or WEBP up to 10MB
                   </p>
                 </div>
               </div>
             ) : (
-              <div className="space-y-5">
-                <div className="relative max-w-sm mx-auto rounded-2xl overflow-hidden border border-agro-primary/40 shadow-xl bg-agro-bg">
+              <div className="space-y-6">
+                <div className="relative max-w-sm mx-auto rounded-3xl overflow-hidden border border-emerald-500/40 shadow-2xl bg-slate-100 dark:bg-slate-900">
                   <img
                     src={previewUrl}
                     alt="Selected leaf preview"
-                    className="w-full h-72 object-cover"
+                    className="w-full h-80 object-cover"
                   />
-                  <div className="absolute top-3 right-3 px-3 py-1 rounded-full bg-agro-card/90 backdrop-blur-md border border-agro-primary/40 text-[11px] font-bold text-agro-primary flex items-center gap-1.5 shadow">
+                  <div className="absolute top-3 right-3 px-3 py-1 rounded-full bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border border-emerald-500/40 text-[11px] font-extrabold text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5 shadow">
                     <CheckCircle2 className="w-3.5 h-3.5" aria-hidden="true" />
-                    <span>Photo Selected</span>
+                    <span>Photo Ready</span>
                   </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
+                <div className="flex flex-col sm:flex-row gap-3.5 justify-center pt-2">
                   <button
                     type="button"
                     onClick={handleReset}
-                    className="px-5 py-3 rounded-xl bg-agro-surface hover:bg-agro-hover border border-agro-border text-agro-cream text-xs font-bold flex items-center justify-center gap-2 transition"
+                    className="px-6 py-3.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 text-xs font-bold flex items-center justify-center gap-2 transition"
                   >
-                    <RefreshCw className="w-4 h-4 text-agro-muted" aria-hidden="true" />
-                    <span>Choose Another</span>
+                    <RefreshCw className="w-4 h-4 text-slate-500 dark:text-slate-400" aria-hidden="true" />
+                    <span>Choose Another Photo</span>
                   </button>
 
                   <button
                     type="button"
                     onClick={() => handleUploadAndAnalyze()}
                     disabled={isAnalyzing}
-                    className="px-7 py-3 rounded-xl bg-agro-primary hover:bg-agro-primaryHover text-white text-xs font-extrabold flex items-center justify-center gap-2 transition shadow-lg shadow-agro-primary/25 active:scale-[0.98] disabled:opacity-50"
+                    className="px-8 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black flex items-center justify-center gap-2 transition shadow-xl shadow-emerald-600/30 active:scale-[0.98] disabled:opacity-50"
                   >
                     <Sparkles className="w-4 h-4" aria-hidden="true" />
-                    <span>{isAnalyzing ? 'Analyzing...' : 'Diagnose Plant Leaf Now'}</span>
+                    <span>{isAnalyzing ? 'Analyzing Plant with AI...' : 'Diagnose Plant Leaf Now'}</span>
                   </button>
                 </div>
               </div>
@@ -404,24 +369,24 @@ export const ScanPage = () => {
         )}
       </section>
 
-      {/* Photo Quality Guidelines */}
-      <section className="agro-panel p-5 rounded-2xl border border-agro-border">
-        <h3 className="text-xs font-bold text-agro-cream mb-3 flex items-center gap-2">
-          <SunMedium className="w-4 h-4 text-agro-lime" aria-hidden="true" />
+      {/* Photo Quality Guidelines (3 High-Contrast Cards) */}
+      <section className="agro-panel p-5 sm:p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
+        <h3 className="text-xs font-bold text-slate-900 dark:text-white mb-3.5 flex items-center gap-2">
+          <SunMedium className="w-4 h-4 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
           <span>Foliage Photography Quality Standard for 98%+ AI Accuracy</span>
         </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-left">
-          <div className="p-3 rounded-xl bg-agro-surface/60 border border-agro-border">
-            <span className="block text-xs font-bold text-agro-cream mb-0.5">Natural Daylight</span>
-            <span className="text-[11px] text-agro-muted">Even daylight without hard reflective flash or shadow glare.</span>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 text-left">
+          <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60">
+            <span className="block text-xs font-bold text-slate-900 dark:text-white mb-1">Natural Daylight</span>
+            <span className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">Even daylight without hard reflective flash or shadow glare.</span>
           </div>
-          <div className="p-3 rounded-xl bg-agro-surface/60 border border-agro-border">
-            <span className="block text-xs font-bold text-agro-cream mb-0.5">Macro Venation Focus</span>
-            <span className="text-[11px] text-agro-muted">Keep the affected spots and leaf vein structure sharply focused.</span>
+          <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60">
+            <span className="block text-xs font-bold text-slate-900 dark:text-white mb-1">Macro Venation Focus</span>
+            <span className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">Keep the affected spots and leaf vein structure sharply focused.</span>
           </div>
-          <div className="p-3 rounded-xl bg-agro-surface/60 border border-agro-border">
-            <span className="block text-xs font-bold text-agro-cream mb-0.5">Frame Single Leaf</span>
-            <span className="text-[11px] text-agro-muted">Fill at least 40% of the frame with the affected leaf blade.</span>
+          <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60">
+            <span className="block text-xs font-bold text-slate-900 dark:text-white mb-1">Frame Single Leaf</span>
+            <span className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">Fill at least 40% of the frame with the affected leaf blade.</span>
           </div>
         </div>
       </section>

@@ -202,13 +202,13 @@ export const FloatingAIChatbot = () => {
           {/* Pulsing Hint Pill */}
           <div 
             onClick={() => { setIsOpen(true); setHasUnread(false); }}
-            className="hidden sm:flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-slate-900/90 dark:bg-slate-900/90 light:bg-white text-slate-100 dark:text-slate-100 light:text-slate-800 border border-emerald-500/40 shadow-xl backdrop-blur-md cursor-pointer hover:border-emerald-400 transition group animate-fade-in"
+            className="hidden sm:flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-white/95 dark:bg-slate-900/90 text-slate-800 dark:text-slate-100 border border-slate-200 dark:border-emerald-500/40 shadow-xl backdrop-blur-md cursor-pointer hover:border-emerald-500 transition group animate-fade-in"
           >
-            <Sparkles className="w-4 h-4 text-emerald-400 group-hover:rotate-12 transition-transform" />
+            <Sparkles className="w-4 h-4 text-emerald-500 dark:text-emerald-400 group-hover:rotate-12 transition-transform" />
             <span className="text-xs font-bold tracking-wide">
               {lang === 'mr' ? 'AI कृषी सल्लागार' : 'Ask AI Agronomist'}
             </span>
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="w-2 h-2 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse" />
           </div>
 
           {/* Glowing Circular FAB */}
@@ -221,7 +221,7 @@ export const FloatingAIChatbot = () => {
             <Bot className="w-7 h-7 text-white group-hover:scale-110 transition-transform" />
             <span className="absolute -top-1 -right-1 flex h-4 w-4">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-4 w-4 bg-emerald-500 border-2 border-slate-900" />
+              <span className="relative inline-flex rounded-full h-4 w-4 bg-emerald-500 border-2 border-white dark:border-slate-900" />
             </span>
           </button>
         </div>
@@ -230,25 +230,25 @@ export const FloatingAIChatbot = () => {
       {/* 2. Floating Chat Drawer / Window */}
       {isOpen && (
         <div 
-          className={`fixed bottom-20 md:bottom-8 right-4 md:right-8 z-50 w-[94vw] sm:w-[460px] md:w-[500px] flex flex-col rounded-3xl overflow-hidden shadow-2xl border border-emerald-500/30 bg-slate-950 dark:bg-slate-950 light:bg-white text-slate-100 dark:text-slate-100 light:text-slate-800 backdrop-blur-2xl transition-all duration-300 animate-slide-up ${
+          className={`fixed bottom-20 md:bottom-8 right-4 md:right-8 z-50 w-[94vw] sm:w-[460px] md:w-[500px] flex flex-col rounded-3xl overflow-hidden shadow-2xl border border-slate-200 dark:border-emerald-500/30 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 backdrop-blur-2xl transition-all duration-300 animate-slide-up ${
             isMinimized ? 'h-16' : 'h-[640px] max-h-[85vh]'
           }`}
         >
           {/* Header */}
-          <div className="p-4 bg-gradient-to-r from-emerald-950/80 via-slate-900/90 to-teal-950/80 border-b border-emerald-500/20 flex items-center justify-between shrink-0 select-none">
+          <div className="p-4 bg-gradient-to-r from-emerald-700 via-teal-700 to-emerald-800 dark:from-emerald-950/80 dark:via-slate-900/90 dark:to-teal-950/80 border-b border-emerald-600/30 dark:border-emerald-500/20 flex items-center justify-between shrink-0 select-none text-white">
             <div className="flex items-center gap-3">
-              <div className="relative w-9 h-9 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white flex items-center justify-center shadow-md shadow-emerald-500/30 border border-emerald-400/30">
-                <Bot className="w-5 h-5" />
-                <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-slate-950 animate-pulse" />
+              <div className="relative w-9 h-9 rounded-2xl bg-white/20 dark:bg-gradient-to-tr dark:from-emerald-600 dark:to-teal-500 text-white flex items-center justify-center shadow-md shadow-emerald-500/30 border border-white/30 dark:border-emerald-400/30">
+                <Bot className="w-5 h-5 text-white" />
+                <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-300 dark:bg-emerald-400 border-2 border-emerald-800 dark:border-slate-950 animate-pulse" />
               </div>
               <div>
                 <h3 className="text-sm font-extrabold flex items-center gap-2 text-white">
                   <span>{lang === 'mr' ? 'ॲग्रोस्कॅन AI कृषी सल्लागार' : 'AgroScan AI Agronomist'}</span>
-                  <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold uppercase tracking-wider">
+                  <span className="px-2 py-0.5 rounded-full bg-white/20 text-white border border-white/30 text-[10px] font-bold uppercase tracking-wider">
                     {lang === 'mr' ? 'थेट' : 'Live'}
                   </span>
                 </h3>
-                <p className="text-[11px] text-emerald-200/80">
+                <p className="text-[11px] text-emerald-100 dark:text-emerald-200/80">
                   {lang === 'mr' ? 'पिकांचे रोग, खते व फवारणी सल्ला' : 'Crop pathology, dosages & farm remedies'}
                 </p>
               </div>
@@ -257,18 +257,18 @@ export const FloatingAIChatbot = () => {
             {/* Actions */}
             <div className="flex items-center gap-1.5">
               {/* Language Switcher */}
-              <div className="flex bg-black/40 rounded-xl p-0.5 border border-white/10 text-[10px] font-bold">
+              <div className="flex bg-black/20 dark:bg-black/40 rounded-xl p-0.5 border border-white/20 text-[10px] font-bold">
                 <button
                   type="button"
                   onClick={() => setLang('en')}
-                  className={`px-2 py-0.5 rounded-lg transition ${lang === 'en' ? 'bg-emerald-500 text-white' : 'text-slate-400 hover:text-white'}`}
+                  className={`px-2 py-0.5 rounded-lg transition ${lang === 'en' ? 'bg-white text-emerald-800 font-extrabold dark:bg-emerald-500 dark:text-white' : 'text-white/80 hover:text-white'}`}
                 >
                   EN
                 </button>
                 <button
                   type="button"
                   onClick={() => setLang('mr')}
-                  className={`px-2 py-0.5 rounded-lg transition ${lang === 'mr' ? 'bg-emerald-500 text-white' : 'text-slate-400 hover:text-white'}`}
+                  className={`px-2 py-0.5 rounded-lg transition ${lang === 'mr' ? 'bg-white text-emerald-800 font-extrabold dark:bg-emerald-500 dark:text-white' : 'text-white/80 hover:text-white'}`}
                 >
                   मराठी
                 </button>
@@ -278,7 +278,7 @@ export const FloatingAIChatbot = () => {
               <button
                 type="button"
                 onClick={() => { setIsOpen(false); navigate('/assistant'); }}
-                className="p-1.5 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white transition"
+                className="p-1.5 rounded-xl hover:bg-white/20 text-white transition"
                 title={lang === 'mr' ? 'संपूर्ण स्क्रीनवर उघडा' : 'Expand to full page'}
               >
                 <Maximize2 className="w-4 h-4" />
@@ -288,7 +288,7 @@ export const FloatingAIChatbot = () => {
               <button
                 type="button"
                 onClick={handleResetChat}
-                className="p-1.5 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white transition"
+                className="p-1.5 rounded-xl hover:bg-white/20 text-white transition"
                 title={lang === 'mr' ? 'नवे सत्र सुरू करा' : 'New consultation session'}
               >
                 <RotateCcw className="w-4 h-4" />
@@ -298,7 +298,7 @@ export const FloatingAIChatbot = () => {
               <button
                 type="button"
                 onClick={() => setIsMinimized(prev => !prev)}
-                className="p-1.5 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white transition"
+                className="p-1.5 rounded-xl hover:bg-white/20 text-white transition"
                 title={isMinimized ? 'Expand' : 'Minimize'}
               >
                 <ChevronDown className={`w-4 h-4 transition-transform ${isMinimized ? 'rotate-180' : ''}`} />
@@ -308,7 +308,7 @@ export const FloatingAIChatbot = () => {
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                className="p-1.5 rounded-xl hover:bg-rose-500/20 text-slate-300 hover:text-rose-400 transition"
+                className="p-1.5 rounded-xl hover:bg-rose-500/30 text-white hover:text-rose-200 transition"
                 title="Close"
               >
                 <X className="w-4 h-4" />
@@ -320,14 +320,14 @@ export const FloatingAIChatbot = () => {
           {!isMinimized && (
             <>
               {/* Message Feed */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-950/70 dark:bg-slate-950/70 light:bg-slate-50">
+              <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50 dark:bg-slate-950/70">
                 {messages.map((msg, idx) => (
                   <div
                     key={idx}
                     className={`flex gap-3 max-w-[92%] ${msg.sender === 'user' ? 'ml-auto justify-end' : ''}`}
                   >
                     {msg.sender === 'assistant' && (
-                      <div className="w-8 h-8 rounded-2xl bg-gradient-to-tr from-emerald-600/30 to-teal-500/20 text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-500/30 shadow-sm mt-0.5">
+                      <div className="w-8 h-8 rounded-2xl bg-emerald-500/10 dark:bg-gradient-to-tr dark:from-emerald-600/30 dark:to-teal-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-500/20 dark:border-emerald-500/30 shadow-sm mt-0.5">
                         <Bot className="w-4 h-4" />
                       </div>
                     )}
@@ -337,7 +337,7 @@ export const FloatingAIChatbot = () => {
                         className={`p-4 rounded-3xl text-xs sm:text-sm leading-relaxed shadow-md ${
                           msg.sender === 'user'
                             ? 'bg-gradient-to-r from-emerald-600 to-teal-500 text-white font-medium rounded-tr-none shadow-emerald-500/20'
-                            : 'bg-slate-900/90 dark:bg-slate-900/90 light:bg-white border border-slate-800 dark:border-white/[0.08] light:border-slate-200 text-slate-100 dark:text-slate-100 light:text-slate-800 rounded-tl-none'
+                            : 'bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-white/[0.08] text-slate-800 dark:text-slate-100 rounded-tl-none'
                         }`}
                       >
                         <FormattedAIMessage
@@ -354,8 +354,8 @@ export const FloatingAIChatbot = () => {
 
                 {/* Animated Thinking State */}
                 {loading && (
-                  <div className="flex items-center gap-3 p-3 rounded-2xl bg-emerald-950/30 border border-emerald-500/20 text-emerald-400 text-xs font-semibold animate-pulse w-fit">
-                    <Sparkles className="w-4 h-4 animate-spin text-emerald-400" />
+                  <div className="flex items-center gap-3 p-3 rounded-2xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-500/20 text-emerald-700 dark:text-emerald-400 text-xs font-semibold animate-pulse w-fit">
+                    <Sparkles className="w-4 h-4 animate-spin text-emerald-500 dark:text-emerald-400" />
                     <span>{lang === 'mr' ? 'कृषी सल्लागार विश्लेषण करत आहे...' : 'AI Agronomist is analyzing remedies & dosages...'}</span>
                   </div>
                 )}
@@ -364,8 +364,8 @@ export const FloatingAIChatbot = () => {
               </div>
 
               {/* Quick Prompt Carousel */}
-              <div className="px-3 py-2 bg-slate-900/80 dark:bg-slate-900/80 light:bg-slate-100 border-t border-slate-800 dark:border-white/[0.06] light:border-slate-200 flex items-center gap-2 overflow-x-auto hide-scrollbar">
-                <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider shrink-0 flex items-center gap-1">
+              <div className="px-3 py-2 bg-white dark:bg-slate-900/80 border-t border-slate-200 dark:border-white/[0.06] flex items-center gap-2 overflow-x-auto hide-scrollbar">
+                <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider shrink-0 flex items-center gap-1">
                   <Sprout className="w-3 h-3" />
                   {lang === 'mr' ? 'सुचवलेले:' : 'Quick:'}
                 </span>
@@ -374,7 +374,7 @@ export const FloatingAIChatbot = () => {
                     key={qIdx}
                     type="button"
                     onClick={() => handleSendMessage(q)}
-                    className="whitespace-nowrap px-3 py-1 rounded-full bg-slate-800 dark:bg-slate-800 light:bg-white hover:bg-emerald-500/20 border border-slate-700 dark:border-white/[0.08] light:border-slate-300 text-[11px] text-slate-300 dark:text-slate-300 light:text-slate-700 hover:text-emerald-400 transition shrink-0"
+                    className="whitespace-nowrap px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-emerald-50 dark:hover:bg-emerald-500/20 border border-slate-200 dark:border-white/[0.08] text-[11px] text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition shrink-0 font-medium"
                   >
                     {q}
                   </button>
@@ -382,7 +382,7 @@ export const FloatingAIChatbot = () => {
               </div>
 
               {/* Input Area */}
-              <div className="p-3 bg-slate-900 dark:bg-slate-900 light:bg-white border-t border-slate-800 dark:border-white/[0.06] light:border-slate-200">
+              <div className="p-3 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-white/[0.06]">
                 <form
                   onSubmit={(e) => {
                     e.preventDefault();
@@ -396,12 +396,12 @@ export const FloatingAIChatbot = () => {
                     onClick={toggleListening}
                     className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 border transition ${
                       isListening
-                        ? 'bg-rose-500/20 text-rose-400 border-rose-500 animate-pulse'
-                        : 'bg-slate-800/80 dark:bg-slate-800/80 light:bg-slate-100 text-slate-300 hover:text-emerald-400 border-slate-700 dark:border-white/[0.08] light:border-slate-200'
+                        ? 'bg-rose-500/20 text-rose-500 border-rose-500 animate-pulse'
+                        : 'bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 border-slate-200 dark:border-white/[0.08]'
                     }`}
                     title={isListening ? 'Stop listening' : 'Speak your question'}
                   >
-                    {isListening ? <MicOff className="w-4 h-4 text-rose-400" /> : <Mic className="w-4 h-4" />}
+                    {isListening ? <MicOff className="w-4 h-4 text-rose-500" /> : <Mic className="w-4 h-4" />}
                   </button>
 
                   {/* Text Input */}
@@ -414,7 +414,7 @@ export const FloatingAIChatbot = () => {
                         ? (lang === 'mr' ? 'ऐकत आहे... बोला' : 'Listening... Speak now')
                         : (lang === 'mr' ? 'पिकांबद्दल काहीही विचारा (उदा. खते, रोग, फवारणी)...' : 'Ask about crop care, organic sprays, dosages...')
                     }
-                    className="flex-1 h-10 px-4 rounded-2xl bg-slate-950 dark:bg-slate-950 light:bg-slate-50 border border-slate-700/80 dark:border-white/[0.08] light:border-slate-300 text-xs sm:text-sm text-slate-100 dark:text-slate-100 light:text-slate-800 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition placeholder:text-slate-500"
+                    className="flex-1 h-10 px-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-white/[0.08] text-xs sm:text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition placeholder:text-slate-400"
                   />
 
                   {/* Send Button */}
@@ -429,15 +429,15 @@ export const FloatingAIChatbot = () => {
                 </form>
 
                 {/* Subtitle / Disclaimer */}
-                <div className="flex items-center justify-between mt-2 px-1 text-[10px] text-slate-500 dark:text-slate-500 light:text-slate-400">
+                <div className="flex items-center justify-between mt-2 px-1 text-[10px] text-slate-400 dark:text-slate-500">
                   <span className="flex items-center gap-1">
-                    <Sparkles className="w-3 h-3 text-emerald-400" />
+                    <Sparkles className="w-3 h-3 text-emerald-500 dark:text-emerald-400" />
                     <span>{lang === 'mr' ? 'कृषी तज्ज्ञ संदर्भयुक्त AI' : 'Expert Grounded Agricultural AI'}</span>
                   </span>
                   <button
                     type="button"
                     onClick={handleExportChat}
-                    className="hover:text-emerald-400 transition underline"
+                    className="hover:text-emerald-600 dark:hover:text-emerald-400 transition underline"
                   >
                     {lang === 'mr' ? 'संवाद सेव्ह करा' : 'Save Transcript'}
                   </button>

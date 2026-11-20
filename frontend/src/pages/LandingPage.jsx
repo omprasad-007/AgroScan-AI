@@ -208,26 +208,26 @@ export const LandingPage = () => {
 
       {/* 2. Hero Section */}
       <section className="relative overflow-hidden pt-12 sm:pt-20 pb-16 sm:pb-24">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-gradient-to-b from-agro-primary/15 via-agro-lime/5 to-transparent blur-3xl pointer-events-none" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-gradient-to-b from-emerald-500/10 dark:from-emerald-500/20 via-transparent to-transparent blur-3xl pointer-events-none" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
 
-          <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-agro-primary/10 border border-agro-primary/30 text-agro-primary text-xs font-bold mb-8 shadow-inner">
-            <Sparkles className="w-3.5 h-3.5 text-agro-primary animate-pulse" />
+          <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-700 dark:text-emerald-300 text-xs font-bold mb-8 shadow-inner">
+            <Sparkles className="w-3.5 h-3.5 text-emerald-500 animate-pulse" />
             <span>{lang === 'mr' ? 'कृत्रिम बुद्धिमत्ता आधारित पीक आरोग्य प्लॅटफॉर्म' : 'AI-Powered Plant Disease Diagnostic Platform'}</span>
           </div>
 
           {/* Headline */}
-          <h1 className="text-4xl sm:text-6xl font-black tracking-tight text-agro-cream max-w-4xl mx-auto leading-[1.15]">
+          <h1 className="text-4xl sm:text-6xl font-black tracking-tight text-slate-900 dark:text-white max-w-4xl mx-auto leading-[1.15]">
             {lang === 'mr' ? (
-              <>तुमच्या पिकांवरील रोग आणि आरोग्याचे <span className="text-agro-primary">झटपट अचूक निदान</span></>
+              <>तुमच्या पिकांवरील रोग आणि आरोग्याचे <span className="bg-gradient-to-r from-emerald-600 to-teal-500 dark:from-emerald-400 dark:to-teal-300 bg-clip-text text-transparent">झटपट अचूक निदान</span></>
             ) : (
-              <>Instantly Identify Plants & Detect Diseases with <span className="text-agro-primary">AI Diagnostic Precision</span></>
+              <>Instantly Identify Plants & Detect Diseases with <span className="bg-gradient-to-r from-emerald-600 to-teal-500 dark:from-emerald-400 dark:to-teal-300 bg-clip-text text-transparent">AI Diagnostic Precision</span></>
             )}
           </h1>
 
           {/* Subheadline */}
-          <p className="mt-6 text-base sm:text-lg text-agro-muted max-w-2xl mx-auto leading-relaxed font-normal">
+          <p className="mt-5 text-base sm:text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto leading-relaxed font-normal">
             {lang === 'mr' ? (
               'पानाचा फोटो अपलोड करा, त्वरित रोग निदान मिळवा आणि आपल्या भाषेत सेंद्रिय आणि रासायनिक उपचार मिळवा.'
             ) : (
@@ -236,10 +236,10 @@ export const LandingPage = () => {
           </p>
 
           {/* CTAs */}
-          <div className="mt-9 flex flex-col sm:flex-row items-center justify-center gap-4 max-w-md mx-auto">
+          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 max-w-md mx-auto">
             <button
               onClick={handleScanClick}
-              className="w-full sm:w-auto px-8 py-4 rounded-xl bg-agro-primary hover:bg-agro-primaryHover text-white font-black text-sm transition-all duration-200 shadow-xl shadow-agro-primary/25 flex items-center justify-center space-x-2 group active:scale-95"
+              className="w-full sm:w-auto px-8 py-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-sm transition-all duration-200 shadow-xl shadow-emerald-600/25 flex items-center justify-center space-x-2 group active:scale-95"
             >
               <ScanLine className="w-5 h-5" />
               <span>{lang === 'mr' ? 'आत्ताच पीक स्कॅन करा' : 'Scan Your Plant Now'}</span>
@@ -248,31 +248,31 @@ export const LandingPage = () => {
 
             <button
               onClick={() => scrollToSection('how-it-works')}
-              className="w-full sm:w-auto px-8 py-4 rounded-xl bg-agro-surface hover:bg-agro-hover text-agro-cream font-bold text-sm border border-agro-border transition flex items-center justify-center space-x-2"
+              className="w-full sm:w-auto px-8 py-4 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 font-bold text-sm border border-slate-200 dark:border-slate-700 shadow-sm transition flex items-center justify-center space-x-2"
             >
               <span>{lang === 'mr' ? 'हे कसे कार्य करते पहा' : 'See How It Works'}</span>
             </button>
           </div>
 
           {/* Hero Visual Mockup */}
-          <div className="mt-14 max-w-4xl mx-auto relative rounded-3xl p-3 sm:p-4 agro-panel shadow-2xl">
-            <div className="rounded-2xl overflow-hidden bg-agro-bg p-6 sm:p-8 text-left border border-agro-border space-y-6">
+          <div className="mt-10 max-w-4xl mx-auto relative rounded-3xl p-2 sm:p-3 agro-panel shadow-2xl">
+            <div className="rounded-2xl overflow-hidden bg-white dark:bg-slate-900 p-6 sm:p-8 text-left border border-slate-200/80 dark:border-slate-800 space-y-6">
 
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-agro-border pb-4">
-                <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 rounded-xl bg-agro-primary/10 border border-agro-primary/25 text-agro-primary flex items-center justify-center shrink-0">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-4">
+                <div className="flex items-center space-x-3.5">
+                  <div className="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 shadow-sm">
                     <Leaf className="w-6 h-6" />
                   </div>
                   <div>
-                    <span className="text-xs font-bold text-agro-primary uppercase tracking-wider">Mangifera indica</span>
-                    <h3 className="text-xl sm:text-2xl font-black text-agro-cream">Mango (आंबा) — Powdery Mildew</h3>
+                    <span className="text-[11px] font-extrabold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">Mangifera indica</span>
+                    <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">Mango (आंबा) — Powdery Mildew</h3>
                   </div>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <span className="px-3 py-1 rounded-full bg-agro-primary/10 border border-agro-primary/30 text-agro-primary text-xs font-bold">
+                  <span className="px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 text-emerald-700 dark:text-emerald-400 text-xs font-bold">
                     Plant Confidence: 94.8%
                   </span>
-                  <span className="px-3 py-1 rounded-full bg-agro-amber/10 border border-agro-amber/30 text-agro-amber text-xs font-bold">
+                  <span className="px-3 py-1 rounded-full bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 text-amber-700 dark:text-amber-400 text-xs font-bold">
                     Moderate Risk
                   </span>
                 </div>
@@ -280,17 +280,17 @@ export const LandingPage = () => {
 
               {/* Sample Result Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="p-4 rounded-xl bg-agro-surface border border-agro-border">
-                  <span className="text-xs text-agro-muted block">Identified Plant</span>
-                  <span className="text-lg font-bold text-agro-cream mt-0.5 block">Mango Leaf</span>
+                <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60">
+                  <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 block">Identified Plant</span>
+                  <span className="text-lg font-bold text-slate-900 dark:text-white mt-0.5 block">Mango Leaf</span>
                 </div>
-                <div className="p-4 rounded-xl bg-agro-surface border border-agro-border">
-                  <span className="text-xs text-agro-muted block">Disease Status</span>
-                  <span className="text-lg font-bold text-agro-amber mt-0.5 block">Powdery Mildew</span>
+                <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60">
+                  <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 block">Disease Status</span>
+                  <span className="text-lg font-bold text-amber-600 dark:text-amber-400 mt-0.5 block">Powdery Mildew</span>
                 </div>
-                <div className="p-4 rounded-xl bg-agro-surface border border-agro-border">
-                  <span className="text-xs text-agro-muted block">Organic Protocol</span>
-                  <span className="text-xs text-agro-cream/90 mt-0.5 block line-clamp-2">Spray sulfur (0.2%) or neem oil (5ml/L) at first sign.</span>
+                <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60">
+                  <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 block">Organic Protocol</span>
+                  <span className="text-xs text-slate-700 dark:text-slate-200 mt-0.5 block line-clamp-2">Spray sulfur (0.2%) or neem oil (5ml/L) at first sign.</span>
                 </div>
               </div>
 
