@@ -106,7 +106,8 @@ export const DashboardPage = () => {
         const healthy = allScans.filter(s => {
           const disease = (s.disease_name || s.disease || '').toLowerCase();
           const sev = (s.severity_level || s.severity || '').toLowerCase();
-          return disease.includes('healthy') || sev === 'healthy';
+          const status = (s.status || '').toUpperCase();
+          return status === 'HEALTHY' || Boolean(s.healthy_status) || disease.includes('healthy') || sev === 'healthy';
         }).length;
         const diseased = total - healthy;
         

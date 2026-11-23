@@ -404,7 +404,7 @@ class LeafValidator:
         # ------------------------------------------------------------------
 
         # Case A: Human Selfie / Portrait
-        if (skin_ratio > 0.35 and green_foliage_ratio < 0.05) or (skin_ratio > 0.50 and leaf_coverage_ratio < 0.12):
+        if (skin_ratio > 0.20 and green_foliage_ratio < 0.05) or (skin_ratio > 0.40 and leaf_coverage_ratio < 0.12):
             return LeafValidationResult(
                 is_plant=False,
                 is_leaf=False,

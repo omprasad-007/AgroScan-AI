@@ -147,6 +147,8 @@ class SynthesisService:
         )
         if is_dispute and intent == AgriculturalIntent.SCAN_EXPLANATION:
             disp = rag_data.get("disputed_plant") or ("टोमॅटो" if is_mr else "Tomato")
+            if is_mr and disp.lower() == "tomato":
+                disp = "टोमॅटो"
             if is_mr:
                 return (
                     f"🌾 **AgroScan AI कृषी सल्लागार:**\n\n"
