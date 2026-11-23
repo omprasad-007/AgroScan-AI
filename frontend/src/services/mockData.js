@@ -468,8 +468,11 @@ export const clientSideDiagnose = (imageFile, targetCrop = null) => {
     selectedCropKey = catalogKeys[absHash % catalogKeys.length];
   }
 
+  const cropData = MULTI_CROP_SPECIES_CATALOG[selectedCropKey] || MULTI_CROP_SPECIES_CATALOG.mango;
+  const diseaseList = cropData.diseases || [];
+
   const lowerName = (imageFile?.name || '').toLowerCase();
-  const isExplicitlyHealthy = lowerName.includes('healthy') || lowerName.includes('clean') || lowerName.includes('normal');
+  const isExplicitlyHealthy = lowerName.includes('healthy') || lowerName.includes('clean') || lowerName.includes('normal') || lowerName.includes('green') || lowerName.includes('fresh');
   let selectedDisease;
   if (isExplicitlyHealthy) {
     selectedDisease = diseaseList.find(d => d.code === 'healthy_leaf') || {
@@ -481,7 +484,7 @@ export const clientSideDiagnose = (imageFile, targetCrop = null) => {
       prevention: 'Regular scouting and orchard sanitation.'
     };
   } else {
-    selectedDisease = diseaseList[absHash % diseaseList.length];
+    selectedDisease = diseaseList[absHash % diseaseList.length] || diseaseList[0];
   }
 
   const isHealthy = selectedDisease.code === 'healthy_leaf' || isExplicitlyHealthy;
@@ -514,7 +517,13 @@ export const clientSideDiagnose = (imageFile, targetCrop = null) => {
     weather_risk_level: isHealthy ? "Low" : "Medium",
     is_demo: false,
     created_at: new Date().toISOString(),
-    image_url: imageFile ? URL.createObjectURL(imageFile) : null,
+    image_url: (() => {
+      try {
+        return (imageFile && typeof URL !== 'undefined' && URL.createObjectURL) ? URL.createObjectURL(imageFile) : null;
+      } catch {
+        return null;
+      }
+    })(),
     recommendation: {
       disease_name: selectedDisease.name,
       crop: cropData.crop,

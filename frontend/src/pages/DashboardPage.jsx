@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   ScanLine, 
@@ -38,6 +38,8 @@ export const DashboardPage = () => {
       alert: ''
     }
   });
+  const [allScansList, setAllScansList] = useState([]);
+  const [filterTab, setFilterTab] = useState('all');
   const [recentScans, setRecentScans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showResetModal, setShowResetModal] = useState(false);
@@ -101,6 +103,7 @@ export const DashboardPage = () => {
             alert: t('dashboard.blank_desc') || 'Your dashboard is currently blank. Upload or capture a plant leaf photo to generate live diagnostics.'
           }
         });
+        setAllScansList([]);
         setRecentScans([]);
       } else {
         const healthy = allScans.filter(s => {
@@ -138,6 +141,7 @@ export const DashboardPage = () => {
             alert: `Active monitoring for ${latest.crop_detected || latest.plant || 'Crops'} (${latest.disease_name || latest.disease || 'General Health'}).`
           }
         });
+        setAllScansList(allScans);
         setRecentScans(allScans.slice(0, 5));
       }
     } catch (err) {
@@ -152,6 +156,7 @@ export const DashboardPage = () => {
 
     const handleScanEvent = () => refreshDashboardData();
     const handleClearEvent = () => {
+      setAllScansList([]);
       setRecentScans([]);
       setAnalytics({
         total_predictions: 0,
@@ -224,6 +229,24 @@ export const DashboardPage = () => {
     }
   };
 
+  const isHealthyScan = useCallback((s) => {
+    if (!s) return false;
+    const disease = (s.disease_name || s.disease || '').toLowerCase();
+    const sev = (s.severity_level || s.severity || '').toLowerCase();
+    const status = (s.status || '').toUpperCase();
+    return status === 'HEALTHY' || Boolean(s.healthy_status) || disease.includes('healthy') || sev === 'healthy';
+  }, []);
+
+  const displayedScans = useMemo(() => {
+    if (filterTab === 'healthy') {
+      return allScansList.filter(isHealthyScan);
+    }
+    if (filterTab === 'risky') {
+      return allScansList.filter(s => !isHealthyScan(s));
+    }
+    return recentScans;
+  }, [filterTab, allScansList, recentScans, isHealthyScan]);
+
   const isBlank = (analytics.total_predictions === 0);
 
   return (
@@ -270,7 +293,11 @@ export const DashboardPage = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         
         {/* Total Scans Card */}
-        <div className="agro-panel bg-agro-card p-5 rounded-2xl border border-agro-border">
+        <div 
+          onClick={() => setFilterTab('all')}
+          className={`agro-panel bg-agro-card p-5 rounded-2xl border transition-all cursor-pointer ${filterTab === 'all' ? 'border-agro-cream/50 ring-1 ring-agro-cream/30 shadow-md' : 'border-agro-border hover:border-agro-cream/30'}`}
+          title="Click to view all scans"
+        >
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-agro-muted">{t('dashboard.card_total')}</span>
             <div className="p-2 rounded-xl bg-agro-primary/10 text-agro-primary border border-agro-primary/25">
@@ -288,9 +315,16 @@ export const DashboardPage = () => {
         </div>
 
         {/* Healthy Crops Card */}
-        <div className="agro-panel bg-agro-card p-5 rounded-2xl border border-agro-border">
+        <div 
+          onClick={() => setFilterTab(filterTab === 'healthy' ? 'all' : 'healthy')}
+          className={`agro-panel bg-agro-card p-5 rounded-2xl border transition-all cursor-pointer ${filterTab === 'healthy' ? 'border-agro-accent ring-2 ring-agro-accent/40 shadow-lg' : 'border-agro-border hover:border-agro-accent/50'}`}
+          title="Click to filter healthy crops only"
+        >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-agro-muted">{t('dashboard.card_healthy')}</span>
+            <span className="text-xs font-semibold text-agro-accent flex items-center gap-1">
+              <span>{t('dashboard.card_healthy')}</span>
+              {filterTab === 'healthy' && <span className="text-[10px] bg-agro-accent/20 px-1.5 py-0.2 rounded font-bold">Active</span>}
+            </span>
             <div className="p-2 rounded-xl bg-agro-accent/15 text-agro-accent border border-agro-accent/30">
               <ShieldCheck className="w-4 h-4" aria-hidden="true" />
             </div>
@@ -306,9 +340,16 @@ export const DashboardPage = () => {
         </div>
 
         {/* Diseased Crops Card */}
-        <div className="agro-panel bg-agro-card p-5 rounded-2xl border border-agro-border">
+        <div 
+          onClick={() => setFilterTab(filterTab === 'risky' ? 'all' : 'risky')}
+          className={`agro-panel bg-agro-card p-5 rounded-2xl border transition-all cursor-pointer ${filterTab === 'risky' ? 'border-agro-primary ring-2 ring-agro-primary/40 shadow-lg' : 'border-agro-border hover:border-agro-primary/50'}`}
+          title="Click to filter risky / diseased crops only"
+        >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-agro-muted">{t('dashboard.card_diseased')}</span>
+            <span className="text-xs font-semibold text-agro-primary flex items-center gap-1">
+              <span>{t('dashboard.card_diseased')}</span>
+              {filterTab === 'risky' && <span className="text-[10px] bg-agro-primary/20 px-1.5 py-0.2 rounded font-bold">Active</span>}
+            </span>
             <div className="p-2 rounded-xl bg-agro-primary/15 text-agro-primary border border-agro-primary/30">
               <AlertTriangle className="w-4 h-4" aria-hidden="true" />
             </div>
@@ -436,9 +477,35 @@ export const DashboardPage = () => {
 
         {/* Recent Scans Table */}
         <div className="agro-panel bg-agro-card p-6 rounded-3xl lg:col-span-2 border border-agro-border">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-base font-bold text-agro-cream font-heading">{t('dashboard.recent_scans') || t('nav.history')}</h3>
-            {recentScans.length > 0 && (
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+            <div className="flex flex-wrap items-center gap-2">
+              <h3 className="text-base font-bold text-agro-cream font-heading">{t('dashboard.recent_scans') || t('nav.history')}</h3>
+              {allScansList.length > 0 && (
+                <div className="flex items-center gap-1 p-1 rounded-xl bg-agro-surface border border-agro-border text-xs">
+                  <button
+                    onClick={() => setFilterTab('all')}
+                    className={`px-2.5 py-1 rounded-lg font-semibold transition ${filterTab === 'all' ? 'bg-agro-card text-agro-cream shadow-sm' : 'text-agro-muted hover:text-agro-cream'}`}
+                  >
+                    All ({allScansList.length})
+                  </button>
+                  <button
+                    onClick={() => setFilterTab('healthy')}
+                    className={`px-2.5 py-1 rounded-lg font-semibold flex items-center gap-1 transition ${filterTab === 'healthy' ? 'bg-agro-accent/20 text-agro-accent border border-agro-accent/40 shadow-sm' : 'text-agro-muted hover:text-agro-accent'}`}
+                  >
+                    <ShieldCheck className="w-3.5 h-3.5" />
+                    <span>Healthy ({analytics.healthy_count})</span>
+                  </button>
+                  <button
+                    onClick={() => setFilterTab('risky')}
+                    className={`px-2.5 py-1 rounded-lg font-semibold flex items-center gap-1 transition ${filterTab === 'risky' ? 'bg-agro-primary/20 text-agro-primary border border-agro-primary/40 shadow-sm' : 'text-agro-muted hover:text-agro-primary'}`}
+                  >
+                    <AlertTriangle className="w-3.5 h-3.5" />
+                    <span>Risky ({analytics.diseased_count})</span>
+                  </button>
+                </div>
+              )}
+            </div>
+            {allScansList.length > 0 && (
               <Link to="/history" className="text-xs text-agro-primary hover:underline inline-flex items-center gap-1 font-semibold">
                 <span>{t('dashboard.view_all') || 'View All'}</span>
                 <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
@@ -446,16 +513,20 @@ export const DashboardPage = () => {
             )}
           </div>
 
-          {recentScans.length === 0 ? (
+          {displayedScans.length === 0 ? (
             <div className="text-center py-12 px-4 space-y-3">
               <div className="w-12 h-12 rounded-2xl bg-agro-surface border border-agro-border text-agro-muted flex items-center justify-center mx-auto">
                 <ScanLine className="w-6 h-6" aria-hidden="true" />
               </div>
               <p className="text-agro-cream text-xs font-bold">
-                {t('dashboard.empty_title') || 'No scans recorded yet'}
+                {allScansList.length === 0 
+                  ? (t('dashboard.empty_title') || 'No scans recorded yet')
+                  : `No ${filterTab === 'healthy' ? 'healthy crops' : 'risky/diseased crops'} found.`}
               </p>
               <p className="text-agro-muted text-[11px] max-w-sm mx-auto">
-                {t('dashboard.empty_msg') || 'Scan a plant leaf to start tracking disease outbreak risk and health metrics.'}
+                {allScansList.length === 0 
+                  ? (t('dashboard.empty_msg') || 'Scan a plant leaf to start tracking disease outbreak risk and health metrics.')
+                  : 'Try switching the filter tab above or capture a new scan.'}
               </p>
               <Link
                 to="/scan"
@@ -469,34 +540,46 @@ export const DashboardPage = () => {
             <>
               {/* Mobile Stacked Cards for Recent Scans (< sm) */}
               <div className="block sm:hidden space-y-3">
-                {recentScans.map((scan) => (
-                  <div
-                    key={scan.id}
-                    className="p-3.5 rounded-xl bg-agro-surface border border-agro-border space-y-2 transition-all shadow-sm"
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="font-bold text-agro-cream text-xs">
-                        {translateCrop(scan.crop_detected || scan.plant)}
-                      </span>
-                      <SeverityBadge level={scan.severity_level || scan.severity} />
+                {displayedScans.map((scan) => {
+                  const healthy = isHealthyScan(scan);
+                  return (
+                    <div
+                      key={scan.id}
+                      className={`p-3.5 rounded-xl bg-agro-surface border space-y-2 transition-all shadow-sm ${healthy ? 'border-agro-accent/30' : 'border-agro-border'}`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-agro-cream text-xs">
+                          {translateCrop(scan.crop_detected || scan.plant)}
+                        </span>
+                        <SeverityBadge level={healthy ? 'Healthy' : (scan.severity_level || scan.severity)} />
+                      </div>
+                      <div className="text-xs text-agro-muted flex items-center gap-1.5">
+                        {healthy ? (
+                          <span className="text-agro-accent font-semibold flex items-center gap-1">
+                            <ShieldCheck className="w-3.5 h-3.5" />
+                            <span>Healthy Leaf (No Disease)</span>
+                          </span>
+                        ) : (
+                          <span className="text-agro-primary font-medium">
+                            {translateDisease(scan.disease_name || scan.disease)}
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center justify-between pt-1.5 border-t border-agro-border text-xs">
+                        <span className="font-mono text-agro-primary font-bold">
+                          {(((Number(scan.confidence_score ?? scan.confidence)) || 0.9) * 100).toFixed(1)}%
+                        </span>
+                        <Link
+                          to={`/results/${scan.id}`}
+                          className="text-xs font-bold text-agro-primary hover:underline inline-flex items-center gap-1"
+                        >
+                          <span>{t('history.view_report') || 'View Report'}</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </Link>
+                      </div>
                     </div>
-                    <div className="text-xs text-agro-muted">
-                      {translateDisease(scan.disease_name || scan.disease)}
-                    </div>
-                    <div className="flex items-center justify-between pt-1.5 border-t border-agro-border text-xs">
-                      <span className="font-mono text-agro-primary font-bold">
-                        {(((Number(scan.confidence_score ?? scan.confidence)) || 0.9) * 100).toFixed(1)}%
-                      </span>
-                      <Link
-                        to={`/results/${scan.id}`}
-                        className="text-xs font-bold text-agro-primary hover:underline inline-flex items-center gap-1"
-                      >
-                        <span>{t('history.view_report') || 'View Report'}</span>
-                        <ArrowRight className="w-3.5 h-3.5" />
-                      </Link>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
 
               {/* Desktop Table (>= sm) */}
@@ -505,37 +588,54 @@ export const DashboardPage = () => {
                   <thead>
                     <tr className="border-b border-agro-border text-agro-muted font-bold">
                       <th className="py-2.5 px-3">{t('history.col_crop') || 'Crop'}</th>
-                      <th className="py-2.5 px-3">{t('history.col_disease') || 'Detected Disease'}</th>
+                      <th className="py-2.5 px-3">{t('history.col_disease') || 'Detected Condition'}</th>
+                      <th className="py-2.5 px-3">Status</th>
                       <th className="py-2.5 px-3">{t('history.col_severity') || 'Severity'}</th>
                       <th className="py-2.5 px-3">{t('history.col_confidence') || 'Confidence'}</th>
                       <th className="py-2.5 px-3 text-right">{t('history.col_report') || 'Action'}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-agro-border">
-                    {recentScans.map((scan) => (
-                      <tr key={scan.id} className="hover:bg-agro-surface/60 transition-colors">
-                        <td className="py-3 px-3 font-bold text-agro-cream">
-                          {translateCrop(scan.crop_detected || scan.plant)}
-                        </td>
-                        <td className="py-3 px-3 text-agro-muted">
-                          {translateDisease(scan.disease_name || scan.disease)}
-                        </td>
-                        <td className="py-3 px-3">
-                          <SeverityBadge level={scan.severity_level || scan.severity} />
-                        </td>
-                        <td className="py-3 px-3 font-mono text-agro-primary font-bold">
-                          {(((Number(scan.confidence_score ?? scan.confidence)) || 0.9) * 100).toFixed(1)}%
-                        </td>
-                        <td className="py-3 px-3 text-right">
-                          <Link
-                            to={`/results/${scan.id}`}
-                            className="text-xs font-bold text-agro-primary hover:underline"
-                          >
-                            {t('history.view_report') || 'View Report'}
-                          </Link>
-                        </td>
-                      </tr>
-                    ))}
+                    {displayedScans.map((scan) => {
+                      const healthy = isHealthyScan(scan);
+                      return (
+                        <tr key={scan.id} className="hover:bg-agro-surface/60 transition-colors">
+                          <td className="py-3 px-3 font-bold text-agro-cream">
+                            {translateCrop(scan.crop_detected || scan.plant)}
+                          </td>
+                          <td className="py-3 px-3 text-agro-cream/90 font-medium">
+                            {healthy ? 'Healthy Foliage' : translateDisease(scan.disease_name || scan.disease)}
+                          </td>
+                          <td className="py-3 px-3">
+                            {healthy ? (
+                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-agro-accent/15 text-agro-accent border border-agro-accent/30">
+                                <ShieldCheck className="w-3 h-3" />
+                                <span>Zero Risk</span>
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-agro-primary/15 text-agro-primary border border-agro-primary/30">
+                                <AlertTriangle className="w-3 h-3" />
+                                <span>Risk Detected</span>
+                              </span>
+                            )}
+                          </td>
+                          <td className="py-3 px-3">
+                            <SeverityBadge level={healthy ? 'Healthy' : (scan.severity_level || scan.severity)} />
+                          </td>
+                          <td className="py-3 px-3 font-mono text-agro-primary font-bold">
+                            {(((Number(scan.confidence_score ?? scan.confidence)) || 0.9) * 100).toFixed(1)}%
+                          </td>
+                          <td className="py-3 px-3 text-right">
+                            <Link
+                              to={`/results/${scan.id}`}
+                              className="text-xs font-bold text-agro-primary hover:underline"
+                            >
+                              {t('history.view_report') || 'View Report'}
+                            </Link>
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>

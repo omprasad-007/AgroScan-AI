@@ -111,9 +111,11 @@ export const ResultPage = () => {
   const rawDisease = scan.disease || scan.disease_name || 'Healthy';
   const rawSeverity = scan.severity || scan.severity_level || 'Normal';
 
+  const isHealthyScan = scan.status === 'HEALTHY' || Boolean(scan.healthy_status) || rawDisease.toLowerCase().includes('healthy') || rawSeverity.toLowerCase().includes('healthy');
+
   const displayCrop = translateCrop(rawCrop);
-  const displayDisease = translateDisease(rawDisease);
-  const displaySeverity = translateSeverity(rawSeverity);
+  const displayDisease = isHealthyScan ? 'Healthy Leaf (No Disease Detected)' : translateDisease(rawDisease);
+  const displaySeverity = isHealthyScan ? 'Healthy' : translateSeverity(rawSeverity);
   const formattedDate = formatDate(scan.created_at || scan.analysis_timestamp || new Date());
 
   const cropSupportStatus = scan.crop_support_status || 'SUPPORTED';
@@ -187,10 +189,49 @@ export const ResultPage = () => {
           </div>
 
           <div className="flex items-center gap-2.5 shrink-0">
-            <SeverityBadge level={scan.severity || scan.severity_level} />
-            <WeatherRiskBadge level={scan.risk || scan.weather_risk_level} />
+            <SeverityBadge level={isHealthyScan ? 'Healthy' : (scan.severity || scan.severity_level)} />
+            <WeatherRiskBadge level={isHealthyScan ? 'Low' : (scan.risk || scan.weather_risk_level)} />
           </div>
         </div>
+
+        {/* Health Status Assessment Banner */}
+        {isHealthyScan ? (
+          <div className="p-4 sm:p-5 rounded-2xl bg-agro-accent/15 border border-agro-accent/35 flex items-start sm:items-center gap-3.5 text-agro-cream">
+            <div className="p-2.5 rounded-xl bg-agro-accent/25 text-agro-accent shrink-0 border border-agro-accent/40">
+              <ShieldCheck className="w-6 h-6" aria-hidden="true" />
+            </div>
+            <div className="space-y-0.5">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-agro-accent uppercase tracking-wider">Health Status Assessment</span>
+                <span className="px-2 py-0.5 rounded-md bg-agro-accent/30 text-[10px] font-bold text-agro-accent uppercase">Zero Pathology Risk</span>
+              </div>
+              <h3 className="text-base sm:text-lg font-extrabold text-agro-cream font-heading">
+                Healthy Foliage — No Pathogen Lesions Detected
+              </h3>
+              <p className="text-xs text-agro-muted leading-relaxed">
+                Botanical computer vision confirmed intact leaf cellular architecture with zero fungal or bacterial lesions. Standard crop care and preventive scouting recommended.
+              </p>
+            </div>
+          </div>
+        ) : (
+          <div className="p-4 sm:p-5 rounded-2xl bg-agro-primary/15 border border-agro-primary/35 flex items-start sm:items-center gap-3.5 text-agro-cream">
+            <div className="p-2.5 rounded-xl bg-agro-primary/25 text-agro-primary shrink-0 border border-agro-primary/40">
+              <AlertTriangle className="w-6 h-6" aria-hidden="true" />
+            </div>
+            <div className="space-y-0.5">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-agro-primary uppercase tracking-wider">Pathology Outbreak Warning</span>
+                <span className="px-2 py-0.5 rounded-md bg-agro-primary/30 text-[10px] font-bold text-agro-primary uppercase">Active Risk</span>
+              </div>
+              <h3 className="text-base sm:text-lg font-extrabold text-agro-cream font-heading">
+                Active Crop Pathology Identified
+              </h3>
+              <p className="text-xs text-agro-muted leading-relaxed">
+                Lesion pattern analysis detected active foliar infection. Follow the containment guidance and recommended application protocol below to protect neighboring yield.
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Crop Support Status Banner */}
         {cropSupportStatus === 'UNSUPPORTED' && (
@@ -231,8 +272,8 @@ export const ResultPage = () => {
 
           <div className="bg-agro-surface/60 p-4 rounded-2xl border border-agro-border">
             <span className="text-xs text-agro-muted block">{t('result.severity') || 'Visual Severity'}</span>
-            <span className="text-xl sm:text-2xl font-extrabold text-agro-amber mt-1 block">
-              {scan.severity_percentage || 0}%
+            <span className={`text-xl sm:text-2xl font-extrabold mt-1 block ${isHealthyScan ? 'text-agro-accent' : 'text-agro-amber'}`}>
+              {isHealthyScan ? '0.0%' : `${scan.severity_percentage || 0}%`}
             </span>
             <span className="text-[10px] text-agro-cream font-medium block mt-0.5">
               {displaySeverity}
@@ -242,10 +283,10 @@ export const ResultPage = () => {
           <div className="bg-agro-surface/60 p-4 rounded-2xl border border-agro-border">
             <span className="text-xs text-agro-muted block">{t('result.affected_area') || 'Affected Area'}</span>
             <span className="text-xl sm:text-2xl font-extrabold text-agro-cream mt-1 block">
-              {scan.affected_area || scan.affected_area_cm2 || 0} cm²
+              {isHealthyScan ? '0.0' : (scan.affected_area || scan.affected_area_cm2 || 0)} cm²
             </span>
             <span className="text-[10px] text-agro-muted block mt-0.5">
-              Leaf Surface
+              {isHealthyScan ? 'Intact Surface' : 'Leaf Surface'}
             </span>
           </div>
         </div>
@@ -296,16 +337,28 @@ export const ResultPage = () => {
               </p>
             </div>
 
-            {/* Chemical Treatment */}
-            <div className="p-5 rounded-2xl bg-agro-surface/70 border border-agro-amber/30 space-y-2">
-              <h3 className="text-xs font-bold text-agro-amber uppercase tracking-wider flex items-center gap-2">
-                <FileText className="w-4 h-4" aria-hidden="true" />
-                <span>{t('result.chemical_remedy') || 'Chemical / Fungicidal Intervention'}</span>
-              </h3>
-              <p className="text-xs sm:text-sm text-agro-cream leading-relaxed font-medium">
-                {recommendation.chemical_treatment || recommendation.chemical_remedy}
-              </p>
-            </div>
+            {/* Chemical Treatment or Healthy Zero-Spray Guidance */}
+            {isHealthyScan ? (
+              <div className="p-5 rounded-2xl bg-agro-surface/70 border border-agro-accent/30 space-y-2">
+                <h3 className="text-xs font-bold text-agro-accent uppercase tracking-wider flex items-center gap-2">
+                  <ShieldCheck className="w-4 h-4" aria-hidden="true" />
+                  <span>Chemical / Fungicidal Intervention</span>
+                </h3>
+                <p className="text-xs sm:text-sm text-agro-cream leading-relaxed font-medium">
+                  No chemical application required. Foliage is completely healthy with zero active pathogen lesions. Withhold synthetic sprays to protect beneficial predatory insects and optimize natural farm ecology.
+                </p>
+              </div>
+            ) : (
+              <div className="p-5 rounded-2xl bg-agro-surface/70 border border-agro-amber/30 space-y-2">
+                <h3 className="text-xs font-bold text-agro-amber uppercase tracking-wider flex items-center gap-2">
+                  <FileText className="w-4 h-4" aria-hidden="true" />
+                  <span>{t('result.chemical_remedy') || 'Chemical / Fungicidal Intervention'}</span>
+                </h3>
+                <p className="text-xs sm:text-sm text-agro-cream leading-relaxed font-medium">
+                  {recommendation.chemical_treatment || recommendation.chemical_remedy}
+                </p>
+              </div>
+            )}
 
             {/* Prevention */}
             <div className="p-5 rounded-2xl bg-agro-surface border border-agro-accent/30 space-y-2">

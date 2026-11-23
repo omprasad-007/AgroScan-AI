@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { Filter, Search, ArrowRight, Trash2, RotateCcw, Sprout, AlertTriangle, ScanLine } from 'lucide-react';
+import { Filter, Search, ArrowRight, Trash2, RotateCcw, Sprout, AlertTriangle, ScanLine, ShieldCheck } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { SeverityBadge, WeatherRiskBadge } from '../components/common/Badge';
 import api from '../services/api';
@@ -13,6 +13,7 @@ export const HistoryPage = () => {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [cropFilter, setCropFilter] = useState('All');
+  const [statusFilter, setStatusFilter] = useState('ALL');
   const [showClearModal, setShowClearModal] = useState(false);
 
   const fetchHistory = useCallback(async () => {
@@ -116,14 +117,27 @@ export const HistoryPage = () => {
     }
   };
 
+  const isHealthyItem = (item) => {
+    if (!item) return false;
+    const disease = (item.disease_name || item.disease || '').toLowerCase();
+    const sev = (item.severity_level || item.severity || '').toLowerCase();
+    const status = (item.status || '').toUpperCase();
+    return status === 'HEALTHY' || Boolean(item.healthy_status) || disease.includes('healthy') || sev === 'healthy';
+  };
+
   const safeHistory = Array.isArray(history) ? history : [];
+  const healthyCount = safeHistory.filter(isHealthyItem).length;
+  const diseasedCount = safeHistory.length - healthyCount;
+
   const filteredHistory = safeHistory.filter((item) => {
     const diseaseName = item.disease_name || item.disease || '';
     const cropName = item.crop_detected || item.plant || '';
     const matchesSearch = diseaseName.toLowerCase().includes(search.toLowerCase()) ||
                           cropName.toLowerCase().includes(search.toLowerCase());
     const matchesCrop = cropFilter === 'All' || cropName === cropFilter;
-    return matchesSearch && matchesCrop;
+    const isH = isHealthyItem(item);
+    const matchesStatus = statusFilter === 'ALL' || (statusFilter === 'HEALTHY' ? isH : !isH);
+    return matchesSearch && matchesCrop && matchesStatus;
   });
 
   return (
@@ -163,8 +177,8 @@ export const HistoryPage = () => {
       </div>
 
       {/* Filter & Search Bar */}
-      <div className="agro-panel bg-agro-card p-4 rounded-2xl border border-agro-border flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="relative w-full sm:w-80">
+      <div className="agro-panel bg-agro-card p-4 rounded-2xl border border-agro-border flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="relative w-full md:w-72">
           <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-agro-muted" />
           <input
             type="text"
@@ -175,12 +189,36 @@ export const HistoryPage = () => {
           />
         </div>
 
-        <div className="flex items-center space-x-2.5 w-full sm:w-auto">
+        {/* Health Status Filter Pills */}
+        <div className="flex items-center gap-1 p-1 rounded-xl bg-agro-surface border border-agro-border text-xs w-full md:w-auto justify-center">
+          <button
+            onClick={() => setStatusFilter('ALL')}
+            className={`px-3 py-1.5 rounded-lg font-semibold transition ${statusFilter === 'ALL' ? 'bg-agro-card text-agro-cream shadow-sm' : 'text-agro-muted hover:text-agro-cream'}`}
+          >
+            All ({safeHistory.length})
+          </button>
+          <button
+            onClick={() => setStatusFilter('HEALTHY')}
+            className={`px-3 py-1.5 rounded-lg font-semibold flex items-center gap-1.5 transition ${statusFilter === 'HEALTHY' ? 'bg-agro-accent/20 text-agro-accent border border-agro-accent/40 shadow-sm' : 'text-agro-muted hover:text-agro-accent'}`}
+          >
+            <ShieldCheck className="w-3.5 h-3.5" />
+            <span>Healthy ({healthyCount})</span>
+          </button>
+          <button
+            onClick={() => setStatusFilter('RISKY')}
+            className={`px-3 py-1.5 rounded-lg font-semibold flex items-center gap-1.5 transition ${statusFilter === 'RISKY' ? 'bg-agro-primary/20 text-agro-primary border border-agro-primary/40 shadow-sm' : 'text-agro-muted hover:text-agro-primary'}`}
+          >
+            <AlertTriangle className="w-3.5 h-3.5" />
+            <span>Risky ({diseasedCount})</span>
+          </button>
+        </div>
+
+        <div className="flex items-center space-x-2.5 w-full md:w-auto">
           <Filter className="w-4 h-4 text-agro-muted shrink-0" />
           <select
             value={cropFilter}
             onChange={(e) => setCropFilter(e.target.value)}
-            className="w-full sm:w-auto px-3.5 py-2.5 rounded-xl bg-agro-surface border border-agro-border text-xs text-agro-cream focus:outline-none focus:border-agro-primary focus:ring-1 focus:ring-agro-primary font-semibold transition cursor-pointer"
+            className="w-full md:w-auto px-3.5 py-2.5 rounded-xl bg-agro-surface border border-agro-border text-xs text-agro-cream focus:outline-none focus:border-agro-primary focus:ring-1 focus:ring-agro-primary font-semibold transition cursor-pointer"
           >
             <option value="All">{t('history.filter_all') || 'All Crops'}</option>
             <option value="Tomato">{translateCrop('Tomato')}</option>
@@ -229,51 +267,63 @@ export const HistoryPage = () => {
           <>
             {/* Mobile Cards (Visible only on < md) */}
             <div className="block md:hidden space-y-3">
-              {filteredHistory.map((item) => (
-                <div
-                  key={item.id}
-                  className="p-4 rounded-xl bg-agro-surface border border-agro-border space-y-2.5 transition-all shadow-sm"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="font-bold text-agro-cream text-sm">
-                      {translateCrop(item.crop_detected || item.plant)}
-                    </span>
-                    <span className="text-[11px] text-agro-muted font-mono">
-                      {formatDate(item.created_at || item.timestamp || new Date())}
-                    </span>
-                  </div>
+              {filteredHistory.map((item) => {
+                const healthy = isHealthyItem(item);
+                return (
+                  <div
+                    key={item.id}
+                    className={`p-4 rounded-xl bg-agro-surface border space-y-2.5 transition-all shadow-sm ${healthy ? 'border-agro-accent/40' : 'border-agro-border'}`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-agro-cream text-sm">
+                        {translateCrop(item.crop_detected || item.plant)}
+                      </span>
+                      <span className="text-[11px] text-agro-muted font-mono">
+                        {formatDate(item.created_at || item.timestamp || new Date())}
+                      </span>
+                    </div>
 
-                  <div className="text-xs text-agro-cream/90 font-medium">
-                    {translateDisease(item.disease_name || item.disease)}
-                  </div>
+                    <div className="text-xs font-medium">
+                      {healthy ? (
+                        <span className="text-agro-accent font-bold flex items-center gap-1.5">
+                          <ShieldCheck className="w-4 h-4 text-agro-accent" />
+                          <span>Healthy Foliage (Zero Risk)</span>
+                        </span>
+                      ) : (
+                        <span className="text-agro-cream/90 font-medium">
+                          {translateDisease(item.disease_name || item.disease)}
+                        </span>
+                      )}
+                    </div>
 
-                  <div className="flex flex-wrap items-center gap-2 pt-1">
-                    <SeverityBadge level={item.severity_level || item.severity} />
-                    <WeatherRiskBadge level={item.weather_risk_level || item.risk || 'Low'} />
-                    <span className="font-mono text-xs font-bold text-agro-primary ml-auto">
-                      {(((Number(item.confidence_score ?? item.confidence)) || 0.9) * 100).toFixed(1)}%
-                    </span>
-                  </div>
+                    <div className="flex flex-wrap items-center gap-2 pt-1">
+                      <SeverityBadge level={healthy ? 'Healthy' : (item.severity_level || item.severity)} />
+                      <WeatherRiskBadge level={healthy ? 'Low' : (item.weather_risk_level || item.risk || 'Low')} />
+                      <span className="font-mono text-xs font-bold text-agro-primary ml-auto">
+                        {(((Number(item.confidence_score ?? item.confidence)) || 0.9) * 100).toFixed(1)}%
+                      </span>
+                    </div>
 
-                  <div className="flex items-center justify-between pt-2 border-t border-agro-border">
-                    <button
-                      onClick={() => handleDeleteItem(item.id)}
-                      className="p-1.5 rounded-lg text-agro-muted hover:text-agro-primary hover:bg-agro-primary/10 transition"
-                      title="Delete scan"
-                      aria-label="Delete scan record"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                    <Link
-                      to={`/results/${item.id}`}
-                      className="text-xs font-bold text-white bg-agro-primary hover:bg-agro-primaryHover px-3 py-1.5 rounded-lg inline-flex items-center space-x-1 transition shadow-sm"
-                    >
-                      <span>{t('history.view_report') || 'View Full Report'}</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </Link>
+                    <div className="flex items-center justify-between pt-2 border-t border-agro-border">
+                      <button
+                        onClick={() => handleDeleteItem(item.id)}
+                        className="p-1.5 rounded-lg text-agro-muted hover:text-agro-primary hover:bg-agro-primary/10 transition"
+                        title="Delete scan"
+                        aria-label="Delete scan record"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                      <Link
+                        to={`/results/${item.id}`}
+                        className="text-xs font-bold text-white bg-agro-primary hover:bg-agro-primaryHover px-3 py-1.5 rounded-lg inline-flex items-center space-x-1 transition shadow-sm"
+                      >
+                        <span>{t('history.view_report') || 'View Full Report'}</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </Link>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             {/* Desktop Table (Visible on >= md) */}
@@ -291,47 +341,59 @@ export const HistoryPage = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-agro-border">
-                  {filteredHistory.map((item) => (
-                    <tr key={item.id} className="hover:bg-agro-surface/60 transition group">
-                      <td className="py-3.5 px-3 text-agro-muted font-mono text-[11px]">
-                        {formatDate(item.created_at || item.timestamp || new Date())}
-                      </td>
-                      <td className="py-3.5 px-3 font-semibold text-agro-cream">
-                        {translateCrop(item.crop_detected || item.plant)}
-                      </td>
-                      <td className="py-3.5 px-3 text-agro-cream/90">
-                        {translateDisease(item.disease_name || item.disease)}
-                      </td>
-                      <td className="py-3.5 px-3">
-                        <SeverityBadge level={item.severity_level || item.severity} />
-                      </td>
-                      <td className="py-3.5 px-3">
-                        <WeatherRiskBadge level={item.weather_risk_level || item.risk || 'Low'} />
-                      </td>
-                      <td className="py-3.5 px-3 font-mono font-bold text-agro-primary">
-                        {(((Number(item.confidence_score ?? item.confidence)) || 0.9) * 100).toFixed(1)}%
-                      </td>
-                      <td className="py-3.5 px-3 text-right">
-                        <div className="inline-flex items-center space-x-2">
-                          <Link
-                            to={`/results/${item.id}`}
-                            className="text-xs font-bold text-agro-primary hover:text-agro-primaryHover inline-flex items-center space-x-1 transition"
-                          >
-                            <span>{t('history.view_report') || 'View Full Report'}</span>
-                            <ArrowRight className="w-3.5 h-3.5" />
-                          </Link>
-                          <button
-                            onClick={() => handleDeleteItem(item.id)}
-                            className="p-1.5 rounded-lg text-agro-muted hover:text-agro-primary hover:bg-agro-primary/10 transition opacity-80 group-hover:opacity-100"
-                            title="Delete scan"
-                            aria-label="Delete scan record"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                  {filteredHistory.map((item) => {
+                    const healthy = isHealthyItem(item);
+                    return (
+                      <tr key={item.id} className="hover:bg-agro-surface/60 transition group">
+                        <td className="py-3.5 px-3 text-agro-muted font-mono text-[11px]">
+                          {formatDate(item.created_at || item.timestamp || new Date())}
+                        </td>
+                        <td className="py-3.5 px-3 font-semibold text-agro-cream">
+                          {translateCrop(item.crop_detected || item.plant)}
+                        </td>
+                        <td className="py-3.5 px-3 text-agro-cream/90">
+                          {healthy ? (
+                            <span className="inline-flex items-center gap-1.5 font-bold text-agro-accent">
+                              <ShieldCheck className="w-4 h-4 text-agro-accent" />
+                              <span>Healthy Foliage (Zero Risk)</span>
+                            </span>
+                          ) : (
+                            <span className="text-agro-primary font-semibold">
+                              {translateDisease(item.disease_name || item.disease)}
+                            </span>
+                          )}
+                        </td>
+                        <td className="py-3.5 px-3">
+                          <SeverityBadge level={healthy ? 'Healthy' : (item.severity_level || item.severity)} />
+                        </td>
+                        <td className="py-3.5 px-3">
+                          <WeatherRiskBadge level={healthy ? 'Low' : (item.weather_risk_level || item.risk || 'Low')} />
+                        </td>
+                        <td className="py-3.5 px-3 font-mono font-bold text-agro-primary">
+                          {(((Number(item.confidence_score ?? item.confidence)) || 0.9) * 100).toFixed(1)}%
+                        </td>
+                        <td className="py-3.5 px-3 text-right">
+                          <div className="inline-flex items-center space-x-2">
+                            <Link
+                              to={`/results/${item.id}`}
+                              className="text-xs font-bold text-agro-primary hover:text-agro-primaryHover inline-flex items-center space-x-1 transition"
+                            >
+                              <span>{t('history.view_report') || 'View Full Report'}</span>
+                              <ArrowRight className="w-3.5 h-3.5" />
+                            </Link>
+                            <button
+                              onClick={() => handleDeleteItem(item.id)}
+                              className="p-1.5 rounded-lg text-agro-muted hover:text-agro-primary hover:bg-agro-primary/10 transition opacity-80 group-hover:opacity-100"
+                              title="Delete scan"
+                              aria-label="Delete scan record"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
