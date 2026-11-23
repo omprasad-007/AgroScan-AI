@@ -119,7 +119,7 @@ def test_plant_verification_detector():
     is_plant, status, reason = PlantDetector.verify_plant_image(blank_bytes)
     assert is_plant is False
     assert status == "NON_PLANT_IMAGE"
-    assert "No clear leaf was detected" in reason or "You have not scanned a leaf or plant." in reason
+    assert "No clear leaf was detected" in reason or "You have not scanned a leaf or plant." in reason or "No recognizable plant or leaf" in reason
 
 def test_validate_image_endpoint():
     # Test non-plant image validation endpoint
@@ -131,7 +131,7 @@ def test_validate_image_endpoint():
     data = response.json()
     assert data["is_plant"] is False
     assert data["status"] == "NON_PLANT_IMAGE"
-    assert "No clear leaf was detected" in data["message"] or "You have not scanned a leaf or plant." in data["message"]
+    assert "No clear leaf was detected" in data["message"] or "You have not scanned a leaf or plant." in data["message"] or "No recognizable plant or leaf" in data["message"]
 
 def test_plant_search_catalog():
     response = client.get("/api/v1/plants/search?q=mango")

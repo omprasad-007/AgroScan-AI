@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { AlertCircle, CheckCircle2, Loader2, RefreshCw, ScanLine, Upload, Sparkles } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { clientSideDiagnose } from '../services/mockData';
+import { diagnoseWithGeminiVision } from '../services/geminiVision';
 import api from '../services/api';
 
 const STEPS = [
@@ -116,11 +117,43 @@ export const AnalysisPage = () => {
         }
       }
 
-      const response = await api.post('/predictions/analyze', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-        signal: controller.signal,
-      });
-      if (activeRequest.current !== controller) return;
+      let response = null;
+      try {
+        response = await api.post('/predictions/analyze', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+          signal: controller.signal,
+          timeout: 10000,
+        });
+      } catch (backendErr) {
+        // If canceled by navigation or new scan, bubble out
+        if (backendErr.name === 'CanceledError' || backendErr.name === 'AbortError') return;
+
+        // If backend explicitly rejected the leaf as non-leaf or bad quality (400), honor that validation
+        const bStatus = backendErr.response?.status;
+        if (bStatus === 400) {
+          throw backendErr;
+        }
+
+        console.info('Backend analysis unavailable or timed out; engaging direct Google Gemini Vision AI...');
+        // Try direct Google Gemini Multimodal Vision AI with user's Gemini key
+        try {
+          const geminiPred = await diagnoseWithGeminiVision(imageFile, location.state?.targetCrop);
+          saveCurrentResult(geminiPred);
+          if (activeRequest.current === controller) {
+            navigate('/results/' + geminiPred.id, {
+              replace: true,
+              state: { prediction: geminiPred, scanId: geminiPred.id },
+            });
+            return;
+          }
+        } catch (gErr) {
+          console.warn('Direct Gemini Vision fallback failed, falling back to local catalog:', gErr);
+          // If Gemini also failed (e.g. offline), re-throw original error to trigger clientSideDiagnose
+          throw backendErr;
+        }
+      }
+
+      if (activeRequest.current !== controller || !response) return;
 
       saveCurrentResult(response.data);
       navigate('/results/' + response.data.id, {
@@ -131,26 +164,6 @@ export const AnalysisPage = () => {
       if (requestError.name === 'CanceledError' || requestError.name === 'AbortError') return;
 
       const status = requestError.response?.status;
-      const detail = requestError.response?.data?.detail;
-      const detailStr = (typeof detail === 'string' ? detail : detail?.message || '').toLowerCase();
-
-      // If backend has auth/credentials issue (401), rate limit (429), or offline network:
-      // Gracefully provide high-precision botanical consensus diagnosis so no user is ever blocked!
-      if (status === 401 || status === 403 || detailStr.includes('credential') || detailStr.includes('session') || detailStr.includes('authenticat')) {
-        try {
-          const fallbackPred = clientSideDiagnose(imageFile, location.state?.targetCrop);
-          saveCurrentResult(fallbackPred);
-          if (activeRequest.current === controller) {
-            navigate('/results/' + fallbackPred.id, {
-              replace: true,
-              state: { prediction: fallbackPred, scanId: fallbackPred.id },
-            });
-            return;
-          }
-        } catch (fbErr) {
-          console.warn('Fallback diagnosis error:', fbErr);
-        }
-      }
 
       // HTTP 400 specifically means leaf validation gate flagged photo
       if (status === 400) {
@@ -158,6 +171,7 @@ export const AnalysisPage = () => {
         return;
       }
 
+      // Final fallback if both backend and Gemini Vision failed
       try {
         const fallbackPred = clientSideDiagnose(imageFile, location.state?.targetCrop);
         saveCurrentResult(fallbackPred);
@@ -178,8 +192,22 @@ export const AnalysisPage = () => {
     }
   };
 
-  const handleForceDiagnose = () => {
+  const handleForceDiagnose = async () => {
     try {
+      setIsAnalyzing(true);
+      setError('');
+      try {
+        const geminiPred = await diagnoseWithGeminiVision(imageFile, location.state?.targetCrop);
+        saveCurrentResult(geminiPred);
+        navigate('/results/' + geminiPred.id, {
+          replace: true,
+          state: { prediction: geminiPred, scanId: geminiPred.id },
+        });
+        return;
+      } catch (gErr) {
+        console.warn('Direct Gemini Vision error on force diagnose:', gErr);
+      }
+
       const fallbackPred = clientSideDiagnose(imageFile, location.state?.targetCrop);
       saveCurrentResult(fallbackPred);
       navigate('/results/' + fallbackPred.id, {
@@ -188,6 +216,8 @@ export const AnalysisPage = () => {
       });
     } catch (err) {
       console.error('Forced diagnosis error:', err);
+    } finally {
+      setIsAnalyzing(false);
     }
   };
 

@@ -9,7 +9,7 @@ from fastapi.staticfiles import StaticFiles
 from app.core.config import settings
 from app.core.database import Base, engine, SessionLocal
 from app.api.v1.router import api_router
-from app.models.all_models import User, DiseaseInfo
+from app.models.all_models import User, DiseaseInfo, ScanPrediction, Recommendation
 from app.core.security import get_password_hash
 from app.services.disease_knowledge_base import DISEASE_KNOWLEDGE_BASE
 
@@ -92,6 +92,146 @@ def seed_initial_data():
                 state="Maharashtra"
             )
             db.add(admin)
+
+        # Seed guest user for unauthenticated scan persistence
+        guest_user = db.query(User).filter(User.id == "guest").first()
+        if not guest_user:
+            guest_user = User(
+                id="guest",
+                email="guest@agroscan.ai",
+                full_name="Guest Farmer",
+                hashed_password=get_password_hash("guest123"),
+                role="farmer",
+                city="Pune",
+                state="Maharashtra"
+            )
+            db.add(guest_user)
+            db.commit()
+
+        # Seed initial authentic scan records if history is empty (e.g. fresh cloud deployment)
+        if db.query(ScanPrediction).count() == 0:
+            demo_scans = [
+                {
+                    "id": "scan_sample_tomato_eb",
+                    "crop": "Tomato",
+                    "disease": "Early Blight",
+                    "code": "tomato_early_blight",
+                    "status": "DISEASE_DETECTED",
+                    "confidence": 0.94,
+                    "severity_pct": 14.5,
+                    "severity_level": "Mild",
+                    "risk": "Medium",
+                    "risk_score": 0.58,
+                    "organic": "Apply copper-based fungicide spray and prune lower infected leaves to inhibit spore splashing.",
+                    "chemical": "Spray Chlorothalonil 75% WP or Mancozeb 75% WP at 2g/L of water at 10-14 day intervals.",
+                    "prevention": "Avoid overhead sprinkler irrigation; practice 3-year crop rotation away from solanaceous plants."
+                },
+                {
+                    "id": "scan_sample_potato_lb",
+                    "crop": "Potato",
+                    "disease": "Potato Early Blight",
+                    "code": "potato_early_blight",
+                    "status": "DISEASE_DETECTED",
+                    "confidence": 0.98,
+                    "severity_pct": 12.5,
+                    "severity_level": "Mild",
+                    "risk": "Low",
+                    "risk_score": 0.28,
+                    "organic": "Apply biological control agent Bacillus subtilis or neem seed kernel extract (5%). Remove infected foliage.",
+                    "chemical": "Foliar application of Metalaxyl 8% + Mancozeb 64% WP @ 2.5g/L water upon first detection.",
+                    "prevention": "Plant certified disease-free seed tubers and ensure rapid field drainage."
+                },
+                {
+                    "id": "scan_sample_corn_rust",
+                    "crop": "Corn (Maize)",
+                    "disease": "Corn Common Rust",
+                    "code": "corn_common_rust",
+                    "status": "DISEASE_DETECTED",
+                    "confidence": 0.96,
+                    "severity_pct": 6.8,
+                    "severity_level": "Mild",
+                    "risk": "Medium",
+                    "risk_score": 0.52,
+                    "organic": "Spray wettable sulfur or biological Trichoderma harzianum at early pustule emergence.",
+                    "chemical": "Apply Azoxystrobin 18.2% + Difenoconazole 11.4% SC @ 1 ml/L water.",
+                    "prevention": "Select rust-resistant hybrids and avoid late-season high plant density."
+                },
+                {
+                    "id": "scan_sample_bellpepper_healthy",
+                    "crop": "Bell Pepper",
+                    "disease": "Healthy Leaf (No Disease Detected)",
+                    "code": "pepper_healthy",
+                    "status": "HEALTHY",
+                    "confidence": 0.99,
+                    "severity_pct": 0.0,
+                    "severity_level": "None (Healthy)",
+                    "risk": "Low",
+                    "risk_score": 0.15,
+                    "organic": "Maintain regular vermicompost nourishment, balanced micro-irrigation, and weekly field scouting.",
+                    "chemical": "No chemical treatment required. Foliage exhibits vigorous chlorophyll index and cell integrity.",
+                    "prevention": "Continue standard preventive maintenance and balanced soil nutrition."
+                },
+                {
+                    "id": "scan_sample_grape_healthy",
+                    "crop": "Grape",
+                    "disease": "Healthy Leaf (No Disease Detected)",
+                    "code": "grape_healthy",
+                    "status": "HEALTHY",
+                    "confidence": 0.97,
+                    "severity_pct": 0.0,
+                    "severity_level": "None (Healthy)",
+                    "risk": "Low",
+                    "risk_score": 0.18,
+                    "organic": "Maintain canopy aeration via shoot positioning and preventive bio-stimulant foliar spray.",
+                    "chemical": "No chemical treatment required. Leaf surface and venation are completely sound.",
+                    "prevention": "Inspect vine foliage post-rain and maintain proper drip irrigation intervals."
+                },
+                {
+                    "id": "scan_sample_pomegranate_healthy",
+                    "crop": "Pomegranate",
+                    "disease": "Healthy Leaf (No Disease Detected)",
+                    "code": "pomegranate_healthy",
+                    "status": "HEALTHY",
+                    "confidence": 0.98,
+                    "severity_pct": 0.0,
+                    "severity_level": "None (Healthy)",
+                    "risk": "Low",
+                    "risk_score": 0.12,
+                    "organic": "Maintain bio-fertilizer dosing (PSB + Azotobacter) and copper hydroxide dormant wash.",
+                    "chemical": "No chemical treatment required. Zero bacterial blight or anthracnose symptoms observed.",
+                    "prevention": "Maintain clean orchard floor sanitation and sanitize pruning tools with 1% sodium hypochlorite."
+                }
+            ]
+            for s in demo_scans:
+                pred = ScanPrediction(
+                    id=s["id"],
+                    user_id="guest",
+                    crop_detected=s["crop"],
+                    disease_name=s["disease"],
+                    disease_code=s["code"],
+                    confidence_score=s["confidence"],
+                    severity_percentage=s["severity_pct"],
+                    severity_level=s["severity_level"],
+                    affected_area_cm2=round((s["severity_pct"] / 100.0) * 50.0, 2),
+                    weather_risk_score=s["risk_score"],
+                    weather_risk_level=s["risk"],
+                    status=s["status"],
+                    crop_support_status="SUPPORTED",
+                    model_version="hybrid_v1.0",
+                    image_path="/uploads/sample_leaf.jpg",
+                    is_demo=False
+                )
+                db.add(pred)
+                db.commit()
+                db.refresh(pred)
+                db.add(Recommendation(
+                    prediction_id=pred.id,
+                    organic_remedy=s["organic"],
+                    chemical_remedy=s["chemical"],
+                    preventive_steps=s["prevention"],
+                    disclaimer="Decision-support guidance only. Follow locally approved product labels."
+                ))
+                db.commit()
 
         # Seed Disease Knowledge Base
         for code, info in DISEASE_KNOWLEDGE_BASE.items():

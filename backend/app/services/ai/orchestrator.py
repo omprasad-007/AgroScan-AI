@@ -194,13 +194,16 @@ class HybridPredictionOrchestrator:
         # Evaluate consensus and agreement
         agreement_status, consensus_score, uncertainty_note = ConfidenceCalibrator.evaluate_model_agreement(all_sources)
 
-        # Primary baseline from local model or first available provider
-        primary = model_predictions[0] if model_predictions else (provider_predictions[0] if provider_predictions else {})
-        gemini_top = next((p for p in provider_predictions if p.get("provider") == "gemini_vision"), None)
+        # Gemini Multimodal Vision AI takes primary precedence as the authoritative botanical classifier
+        gemini_top = next((p for p in provider_predictions if p.get("provider") == "gemini_vision" and p.get("status") == "success"), None)
+        if gemini_top:
+            primary = gemini_top
+        else:
+            primary = model_predictions[0] if model_predictions else (provider_predictions[0] if provider_predictions else {})
 
-        plant_name = primary.get("crop") or primary.get("plant") or (crop_profile.common_name if crop_profile else "Plant")
+        plant_name = primary.get("plant") or primary.get("crop") or (crop_profile.common_name if crop_profile else "Plant")
         scientific_name = primary.get("scientific_name") or (crop_profile.scientific_name if crop_profile else "Plantae")
-        disease_name = primary.get("disease_name") or primary.get("disease") or "Unknown"
+        disease_name = primary.get("disease") or primary.get("disease_name") or "Unknown"
         disease_code = primary.get("disease_code") or "unknown_condition"
         is_healthy = primary.get("is_healthy", False)
         calibrated_conf = float(primary.get("confidence", 0.50))
