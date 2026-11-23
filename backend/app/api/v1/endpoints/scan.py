@@ -310,20 +310,20 @@ async def analyze_leaf(
         )
 
         rec_data = orch_res.get("recommendation", {})
-        if current_user:
-            db.add(prediction)
-            db.commit()
-            db.refresh(prediction)
-            db.add(
-                Recommendation(
-                    prediction_id=prediction.id,
-                    organic_remedy=rec_data.get("organic_treatment", ""),
-                    chemical_remedy=rec_data.get("chemical_treatment", ""),
-                    preventive_steps=rec_data.get("prevention", ""),
-                    disclaimer=rec_data.get("disclaimer", "")
-                )
+        # Always save prediction and recommendations to the database for full diagnostic history
+        db.add(prediction)
+        db.commit()
+        db.refresh(prediction)
+        db.add(
+            Recommendation(
+                prediction_id=prediction.id,
+                organic_remedy=rec_data.get("organic_treatment", ""),
+                chemical_remedy=rec_data.get("chemical_treatment", ""),
+                preventive_steps=rec_data.get("prevention", ""),
+                disclaimer=rec_data.get("disclaimer", "")
             )
-            db.commit()
+        )
+        db.commit()
 
         return PredictionResponse(**orch_res)
 
@@ -353,10 +353,14 @@ def get_prediction_history(
     db: Session = Depends(get_db),
     current_user: Optional[User] = Depends(get_optional_current_user),
 ):
-    user_id = current_user.id if current_user else "guest"
-    query = db.query(ScanPrediction).filter(
-        (ScanPrediction.user_id == user_id) | (ScanPrediction.user_id == "guest")
-    ) if not current_user else db.query(ScanPrediction).filter(ScanPrediction.user_id == current_user.id)
+    if current_user:
+        query = db.query(ScanPrediction).filter(
+            (ScanPrediction.user_id == current_user.id) | (ScanPrediction.user_id == "guest") | (ScanPrediction.user_id.is_(None))
+        )
+    else:
+        query = db.query(ScanPrediction).filter(
+            (ScanPrediction.user_id == "guest") | (ScanPrediction.user_id.is_(None))
+        )
 
     predictions = query.order_by(ScanPrediction.created_at.desc()).limit(limit).all()
     return [format_prediction_response(prediction) for prediction in predictions]
@@ -428,10 +432,6 @@ def get_prediction_by_id(
     current_user: Optional[User] = Depends(get_optional_current_user),
 ):
     query = db.query(ScanPrediction).filter(ScanPrediction.id == id)
-    if current_user:
-        query = query.filter((ScanPrediction.user_id == current_user.id) | (ScanPrediction.user_id == "guest"))
-    else:
-        query = query.filter(ScanPrediction.user_id == "guest")
     prediction = query.first()
     if not prediction:
         raise HTTPException(status_code=404, detail="Prediction record not found")
