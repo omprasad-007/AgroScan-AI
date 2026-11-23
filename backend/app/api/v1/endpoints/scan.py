@@ -260,10 +260,40 @@ async def analyze_leaf(
         language = (getattr(current_user, "language", "en") or "en") if current_user else "en"
         weather_params = {"temperature_c": temp_c, "humidity_pct": humidity, "rainfall_mm": rainfall}
 
+        effective_crop = target_crop
+        if not effective_crop or str(effective_crop).lower() in ["auto", "auto-detect", "unknown", "none", "crop"]:
+            fn_lower = (file.filename or "").lower()
+            if any(k in fn_lower for k in ["soybean", "soyabean", "soya", "soy"]):
+                effective_crop = "Soybean"
+            elif any(k in fn_lower for k in ["cotton", "kapas"]):
+                effective_crop = "Cotton"
+            elif any(k in fn_lower for k in ["sugarcane", "ganna", "us"]):
+                effective_crop = "Sugarcane"
+            elif any(k in fn_lower for k in ["rice", "paddy", "dhan"]):
+                effective_crop = "Rice"
+            elif any(k in fn_lower for k in ["wheat", "gehun", "gahu"]):
+                effective_crop = "Wheat"
+            elif any(k in fn_lower for k in ["corn", "maize", "maka"]):
+                effective_crop = "Corn"
+            elif any(k in fn_lower for k in ["tomato", "tamatar"]):
+                effective_crop = "Tomato"
+            elif any(k in fn_lower for k in ["potato", "batata", "aalu"]):
+                effective_crop = "Potato"
+            elif any(k in fn_lower for k in ["chilli", "mirchi", "pepper"]):
+                effective_crop = "Chilli"
+            elif any(k in fn_lower for k in ["onion", "pyaz", "kanda"]):
+                effective_crop = "Onion"
+            elif any(k in fn_lower for k in ["grape", "angur"]):
+                effective_crop = "Grapes"
+            elif any(k in fn_lower for k in ["mango", "aam", "amba"]):
+                effective_crop = "Mango"
+            elif any(k in fn_lower for k in ["banana", "kela"]):
+                effective_crop = "Banana"
+
         orch_res = await orchestrator.orchestrate_scan(
             image_bytes=contents,
             scan_id=scan_id,
-            target_crop=target_crop,
+            target_crop=effective_crop,
             weather_params=weather_params,
             location={
                 "latitude": latitude or 16.6941,

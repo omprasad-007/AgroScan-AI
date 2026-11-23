@@ -47,6 +47,8 @@ class HuggingFaceInferenceService:
             crop = "Rice (Paddy)"
         elif "wheat" in raw_disease_lower or "wheat" in raw_crop_lower:
             crop = "Wheat"
+        elif "soybean" in raw_disease_lower or "soybean" in raw_crop_lower or "soya" in raw_crop_lower:
+            crop = "Soybean"
         elif "maize" in raw_disease_lower or "corn" in raw_crop_lower:
             crop = "Corn (Maize)"
         elif "pepper" in raw_crop_lower:
@@ -87,6 +89,8 @@ class HuggingFaceInferenceService:
             return "auto"
 
         tc = target_crop.lower()
+        if any(c in tc for c in ["soybean", "soyabean", "soya", "soy"]):
+            return getattr(settings, "DEFAULT_LOCAL_MODEL", "neghani/plantvillage-mobilenetv2")
         if any(c in tc for c in ["cotton", "kapas", "rice", "paddy", "dhan", "sugarcane", "ganna", "us", "wheat", "gehun", "gahu"]):
             return "sanjeevani-04/indian-crop-disease-mobilenetv2"
         return getattr(settings, "DEFAULT_LOCAL_MODEL", "neghani/plantvillage-mobilenetv2")
@@ -226,13 +230,25 @@ class HuggingFaceInferenceService:
             logger.warning(f"Indian crop model inference skipped: {indian_err}")
             return res_pv
 
-        # Select the model with highest calibrated confidence
-        if res_indian["confidence"] > res_pv["confidence"]:
-            # Combine candidates
-            res_indian["top_candidates"] = (res_indian["top_candidates"] + res_pv["top_candidates"])[:top_k]
-            res_indian["latency_ms"] = round(res_indian["latency_ms"] + res_pv["latency_ms"], 1)
-            return res_indian
+        # Select the optimal model:
+        # PlantVillage has 38 classes (including Soybean, Tomato, Potato, Apple, Corn, Grape, Pepper, etc.).
+        # Indian model has ONLY 4 classes (Cotton, Rice, Sugarcane, Wheat).
+        # A 4-class model artificially concentrates its softmax over only 4 crops, producing high confidence.
+        # If PlantVillage predicts a specific crop (e.g. Soybean, Tomato, Potato, Grape, Pepper) with confidence >= 0.20,
+        # it MUST take precedence over the Indian model's narrow 4-crop guess!
+        pv_crop_lower = res_pv.get("crop", "").lower()
+        is_pv_specific = any(c in pv_crop_lower for c in ["soybean", "tomato", "potato", "apple", "grape", "corn", "pepper", "orange", "peach", "strawberry"])
+
+        if is_pv_specific and res_pv["confidence"] >= 0.20:
+            chosen = res_pv
+            other = res_indian
+        elif res_indian["confidence"] > (res_pv["confidence"] + 0.15):
+            chosen = res_indian
+            other = res_pv
         else:
-            res_pv["top_candidates"] = (res_pv["top_candidates"] + res_indian["top_candidates"])[:top_k]
-            res_pv["latency_ms"] = round(res_pv["latency_ms"] + res_indian["latency_ms"], 1)
-            return res_pv
+            chosen = res_pv
+            other = res_indian
+
+        chosen["top_candidates"] = (chosen["top_candidates"] + other["top_candidates"])[:top_k]
+        chosen["latency_ms"] = round(chosen["latency_ms"] + other["latency_ms"], 1)
+        return chosen

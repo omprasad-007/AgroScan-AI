@@ -54,7 +54,7 @@ export const AIAssistantPanel = ({ scanData, predictionId, autoOpen = true }) =>
       const rawDisease = scanData.disease_name || scanData.disease || 'Healthy';
       const plant = translateCrop(rawCrop);
       const disease = translateDisease(rawDisease);
-      const isHealthy = rawDisease.toLowerCase().includes('healthy') || rawDisease.toLowerCase().includes('no disease');
+      const isHealthy = rawDisease.toLowerCase().includes('healthy') || rawDisease.toLowerCase().includes('no disease') || scanData.status === 'HEALTHY' || Boolean(scanData.healthy_status);
 
       let greeting = '';
       if (lang === 'mr') {
@@ -63,8 +63,8 @@ export const AIAssistantPanel = ({ scanData, predictionId, autoOpen = true }) =>
           : `मी पाहत आहे की **${plant}** वर **${disease}** चे लक्षण आढळले आहे. सेंद्रिय उपचार, फवारणीचे प्रमाण किंवा प्रतिबंधात्मक उपायांबद्दल विचारू शकता.`;
       } else {
         greeting = isHealthy
-          ? `I see this is **${rawCrop}** with no disease detected — ask me anything about care, watering, or fertilizing.`
-          : `I see this is **${rawCrop}** with **${rawDisease}** detected — ask me anything about organic remedies, chemical options, or prevention.`;
+          ? `I see this is **${plant}** with no disease detected — ask me anything about care, watering, or fertilizing.`
+          : `I see this is **${plant}** with **${disease}** detected — ask me anything about organic remedies, chemical options, or prevention.`;
       }
 
       setMessages([{ 

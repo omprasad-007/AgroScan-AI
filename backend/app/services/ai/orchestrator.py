@@ -147,7 +147,13 @@ class HybridPredictionOrchestrator:
             logger.warning(f"External and local inference unavailable for {scan_id}; engaging scientific botanical fall-through.")
             severity_result = SeverityAnalyzer.analyze_image_bytes(image_bytes)
             is_sev_healthy = severity_result.get("severity_percentage", 0.0) < 5.0
-            fallback_crop = target_crop.strip().title() if target_crop and target_crop.lower() not in ["auto", "crop", "general"] else "General Plant"
+            tc_clean = (target_crop or "").lower().strip()
+            if any(k in tc_clean for k in ["soybean", "soyabean", "soya", "soy"]) or (image_url and any(k in image_url.lower() for k in ["soybean", "soyabean", "soya", "soy"])):
+                fallback_crop = "Soybean"
+            elif target_crop and tc_clean not in ["auto", "crop", "general"]:
+                fallback_crop = target_crop.strip().title()
+            else:
+                fallback_crop = crop_profile.common_name if crop_profile else "General Plant"
 
             if is_sev_healthy:
                 dis_name = "Healthy Leaf (No Disease Detected)"
@@ -220,19 +226,23 @@ class HybridPredictionOrchestrator:
                 cereal_names = ["corn", "maize", "wheat", "rice", "paddy", "sugarcane", "sorghum", "barley"]
                 local_crop_lower = plant_name.lower()
                 g_crop_lower = g_crop.lower()
-
                 is_cereal_confusion = any(c in local_crop_lower for c in cereal_names) and any(c in g_crop_lower for c in cereal_names)
-                if is_cereal_confusion and g_crop_lower != local_crop_lower:
+
+                if any(k in g_crop_lower for k in ["soybean", "soyabean", "soya"]):
+                    logger.info(f"Gemini Vision botanically validated Soybean foliage: '{plant_name}' -> 'Soybean'")
+                    plant_name = "Soybean"
+                    scientific_name = "Glycine max"
+                    agreement_status = "VALIDATED_SPECIES"
+                elif is_cereal_confusion and g_crop_lower != local_crop_lower:
                     logger.info(f"Correcting cereal crop classification: '{plant_name}' -> Gemini '{g_crop}'")
                     plant_name = g_crop
                     scientific_name = g_sci
                     agreement_status = "VALIDATED_SPECIES"
-
-                # Check if local model guessed a crop it wasn't trained on (e.g. Mango, Papaya, Onion, Chilli)
-                elif not any(p in local_crop_lower for p in ["tomato", "potato", "apple", "grape", "corn"]) or g_conf >= 0.85:
-                    if g_crop_lower not in local_crop_lower:
-                        plant_name = g_crop
-                        scientific_name = g_sci
+                elif g_crop_lower not in local_crop_lower and g_conf >= 0.75:
+                    logger.info(f"Gemini Vision botanical species override: '{plant_name}' -> '{g_crop}' ({g_conf:.2f})")
+                    plant_name = g_crop
+                    scientific_name = g_sci
+                    agreement_status = "VALIDATED_SPECIES"
 
             # --- Rule B: Healthy vs. Diseased Leaf Validation ---
             if g_healthy:

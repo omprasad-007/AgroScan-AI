@@ -451,19 +451,47 @@ export const clientSideDiagnose = (imageFile, targetCrop = null) => {
   const catalogKeys = Object.keys(MULTI_CROP_SPECIES_CATALOG);
   let selectedCropKey = null;
 
+  const CROP_PATTERNS = [
+    { key: 'soybean', patterns: ['soybean', 'soyabean', 'soya', 'soy', 'bhatma', 'glycine', 'edamame', 'soja'] },
+    { key: 'cotton', patterns: ['cotton', 'kapas', 'kapus', 'gossypium'] },
+    { key: 'sugarcane', patterns: ['sugarcane', 'ganna', 'us', 'saccharum'] },
+    { key: 'rice', patterns: ['rice', 'paddy', 'dhan', 'bhat', 'chawal', 'oryza'] },
+    { key: 'wheat', patterns: ['wheat', 'gehun', 'gahu', 'triticum'] },
+    { key: 'corn', patterns: ['corn', 'maize', 'maka', 'makka', 'bhutta', 'zea'] },
+    { key: 'tomato', patterns: ['tomato', 'tamatar', 'tometo', 'lycopersicum'] },
+    { key: 'potato', patterns: ['potato', 'aalu', 'alu', 'batata', 'tuberosum'] },
+    { key: 'chilli', patterns: ['chilli', 'chili', 'pepper', 'mirchi', 'mirch', 'capsicum'] },
+    { key: 'onion', patterns: ['onion', 'pyaz', 'kanda', 'allium'] },
+    { key: 'grapes', patterns: ['grape', 'grapes', 'angur', 'draksh', 'vitis'] },
+    { key: 'mango', patterns: ['mango', 'aam', 'amba', 'mangifera'] },
+    { key: 'banana', patterns: ['banana', 'kela', 'keli', 'musa'] },
+    { key: 'pomegranate', patterns: ['pomegranate', 'anar', 'dalimb', 'punica'] },
+    { key: 'citrus', patterns: ['citrus', 'lemon', 'nimbu', 'limbu', 'orange', 'mosambi'] },
+  ];
+
+  const resolveCropKey = (text) => {
+    if (!text) return null;
+    const str = String(text).toLowerCase();
+    for (const item of CROP_PATTERNS) {
+      if (item.key === str || item.patterns.some(p => str.includes(p))) {
+        return item.key;
+      }
+    }
+    return null;
+  };
+
   // 1. Check if user specified a target crop
   if (targetCrop && targetCrop !== 'auto' && targetCrop !== 'Auto-Detect') {
-    const clean = targetCrop.toLowerCase();
-    selectedCropKey = catalogKeys.find(k => clean.includes(k) || k.includes(clean));
+    selectedCropKey = resolveCropKey(targetCrop);
   }
 
   // 2. Automated Botanical Classification based on file name or image signature
   if (!selectedCropKey) {
-    const lowerName = (imageFile?.name || '').toLowerCase();
-    selectedCropKey = catalogKeys.find(k => lowerName.includes(k));
+    const rawFileName = (imageFile?.name || '').toLowerCase();
+    selectedCropKey = resolveCropKey(rawFileName);
   }
 
-  // 3. Diverse selection across crops (NOT just potato and tomato!)
+  // 3. Fallback selection across diverse crops
   if (!selectedCropKey) {
     selectedCropKey = catalogKeys[absHash % catalogKeys.length];
   }

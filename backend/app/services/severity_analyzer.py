@@ -67,8 +67,8 @@ class SeverityAnalyzer:
                 severity_pct = max(0.0, min(95.0, severity_pct))
 
             # Categorize Severity Level
-            if severity_pct < SeverityAnalyzer.HEALTHY_MAX:
-                level = "Healthy"
+            if severity_pct < 0.1:
+                level = "None (Healthy)"
             elif severity_pct < SeverityAnalyzer.MILD_MAX:
                 level = "Mild"
             elif severity_pct < SeverityAnalyzer.MODERATE_MAX:
