@@ -14,9 +14,9 @@ class GeminiProvider:
     """Invokes Google Gemini API with system instructions and conversation context."""
 
     MODELS = [
-        "gemini-3.5-flash-lite",
-        "gemini-3.5-flash",
-        "gemini-3.1-flash-lite"
+        "gemini-2.0-flash",
+        "gemini-1.5-flash",
+        "gemini-1.5-flash-8b"
     ]
 
     @classmethod
@@ -46,7 +46,7 @@ class GeminiProvider:
             },
             "generationConfig": {
                 "temperature": 0.3,
-                "maxOutputTokens": 600
+                "maxOutputTokens": 2048
             }
         }
 

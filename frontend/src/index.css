@@ -124,18 +124,19 @@ html.dark .bg-grid-pattern {
 }
 
 /* =============================================================
- * SURFACES & PANELS
+ * SURFACES & PANELS (Hardware-Accelerated Smooth 60fps)
  * =========================================================== */
 .agro-panel,
 .glass-panel,
 .glass-card {
   background: var(--panel-bg);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border: 1px solid var(--border-color);
   border-radius: 1.25rem;
   box-shadow: var(--panel-shadow);
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+  will-change: transform;
 }
 
 .agro-panel:hover,
@@ -176,24 +177,27 @@ textarea::placeholder {
   @apply inline-flex items-center justify-center font-semibold text-[15px] transition-all duration-150 rounded-xl bg-agro-surface hover:bg-agro-hover border border-agro-border text-agro-cream active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
 }
 
-/* Laser Scanner Line Animation (Orange/Yellow HUD) */
+/* Laser Scanner Line Animation (Hardware Accelerated GPU Transform) */
 @keyframes laser-sweep {
   0% {
-    top: 0%;
+    transform: translate3d(0, 0px, 0);
     opacity: 0.8;
   }
   50% {
-    top: 96%;
+    transform: translate3d(0, 360px, 0);
     opacity: 1;
   }
   100% {
-    top: 0%;
+    transform: translate3d(0, 0px, 0);
     opacity: 0.8;
   }
 }
 
 .animate-laser-sweep {
-  animation: laser-sweep 3s ease-in-out infinite;
+  will-change: transform, opacity;
+  animation: laser-sweep 3.2s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+  backface-visibility: hidden;
+  transform: translateZ(0);
 }
 
 /* Scrollbars - Warm Cocoa & Ivory */

@@ -104,11 +104,18 @@ class HybridPredictionOrchestrator:
 
         # Local Hugging Face Inference
         hf_success = False
+        local_hypothesis = None
         try:
             hf_res = HuggingFaceInferenceService.predict(image_bytes, target_crop=target_crop)
             if hf_res and hf_res.get("status") == "success":
                 model_predictions.append(hf_res)
                 hf_success = True
+                local_hypothesis = {
+                    "crop": hf_res.get("crop"),
+                    "disease": hf_res.get("disease_name"),
+                    "is_healthy": hf_res.get("is_healthy", False),
+                    "confidence": hf_res.get("confidence", 0.0)
+                }
                 logger.info(
                     f"Local HF inference succeeded: {hf_res['crop']} - {hf_res['disease_name']} "
                     f"({hf_res['confidence']:.2f}) in {hf_res['latency_ms']}ms"
@@ -120,7 +127,7 @@ class HybridPredictionOrchestrator:
         external_tasks = []
         if self.gemini_provider.is_available():
             external_tasks.append(
-                self._safe_provider_call(self.gemini_provider, image_bytes, target_crop, location, language)
+                self._safe_provider_call(self.gemini_provider, image_bytes, target_crop, location, language, local_hypothesis=local_hypothesis)
             )
         if self.kindwise_provider.is_available():
             external_tasks.append(
@@ -148,25 +155,9 @@ class HybridPredictionOrchestrator:
         # Evaluate consensus and agreement
         agreement_status, consensus_score, uncertainty_note = ConfidenceCalibrator.evaluate_model_agreement(all_sources)
 
-        # Select primary candidate
+        # Primary baseline from local model or first available provider
         primary = model_predictions[0] if model_predictions else (provider_predictions[0] if provider_predictions else {})
-
-        # Fallback to Gemini Vision if:
-        # 1. Local model failed or is UNCERTAIN (confidence < 0.50)
-        # 2. Gemini identified a crop matching user's selected non-PlantVillage crop (e.g. Mango, Sugarcane, Cotton, Rice)
-        if provider_predictions:
-            ext_top = provider_predictions[0]
-            ext_crop = ext_top.get("plant", "")
-            local_conf = float(model_predictions[0].get("confidence", 0.0)) if model_predictions else 0.0
-            ext_conf = float(ext_top.get("confidence", 0.0))
-
-            if not hf_success or local_conf < getattr(settings, "MODERATE_CONFIDENCE_THRESHOLD", 0.50):
-                primary = ext_top
-                logger.info(f"Local model uncertain ({local_conf:.2f}); seamlessly falling back to Gemini Vision ({ext_conf:.2f} - {ext_crop})")
-            elif ext_crop and crop_profile and ext_crop.lower() in crop_profile.common_name.lower():
-                primary = ext_top
-            elif target_crop and target_crop.lower() not in ["auto", "crop", "general"] and ext_crop.lower() in target_crop.lower():
-                primary = ext_top
+        gemini_top = next((p for p in provider_predictions if p.get("provider") == "gemini_vision"), None)
 
         plant_name = primary.get("crop") or primary.get("plant") or (crop_profile.common_name if crop_profile else "Plant")
         scientific_name = primary.get("scientific_name") or (crop_profile.scientific_name if crop_profile else "Plantae")
@@ -175,15 +166,93 @@ class HybridPredictionOrchestrator:
         is_healthy = primary.get("is_healthy", False)
         calibrated_conf = float(primary.get("confidence", 0.50))
 
+        # =====================================================================
+        # GEMINI API VALIDATION & ENSEMBLE CONSENSUS GATE
+        # Ensures:
+        # 1. Healthy leaves are never misdiagnosed as diseased.
+        # 2. Crop species discrimination (e.g. Corn vs. Wheat) is botanical and accurate.
+        # =====================================================================
+        if gemini_top and gemini_top.get("status") == "success":
+            g_crop = (gemini_top.get("plant") or "").strip().title()
+            g_sci = gemini_top.get("scientific_name") or scientific_name
+            g_dis = (gemini_top.get("disease") or "").strip().title()
+            g_code = gemini_top.get("disease_code") or "healthy_leaf"
+            g_healthy = bool(gemini_top.get("is_healthy", False)) or ("healthy" in g_dis.lower())
+            g_conf = float(gemini_top.get("confidence", 0.90))
+
+            # --- Rule A: Botanical Crop Species Discrimination ---
+            # If Gemini identified the crop with confidence >= 0.70, validate or correct local crop species
+            if g_crop and g_crop.lower() not in ["general", "general crop", "unknown", "plant", "crop"]:
+                # Check for Corn vs Wheat vs Rice confusion
+                cereal_names = ["corn", "maize", "wheat", "rice", "paddy", "sugarcane", "sorghum", "barley"]
+                local_crop_lower = plant_name.lower()
+                g_crop_lower = g_crop.lower()
+
+                is_cereal_confusion = any(c in local_crop_lower for c in cereal_names) and any(c in g_crop_lower for c in cereal_names)
+                if is_cereal_confusion and g_crop_lower != local_crop_lower:
+                    logger.info(f"Correcting cereal crop classification: '{plant_name}' -> Gemini '{g_crop}'")
+                    plant_name = g_crop
+                    scientific_name = g_sci
+                    agreement_status = "VALIDATED_SPECIES"
+
+                # Check if local model guessed a crop it wasn't trained on (e.g. Mango, Papaya, Onion, Chilli)
+                elif not any(p in local_crop_lower for p in ["tomato", "potato", "apple", "grape", "corn"]) or g_conf >= 0.85:
+                    if g_crop_lower not in local_crop_lower:
+                        plant_name = g_crop
+                        scientific_name = g_sci
+
+            # --- Rule B: Healthy vs. Diseased Leaf Validation ---
+            if g_healthy:
+                # Gemini explicitly determined that the leaf has NO pathogen lesions (Healthy leaf)
+                if not is_healthy:
+                    logger.info(f"Gemini Vision overturns false positive disease: '{disease_name}' -> 'Healthy Leaf' (confidence {g_conf:.2f})")
+                is_healthy = True
+                disease_name = "Healthy Leaf (No Disease Detected)"
+                disease_code = "healthy_leaf"
+                calibrated_conf = max(0.92, g_conf)
+                agreement_status = "VALIDATED_HEALTHY"
+                uncertainty_note = f"Verified healthy by Gemini Vision AI with no active fungal or bacterial lesions on {plant_name}."
+            elif is_healthy and not g_healthy and g_conf >= 0.88:
+                # Local missed a disease that Gemini caught with very high confidence
+                is_healthy = False
+                disease_name = g_dis
+                disease_code = g_code
+                calibrated_conf = g_conf
+                agreement_status = "VALIDATED_DISEASE"
+                uncertainty_note = f"Gemini Vision detected visible pathogen symptoms: {g_dis}."
+            elif not is_healthy and not g_healthy:
+                # Both detected a disease
+                # If Gemini provided a more specific disease for the validated crop, adopt it
+                if g_crop.lower() in plant_name.lower() and g_conf > calibrated_conf:
+                    disease_name = g_dis
+                    disease_code = g_code
+                    calibrated_conf = min(0.99, max(calibrated_conf, g_conf) + 0.03)
+                    agreement_status = "AGREED"
+                    uncertainty_note = f"Consensus confirmed between local neural model and Gemini Vision ({disease_name})."
+                else:
+                    calibrated_conf = min(0.99, max(calibrated_conf, g_conf) + 0.02)
+                    agreement_status = "AGREED"
+
         # STEP 9: Apply Calibrated Decision Rules
         final_status = "DISEASE_DETECTED"
-        if is_healthy or "healthy" in disease_code.lower():
+        if is_healthy or "healthy" in disease_code.lower() or "healthy" in disease_name.lower():
             final_status = "HEALTHY"
+            is_healthy = True
+            disease_name = "Healthy Leaf (No Disease Detected)"
+            disease_code = "healthy_leaf"
         elif agreement_status == "CONFLICTING" or calibrated_conf < getattr(settings, "MODERATE_CONFIDENCE_THRESHOLD", 0.50):
             final_status = "UNCERTAIN"
 
         # Additional feature extractions: Lesion Severity & Weather Risk
         severity_result = SeverityAnalyzer.analyze_image_bytes(image_bytes)
+        if is_healthy:
+            severity_result = {
+                "affected_area_cm2": 0.0,
+                "severity_percentage": 0.0,
+                "severity_level": "None (Healthy)",
+                "confidence": calibrated_conf
+            }
+
         w_params = weather_params or {"temperature_c": 24.0, "humidity_pct": 78.0, "rainfall_mm": 5.0}
         weather_result = WeatherRiskService.calculate_risk(
             temp_c=w_params.get("temperature_c", 24.0),
@@ -221,12 +290,29 @@ class HybridPredictionOrchestrator:
         logger.info(f"Scan {scan_id} completed in {total_latency}ms -> {final_status}: {plant_name} | {disease_name} ({calibrated_conf:.2f})")
         return normalized_response
 
-    async def _safe_provider_call(self, provider: Any, image_bytes: bytes, target_crop: Optional[str], location: Optional[Dict[str, Any]], language: str) -> Dict[str, Any]:
+    async def _safe_provider_call(
+        self,
+        provider: Any,
+        image_bytes: bytes,
+        target_crop: Optional[str],
+        location: Optional[Dict[str, Any]],
+        language: str,
+        local_hypothesis: Optional[Dict[str, Any]] = None
+    ) -> Dict[str, Any]:
         """Calls an external provider with a strict timeout and wraps result safely."""
         try:
             timeout_sec = 25.0
+            kwargs = {
+                "image_bytes": image_bytes,
+                "plant_name": target_crop,
+                "location": location,
+                "language": language
+            }
+            if hasattr(provider, "name") and provider.name == "gemini_vision" and local_hypothesis:
+                kwargs["local_hypothesis"] = local_hypothesis
+
             res = await asyncio.wait_for(
-                provider.diagnose(image_bytes=image_bytes, plant_name=target_crop, location=location, language=language),
+                provider.diagnose(**kwargs),
                 timeout=timeout_sec
             )
             return res.model_dump() if hasattr(res, "model_dump") else dict(res)

@@ -22,8 +22,9 @@ class GeminiVisionProvider(DiseaseDetectionProvider):
 
     GEMINI_MODELS = [
         "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent",
-        "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent",
-        "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent"
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent",
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent",
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent"
     ]
 
     def __init__(self):
@@ -37,7 +38,8 @@ class GeminiVisionProvider(DiseaseDetectionProvider):
         image_bytes: bytes,
         plant_name: Optional[str] = None,
         location: Optional[Dict[str, Any]] = None,
-        language: str = "en"
+        language: str = "en",
+        local_hypothesis: Optional[Dict[str, Any]] = None
     ) -> ProviderDiagnosisResult:
         self.total_calls += 1
         t0 = time.time()
@@ -57,24 +59,55 @@ class GeminiVisionProvider(DiseaseDetectionProvider):
         b64_img = base64.b64encode(image_bytes).decode("utf-8")
 
         prompt = (
-            "You are an expert agricultural botanist and plant pathologist.\n"
-            "Examine this plant/crop leaf or foliage image with high scientific precision.\n"
-            "Identify the exact plant species, botanical scientific name, and specific disease (or Healthy).\n"
+            "You are a premier world-class agricultural botanist and plant pathologist.\n"
+            "Analyze this crop foliage/leaf photograph with high scientific precision.\n\n"
+            "TASK 1 — BOTANICAL CROP IDENTIFICATION (CRITICAL DISCRIMINATION):\n"
+            "- Accurately identify the exact plant species and botanical scientific name.\n"
+            "- CEREAL & MONOCOT DISCRIMINATION: Pay extreme attention to distinguish between visually similar cereal crops:\n"
+            "  * Corn / Maize (Zea mays): Broad, wide blade (>3 cm), thick pale central midrib, wavy undulating margin.\n"
+            "  * Wheat (Triticum aestivum): Slender, narrow grass blade (1-2 cm), fine parallel venation, claw-like auricles clasping sheath.\n"
+            "  * Rice / Paddy (Oryza sativa): Rough scabrous texture, long acute ligule, erect blade.\n"
+            "  * Sugarcane (Saccharum officinarum): Very thick white midvein, micro-serrated margin, arching blade.\n"
+            "  * Other crops: Cotton, Soybean, Tomato, Potato, Chilli/Pepper, Onion, Mango, Grape, Banana, Rose, Papaya, Pomegranate, Citrus, etc.\n\n"
+            "TASK 2 — HEALTH STATUS & PATHOLOGY ASSESSMENT (HEALTHY vs. DISEASED):\n"
+            "- Examine the leaf surface meticulously for genuine active pathological lesions.\n"
+            "- If the leaf foliage is green and healthy without fungal pustules, necrotic spots, chlorotic halos, or powdery mildew "
+            "(even if natural shadows, surface dust, or mechanical tears exist), YOU MUST CLASSIFY AS HEALTHY: "
+            "set 'is_healthy': true and 'disease': 'Healthy Leaf (No Disease Detected)'.\n"
+            "- Do NOT diagnose healthy leaves as diseased.\n"
+            "- If real disease symptoms are present, specify the exact pathogen/disease name.\n\n"
+        )
+
+        if local_hypothesis:
+            lh_crop = local_hypothesis.get("crop", "Unknown")
+            lh_dis = local_hypothesis.get("disease", "Unknown")
+            lh_healthy = local_hypothesis.get("is_healthy", False)
+            prompt += (
+                f"TASK 3 — PRELIMINARY LOCAL MODEL CROSS-EXAMINATION:\n"
+                f"- A preliminary local model hypothesized: Crop='{lh_crop}', Condition='{lh_dis}' (Healthy: {lh_healthy}).\n"
+                f"- Validate whether this local hypothesis is correct or erroneous. "
+                f"Is the crop truly {lh_crop} or is it another species (e.g. Corn vs Wheat)? Is the condition actually {lh_dis} or is the leaf Healthy?\n"
+                f"- State clearly in 'agrees_with_local' (true/false) and 'validation_notes'.\n\n"
+            )
+
+        if plant_name and plant_name not in ["Crop", "General", "General Crop", "Unknown", "auto", "Auto-Detect"]:
+            prompt += f"Note: The farmer indicated this may be a '{plant_name}' crop.\n\n"
+
+        prompt += (
             "Return STRICT JSON ONLY (no markdown fences, raw JSON):\n"
             "{\n"
             '  "is_plant": true,\n'
-            '  "plant": "Exact crop name (e.g. Mango, Rice, Cotton, Sugarcane, Tomato, Potato, Corn, Wheat, Chilli, etc.)",\n'
+            '  "plant": "Exact crop name (e.g. Corn, Wheat, Mango, Rice, Cotton, Sugarcane, Tomato, etc.)",\n'
             '  "scientific_name": "Botanical Latin name",\n'
             '  "disease": "Specific disease name or \'Healthy Leaf (No Disease Detected)\'",\n'
             '  "disease_code": "snake_case_disease_code",\n'
             '  "confidence": 0.95,\n'
             '  "is_healthy": false,\n'
-            '  "symptoms": "Brief description of visible symptoms"\n'
+            '  "agrees_with_local": true,\n'
+            '  "validation_notes": "Detailed diagnostic notes validating or correcting the leaf health and crop species",\n'
+            '  "symptoms": "Brief description of visible leaf surface characteristics"\n'
             "}\n"
         )
-
-        if plant_name and plant_name not in ["Crop", "General", "General Crop", "Unknown", "auto", "Auto-Detect"]:
-            prompt += f"\nNote: The farmer indicates this may be a '{plant_name}' crop."
 
         payload = {
             "contents": [
@@ -93,7 +126,7 @@ class GeminiVisionProvider(DiseaseDetectionProvider):
             ],
             "generationConfig": {
                 "temperature": 0.1,
-                "maxOutputTokens": 300
+                "maxOutputTokens": 400
             }
         }
 
@@ -156,6 +189,11 @@ class GeminiVisionProvider(DiseaseDetectionProvider):
                                     ))
 
                             self.last_success_at = datetime.now(timezone.utc)
+                            raw_ref_meta = {
+                                "validation_notes": parsed.get("validation_notes", ""),
+                                "agrees_with_local": parsed.get("agrees_with_local", True),
+                                "symptoms": parsed.get("symptoms", "")
+                            }
                             return ProviderDiagnosisResult(
                                 provider=self.name,
                                 status="success",
@@ -165,6 +203,7 @@ class GeminiVisionProvider(DiseaseDetectionProvider):
                                 disease_code=disease_code,
                                 confidence=round(confidence, 3),
                                 is_healthy=is_healthy,
+                                raw_reference=json.dumps(raw_ref_meta),
                                 top_predictions=[
                                     PredictionCandidate(
                                         crop=plant,
@@ -172,7 +211,8 @@ class GeminiVisionProvider(DiseaseDetectionProvider):
                                         disease_code=disease_code,
                                         confidence=round(confidence, 3),
                                         is_healthy=is_healthy,
-                                        scientific_name=sci_name
+                                        scientific_name=sci_name,
+                                        symptoms_summary=parsed.get("symptoms")
                                     ),
                                     *alts
                                 ],

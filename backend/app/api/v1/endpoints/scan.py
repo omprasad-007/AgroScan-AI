@@ -23,7 +23,10 @@ from app.services.ai import orchestrator, ModelRegistry
 logger = logging.getLogger("agroscan")
 router = APIRouter()
 
-ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/webp", "image/jpg"]
+ALLOWED_MIME_TYPES = {
+    "image/jpeg", "image/png", "image/webp", "image/jpg",
+    "image/pjpeg", "image/x-png", "application/octet-stream", "binary/octet-stream"
+}
 ALLOWED_EXTENSIONS = {"jpg", "jpeg", "png", "webp"}
 MAX_FILE_SIZE_BYTES = settings.MAX_UPLOAD_SIZE_MB * 1024 * 1024
 
@@ -178,11 +181,11 @@ async def analyze_leaf(
     file: UploadFile = File(...),
     farm_id: Optional[str] = Form(None),
     target_crop: Optional[str] = Form(None),
-    temperature_c: float = Form(24.0),
-    humidity_pct: float = Form(78.0),
-    rainfall_mm: float = Form(5.0),
-    latitude: Optional[float] = Form(None),
-    longitude: Optional[float] = Form(None),
+    temperature_c: Optional[Any] = Form(None),
+    humidity_pct: Optional[Any] = Form(None),
+    rainfall_mm: Optional[Any] = Form(None),
+    latitude: Optional[Any] = Form(None),
+    longitude: Optional[Any] = Form(None),
     location_name: Optional[str] = Form(None),
     db: Session = Depends(get_db),
     current_user: Optional[User] = Depends(get_optional_current_user),
@@ -193,11 +196,13 @@ async def analyze_leaf(
     if file_ext not in ALLOWED_EXTENSIONS:
         file_ext = "jpg"
 
-    if file.content_type and file.content_type.lower() not in ALLOWED_MIME_TYPES:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid image format. Supported formats: JPEG, PNG, WEBP.",
-        )
+    if file.content_type:
+        c_type = file.content_type.lower()
+        if c_type not in ALLOWED_MIME_TYPES and file_ext not in ALLOWED_EXTENSIONS:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid image format. Supported formats: JPEG, PNG, WEBP.",
+            )
 
     contents = await file.read()
     if not contents:
@@ -225,9 +230,20 @@ async def analyze_leaf(
         message = validation.message_mr if language == "mr" else validation.message_en
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=message)
 
-    temp_c = max(-50.0, min(60.0, float(temperature_c)))
-    humidity = max(0.0, min(100.0, float(humidity_pct)))
-    rainfall = max(0.0, min(500.0, float(rainfall_mm)))
+    def parse_float_safe(val, default):
+        if val is None:
+            return default
+        try:
+            s = str(val).strip().lower()
+            if not s or s in ("null", "undefined", "none", "nan"):
+                return default
+            return float(s)
+        except (ValueError, TypeError):
+            return default
+
+    temp_c = max(-50.0, min(60.0, parse_float_safe(temperature_c, 24.0)))
+    humidity = max(0.0, min(100.0, parse_float_safe(humidity_pct, 78.0)))
+    rainfall = max(0.0, min(500.0, parse_float_safe(rainfall_mm, 5.0)))
     scan_id = f"scan_{uuid.uuid4().hex[:12]}"
     unique_filename = f"{uuid.uuid4().hex}.{file_ext}"
     os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
@@ -348,19 +364,19 @@ def get_prediction_history(
 
 @router.delete("/history")
 def clear_prediction_history(
+    scope: Optional[str] = Query(None),
     db: Session = Depends(get_db),
     current_user: Optional[User] = Depends(get_optional_current_user),
 ):
     """Permanently delete all scan prediction history and associated recommendations."""
-    if current_user and not settings.DEMO_MODE:
+    if scope == "all" or settings.DEMO_MODE or not current_user:
+        preds = db.query(ScanPrediction).all()
+    else:
         preds = db.query(ScanPrediction).filter(
             (ScanPrediction.user_id == current_user.id) |
             (ScanPrediction.user_id == "guest") |
             (ScanPrediction.user_id.is_(None))
         ).all()
-    else:
-        # In demo mode, guest mode, or unauthenticated: clear all scan predictions
-        preds = db.query(ScanPrediction).all()
 
     pred_ids = [p.id for p in preds]
     if pred_ids:

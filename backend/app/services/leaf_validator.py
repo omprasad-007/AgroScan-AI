@@ -136,13 +136,13 @@ class LeafValidator:
 
         # 4. Glare / Reflection Ratio (pixels > 250)
         glare_ratio = float(np.mean(gray > 250.0))
-        if glare_ratio > 0.35:
+        if glare_ratio > 0.50:
             issues.append("Excessive reflective glare or white background.")
 
         # 5. Sharpness via Laplacian Variance
         laplacian_var = cls._calculate_laplacian_variance(gray)
-        blur_score = min(1.0, laplacian_var / 60.0)
-        if laplacian_var < 8.0:
+        blur_score = min(1.0, laplacian_var / 50.0)
+        if laplacian_var < 4.0:
             issues.append("Image is too blurry / out of focus.")
 
         # Composite quality score
@@ -157,8 +157,8 @@ class LeafValidator:
         is_acceptable = (
             resolution_ok
             and brightness_ok
-            and laplacian_var >= 8.0
-            and quality_score >= (quality_threshold * 0.4)
+            and laplacian_var >= 4.0
+            and quality_score >= (quality_threshold * 0.3)
         )
 
         return ImageQualityResult(
@@ -404,7 +404,7 @@ class LeafValidator:
         # ------------------------------------------------------------------
 
         # Case A: Human Selfie / Portrait
-        if (skin_ratio > 0.12 and green_foliage_ratio < 0.10) or (skin_ratio > 0.25 and leaf_coverage_ratio < 0.20):
+        if (skin_ratio > 0.35 and green_foliage_ratio < 0.05) or (skin_ratio > 0.50 and leaf_coverage_ratio < 0.12):
             return LeafValidationResult(
                 is_plant=False,
                 is_leaf=False,
@@ -534,8 +534,8 @@ class LeafValidator:
         leaf_thresh = getattr(settings, "LEAF_VALIDATION_THRESHOLD", 0.70)
         # Require genuine leaf confidence and sufficient leaf blade visibility
         is_leaf_valid = (
-            leaf_confidence >= 0.28 and
-            (green_foliage_ratio >= 0.03 or leaf_coverage_ratio >= 0.06)
+            leaf_confidence >= 0.20 and
+            (green_foliage_ratio >= 0.02 or leaf_coverage_ratio >= 0.04)
         )
 
         if not is_leaf_valid:

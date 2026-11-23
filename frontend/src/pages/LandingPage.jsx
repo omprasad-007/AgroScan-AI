@@ -365,9 +365,9 @@ export const LandingPage = () => {
        * 2. HERO SECTION — VIBRANT ORANGE & MANROPE TYPOGRAPHY
        * ======================================================= */}
       <section className="relative overflow-hidden pt-12 sm:pt-20 pb-16 sm:pb-24">
-        {/* Warm Ambient Orbs */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[450px] bg-gradient-to-b from-agro-primary/10 via-agro-highlight/5 to-transparent blur-3xl pointer-events-none" />
-        <div className="absolute top-1/4 right-10 w-72 h-72 bg-agro-accent/5 rounded-full blur-3xl pointer-events-none" />
+        {/* Warm Ambient Orbs (GPU Layered) */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[450px] bg-gradient-to-b from-agro-primary/10 via-agro-highlight/5 to-transparent blur-2xl pointer-events-none [transform:translateZ(0)]" />
+        <div className="absolute top-1/4 right-10 w-72 h-72 bg-agro-accent/5 rounded-full blur-2xl pointer-events-none [transform:translateZ(0)]" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
 
@@ -554,6 +554,8 @@ export const LandingPage = () => {
                 <img
                   src={selectedCrop.imageUrl}
                   alt={selectedCrop.cropNameEn}
+                  loading="lazy"
+                  decoding="async"
                   className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-85"
                 />
 

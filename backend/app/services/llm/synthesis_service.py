@@ -6,6 +6,7 @@ with question-category specific templates in English and Marathi.
 
 from typing import Dict, Any, Optional
 from app.services.intent_service import AgriculturalIntent
+from app.knowledge.plants_data import get_plant_knowledge, PLANTS_KNOWLEDGE_BASE
 
 class SynthesisService:
     """Constructs strict evidence-grounded prompts and multi-template domain responses."""
@@ -120,6 +121,12 @@ class SynthesisService:
         plant_name = rag_data.get("plant_name") or "Crop"
         is_mr = language == "mr"
         q_clean = question.lower().strip()
+
+        if not plant_info:
+            if plant_name and plant_name not in ["Crop", "General"]:
+                plant_info = get_plant_knowledge(plant_name)
+            if not plant_info:
+                plant_info = get_plant_knowledge(question)
 
         # 1. Non-Agri / Math / Greetings
         if intent == AgriculturalIntent.GENERAL:
@@ -410,6 +417,21 @@ class SynthesisService:
                     f"- **Organic Base:** Incorporate 15-20 tonnes/ha well-rotted Farm Yard Manure (FYM) or vermicompost as basal application.\n"
                     f"- **Micronutrient Balance:** Correct Zinc, Boron, or Iron deficiencies with foliar chelates based on soil testing."
                 )
+            if is_mr:
+                return (
+                    "🧪 **संतुलित खत व्यवस्थापन (Fertilizer Management):**\n\n"
+                    "- **सेंद्रिय खत:** पिकाच्या लागवडीपूर्वी जमिनीत प्रति एकरी ५ ते १० टन चांगले कुजलेले शेणखत किंवा गांडूळ खत मिसळावे.\n"
+                    "- **मूलभूत पोषण (NPK):** पिकाच्या वाढीच्या टप्प्यानुसार नत्र (N), स्फुरद (P) आणि पालाश (K) खतांची संतुलित मात्रा द्यावी.\n"
+                    "- **सूक्ष्म अन्नद्रव्ये:** झिंक, बोरॉन आणि फेरसची कमतरता असल्यास फवारणीद्वारे सूक्ष्म अन्नद्रव्ये द्यावीत.\n\n"
+                    "विशिष्ट पिकाच्या अचूक खत मात्रेसाठी (उदा. ऊस, टोमॅटो, कापूस) पिकाचे नाव सांगा."
+                )
+            return (
+                "🧪 **Balanced Fertilizer & Crop Nutrition Guide:**\n\n"
+                "- **Organic Base:** Incorporate 5-10 tonnes/acre well-rotted Farm Yard Manure (FYM) or vermicompost as basal manure.\n"
+                "- **Primary Nutrients (NPK):** Supply balanced Nitrogen (N), Phosphorus (P), and Potassium (K) based on crop growth stages.\n"
+                "- **Micronutrients:** Apply foliar sprays of Zinc, Boron, or Iron chelates according to deficiency symptoms.\n\n"
+                "Please specify your crop (e.g. Tomato, Sugarcane, Cotton) for the exact split schedule."
+            )
 
         # 8. Harvesting & Post-Harvest
         if intent == AgriculturalIntent.HARVESTING:
@@ -525,6 +547,26 @@ class SynthesisService:
                     f"3. **Safety & Label Instructions:** {disease_info['safety_notes']}"
                 )
 
+        # 15b. General Disease Causes & Leaf Yellowing (when specific disease code is not isolated)
+        if intent == AgriculturalIntent.DISEASE_CAUSE:
+            if is_mr:
+                return (
+                    "🍂 **झाडाची पाने पिवळी पडण्याची प्रमुख कारणे व उपाय (Chlorosis & Yellowing):**\n\n"
+                    "1. **अन्नद्रव्यांची कमतरता:** मुख्यत्वे नत्र (Nitrogen), लोह (Iron) किंवा झिंकची कमतरता असल्यास हरितद्रव्य कमी होऊन पाने पिवळी पडतात.\n"
+                    "2. **पाण्याचा निचरा न होणे / जादा पाणी:** मुळांभोवती पाणी साचून राहिल्यास हवा खेळती राहत नाही, ज्यामुळे मुळे सडतात आणि पाने पिवळी पडतात.\n"
+                    "3. **रसशोषक किडींचा प्रादुर्भाव:** मावा, तुडतुडे, पांढरी माशी किंवा कोळी पानांतील अन्नरस शोषून घेतात.\n"
+                    "4. **जमिनीतील बुरशीजन्य रोग:** मूळकुज किंवा मर रोगामुळे मुळांचे कार्य थांबल्यास पाण्याचे व अन्नाचे वहन थांबते.\n\n"
+                    "💡 **उपाय:** शेतातील पाण्याचा निचरा सुधारा, माती परीक्षणानुसार नत्रयुक्त किंवा ग्रेड-२ सूक्ष्म अन्नद्रव्यांची फवारणी करा आणि पानांच्या मागील बाजूस किडींची पाहणी करा."
+                )
+            return (
+                "🍂 **Primary Causes of Leaf Yellowing (Chlorosis) & Recommended Actions:**\n\n"
+                "1. **Nutrient Deficiency (Nitrogen / Iron / Zinc):** Nitrogen deficiency causes older lower leaves to turn pale yellow. Iron deficiency causes yellowing between veins on tender new leaves.\n"
+                "2. **Poor Soil Drainage & Overwatering:** Saturated roots suffocate from lack of oxygen, impeding water and mineral transport.\n"
+                "3. **Sap-Sucking Pest Infestation:** Aphids, whiteflies, thrips, and mites suck vital cell sap from leaf undersides, draining chlorophyll.\n"
+                "4. **Root Rot / Soil Pathogens:** Fungal root rot impairs vascular flow, leading to wilting and yellowing.\n\n"
+                "💡 **Action Steps:** Ensure adequate soil aeration and drainage, apply balanced nitrogen and foliar micronutrient sprays, and scout for sucking pests."
+            )
+
         # 16. General Pests
         if intent in [AgriculturalIntent.PEST, AgriculturalIntent.PEST_MANAGEMENT]:
             if plant_info:
@@ -543,9 +585,111 @@ class SynthesisService:
 
         # 17. Default Agronomy Decision-Support Response
         if is_mr:
+            if plant_info:
+                cname = plant_info.get("common_name", plant_name)
+                sname = f" (*{plant_info.get('scientific_name')}*)" if plant_info.get("scientific_name") else ""
+                ptype = plant_info.get("plant_type", "शेती पीक")
+                temp = plant_info.get("temperature", "२०°C ते ३०°C")
+                soil = plant_info.get("soil", "चांगल्या निचऱ्याची सुपीक जमीन")
+                ph = plant_info.get("pH", "६.० ते ७.५")
+                irrig = plant_info.get("irrigation", "नियमित व आवश्यकतेनुसार ठिबक सिंचन करावे.")
+                fert = plant_info.get("fertilizer", "संतुलित NPK आणि लागवडीवेळी सेंद्रिय खताचा वापर करावा.")
+                pests = plant_info.get("pests", [])
+                diseases = plant_info.get("diseases", [])
+                prev = plant_info.get("prevention", "तण नियंत्रण, हवा खेळती ठेवणे आणि नियमित पाहणी.")
+                spc = plant_info.get("spacing", "वाणानुसार योग्य अंतर.")
+                harv = plant_info.get("harvesting", "पक्वतेनुसार वेळेवर काढणी.")
+                post_h = plant_info.get("post_harvest", "स्वच्छ व कोरड्या जागी साठवणूक.")
+                
+                pest_lines = "\n".join(f"  • {p}" for p in pests[:3]) if pests else "  • मावा, तुडतुडे व पाने खाणारी अळी"
+                dis_lines = "\n".join(f"  • {d}" for d in diseases[:3]) if diseases else "  • करपा, भुरी व मर रोग"
+
+                return (
+                    f"🌾 **AgroScan AI कृषी सल्लागार — {cname}{sname} सर्वसमावेशक व्यवस्थापन मार्गदर्शक:**\n\n"
+                    f"🌱 **पिकाची माहिती व अनुकूल वातावरण:**\n"
+                    f"- **पिकाचा प्रकार:** {ptype}\n"
+                    f"- **अनुकूल तापमान:** {temp}\n"
+                    f"- **जमीन व सामू (pH):** {soil} (सामू: {ph})\n\n"
+                    f"💧 **पाणी व सिंचन व्यवस्थापन:**\n"
+                    f"{irrig}\n\n"
+                    f"🧪 **खत व अन्नद्रव्य व्यवस्थापन (NPK & सूक्ष्म अन्नद्रव्ये):**\n"
+                    f"{fert}\n\n"
+                    f"🛡️ **एकात्मिक कीड व्यवस्थापन (IPM):**\n"
+                    f"{pest_lines}\n\n"
+                    f"🦠 **प्रमुख रोग व लक्षणे:**\n"
+                    f"{dis_lines}\n\n"
+                    f"🌿 **मशागत व प्रतिबंधात्मक उपाय:**\n"
+                    f"- **लागवड अंतर:** {spc}\n"
+                    f"- **रोगप्रतिबंधक उपाय:** {prev}\n\n"
+                    f"📦 **काढणी व साठवणूक:**\n"
+                    f"- **काढणीची योग्य वेळ:** {harv}\n"
+                    f"- **काढणीनंतरची साठवणूक:** {post_h}\n\n"
+                    f"💡 *आपल्याला या पिकातील एखाद्या विशिष्ट किडीबद्दल, फवारणीबद्दल किंवा खतांच्या वेळापत्रकाबद्दल सविस्तर माहिती हवी असल्यास चॅटमध्ये विचारू शकता.*"
+                )
             if plant_name and plant_name not in ["Crop", "General"]:
-                return f"🌾 **AgroScan AI कृषी सल्लागार ({plant_name}):**\n\n{plant_name} पिकाच्या निरोगी वाढीसाठी योग्य मशागत, पाण्याचा निचरा आणि संतुलित अन्नद्रव्य व्यवस्थापन आवश्यक आहे. विशिष्ट समस्या, कीड किंवा रोगाविषयी तपशील विचारू शकता."
+                return (
+                    f"🌾 **AgroScan AI कृषी सल्लागार ({plant_name}):**\n\n"
+                    f"{plant_name} पिकाच्या निरोगी वाढीसाठी योग्य मशागत, पाण्याचा निचरा आणि संतुलित अन्नद्रव्य व्यवस्थापन आवश्यक आहे.\n\n"
+                    f"📌 **शेतकऱ्यांसाठी शिफारसी:**\n"
+                    f"1. **तपासणी व निगा:** पानांवरील ठिपके, पिवळेपणा किंवा किडींचा प्रादुर्भाव नियमितपणे तपासा.\n"
+                    f"2. **पाणी व्यवस्थापन:** जमिनीत जास्त वेळ पाणी साचू देऊ नका; ठिबक सिंचनाचा वापर करा.\n"
+                    f"3. **संतुलित पोषण:** माती परीक्षणानुसार रासायनिक खतांसोबत शेणखत किंवा गांडूळ खताचा वापर करा.\n\n"
+                    f"कोणत्याही विशिष्ट कीड, रोग किंवा लक्षणाविषयी अधिक माहितीसाठी विचारू शकता."
+                )
             return "🌾 **AgroScan AI कृषी सल्लागार:**\n\nआपल्या शेतीविषयक प्रश्नासाठी, कृपया पिकाचे नाव आणि लक्षणे नमूद करा जेणेकरून आम्ही अचूक शास्त्रीय सल्ला देऊ शकू."
+
+        if plant_info:
+            cname = plant_info.get("common_name", plant_name)
+            sname = f" (*{plant_info.get('scientific_name')}*)" if plant_info.get("scientific_name") else ""
+            ptype = plant_info.get("plant_type", "Agricultural Crop")
+            temp = plant_info.get("temperature", "20°C to 30°C")
+            soil = plant_info.get("soil", "Well-drained fertile loam")
+            ph = plant_info.get("pH", "6.0 to 7.5")
+            clim = plant_info.get("climate", "Warm and temperate conditions")
+            rain = plant_info.get("rainfall", "Adequate moisture")
+            irrig = plant_info.get("irrigation", "Irrigate at regular intervals using drip irrigation.")
+            fert = plant_info.get("fertilizer", "Apply balanced basal NPK and organic compost.")
+            pests = plant_info.get("pests", [])
+            diseases = plant_info.get("diseases", [])
+            prev = plant_info.get("prevention", "Practice clean cultivation and crop rotation.")
+            spc = plant_info.get("spacing", "Standard row-to-row spacing.")
+            harv = plant_info.get("harvesting", "Harvest upon physiological maturity.")
+            post_h = plant_info.get("post_harvest", "Sort, grade, and store in cool, ventilated conditions.")
+            
+            pest_lines = "\n".join(f"  • {p}" for p in pests[:3]) if pests else "  • Sucking pests, aphids, and caterpillars"
+            dis_lines = "\n".join(f"  • {d}" for d in diseases[:3]) if diseases else "  • Blight, wilt, and leaf spot pathogens"
+
+            return (
+                f"🌾 **AgroScan AI Agronomist — Comprehensive Guide for {cname}{sname}:**\n\n"
+                f"🌱 **Crop Profile & Optimal Growth Conditions:**\n"
+                f"- **Crop Type:** {ptype}\n"
+                f"- **Optimal Temperature:** {temp}\n"
+                f"- **Soil & pH:** {soil} (pH: {ph})\n"
+                f"- **Climate & Rainfall:** {clim} | Annual Rainfall: {rain}\n\n"
+                f"💧 **Irrigation & Water Schedule:**\n"
+                f"{irrig}\n\n"
+                f"🧪 **Nutrient & Fertilizer Protocol:**\n"
+                f"{fert}\n\n"
+                f"🛡️ **Integrated Pest Management (IPM):**\n"
+                f"{pest_lines}\n\n"
+                f"🦠 **Major Diseases & Pathogen Monitoring:**\n"
+                f"{dis_lines}\n\n"
+                f"🌿 **Field Sanitation & Cultural Practices:**\n"
+                f"- **Recommended Spacing:** {spc}\n"
+                f"- **Preventive Care:** {prev}\n\n"
+                f"📦 **Harvesting & Post-Harvest Storage:**\n"
+                f"- **Maturity & Picking:** {harv}\n"
+                f"- **Post-Harvest Handling:** {post_h}\n\n"
+                f"💡 *Feel free to ask about specific leaf symptoms, pesticide dosages, or disease treatments for {cname}.*"
+            )
         if plant_name and plant_name not in ["Crop", "General"]:
-            return f"🌾 **AgroScan AI Agronomist ({plant_name}):**\n\nFor optimal {plant_name} health and yield, maintain balanced nutrition, appropriate irrigation intervals, and regular scouting. Feel free to describe any specific leaf or growth symptoms."
+            return (
+                f"🌾 **AgroScan AI Agronomist ({plant_name}):**\n\n"
+                f"For optimal {plant_name} health and yield, maintain balanced nutrition, appropriate irrigation intervals, and regular scouting.\n\n"
+                f"📌 **Key Recommendations:**\n"
+                f"1. **Scouting:** Regularly inspect leaf undersides and stems for early signs of chlorosis, blight, or pest infestation.\n"
+                f"2. **Irrigation:** Ensure well-drained soil conditions and avoid prolonged water stagnation around roots.\n"
+                f"3. **Nutrition:** Apply balanced basal NPK supplemented with well-composted organic manure and micronutrient sprays during active growth.\n\n"
+                f"Feel free to describe any specific leaf or growth symptoms to receive a targeted treatment protocol."
+            )
         return "🌾 **AgroScan AI Agronomist:**\n\nPlease mention your specific crop name and symptoms so we can provide tailored agronomic recommendations."

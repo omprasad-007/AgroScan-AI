@@ -58,17 +58,32 @@ export const HistoryPage = () => {
   useEffect(() => {
     fetchHistory();
     const handleScanEvent = () => fetchHistory();
+    const handleClearEvent = () => {
+      setHistory([]);
+      try {
+        localStorage.setItem(STORAGE_KEY, '[]');
+      } catch {
+        // storage fallback
+      }
+    };
     window.addEventListener('agroscan_scan_completed', handleScanEvent);
-    return () => window.removeEventListener('agroscan_scan_completed', handleScanEvent);
+    window.addEventListener('agroscan_history_cleared', handleClearEvent);
+    return () => {
+      window.removeEventListener('agroscan_scan_completed', handleScanEvent);
+      window.removeEventListener('agroscan_history_cleared', handleClearEvent);
+    };
   }, [fetchHistory]);
 
   const handleDeleteItem = async (id) => {
     try {
       const updated = history.filter(item => item.id !== id);
       setHistory(updated);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      } catch {
+        // storage fallback
+      }
       await api.delete('/predictions/' + id).catch(() => {});
-      window.dispatchEvent(new Event('agroscan_scan_completed'));
     } catch (e) {
       console.error('Failed to delete item:', e);
     }
@@ -79,15 +94,21 @@ export const HistoryPage = () => {
       setLoading(true);
       setShowClearModal(false);
       setHistory([]);
-      localStorage.removeItem(STORAGE_KEY);
-      localStorage.setItem(STORAGE_KEY, '[]');
       try {
-        await api.delete('/predictions/history');
+        localStorage.removeItem(STORAGE_KEY);
+        localStorage.setItem(STORAGE_KEY, '[]');
+      } catch {
+        // storage fallback
+      }
+
+      try {
+        await api.delete('/predictions/history?scope=all');
       } catch (apiErr) {
         console.warn('Backend clear history notification:', apiErr);
       }
+
       setHistory([]);
-      window.dispatchEvent(new Event('agroscan_scan_completed'));
+      window.dispatchEvent(new Event('agroscan_history_cleared'));
     } catch (e) {
       console.error('Failed to clear history:', e);
     } finally {

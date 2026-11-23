@@ -15,10 +15,18 @@ const STEPS = [
 const errorMessage = (error) => {
   const status = error.response?.status;
   const detail = error.response?.data?.detail;
+
+  if (Array.isArray(detail)) {
+    const msgs = detail.map(d => d.msg || d.message).filter(Boolean);
+    if (msgs.length > 0) return msgs.join('. ');
+    return 'Invalid photo parameters. Please capture or select a clear leaf photo.';
+  }
+
   const serverMessage = typeof detail === 'string' ? detail : detail?.message;
 
   if (status === 400) return serverMessage || 'This photo cannot be analysed yet. Please capture a close, well-lit photo of one affected leaf.';
   if (status === 413) return 'The image is too large. Please use a photo smaller than 10 MB.';
+  if (status === 422) return serverMessage || 'Invalid image or upload parameters. Please capture or select a clear leaf photo.';
   if (status === 429) return 'High scan demand. Please wait a moment and try again.';
   if (status === 503) return 'Diagnosis service is initializing. Please retry in a few seconds.';
   if (!error.response || error.code === 'ECONNABORTED') return 'Could not reach diagnostic service. Check your connection or use the offline consensus option.';
@@ -81,27 +89,31 @@ export const AnalysisPage = () => {
     try {
       const formData = new FormData();
       formData.append('file', imageFile);
-      if (location.state?.farmId) formData.append('farm_id', location.state.farmId);
+      if (location.state?.farmId) formData.append('farm_id', String(location.state.farmId));
       if (location.state?.targetCrop && location.state.targetCrop !== 'auto') {
-        formData.append('target_crop', location.state.targetCrop);
+        formData.append('target_crop', String(location.state.targetCrop));
       }
-      if (location.state?.weather?.temperature_c !== undefined) {
-        formData.append('temperature_c', location.state.weather.temperature_c);
-      }
-      if (location.state?.weather?.humidity_pct !== undefined) {
-        formData.append('humidity_pct', location.state.weather.humidity_pct);
-      }
-      if (location.state?.weather?.rainfall_mm !== undefined) {
-        formData.append('rainfall_mm', location.state.weather.rainfall_mm);
-      }
-      if (location.state?.weather?.latitude !== undefined) {
-        formData.append('latitude', location.state.weather.latitude);
-      }
-      if (location.state?.weather?.longitude !== undefined) {
-        formData.append('longitude', location.state.weather.longitude);
-      }
-      if (location.state?.weather?.location) {
-        formData.append('location_name', location.state.weather.location);
+
+      const w = location.state?.weather;
+      if (w) {
+        if (w.temperature_c != null && !isNaN(Number(w.temperature_c))) {
+          formData.append('temperature_c', String(w.temperature_c));
+        }
+        if (w.humidity_pct != null && !isNaN(Number(w.humidity_pct))) {
+          formData.append('humidity_pct', String(w.humidity_pct));
+        }
+        if (w.rainfall_mm != null && !isNaN(Number(w.rainfall_mm))) {
+          formData.append('rainfall_mm', String(w.rainfall_mm));
+        }
+        if (w.latitude != null && !isNaN(Number(w.latitude))) {
+          formData.append('latitude', String(w.latitude));
+        }
+        if (w.longitude != null && !isNaN(Number(w.longitude))) {
+          formData.append('longitude', String(w.longitude));
+        }
+        if (w.location && typeof w.location === 'string' && w.location.trim()) {
+          formData.append('location_name', w.location.trim());
+        }
       }
 
       const response = await api.post('/predictions/analyze', formData, {

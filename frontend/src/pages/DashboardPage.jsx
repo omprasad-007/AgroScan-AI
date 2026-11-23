@@ -150,28 +150,7 @@ export const DashboardPage = () => {
     refreshDashboardData();
 
     const handleScanEvent = () => refreshDashboardData();
-    window.addEventListener('agroscan_scan_completed', handleScanEvent);
-    window.addEventListener('storage', handleScanEvent);
-
-    return () => {
-      window.removeEventListener('agroscan_scan_completed', handleScanEvent);
-      window.removeEventListener('storage', handleScanEvent);
-    };
-  }, [refreshDashboardData]);
-
-  useEffect(() => {
-    detectLocalWeather(lang)
-      .then(w => {
-        if (w) setLocalWeather(w);
-      })
-      .catch(() => {});
-  }, [lang]);
-
-  const handleResetData = async () => {
-    try {
-      setShowResetModal(false);
-      localStorage.removeItem(STORAGE_KEY);
-      localStorage.setItem(STORAGE_KEY, '[]');
+    const handleClearEvent = () => {
       setRecentScans([]);
       setAnalytics({
         total_predictions: 0,
@@ -186,11 +165,59 @@ export const DashboardPage = () => {
         }
       });
       try {
-        await api.delete('/predictions/history');
+        localStorage.setItem(STORAGE_KEY, '[]');
+      } catch {
+        // storage fallback
+      }
+    };
+
+    window.addEventListener('agroscan_scan_completed', handleScanEvent);
+    window.addEventListener('agroscan_history_cleared', handleClearEvent);
+    window.addEventListener('storage', handleScanEvent);
+
+    return () => {
+      window.removeEventListener('agroscan_scan_completed', handleScanEvent);
+      window.removeEventListener('agroscan_history_cleared', handleClearEvent);
+      window.removeEventListener('storage', handleScanEvent);
+    };
+  }, [refreshDashboardData, t]);
+
+  useEffect(() => {
+    detectLocalWeather(lang)
+      .then(w => {
+        if (w) setLocalWeather(w);
+      })
+      .catch(() => {});
+  }, [lang]);
+
+  const handleResetData = async () => {
+    try {
+      setShowResetModal(false);
+      try {
+        localStorage.removeItem(STORAGE_KEY);
+        localStorage.setItem(STORAGE_KEY, '[]');
+      } catch {
+        // storage fallback
+      }
+      setRecentScans([]);
+      setAnalytics({
+        total_predictions: 0,
+        healthy_count: 0,
+        diseased_count: 0,
+        average_confidence: 0,
+        weather_risk_summary: {
+          overall_risk_level: 'None',
+          current_temp: 26.5,
+          current_humidity: 65.0,
+          alert: t('dashboard.blank_desc') || 'Your dashboard is currently blank. Upload or capture a plant leaf photo to generate live diagnostics.'
+        }
+      });
+      try {
+        await api.delete('/predictions/history?scope=all');
       } catch (e) {
         console.warn('Backend reset call notice:', e);
       }
-      window.dispatchEvent(new Event('agroscan_scan_completed'));
+      window.dispatchEvent(new Event('agroscan_history_cleared'));
     } catch (e) {
       console.error('Failed to reset dashboard data:', e);
     }

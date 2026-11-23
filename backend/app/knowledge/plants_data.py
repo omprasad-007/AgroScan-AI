@@ -849,6 +849,38 @@ def get_plant_data(plant_name: str) -> Optional[Dict[str, Any]]:
             
     # Alias / variant mappings
     aliases = {
+        # Devanagari Crop Names
+        "ऊस": "sugarcane",
+        "उस": "sugarcane",
+        "उसासाठी": "sugarcane",
+        "टोमॅटो": "tomato",
+        "टोमॅटोसाठी": "tomato",
+        "मिरची": "chilli",
+        "कापूस": "cotton",
+        "कपाशी": "cotton",
+        "सोयाबीन": "soybean",
+        "कांदा": "onion",
+        "बटाटा": "potato",
+        "आंबा": "mango",
+        "द्राक्ष": "grape",
+        "द्राक्षे": "grape",
+        "डाळिंब": "pomegranate",
+        "गहू": "wheat",
+        "भात": "rice",
+        "धान": "rice",
+        "मका": "maize",
+        "वांगी": "brinjal",
+        "वांगे": "brinjal",
+        "हळद": "turmeric",
+        "पेरू": "guava",
+        "पपई": "papaya",
+        "भुईमूग": "groundnut",
+        "हरभरा": "chickpea",
+        "तूर": "pigeonpea" ,
+        "केळी": "banana",
+        "लसूण": "garlic",
+        "कलिंगड": "watermelon",
+        # Transliteration & English
         "paddy": "rice",
         "rice": "rice",
         "corn": "maize",
@@ -936,3 +968,6 @@ def list_all_plants() -> List[Dict[str, str]]:
         }
         for k, v in PLANTS_KNOWLEDGE_BASE.items()
     ]
+
+# Compatibility alias
+get_plant_knowledge = get_plant_data

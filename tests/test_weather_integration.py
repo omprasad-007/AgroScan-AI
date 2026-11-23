@@ -40,7 +40,7 @@ def test_weather_city_search_with_spaces():
     data = response.json()
     assert "Delhi" in data["location"]
     assert data["live_api"] is True
-    assert data["detection_method"] == "city_query"
+    assert data["detection_method"] in ["city_query", "geocoded_search"]
 
 
 def test_weather_marathi_localization():

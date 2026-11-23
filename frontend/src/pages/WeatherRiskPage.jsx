@@ -113,12 +113,6 @@ export const WeatherRiskPage = () => {
         setWindSpeed(live.wind_speed_kmh || 6.0);
         evaluateRisk(live.temperature_c, live.humidity_pct, live.rainfall_mm, crop);
       }
-
-      // Load 5-day forecast
-      const fcData = await fetchWeatherForecast(locationQuery || selectedDistrict, lat, lon, lang);
-      if (fcData && fcData.forecast) {
-        setForecastList(fcData.forecast);
-      }
     } catch (err) {
       console.warn('Weather detection error:', err);
       if (err.message === 'PERMISSION_DENIED') {
@@ -136,6 +130,16 @@ export const WeatherRiskPage = () => {
       }
     } finally {
       setDetectingGps(false);
+    }
+
+    // Load 5-day forecast independently so forecast issues NEVER trigger GPS error messages
+    try {
+      const fcData = await fetchWeatherForecast(locationQuery || selectedDistrict, lat, lon, lang);
+      if (fcData && fcData.forecast) {
+        setForecastList(fcData.forecast);
+      }
+    } catch (fcErr) {
+      console.warn('Forecast fetch warning:', fcErr);
     }
   }, [crop, evaluateRisk, lang, selectedDistrict]);
 
