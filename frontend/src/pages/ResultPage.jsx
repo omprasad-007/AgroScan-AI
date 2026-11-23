@@ -111,7 +111,13 @@ export const ResultPage = () => {
   const rawDisease = scan.disease || scan.disease_name || 'Healthy';
   const rawSeverity = scan.severity || scan.severity_level || 'Normal';
 
-  const isHealthyScan = scan.status === 'HEALTHY' || Boolean(scan.healthy_status) || rawDisease.toLowerCase().includes('healthy') || rawSeverity.toLowerCase().includes('healthy');
+  const isHealthyScan = (
+    scan.status === 'HEALTHY' ||
+    Boolean(scan.healthy_status) ||
+    rawDisease.toLowerCase() === 'healthy' ||
+    rawDisease.toLowerCase().includes('healthy leaf') ||
+    rawDisease.toLowerCase().includes('no disease')
+  );
 
   const displayCrop = translateCrop(rawCrop);
   const displayDisease = isHealthyScan ? 'Healthy Leaf (No Disease Detected)' : translateDisease(rawDisease);

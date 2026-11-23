@@ -295,6 +295,10 @@ class HybridPredictionOrchestrator:
                 "severity_level": "None (Healthy)",
                 "confidence": calibrated_conf
             }
+        else:
+            # If a pathogen / disease is detected, severity must be pathological (e.g. Mild), never healthy
+            if "healthy" in str(severity_result.get("severity_level", "")).lower():
+                severity_result["severity_level"] = "Mild"
 
         w_params = weather_params or {"temperature_c": 24.0, "humidity_pct": 78.0, "rainfall_mm": 5.0}
         weather_result = WeatherRiskService.calculate_risk(

@@ -13,10 +13,20 @@ def get_dashboard_analytics(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    preds = db.query(ScanPrediction).filter(ScanPrediction.user_id == current_user.id).all()
+    preds = db.query(ScanPrediction).filter(
+        (ScanPrediction.user_id == current_user.id) |
+        (ScanPrediction.user_id == "guest") |
+        (ScanPrediction.user_id.is_(None))
+    ).all()
     
     total = len(preds)
-    healthy = sum(1 for p in preds if "Healthy" in p.disease_name)
+    healthy = sum(
+        1 for p in preds
+        if p.status == "HEALTHY"
+        or "healthy" in (p.disease_name or "").lower()
+        or "healthy" in (p.disease_code or "").lower()
+        or "no disease" in (p.disease_name or "").lower()
+    )
     diseased = total - healthy
     
     avg_conf = round(sum(p.confidence_score for p in preds) / total, 4) if total > 0 else 0.92
@@ -26,8 +36,14 @@ def get_dashboard_analytics(
     severity_map = {"Healthy": 0, "Mild": 0, "Moderate": 0, "Severe": 0}
 
     for p in preds:
-        dist_map[p.disease_name] = dist_map.get(p.disease_name, 0) + 1
-        sev = p.severity_level if p.severity_level in severity_map else "Mild"
+        is_h = (
+            p.status == "HEALTHY"
+            or "healthy" in (p.disease_name or "").lower()
+            or "healthy" in (p.disease_code or "").lower()
+        )
+        group_name = "Healthy Plants" if is_h else p.disease_name
+        dist_map[group_name] = dist_map.get(group_name, 0) + 1
+        sev = "Healthy" if is_h else (p.severity_level if p.severity_level in severity_map else "Mild")
         severity_map[sev] += 1
 
     # Return genuine blank state if no scans exist

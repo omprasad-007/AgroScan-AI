@@ -108,9 +108,8 @@ export const DashboardPage = () => {
       } else {
         const healthy = allScans.filter(s => {
           const disease = (s.disease_name || s.disease || '').toLowerCase();
-          const sev = (s.severity_level || s.severity || '').toLowerCase();
           const status = (s.status || '').toUpperCase();
-          return status === 'HEALTHY' || Boolean(s.healthy_status) || disease.includes('healthy') || sev === 'healthy';
+          return status === 'HEALTHY' || Boolean(s.healthy_status) || disease === 'healthy' || disease.includes('healthy leaf') || disease.includes('no disease');
         }).length;
         const diseased = total - healthy;
         
@@ -232,9 +231,14 @@ export const DashboardPage = () => {
   const isHealthyScan = useCallback((s) => {
     if (!s) return false;
     const disease = (s.disease_name || s.disease || '').toLowerCase();
-    const sev = (s.severity_level || s.severity || '').toLowerCase();
     const status = (s.status || '').toUpperCase();
-    return status === 'HEALTHY' || Boolean(s.healthy_status) || disease.includes('healthy') || sev === 'healthy';
+    return (
+      status === 'HEALTHY' ||
+      Boolean(s.healthy_status) ||
+      disease === 'healthy' ||
+      disease.includes('healthy leaf') ||
+      disease.includes('no disease')
+    );
   }, []);
 
   const displayedScans = useMemo(() => {

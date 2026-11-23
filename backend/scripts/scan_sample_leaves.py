@@ -39,10 +39,9 @@ def generate_leaf_image(crop_type: str, disease_type: str) -> bytes:
 
         if disease_type == "early_blight":
             # Concentric target-board rings with chlorotic halo
-            cv2.circle(img, (150, 160), 20, (15, 55, 120), -1)
-            cv2.circle(img, (150, 160), 26, (35, 160, 205), 3)
-            cv2.circle(img, (200, 190), 14, (15, 50, 110), -1)
-            cv2.circle(img, (200, 190), 19, (35, 160, 205), 2)
+            for cx, cy, rad in [(150, 160, 24), (200, 190, 18), (170, 130, 14)]:
+                cv2.circle(img, (cx, cy), rad, (15, 55, 120), -1)
+                cv2.circle(img, (cx, cy), rad + 5, (35, 160, 205), 3)
 
     elif crop_type == "Potato":
         # Broad ovate potato leaf
@@ -53,10 +52,9 @@ def generate_leaf_image(crop_type: str, disease_type: str) -> bytes:
 
         if disease_type == "late_blight":
             # Water-soaked irregular dark lesions
-            cv2.ellipse(img, (145, 155), (28, 18), 20, 0, 360, (18, 40, 75), -1)
-            cv2.ellipse(img, (205, 205), (22, 14), -15, 0, 360, (18, 40, 75), -1)
-            # Pale fungal mold edge
-            cv2.ellipse(img, (145, 155), (32, 22), 20, 0, 360, (180, 200, 210), 2)
+            cv2.ellipse(img, (145, 155), (32, 22), 20, 0, 360, (18, 40, 75), -1)
+            cv2.ellipse(img, (205, 205), (28, 18), -15, 0, 360, (18, 40, 75), -1)
+            cv2.ellipse(img, (145, 155), (36, 26), 20, 0, 360, (180, 200, 210), 2)
 
     elif crop_type == "Corn":
         # Long linear lanceolate leaf with parallel venation
@@ -68,9 +66,9 @@ def generate_leaf_image(crop_type: str, disease_type: str) -> bytes:
             cv2.line(img, pt1, pt2, (55, 195, 75), 2)
 
         if disease_type == "common_rust":
-            # Small cinnamon-brown oval pustules
-            for px, py in [(140, 150), (165, 170), (190, 195), (150, 180), (210, 210)]:
-                cv2.ellipse(img, (px, py), (6, 3), 25, 0, 360, (15, 45, 160), -1)
+            # Dense cinnamon-brown oval pustules
+            for px, py in [(130, 140), (145, 155), (165, 170), (185, 190), (200, 205), (150, 175), (175, 150), (210, 215)]:
+                cv2.ellipse(img, (px, py), (9, 5), 25, 0, 360, (15, 45, 160), -1)
 
     elif crop_type == "Grape":
         # Broad lobed palmate grape leaf
@@ -84,8 +82,8 @@ def generate_leaf_image(crop_type: str, disease_type: str) -> bytes:
 
         if disease_type == "powdery_mildew":
             # Powdery white patches on leaf surface
-            cv2.circle(img, (150, 160), 25, (210, 220, 225), -1)
-            cv2.circle(img, (200, 175), 20, (205, 215, 220), -1)
+            cv2.circle(img, (150, 160), 28, (210, 220, 225), -1)
+            cv2.circle(img, (200, 175), 24, (205, 215, 220), -1)
 
     elif crop_type == "Pepper":
         # Smooth entire margin healthy bell pepper leaf
@@ -101,10 +99,10 @@ def generate_leaf_image(crop_type: str, disease_type: str) -> bytes:
         cv2.line(img, (95, 245), (255, 105), (50, 185, 65), 3)
 
         if disease_type == "anthracnose":
-            # Small circular dark brown spots with sunken appearance
-            for spot in [(140, 180), (175, 150), (200, 130), (160, 170)]:
-                cv2.circle(img, spot, 8, (15, 35, 80), -1)
-                cv2.circle(img, spot, 11, (30, 120, 160), 1)
+            # Conspicuous dark brown sunken spots
+            for spot in [(140, 180), (175, 150), (200, 130), (160, 170), (185, 165), (130, 195)]:
+                cv2.circle(img, spot, 12, (15, 35, 80), -1)
+                cv2.circle(img, spot, 15, (30, 120, 160), 2)
 
     # Encode to high-quality JPEG
     _, encoded = cv2.imencode(".jpg", img, [cv2.IMWRITE_JPEG_QUALITY, 94])

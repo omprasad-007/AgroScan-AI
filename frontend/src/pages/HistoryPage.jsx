@@ -120,9 +120,14 @@ export const HistoryPage = () => {
   const isHealthyItem = (item) => {
     if (!item) return false;
     const disease = (item.disease_name || item.disease || '').toLowerCase();
-    const sev = (item.severity_level || item.severity || '').toLowerCase();
     const status = (item.status || '').toUpperCase();
-    return status === 'HEALTHY' || Boolean(item.healthy_status) || disease.includes('healthy') || sev === 'healthy';
+    return (
+      status === 'HEALTHY' ||
+      Boolean(item.healthy_status) ||
+      disease === 'healthy' ||
+      disease.includes('healthy leaf') ||
+      disease.includes('no disease')
+    );
   };
 
   const safeHistory = Array.isArray(history) ? history : [];

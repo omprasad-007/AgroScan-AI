@@ -126,7 +126,12 @@ def format_prediction_response(
         disease_name=prediction.disease_name,
         disease_code=prediction.disease_code,
         disease_category=meta.get("disease_category", "Foliar Pathology"),
-        healthy_status="healthy" in prediction.disease_code.lower(),
+        healthy_status=(
+            prediction.status == "HEALTHY"
+            or "healthy" in (prediction.disease_code or "").lower()
+            or "healthy" in (prediction.disease_name or "").lower()
+            or "no disease" in (prediction.disease_name or "").lower()
+        ),
         confidence=prediction.confidence_score,
         prediction_confidence=prediction.confidence_score,
         confidence_interpretation=(
